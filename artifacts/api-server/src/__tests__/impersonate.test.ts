@@ -1,21 +1,28 @@
 /**
  * impersonate.test.ts
  *
- * Integration tests for the superadmin impersonation feature.
+ * Tests for the superadmin impersonation feature covering:
  *
- * Coverage:
- *   1. requireSuperAdmin middleware — 401 for unauthenticated, 403 for admin-tier
- *   2. POST /admin/impersonate — blocks nested, self, and superadmin targets
- *   3. POST /admin/impersonate — success: session fields set, audit log written
- *   4. POST /admin/impersonate/exit — clears session fields, writes audit end event
- *   5. effectiveIdentityMiddleware — returns impersonated identity during impersonation
- *   6. requireHomebaseAuth — passes for impersonated homebase audience
- *   7. isSuperAdmin — used to block impersonating another superadmin
+ *  UNIT (pure helpers):
+ *    - isSuperAdmin, requireSuperAdmin, effectiveIdentityMiddleware,
+ *      requireHomebaseAuth (impersonation-aware variant)
+ *
+ *  ROUTE-LEVEL (HTTP via supertest):
+ *    - POST /admin/impersonate success path
+ *    - POST /admin/impersonate: nested, self, superadmin-target, unauthenticated, non-superadmin
+ *    - POST /admin/impersonate: audit write failure → 500, session NOT modified
+ *    - POST /admin/impersonate: session save failure after audit → 500, audit was written
+ *    - POST /admin/impersonate/exit success path
+ *    - POST /admin/impersonate/exit: not impersonating → 200 no-op
+ *    - POST /admin/impersonate/exit: audit write failure → 500, session unchanged
+ *    - POST /admin/impersonate/exit: session save failure after audit → 500
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import express, { type Express } from 'express';
+import request from 'supertest';
 
-// ── Mock @workspace/db ────────────────────────────────────────────────────────
+// ── DB mock (must be hoisted before dynamic imports) ─────────────────────────
 
 vi.mock('@workspace/db', () => {
   const valuesFn = vi.fn().mockResolvedValue(undefined);
@@ -27,170 +34,117 @@ vi.mock('@workspace/db/schema', () => ({
   trailOsAuditLogTable: { _: { name: 'trail_os_audit_log' } },
 }));
 
+// Lazy-import after mocks are registered
+async function getDb() {
+  const { db } = await import('@workspace/db');
+  return db;
+}
+async function getTable() {
+  const { trailOsAuditLogTable } = await import('@workspace/db/schema');
+  return trailOsAuditLogTable;
+}
+
+// ── Unit tests — pure helpers ─────────────────────────────────────────────────
+
 import {
   isSuperAdmin,
-  isAdmin,
   requireSuperAdmin,
   requireHomebaseAuth,
   effectiveIdentityMiddleware,
 } from '../middlewares/requireAuth.js';
 
-// ── isSuperAdmin ──────────────────────────────────────────────────────────────
-
 describe('isSuperAdmin', () => {
   const SA = 'super@transitiontrails.org';
+  beforeEach(() => { process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = SA; });
+  afterEach(()  => { delete process.env['TRAIL_OS_SUPERADMIN_EMAILS']; });
 
-  beforeEach(() => {
-    process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = SA;
-  });
-  afterEach(() => {
-    delete process.env['TRAIL_OS_SUPERADMIN_EMAILS'];
-  });
-
-  it('returns true for a superadmin email', () => {
+  it('returns true for listed email (case-insensitive)', () => {
     expect(isSuperAdmin(SA)).toBe(true);
-  });
-
-  it('is case-insensitive', () => {
     expect(isSuperAdmin(SA.toUpperCase())).toBe(true);
   });
-
-  it('returns false for a non-superadmin email', () => {
-    expect(isSuperAdmin('admin@transitiontrails.org')).toBe(false);
+  it('returns false for unlisted email', () => {
+    expect(isSuperAdmin('other@transitiontrails.org')).toBe(false);
   });
-
-  it('returns false when TRAIL_OS_SUPERADMIN_EMAILS is empty', () => {
+  it('returns false when env var is empty', () => {
     process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = '';
     expect(isSuperAdmin(SA)).toBe(false);
   });
-
-  it('supports a comma-separated list', () => {
-    process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = `${SA}, other@transitiontrails.org`;
-    expect(isSuperAdmin('other@transitiontrails.org')).toBe(true);
+  it('supports comma-separated list', () => {
+    process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = `${SA}, second@transitiontrails.org`;
+    expect(isSuperAdmin('second@transitiontrails.org')).toBe(true);
   });
 });
 
-// ── requireSuperAdmin ─────────────────────────────────────────────────────────
-
 describe('requireSuperAdmin middleware', () => {
-  const SA    = 'super@transitiontrails.org';
-  const ADMIN = 'admin@transitiontrails.org';
+  const SA = 'super@transitiontrails.org';
+  beforeEach(() => { process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = SA; });
+  afterEach(()  => { delete process.env['TRAIL_OS_SUPERADMIN_EMAILS']; });
 
-  function makeReqRes(opts: {
-    email?: string;
-  }) {
-    const req: Record<string, unknown> = {
-      session: { googleEmail: opts.email },
-    };
-    const res = {
-      status: vi.fn().mockReturnThis(),
-      json:   vi.fn().mockReturnThis(),
-    };
+  function invoke(email?: string) {
+    const req = { session: { googleEmail: email } };
+    const res = { status: vi.fn().mockReturnThis(), json: vi.fn().mockReturnThis() };
     const next = vi.fn();
+    requireSuperAdmin(req as never, res as never, next);
     return { req, res, next };
   }
 
-  beforeEach(() => {
-    process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = SA;
-  });
-  afterEach(() => {
-    delete process.env['TRAIL_OS_SUPERADMIN_EMAILS'];
-  });
-
   it('returns 401 when there is no session email', () => {
-    const { req, res, next } = makeReqRes({});
-    requireSuperAdmin(req as never, res as never, next);
+    const { res, next } = invoke(undefined);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(next).not.toHaveBeenCalled();
   });
-
-  it('returns 403 for an admin-tier user (not superadmin)', () => {
-    const { req, res, next } = makeReqRes({ email: ADMIN });
-    requireSuperAdmin(req as never, res as never, next);
+  it('returns 403 for non-superadmin email', () => {
+    const { res, next } = invoke('admin@transitiontrails.org');
     expect(res.status).toHaveBeenCalledWith(403);
     expect(next).not.toHaveBeenCalled();
   });
-
-  it('calls next() for a superadmin email', () => {
-    const { req, res, next } = makeReqRes({ email: SA });
-    requireSuperAdmin(req as never, res as never, next);
+  it('calls next() for superadmin email', () => {
+    const { res, next } = invoke(SA);
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
   });
 });
 
-// ── effectiveIdentityMiddleware ───────────────────────────────────────────────
-
 describe('effectiveIdentityMiddleware', () => {
-  function makeReqRes(session: Record<string, unknown>) {
+  function invoke(session: Record<string, unknown>) {
     const req = { session };
     const res = { locals: {} as Record<string, unknown> };
     const next = vi.fn();
-    return { req, res, next };
+    effectiveIdentityMiddleware(req as never, res as never, next);
+    return { res, next };
   }
 
-  it('uses real session identity when not impersonating', () => {
-    const { req, res, next } = makeReqRes({
-      googleEmail:    'staff@transitiontrails.org',
-      googleAudience: null,
-    });
-    effectiveIdentityMiddleware(req as never, res as never, next);
-    expect(res.locals['effectiveEmail']).toBe('staff@transitiontrails.org');
+  it('uses real email/audience when not impersonating', () => {
+    const { res } = invoke({ googleEmail: 'staff@x.org', googleAudience: null });
+    expect(res.locals['effectiveEmail']).toBe('staff@x.org');
     expect(res.locals['effectiveAudience']).toBeNull();
-    expect(next).toHaveBeenCalled();
   });
-
-  it('uses impersonated identity when impersonating', () => {
-    const { req, res, next } = makeReqRes({
-      googleEmail:          'super@transitiontrails.org',
-      googleAudience:       null,
-      impersonatedEmail:    'learner@transitiontrails.org',
-      impersonatedAudience: 'learner',
+  it('uses impersonated email/audience when impersonating', () => {
+    const { res } = invoke({
+      googleEmail: 'super@x.org', googleAudience: null,
+      impersonatedEmail: 'learner@x.org', impersonatedAudience: 'learner',
     });
-    effectiveIdentityMiddleware(req as never, res as never, next);
-    expect(res.locals['effectiveEmail']).toBe('learner@transitiontrails.org');
+    expect(res.locals['effectiveEmail']).toBe('learner@x.org');
     expect(res.locals['effectiveAudience']).toBe('learner');
-    expect(next).toHaveBeenCalled();
   });
-
-  it('uses impersonated audience "coach" correctly', () => {
-    const { req, res, next } = makeReqRes({
-      googleEmail:          'super@transitiontrails.org',
-      googleAudience:       null,
-      impersonatedEmail:    'coach@transitiontrails.org',
-      impersonatedAudience: 'coach',
+  it('handles coach audience', () => {
+    const { res } = invoke({
+      googleEmail: 'super@x.org', googleAudience: null,
+      impersonatedEmail: 'coach@x.org', impersonatedAudience: 'coach',
     });
-    effectiveIdentityMiddleware(req as never, res as never, next);
     expect(res.locals['effectiveAudience']).toBe('coach');
   });
-
-  it('uses impersonated audience "volunteer" correctly', () => {
-    const { req, res, next } = makeReqRes({
-      googleEmail:          'super@transitiontrails.org',
-      googleAudience:       null,
-      impersonatedEmail:    'vol@transitiontrails.org',
-      impersonatedAudience: 'volunteer',
+  it('handles volunteer audience', () => {
+    const { res } = invoke({
+      googleEmail: 'super@x.org', googleAudience: null,
+      impersonatedEmail: 'vol@x.org', impersonatedAudience: 'volunteer',
     });
-    effectiveIdentityMiddleware(req as never, res as never, next);
     expect(res.locals['effectiveAudience']).toBe('volunteer');
-  });
-
-  it('returns null effectiveAudience for staff impersonating a staff user', () => {
-    const { req, res, next } = makeReqRes({
-      googleEmail:          'super@transitiontrails.org',
-      googleAudience:       null,
-      impersonatedEmail:    'staff2@transitiontrails.org',
-      impersonatedAudience: null,
-    });
-    effectiveIdentityMiddleware(req as never, res as never, next);
-    expect(res.locals['effectiveAudience']).toBeNull();
   });
 });
 
-// ── requireHomebaseAuth ───────────────────────────────────────────────────────
-
-describe('requireHomebaseAuth — impersonation aware', () => {
-  function makeReqRes(session: Record<string, unknown>, effectiveAudience: string | null) {
+describe('requireHomebaseAuth — impersonation-aware', () => {
+  function invoke(session: Record<string, unknown>, effectiveAudience: string | null) {
     const req = { session };
     const res = {
       locals: { effectiveAudience } as Record<string, unknown>,
@@ -198,134 +152,319 @@ describe('requireHomebaseAuth — impersonation aware', () => {
       json:   vi.fn().mockReturnThis(),
     };
     const next = vi.fn();
-    return { req, res, next };
+    requireHomebaseAuth(req as never, res as never, next);
+    return { res, next };
   }
 
-  it('returns 401 when there is no real session email', () => {
-    const { req, res, next } = makeReqRes({ googleEmail: undefined }, 'learner');
-    requireHomebaseAuth(req as never, res as never, next);
+  it('401 when no real session email', () => {
+    const { res, next } = invoke({}, 'learner');
     expect(res.status).toHaveBeenCalledWith(401);
     expect(next).not.toHaveBeenCalled();
   });
-
-  it('returns 403 when effective audience is null (staff, no homebase)', () => {
-    const { req, res, next } = makeReqRes({ googleEmail: 'staff@transitiontrails.org' }, null);
-    requireHomebaseAuth(req as never, res as never, next);
+  it('403 when effective audience is null', () => {
+    const { res, next } = invoke({ googleEmail: 'staff@x.org' }, null);
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(next).not.toHaveBeenCalled();
   });
-
-  it('calls next() when superadmin is impersonating a learner (effectiveAudience=learner)', () => {
-    const { req, res, next } = makeReqRes(
-      { googleEmail: 'super@transitiontrails.org', googleAudience: null },
-      'learner',
+  it('passes for impersonated learner', () => {
+    const { next } = invoke(
+      { googleEmail: 'super@x.org', googleAudience: null }, 'learner',
     );
-    requireHomebaseAuth(req as never, res as never, next);
-    expect(next).toHaveBeenCalled();
-    expect(res.status).not.toHaveBeenCalled();
-  });
-
-  it('calls next() when superadmin is impersonating a coach (effectiveAudience=coach)', () => {
-    const { req, res, next } = makeReqRes(
-      { googleEmail: 'super@transitiontrails.org', googleAudience: null },
-      'coach',
-    );
-    requireHomebaseAuth(req as never, res as never, next);
     expect(next).toHaveBeenCalled();
   });
-
-  it('calls next() when superadmin is impersonating a volunteer (effectiveAudience=volunteer)', () => {
-    const { req, res, next } = makeReqRes(
-      { googleEmail: 'super@transitiontrails.org', googleAudience: null },
-      'volunteer',
+  it('passes for impersonated coach', () => {
+    const { next } = invoke(
+      { googleEmail: 'super@x.org', googleAudience: null }, 'coach',
     );
-    requireHomebaseAuth(req as never, res as never, next);
     expect(next).toHaveBeenCalled();
   });
-
-  it('returns 403 for team audience (team is not a homebase data audience)', () => {
-    const { req, res, next } = makeReqRes(
-      { googleEmail: 'team@transitiontrails.org', googleAudience: 'team' },
-      'team',
+  it('passes for impersonated volunteer', () => {
+    const { next } = invoke(
+      { googleEmail: 'super@x.org', googleAudience: null }, 'volunteer',
     );
-    requireHomebaseAuth(req as never, res as never, next);
+    expect(next).toHaveBeenCalled();
+  });
+  it('403 for team audience (not a homebase data audience)', () => {
+    const { res } = invoke({ googleEmail: 'team@x.org', googleAudience: 'team' }, 'team');
     expect(res.status).toHaveBeenCalledWith(403);
   });
 });
 
-// ── Impersonation constraint checks ──────────────────────────────────────────
-// Tests for the business logic guards inside the route handler.
-// We test the helpers directly rather than making HTTP requests.
+// ── Route-level HTTP tests ────────────────────────────────────────────────────
+// Each test builds a minimal Express app with a fake session middleware so we
+// can control session state and save() behavior, then exercises the actual
+// route handler over HTTP.
 
-describe('Impersonation guard: isSuperAdmin blocks superadmin targets', () => {
-  const SA1 = 'super1@transitiontrails.org';
+const SA    = 'super@transitiontrails.org';
+const SA2   = 'super2@transitiontrails.org';
+const TARGET = 'learner@transitiontrails.org';
+
+/** Build a test Express app with a controlled session. */
+function buildApp(opts: {
+  /** Fields pre-loaded in the session before the request. */
+  session?: Record<string, unknown>;
+  /** If provided, save() will call cb(err) on the nth call (1-indexed). */
+  saveFailOnCall?: number;
+} = {}): { app: Express; sessionStore: Record<string, unknown>; saveCalls: Error[] } {
+  const sessionStore: Record<string, unknown> = { googleEmail: SA, ...(opts.session ?? {}) };
+  const saveCalls: Error[] = [];
+  let saveCallCount = 0;
+
+  const app = express();
+  app.use(express.json());
+
+  // Fake session middleware — exposes a controllable save()
+  app.use((req, _res, next) => {
+    (req as never as { session: Record<string, unknown> }).session = {
+      ...sessionStore,
+      save: (cb: (err?: Error | null) => void) => {
+        saveCallCount++;
+        const shouldFail = opts.saveFailOnCall != null && saveCallCount === opts.saveFailOnCall;
+        if (shouldFail) {
+          const err = new Error('Session store unavailable');
+          saveCalls.push(err);
+          // Sync the in-memory session to store for non-failing calls
+          cb(err);
+        } else {
+          // Sync in-memory modifications to store
+          const s = (req as never as { session: Record<string, unknown> }).session;
+          for (const k of Object.keys(s)) {
+            if (k !== 'save') sessionStore[k] = s[k];
+          }
+          // Also handle deletions
+          for (const k of Object.keys(sessionStore)) {
+            if (!(k in s) || s[k] === undefined) delete sessionStore[k];
+          }
+          cb(null);
+        }
+      },
+    };
+    next();
+  });
+
+  // requireSuperAdmin gate
+  app.use(requireSuperAdmin);
+
+  // Dynamic import-based router (can't use static import due to mock timing)
+  // We use a lazy route registration trick
+  app.use(async (req, res, next) => {
+    const { default: impersonateRouter } = await import('../routes/impersonate.js');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (impersonateRouter as any)(req, res, next);
+  });
+
+  return { app, sessionStore, saveCalls };
+}
+
+describe('POST /admin/impersonate — route-level', () => {
+  const SA = 'super@transitiontrails.org';
   const SA2 = 'super2@transitiontrails.org';
+  const TARGET = 'learner@transitiontrails.org';
 
   beforeEach(() => {
-    process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = `${SA1}, ${SA2}`;
+    process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = `${SA}, ${SA2}`;
   });
   afterEach(() => {
     delete process.env['TRAIL_OS_SUPERADMIN_EMAILS'];
+    vi.clearAllMocks();
   });
 
-  it('both superadmin emails are detected', () => {
-    expect(isSuperAdmin(SA1)).toBe(true);
-    expect(isSuperAdmin(SA2)).toBe(true);
+  it('unauthenticated → 401', async () => {
+    const { app } = buildApp({ session: { googleEmail: undefined } });
+    const res = await request(app)
+      .post('/admin/impersonate')
+      .send({ targetEmail: TARGET, targetAudience: 'learner' });
+    expect(res.status).toBe(401);
   });
 
-  it('a regular admin is not a superadmin', () => {
-    expect(isSuperAdmin('admin@transitiontrails.org')).toBe(false);
+  it('non-superadmin → 403', async () => {
+    const { app } = buildApp({ session: { googleEmail: 'admin@transitiontrails.org' } });
+    const res = await request(app)
+      .post('/admin/impersonate')
+      .send({ targetEmail: TARGET, targetAudience: 'learner' });
+    expect(res.status).toBe(403);
+  });
+
+  it('nested impersonation → 409', async () => {
+    const { app } = buildApp({
+      session: {
+        googleEmail: SA,
+        impersonatedEmail: TARGET,
+        originalSuperadminEmail: SA,
+      },
+    });
+    const res = await request(app)
+      .post('/admin/impersonate')
+      .send({ targetEmail: 'other@transitiontrails.org' });
+    expect(res.status).toBe(409);
+  });
+
+  it('self-impersonation → 400', async () => {
+    const { app } = buildApp();
+    const res = await request(app)
+      .post('/admin/impersonate')
+      .send({ targetEmail: SA });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('self_impersonation');
+  });
+
+  it('impersonating another superadmin → 403', async () => {
+    const { app } = buildApp();
+    const res = await request(app)
+      .post('/admin/impersonate')
+      .send({ targetEmail: SA2 });
+    expect(res.status).toBe(403);
+    expect(res.body.error).toBe('target_is_superadmin');
+  });
+
+  it('missing targetEmail → 400', async () => {
+    const { app } = buildApp();
+    const res = await request(app).post('/admin/impersonate').send({});
+    expect(res.status).toBe(400);
+  });
+
+  it('success → 200, session has impersonation fields, audit written', async () => {
+    const { app, sessionStore } = buildApp();
+    const db = await getDb();
+    const table = await getTable();
+
+    const res = await request(app)
+      .post('/admin/impersonate')
+      .send({ targetEmail: TARGET, targetName: 'A Learner', targetAudience: 'learner' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+    expect(res.body.impersonatedAs).toBe(TARGET);
+    expect(res.body.audience).toBe('learner');
+
+    // Session was persisted with impersonation fields
+    expect(sessionStore['impersonatedEmail']).toBe(TARGET);
+    expect(sessionStore['impersonatedAudience']).toBe('learner');
+    expect(sessionStore['originalSuperadminEmail']).toBe(SA);
+
+    // Audit record was written before the session
+    expect(db.insert).toHaveBeenCalledWith(table);
+  });
+
+  it('audit write failure → 500, session NOT modified', async () => {
+    const { app, sessionStore } = buildApp();
+    const db = await getDb();
+    // Make the insert().values() reject
+    const valuesFn = vi.fn().mockRejectedValueOnce(new Error('DB down'));
+    vi.mocked(db.insert).mockReturnValueOnce({ values: valuesFn } as never);
+
+    const res = await request(app)
+      .post('/admin/impersonate')
+      .send({ targetEmail: TARGET, targetAudience: 'learner' });
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe('audit_log_failed');
+
+    // Session must NOT have impersonation fields — audit wrote first, save never ran
+    expect(sessionStore['impersonatedEmail']).toBeUndefined();
+    expect(sessionStore['originalSuperadminEmail']).toBeUndefined();
+  });
+
+  it('session save failure after successful audit → 500', async () => {
+    // saveFailOnCall: 1 — the very first save() call fails (the one in the start route)
+    const { app, sessionStore } = buildApp({ saveFailOnCall: 1 });
+
+    const res = await request(app)
+      .post('/admin/impersonate')
+      .send({ targetEmail: TARGET, targetAudience: 'learner' });
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe('session_save_failed');
+    // The sessionStore was not updated because the save failed
+    expect(sessionStore['impersonatedEmail']).toBeUndefined();
   });
 });
 
-// ── Audit log insert shape for impersonation events ───────────────────────────
+describe('POST /admin/impersonate/exit — route-level', () => {
+  const SA = 'super@transitiontrails.org';
+  const TARGET = 'learner@transitiontrails.org';
 
-describe('impersonation audit log insert shape', () => {
-  it('impersonation_start row has correct event type and actor/target', async () => {
-    const { db } = await import('@workspace/db');
-    const { trailOsAuditLogTable } = await import('@workspace/db/schema');
-
-    await db.insert(trailOsAuditLogTable).values({
-      eventType:   'impersonation_start',
-      actorEmail:  'super@transitiontrails.org',
-      targetEmail: 'learner@transitiontrails.org',
-      audience:    'learner',
-      ipAddress:   '127.0.0.1',
-      metadata:    { displayName: 'A Learner', targetAudience: 'learner' },
-    });
-
-    expect(db.insert).toHaveBeenCalledWith(trailOsAuditLogTable);
+  beforeEach(() => {
+    process.env['TRAIL_OS_SUPERADMIN_EMAILS'] = SA;
+  });
+  afterEach(() => {
+    delete process.env['TRAIL_OS_SUPERADMIN_EMAILS'];
+    vi.clearAllMocks();
   });
 
-  it('impersonation_end row has correct event type and null audience', async () => {
-    const { db } = await import('@workspace/db');
-    const { trailOsAuditLogTable } = await import('@workspace/db/schema');
-
-    await db.insert(trailOsAuditLogTable).values({
-      eventType:   'impersonation_end',
-      actorEmail:  'super@transitiontrails.org',
-      targetEmail: 'learner@transitiontrails.org',
-      audience:    null,
-      ipAddress:   '127.0.0.1',
-      metadata:    { exitedFrom: null },
-    });
-
-    expect(db.insert).toHaveBeenCalledWith(trailOsAuditLogTable);
+  it('not currently impersonating → 200 no-op', async () => {
+    const { app, sessionStore } = buildApp({ session: { googleEmail: SA } });
+    const res = await request(app).post('/admin/impersonate/exit').send({});
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+    // Session unchanged
+    expect(sessionStore['impersonatedEmail']).toBeUndefined();
   });
 
-  it('impersonation_action row captures method, path, and bodyFields', async () => {
-    const { db } = await import('@workspace/db');
-    const { trailOsAuditLogTable } = await import('@workspace/db/schema');
+  it('success → 200, session fields cleared, audit end event written', async () => {
+    const { app, sessionStore } = buildApp({
+      session: {
+        googleEmail: SA,
+        impersonatedEmail:       TARGET,
+        impersonatedAudience:    'learner',
+        impersonatedDisplayName: 'A Learner',
+        originalSuperadminEmail: SA,
+      },
+    });
+    const db = await getDb();
+    const table = await getTable();
 
-    await db.insert(trailOsAuditLogTable).values({
-      eventType:   'impersonation_action',
-      actorEmail:  'super@transitiontrails.org',
-      targetEmail: 'learner@transitiontrails.org',
-      audience:    'learner',
-      ipAddress:   '127.0.0.1',
-      metadata:    { method: 'POST', path: '/homebase/learner/stone', bodyFields: 'date' },
+    const res = await request(app).post('/admin/impersonate/exit').send({});
+
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+
+    // Session fields must be cleared
+    expect(sessionStore['impersonatedEmail']).toBeUndefined();
+    expect(sessionStore['impersonatedAudience']).toBeUndefined();
+    expect(sessionStore['originalSuperadminEmail']).toBeUndefined();
+
+    // Audit end event was written
+    expect(db.insert).toHaveBeenCalledWith(table);
+  });
+
+  it('audit write failure → 500, session NOT cleared (still impersonating)', async () => {
+    const { app, sessionStore } = buildApp({
+      session: {
+        googleEmail: SA,
+        impersonatedEmail:       TARGET,
+        impersonatedAudience:    'learner',
+        originalSuperadminEmail: SA,
+      },
+    });
+    const db = await getDb();
+    const valuesFn = vi.fn().mockRejectedValueOnce(new Error('DB down'));
+    vi.mocked(db.insert).mockReturnValueOnce({ values: valuesFn } as never);
+
+    const res = await request(app).post('/admin/impersonate/exit').send({});
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe('audit_log_failed');
+
+    // Session MUST still have impersonation fields — exit was rejected
+    expect(sessionStore['impersonatedEmail']).toBe(TARGET);
+    expect(sessionStore['originalSuperadminEmail']).toBe(SA);
+  });
+
+  it('session save failure after audit → 500', async () => {
+    // First save() call in the exit route (the clear + save) fails
+    const { app } = buildApp({
+      session: {
+        googleEmail: SA,
+        impersonatedEmail:       TARGET,
+        impersonatedAudience:    'learner',
+        originalSuperadminEmail: SA,
+      },
+      saveFailOnCall: 1,
     });
 
-    expect(db.insert).toHaveBeenCalledWith(trailOsAuditLogTable);
+    const res = await request(app).post('/admin/impersonate/exit').send({});
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe('session_save_failed');
   });
 });

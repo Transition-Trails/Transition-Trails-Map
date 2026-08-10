@@ -3,24 +3,23 @@
  *
  * Superadmin impersonation — lets a superadmin view Trail OS as any user.
  *
- * Routes (all require requireSuperAdmin middleware applied at mount time):
+ * Routes (requireSuperAdmin middleware is applied at mount time in index.ts):
  *   POST /admin/impersonate         — start impersonating a target user
  *   POST /admin/impersonate/exit    — stop impersonating, restore real session
  *
- * Audit log:
- *   impersonation_start  — written on POST /admin/impersonate  (BLOCKING — aborts on failure)
- *   impersonation_end    — written on POST /admin/impersonate/exit  (best-effort)
+ * Audit ordering — both events are BLOCKING success gates:
  *
- * What impersonation does:
- *   Writes four session fields (impersonatedEmail, impersonatedAudience,
- *   impersonatedDisplayName, originalSuperadminEmail).  The effectiveIdentityMiddleware
- *   propagates these to res.locals so every route reads the impersonated identity.
- *   The /me and /auth/homebase/status routes overlay these for the frontend.
- *   All access-control checks (requireStaff / requireAdmin / requireSuperAdmin)
- *   continue to use the REAL session (googleEmail, googleGroups) so the
- *   superadmin retains their own permissions throughout.
+ *   START:  (1) write impersonation_start FIRST, (2) then save session.
+ *           If the audit write fails → 500, nothing was persisted, clean state.
+ *           If the session save then fails → 500, an orphaned audit record exists
+ *           (impersonation that never became active) — logged prominently.
  *
- * Constraints enforced here:
+ *   EXIT:   (1) write impersonation_end FIRST, (2) then clear & save session.
+ *           If the audit write fails → 500, session is unchanged (still impersonating).
+ *           If the session save then fails → 500 with critical log.
+ *           In both failure cases the exit has NOT succeeded from the caller's perspective.
+ *
+ * Security constraints:
  *   - Superadmin-only (requireSuperAdmin applied at mount)
  *   - Cannot impersonate another superadmin
  *   - Cannot impersonate yourself
@@ -35,6 +34,20 @@ import { logger } from '../lib/logger';
 
 const router = Router();
 
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+function getIp(req: import('express').Request): string | null {
+  return (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim()
+    ?? req.socket?.remoteAddress
+    ?? null;
+}
+
+function sessionSave(req: import('express').Request): Promise<void> {
+  return new Promise((resolve, reject) =>
+    req.session.save(err => (err ? reject(err) : resolve())),
+  );
+}
+
 // ── POST /admin/impersonate ───────────────────────────────────────────────────
 
 router.post('/admin/impersonate', async (req, res) => {
@@ -44,7 +57,7 @@ router.post('/admin/impersonate', async (req, res) => {
   if (req.session.impersonatedEmail) {
     res.status(409).json({
       error:   'already_impersonating',
-      message: `You are already viewing the platform as ${req.session.impersonatedEmail}. Exit first before starting a new impersonation.`,
+      message: `You are already viewing the platform as ${req.session.impersonatedEmail}. Exit first.`,
     });
     return;
   }
@@ -62,82 +75,40 @@ router.post('/admin/impersonate', async (req, res) => {
 
   const normalizedTarget = targetEmail.trim().toLowerCase();
 
-  // Block impersonating yourself
   if (normalizedTarget === superadminEmail.toLowerCase()) {
-    res.status(400).json({
-      error:   'self_impersonation',
-      message: 'You cannot impersonate yourself.',
-    });
+    res.status(400).json({ error: 'self_impersonation', message: 'You cannot impersonate yourself.' });
     return;
   }
 
-  // Block impersonating another superadmin
   if (isSuperAdmin(normalizedTarget)) {
-    res.status(403).json({
-      error:   'target_is_superadmin',
-      message: 'Superadmin accounts cannot be impersonated.',
-    });
+    res.status(403).json({ error: 'target_is_superadmin', message: 'Superadmin accounts cannot be impersonated.' });
     return;
   }
 
-  // Validate audience
   const VALID_AUDIENCES = ['learner', 'coach', 'volunteer', 'team'] as const;
   type ValidAudience = typeof VALID_AUDIENCES[number];
   const audience: ValidAudience | null =
-    VALID_AUDIENCES.includes(targetAudience as ValidAudience)
-      ? (targetAudience as ValidAudience)
-      : null;
+    VALID_AUDIENCES.includes(targetAudience as ValidAudience) ? (targetAudience as ValidAudience) : null;
 
   const displayName =
-    typeof targetName === 'string' && targetName.trim()
-      ? targetName.trim()
-      : normalizedTarget;
+    typeof targetName === 'string' && targetName.trim() ? targetName.trim() : normalizedTarget;
 
-  // Set impersonation session fields
-  req.session.impersonatedEmail       = normalizedTarget;
-  req.session.impersonatedAudience    = audience;
-  req.session.impersonatedDisplayName = displayName;
-  req.session.originalSuperadminEmail = superadminEmail;
+  const ip = getIp(req);
 
-  // Persist session
-  try {
-    await new Promise<void>((resolve, reject) =>
-      req.session.save(err => (err ? reject(err) : resolve())),
-    );
-  } catch (sessionErr) {
-    logger.error({ sessionErr }, 'impersonate: session save failed');
-    // Clear the in-memory fields we just set (session wasn't saved)
-    delete req.session.impersonatedEmail;
-    delete req.session.impersonatedAudience;
-    delete req.session.impersonatedDisplayName;
-    delete req.session.originalSuperadminEmail;
-    res.status(500).json({ error: 'session_save_failed' });
-    return;
-  }
-
-  // Blocking audit write — abort impersonation if audit cannot be recorded
-  const ip =
-    (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim()
-    ?? req.socket.remoteAddress
-    ?? null;
-
+  // ── Step 1: Write audit record FIRST ────────────────────────────────────────
+  // Writing before saving the session means a failure here leaves the session
+  // unchanged — no rollback required.
   try {
     await db.insert(trailOsAuditLogTable).values({
       eventType:   'impersonation_start',
       actorEmail:  superadminEmail,
       targetEmail: normalizedTarget,
-      audience:    audience,
+      audience,
       ipAddress:   ip,
       metadata:    { displayName, targetAudience: audience ?? 'staff' },
     });
   } catch (auditErr) {
-    // Roll back: clear session fields and re-save
-    delete req.session.impersonatedEmail;
-    delete req.session.impersonatedAudience;
-    delete req.session.impersonatedDisplayName;
-    delete req.session.originalSuperadminEmail;
-    await new Promise<void>(resolve => req.session.save(() => resolve()));
-    logger.error({ auditErr }, 'impersonate: audit log write failed — impersonation aborted');
+    logger.error({ auditErr }, 'impersonate: audit write failed — impersonation aborted, session unchanged');
     res.status(500).json({
       error:   'audit_log_failed',
       message: 'Could not record impersonation in audit log. Impersonation aborted to preserve audit trail integrity.',
@@ -145,17 +116,28 @@ router.post('/admin/impersonate', async (req, res) => {
     return;
   }
 
-  logger.info(
-    { superadmin: superadminEmail, target: normalizedTarget, audience },
-    'impersonate: impersonation started',
-  );
+  // ── Step 2: Persist impersonation fields to session ──────────────────────────
+  req.session.impersonatedEmail       = normalizedTarget;
+  req.session.impersonatedAudience    = audience;
+  req.session.impersonatedDisplayName = displayName;
+  req.session.originalSuperadminEmail = superadminEmail;
 
-  res.json({
-    ok:             true,
-    impersonatedAs: normalizedTarget,
-    audience,
-    displayName,
-  });
+  try {
+    await sessionSave(req);
+  } catch (sessionErr) {
+    // Audit record exists but session could not be saved — orphaned audit entry.
+    // Impersonation did not become active. Log prominently.
+    logger.error(
+      { sessionErr, superadmin: superadminEmail, target: normalizedTarget },
+      'impersonate: CRITICAL — audit written but session save failed; impersonation not active',
+    );
+    res.status(500).json({ error: 'session_save_failed', message: 'Session could not be saved after audit was recorded.' });
+    return;
+  }
+
+  logger.info({ superadmin: superadminEmail, target: normalizedTarget, audience }, 'impersonate: started');
+
+  res.json({ ok: true, impersonatedAs: normalizedTarget, audience, displayName });
 });
 
 // ── POST /admin/impersonate/exit ──────────────────────────────────────────────
@@ -165,34 +147,15 @@ router.post('/admin/impersonate/exit', async (req, res) => {
   const impersonatedEmail = req.session.impersonatedEmail;
 
   if (!impersonatedEmail) {
-    // Not currently impersonating — no-op
     res.json({ ok: true, message: 'Not currently impersonating.' });
     return;
   }
 
-  // Clear impersonation fields
-  delete req.session.impersonatedEmail;
-  delete req.session.impersonatedAudience;
-  delete req.session.impersonatedDisplayName;
-  delete req.session.originalSuperadminEmail;
+  const ip = getIp(req);
 
-  try {
-    await new Promise<void>((resolve, reject) =>
-      req.session.save(err => (err ? reject(err) : resolve())),
-    );
-  } catch (sessionErr) {
-    logger.error({ sessionErr }, 'impersonate/exit: session save failed');
-    res.status(500).json({ error: 'session_save_failed' });
-    return;
-  }
-
-  const ip =
-    (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim()
-    ?? req.socket.remoteAddress
-    ?? null;
-
-  // Best-effort audit write — exit always succeeds even if audit fails,
-  // since rolling back here would leave the superadmin stuck impersonating.
+  // ── Step 1: Write audit record FIRST (success gate) ─────────────────────────
+  // If the audit write fails the exit is rejected — session remains unchanged.
+  // This guarantees every successful exit has an audit record.
   try {
     await db.insert(trailOsAuditLogTable).values({
       eventType:   'impersonation_end',
@@ -203,13 +166,32 @@ router.post('/admin/impersonate/exit', async (req, res) => {
       metadata:    { exitedFrom: req.headers['referer'] ?? null },
     });
   } catch (auditErr) {
-    logger.error({ auditErr }, 'impersonate/exit: audit log write failed for end event');
+    logger.error({ auditErr }, 'impersonate/exit: audit write failed — exit rejected, session unchanged');
+    res.status(500).json({
+      error:   'audit_log_failed',
+      message: 'Could not record impersonation end in audit log. Exit rejected to preserve audit trail integrity.',
+    });
+    return;
   }
 
-  logger.info(
-    { superadmin: superadminEmail, target: impersonatedEmail },
-    'impersonate: impersonation ended',
-  );
+  // ── Step 2: Clear impersonation session fields ───────────────────────────────
+  delete req.session.impersonatedEmail;
+  delete req.session.impersonatedAudience;
+  delete req.session.impersonatedDisplayName;
+  delete req.session.originalSuperadminEmail;
+
+  try {
+    await sessionSave(req);
+  } catch (sessionErr) {
+    logger.error(
+      { sessionErr, superadmin: superadminEmail, target: impersonatedEmail },
+      'impersonate/exit: CRITICAL — audit end written but session clear failed; session may still show impersonation',
+    );
+    res.status(500).json({ error: 'session_save_failed', message: 'Session could not be cleared after audit was recorded.' });
+    return;
+  }
+
+  logger.info({ superadmin: superadminEmail, target: impersonatedEmail }, 'impersonate: ended');
 
   res.json({ ok: true });
 });
