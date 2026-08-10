@@ -32,3 +32,4 @@ export * from "./timeLogs";
 export * from "./volunteerProfiles";
 export * from "./coachProfiles";
 export * from "./auditLog";
+export * from "./slackUserTokens";

@@ -5,22 +5,18 @@
  * Rendered inside HomebaseShell — no Sidebar/Topbar/ContextBar.
  *
  * Layout:
- *   ─ ThisMonthBand     (hours + merch progress, collapsible, full width)
- *   ─ LogTimeRow        (always visible — primary amber CTA, the one amber CTA on the page)
- *   ─ WaysToHelpCard    (unassigned queue, full width)
- *   ─ SquadGrid-like    (specialty card + record process)
- *   ─ 2-col grid:
- *       Left:  VolunteerCasesCard · ShareablesCard
- *       Right: GrowthCard
+ *   ─ ThisMonthBand
+ *   ─ LogTimeRow       (primary amber CTA)
+ *   ─ WaysToHelpCard
+ *   ─ SpecialtyCard + RecordProcessCard (2-col)
+ *   ─ [Cases + Shareables] | [Growth] (2-col)
+ *   ─ CoordinatorCard  (coordinator contact, full width, bottom)
  *
- * Right People panel: VolunteerPeoplePanel (coordinator contact)
- *
- * Amber CTA rule: LogTimeRow is primary (amber). All other buttons are secondary,
- * disabled, or linked — no competing amber CTAs.
+ * Right rail: SlimSlackPanel (wired in HomebaseShell)
  */
 
 import { Link } from "wouter";
-import { FileText } from "lucide-react";
+import { FileText, MessageSquare, Hash, Heart } from "lucide-react";
 import { HomebaseShell }        from "@/components/layout/HomebaseShell";
 import { LogTimeRow }           from "@/components/homebase/LogTimeRow";
 import { ThisMonthBand }        from "@/components/homebase/ThisMonthBand";
@@ -28,7 +24,6 @@ import { VolunteerCasesCard }   from "@/components/homebase/VolunteerCasesCard";
 import { WaysToHelpCard }       from "@/components/homebase/WaysToHelpCard";
 import { GrowthCard }           from "@/components/homebase/GrowthCard";
 import { ShareablesCard }       from "@/components/homebase/ShareablesCard";
-import { VolunteerPeoplePanel } from "@/components/homebase/VolunteerPeoplePanel";
 import {
   useVolunteerMonth,
   useVolunteerCases,
@@ -38,7 +33,8 @@ import {
   useVolunteerCoordinator,
   useAssignQueueCase,
 } from "@/hooks/useHomebaseVolunteer";
-import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
+import type { CoordinatorState } from "@/hooks/useHomebaseVolunteer";
+import type { HomebaseAudience }  from "@/hooks/useHomebaseAuth";
 
 // ── Specialty card ─────────────────────────────────────────────────────────────
 
@@ -90,6 +86,82 @@ function RecordProcessCard() {
   );
 }
 
+// ── Inline coordinator card ───────────────────────────────────────────────────
+
+function CoordinatorCard({ coordinatorState }: { coordinatorState: CoordinatorState | undefined }) {
+  if (!coordinatorState || !coordinatorState.coordinatorName) {
+    return (
+      <div className="rounded-xl border border-border bg-white p-4 flex items-start gap-3">
+        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+          <Heart className="w-4 h-4 text-muted-foreground" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">Volunteer Coordinator</p>
+          <p className="text-[12px] text-muted-foreground leading-relaxed mt-0.5">
+            Your coordinator's contact will appear here once your volunteer record is confirmed.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const { coordinatorName, coordinatorSlackId, volunteerSlackChannel } = coordinatorState;
+  const firstName  = coordinatorName.split(" ")[0] ?? coordinatorName;
+  const slackDmUrl = coordinatorSlackId
+    ? `https://slack.com/app_redirect?channel=${coordinatorSlackId}`
+    : null;
+  const channelUrl = volunteerSlackChannel
+    ? `https://slack.com/app_redirect?channel=${volunteerSlackChannel}`
+    : null;
+
+  return (
+    <div className="rounded-xl border border-border bg-white p-4 flex flex-col gap-3">
+      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+        Your Team
+      </p>
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+          <Heart className="w-4 h-4 text-emerald-600" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">{coordinatorName}</p>
+          <p className="text-[12px] text-muted-foreground">Volunteer Coordinator</p>
+        </div>
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        {slackDmUrl ? (
+          <a
+            href={slackDmUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted/30 transition-colors"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
+            Message {firstName}
+          </a>
+        ) : (
+          <span className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground">
+            <MessageSquare className="w-3.5 h-3.5" />
+            {coordinatorName}
+          </span>
+        )}
+        {channelUrl && volunteerSlackChannel && (
+          <a
+            href={channelUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted/30 transition-colors"
+          >
+            <Hash className="w-3.5 h-3.5 text-muted-foreground" />
+            #{volunteerSlackChannel.replace(/^#/, "")}
+          </a>
+        )}
+      </div>
+      <p className="text-[11px] text-muted-foreground">Assigned on your volunteer record.</p>
+    </div>
+  );
+}
+
 // ── VolunteerHomebase (exported) ──────────────────────────────────────────────
 
 interface VolunteerHomebaseProps {
@@ -106,25 +178,17 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
   const coordinatorResult = useVolunteerCoordinator();
   const assignMutation    = useAssignQueueCase();
 
-  // Read specialty from month endpoint (includes profile data)
-  const specialty = monthResult.data?.specialty ?? null;
-
-  // Count of cases already assigned to this volunteer (for limit enforcement)
+  const specialty        = monthResult.data?.specialty ?? null;
   const currentCaseCount = casesResult.data?.cases?.length ?? 0;
 
   async function handleAssign(caseId: string): Promise<void> {
     await assignMutation.mutateAsync(caseId);
   }
 
-  const peoplePanel = (
-    <VolunteerPeoplePanel coordinatorState={coordinatorResult.data} />
-  );
-
   return (
     <HomebaseShell
       audience={audience}
       displayName={displayName}
-      peoplePanel={peoplePanel}
     >
       <div className="flex flex-col gap-4 px-5 py-5 max-w-3xl mx-auto">
 
@@ -135,14 +199,14 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
           error={monthResult.error}
         />
 
-        {/* 2 — Log time (primary amber CTA — the only amber CTA on the page) */}
+        {/* 2 — Log time (primary amber CTA) */}
         <LogTimeRow
           audience={audience}
           defaultActivity={specialty ?? undefined}
           buttonVariant="primary"
         />
 
-        {/* 3 — Ways to help (unassigned queue) */}
+        {/* 3 — Ways to help */}
         <WaysToHelpCard
           isLoading={queueResult.isLoading}
           queueState={queueResult.data}
@@ -151,13 +215,13 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
           onAssign={handleAssign}
         />
 
-        {/* 4 — Specialty card + Record a process */}
+        {/* 4 — Specialty + Record a process */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SpecialtyCard specialty={specialty} />
           <RecordProcessCard />
         </div>
 
-        {/* 5 — Two-column grid: [Cases + Shareables] | [Growth] */}
+        {/* 5 — Cases + Growth */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-4">
             <VolunteerCasesCard
@@ -177,6 +241,9 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
             error={growthResult.error}
           />
         </div>
+
+        {/* 6 — Coordinator card */}
+        <CoordinatorCard coordinatorState={coordinatorResult.data} />
       </div>
     </HomebaseShell>
   );

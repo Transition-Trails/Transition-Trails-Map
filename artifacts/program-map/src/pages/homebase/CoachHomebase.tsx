@@ -5,20 +5,15 @@
  * Rendered inside HomebaseShell — no Sidebar/Topbar/ContextBar.
  *
  * Layout:
- *   ─ Level header strip     (coach level label + name, top of main)
- *   ─ PennyPreparedBand      (draft items — collapsible, full width)
- *   ─ LogTimeRow             (always visible; secondary when Penny band has items)
- *   ─ ArtefactsCard          (always visible, full width, level-aware heading)
- *   ─ SquadGrid              (full width, collapsible)
- *   ─ 2-col grid:
- *       Left:  CoachCasesCard
- *       Right: CoachWeekCard
+ *   ─ Level header strip
+ *   ─ PennyPreparedBand
+ *   ─ LogTimeRow
+ *   ─ ArtefactsCard
+ *   ─ SquadGrid
+ *   ─ 2-col grid: CoachCasesCard | CoachWeekCard
+ *   ─ LeadTeamCard (lead coach contact, full width, bottom)
  *
- * Right People panel: CoachPeoplePanel (lead coach contact + protocol note)
- *
- * Coach level:
- *   Reads from session via useHomebaseAuth (coachLevel field, present once task
- *   #254 provisions SF coaching fields).  Falls back to 'associate' until then.
+ * Right rail: SlimSlackPanel (wired in HomebaseShell)
  */
 
 import { HomebaseShell }      from "@/components/layout/HomebaseShell";
@@ -28,7 +23,7 @@ import { ArtefactsCard }      from "@/components/homebase/ArtefactsCard";
 import { SquadGrid }          from "@/components/homebase/SquadGrid";
 import { CoachCasesCard }     from "@/components/homebase/CoachCasesCard";
 import { CoachWeekCard }      from "@/components/homebase/CoachWeekCard";
-import { CoachPeoplePanel }   from "@/components/homebase/CoachPeoplePanel";
+import { Shield, MessageSquare, Hash, Users } from "lucide-react";
 import {
   useCoachPennyPrepared,
   useCoachArtefacts,
@@ -37,15 +32,115 @@ import {
   useCoachCases,
   COACH_LEVEL_LABELS,
 } from "@/hooks/useHomebaseCoach";
-import type { CoachLevel }    from "@/hooks/useHomebaseCoach";
-import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
+import type { LeadState, CoachLevel } from "@/hooks/useHomebaseCoach";
+import type { HomebaseAudience }      from "@/hooks/useHomebaseAuth";
+
+// ── Inline lead team card ─────────────────────────────────────────────────────
+
+function AssistantNote() {
+  return (
+    <div className="rounded-lg border border-amber-100 bg-amber-50 px-3 py-3 flex items-start gap-2.5">
+      <Shield className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
+      <p className="text-[12px] text-amber-800 leading-relaxed">
+        As Coach's Assistant, your draft verdicts need your lead coach's countersign before they take effect.
+      </p>
+    </div>
+  );
+}
+
+function LeadTeamCard({
+  leadState,
+  coachLevel,
+}: {
+  leadState:  LeadState | undefined;
+  coachLevel: CoachLevel;
+}) {
+  const lead = leadState?.lead;
+
+  if (!lead) {
+    return (
+      <div className="rounded-xl border border-border bg-white p-4 flex flex-col gap-3">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+          Your Team
+        </p>
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+            <Users className="w-4 h-4 text-muted-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground">Lead coach</p>
+            <p className="text-[12px] text-muted-foreground leading-relaxed mt-0.5">
+              Lead contact will appear once coaching assignments are configured.
+            </p>
+          </div>
+        </div>
+        {coachLevel === "assistant" && <AssistantNote />}
+      </div>
+    );
+  }
+
+  const firstName      = lead.name.split(" ")[0] ?? lead.name;
+  const cohortChannel  = leadState?.cohortSlackChannel ?? null;
+  const slackDmUrl     = lead.slackUserId
+    ? `https://slack.com/app_redirect?channel=${lead.slackUserId}`
+    : null;
+  const channelUrl     = cohortChannel
+    ? `https://slack.com/app_redirect?channel=${cohortChannel}`
+    : null;
+
+  return (
+    <div className="rounded-xl border border-border bg-white p-4 flex flex-col gap-3">
+      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+        Your Team
+      </p>
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
+          <Users className="w-4 h-4 text-sky-600" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">{lead.name}</p>
+          <p className="text-[12px] text-muted-foreground">Lead coach</p>
+        </div>
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        {slackDmUrl ? (
+          <a
+            href={slackDmUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted/30 transition-colors"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
+            Message {firstName}
+          </a>
+        ) : (
+          <span className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground">
+            <MessageSquare className="w-3.5 h-3.5" />
+            {lead.email}
+          </span>
+        )}
+        {channelUrl && cohortChannel && (
+          <a
+            href={channelUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted/30 transition-colors"
+          >
+            <Hash className="w-3.5 h-3.5 text-muted-foreground" />
+            #{cohortChannel.replace(/^#/, "")}
+          </a>
+        )}
+      </div>
+      {coachLevel === "assistant" && <AssistantNote />}
+    </div>
+  );
+}
 
 // ── CoachHomebase (exported) ──────────────────────────────────────────────────
 
 interface CoachHomebaseProps {
   audience:    HomebaseAudience;
   displayName: string;
-  /** Falls back to 'associate' when absent (SF fields not yet provisioned). */
   coachLevel?: CoachLevel | null;
 }
 
@@ -54,7 +149,6 @@ export default function CoachHomebase({
   displayName,
   coachLevel: coachLevelProp,
 }: CoachHomebaseProps) {
-  // Default to 'associate' — the middle level — until SF fields are provisioned
   const coachLevel: CoachLevel = coachLevelProp ?? "associate";
   const levelLabel = COACH_LEVEL_LABELS[coachLevel];
 
@@ -64,23 +158,12 @@ export default function CoachHomebase({
   const leadResult     = useCoachLead();
   const casesResult    = useCoachCases();
 
-  // Amber CTA rule: the first Penny-prepared approve button is the amber CTA.
-  // When Penny band has items, LogTimeRow must be secondary (bordered outline).
-  // When Penny band is empty, LogTimeRow is the primary (amber) CTA on the page.
   const pennyHasItems = (pennyResult.data?.items?.length ?? 0) > 0;
-
-  const peoplePanel = (
-    <CoachPeoplePanel
-      leadState={leadResult.data}
-      coachLevel={coachLevel}
-    />
-  );
 
   return (
     <HomebaseShell
       audience={audience}
       displayName={displayName}
-      peoplePanel={peoplePanel}
     >
       <div className="flex flex-col gap-4 px-5 py-5 max-w-3xl mx-auto">
 
@@ -103,14 +186,14 @@ export default function CoachHomebase({
           error={pennyResult.error}
         />
 
-        {/* 3 — Log time (secondary when Penny band has items; primary otherwise) */}
+        {/* 3 — Log time */}
         <LogTimeRow
           audience={audience}
           defaultActivity="Squad coaching"
           buttonVariant={pennyHasItems ? "secondary" : "primary"}
         />
 
-        {/* 4 — Artefacts (level-aware heading + CTA) */}
+        {/* 4 — Artefacts */}
         <ArtefactsCard
           isLoading={artefactResult.isLoading}
           artefactsState={artefactResult.data}
@@ -126,7 +209,7 @@ export default function CoachHomebase({
           coachLevel={coachLevel}
         />
 
-        {/* 6 — Two-column grid: Cases + This week */}
+        {/* 6 — Two-column grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <CoachCasesCard
             isLoading={casesResult.isLoading}
@@ -135,6 +218,9 @@ export default function CoachHomebase({
           />
           <CoachWeekCard />
         </div>
+
+        {/* 7 — Lead team card */}
+        <LeadTeamCard leadState={leadResult.data} coachLevel={coachLevel} />
       </div>
     </HomebaseShell>
   );

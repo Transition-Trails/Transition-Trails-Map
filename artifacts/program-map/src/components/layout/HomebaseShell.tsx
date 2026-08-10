@@ -7,18 +7,18 @@
  *
  * Layout:
  *   ┌──────┬─────────────────────────────────┬────────────┐
- *   │  WS  │  [Penny bar ─────────────────]  │  People    │
+ *   │  WS  │  [Penny bar ─────────────────]  │  Slack     │
  *   │drawer│                                 │  panel     │
- *   │      │  <children / page content>      │  (288px)   │
+ *   │      │  <children / page content>      │  (320px)   │
  *   │ 60px │                                 │            │
- *   │ or   │                                 │            │
- *   │ 240px│                                 │            │
+ *   │ or   │                                 │  40px when │
+ *   │ 240px│                                 │  collapsed │
  *   └──────┴─────────────────────────────────┴────────────┘
  *
  * Rules:
- *  - Only one side panel (Workspace drawer OR People panel) can be open at once.
+ *  - Only one side panel (Workspace drawer OR Slack panel) can be open at once.
  *  - Collapsed Workspace drawer is 60px; expanded is 240px.
- *  - Collapsed People panel is 40px (icon strip); expanded is 288px.
+ *  - Collapsed Slack panel is 40px (icon strip); expanded is 320px.
  */
 
 import React, { useState, useCallback } from "react";
@@ -26,8 +26,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronRight,
   ChevronLeft,
-  ChevronDown,
-  ChevronUp,
   Mail,
   Calendar,
   HardDrive,
@@ -48,7 +46,9 @@ import {
   Briefcase,
   LayoutDashboard,
 } from "lucide-react";
+import { useLocation } from "wouter";
 import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
+import { SlimSlackPanel } from "@/components/homebase/SlimSlackPanel";
 
 // ── Google Workspace app links ─────────────────────────────────────────────────
 
@@ -111,9 +111,7 @@ function WorkspaceDrawer({
       animate={{ width: open ? 240 : 60 }}
       transition={{ type: "spring", damping: 28, stiffness: 300 }}
     >
-      {/* Toggle button — sits at the drawer edge, half-overlapping the centre column.
-          overflow-hidden has been moved to the inner content div so this button
-          is never clipped and remains fully clickable. */}
+      {/* Toggle button */}
       <button
         onClick={onToggle}
         className="absolute top-3 right-0 translate-x-1/2 z-20 w-5 h-5 rounded-full border border-border bg-white shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
@@ -122,8 +120,6 @@ function WorkspaceDrawer({
         {open ? <ChevronLeft className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
       </button>
 
-      {/* Inner content wrapper — overflow-hidden here clips text labels when
-          the drawer is collapsed without affecting the toggle button above. */}
       <div className="flex flex-col flex-1 overflow-hidden">
 
       {/* Header — audience identity */}
@@ -235,8 +231,7 @@ function WorkspaceDrawer({
         ))}
       </div>
 
-      {/* Build link (audience-specific) — always opens in a new tab so the
-          homebase stays open in the current tab regardless of destination. */}
+      {/* Build link (audience-specific) */}
       <div className="px-1.5 py-2 mt-auto">
         <a
           href={buildLink.href}
@@ -273,7 +268,7 @@ function WorkspaceDrawer({
 // ── PennyBar ───────────────────────────────────────────────────────────────────
 
 function PennyBar({ displayName }: { displayName: string }) {
-  const [query, setQuery]   = useState("");
+  const [query, setQuery]     = useState("");
   const [sending, setSending] = useState(false);
 
   const handleSend = useCallback(async () => {
@@ -316,83 +311,34 @@ function PennyBar({ displayName }: { displayName: string }) {
   );
 }
 
-// ── PeoplePanel ────────────────────────────────────────────────────────────────
-
-function PeoplePanel({
-  open,
-  onToggle,
-}: {
-  open:     boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <motion.div
-      className="relative flex-shrink-0 flex flex-col border-l border-border bg-white overflow-hidden"
-      animate={{ width: open ? 288 : 40 }}
-      transition={{ type: "spring", damping: 28, stiffness: 300 }}
-    >
-      {/* Toggle strip */}
-      <button
-        onClick={onToggle}
-        className="flex items-center justify-center w-full py-3 border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors"
-        aria-label={open ? "Collapse people panel" : "Expand people panel"}
-      >
-        {open ? <ChevronUp className="w-4 h-4 rotate-90" /> : <ChevronDown className="w-4 h-4 rotate-90" />}
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="flex flex-col gap-4 px-4 py-4 overflow-y-auto flex-1"
-          >
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
-              Your Team
-            </p>
-            {/* Populated by audience-specific homebase pages */}
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Team contacts will appear here once your homebase is fully set up.
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-}
-
 // ── HomebaseShell (exported) ───────────────────────────────────────────────────
 
 interface HomebaseShellProps {
   audience:    HomebaseAudience;
   displayName: string;
   children:    React.ReactNode;
-  /** Override the right People panel content (for audience-specific data). */
-  peoplePanel?: React.ReactNode;
 }
 
 export function HomebaseShell({
   audience,
   displayName,
   children,
-  peoplePanel,
 }: HomebaseShellProps) {
+  const [location] = useLocation();
   // Mutual exclusion: only one of left/right panel can be open
   const [leftOpen,  setLeftOpen]  = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
 
   const toggleLeft = useCallback(() => {
     setLeftOpen(prev => {
-      if (!prev) setRightOpen(false); // opening left → close right
+      if (!prev) setRightOpen(false);
       return !prev;
     });
   }, []);
 
   const toggleRight = useCallback(() => {
     setRightOpen(prev => {
-      if (!prev) setLeftOpen(false); // opening right → close left
+      if (!prev) setLeftOpen(false);
       return !prev;
     });
   }, []);
@@ -414,39 +360,21 @@ export function HomebaseShell({
         </main>
       </div>
 
-      {/* Right: People panel */}
-      {peoplePanel ? (
+      {/* Right: Slack panel (learner / coach / volunteer only)
+          Team staff are already in Slack as workspace members; they don't need
+          a personal-auth panel inside Homebase. */}
+      {audience !== "team" && (
         <motion.div
           className="relative flex-shrink-0 flex flex-col border-l border-border bg-white overflow-hidden"
-          animate={{ width: rightOpen ? 288 : 40 }}
+          animate={{ width: rightOpen ? 320 : 40 }}
           transition={{ type: "spring", damping: 28, stiffness: 300 }}
         >
-          <button
-            onClick={toggleRight}
-            className="flex items-center justify-center w-full py-3 border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors"
-            aria-label={rightOpen ? "Collapse people panel" : "Expand people panel"}
-          >
-            {rightOpen
-              ? <ChevronDown className="w-4 h-4 rotate-90" />
-              : <ChevronDown className="w-4 h-4 -rotate-90" />
-            }
-          </button>
-          <AnimatePresence>
-            {rightOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="flex flex-col overflow-y-auto flex-1"
-              >
-                {peoplePanel}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <SlimSlackPanel
+            open={rightOpen}
+            onToggle={toggleRight}
+            returnPath={location ?? "/"}
+          />
         </motion.div>
-      ) : (
-        <PeoplePanel open={rightOpen} onToggle={toggleRight} />
       )}
     </div>
   );

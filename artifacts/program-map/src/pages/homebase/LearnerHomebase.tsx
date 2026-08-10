@@ -10,24 +10,25 @@
  *   ─ 2-col grid:
  *       Left:  LearnerCasesCard · DecisionLogCard
  *       Right: WeekItemsCard    · RecordDemoCard
+ *   ─ TeamCard         (coach contact / Penny fallback — full width, bottom)
  *
- * Right People panel: LearnerPeoplePanel (coach or Penny fallback)
+ * Right rail: SlimSlackPanel (wired in HomebaseShell)
  */
 
 import { Link } from "wouter";
-import { BookOpen, Video } from "lucide-react";
+import { BookOpen, Video, Sparkles, MessageSquare, Users, CalendarClock, Hash } from "lucide-react";
 import { HomebaseShell }       from "@/components/layout/HomebaseShell";
 import { LogTimeRow }          from "@/components/homebase/LogTimeRow";
 import { CairnBand }           from "@/components/homebase/CairnBand";
 import { LearnerCasesCard }    from "@/components/homebase/LearnerCasesCard";
 import { WeekItemsCard }       from "@/components/homebase/WeekItemsCard";
-import { LearnerPeoplePanel }  from "@/components/homebase/LearnerPeoplePanel";
 import {
   useHomebaseLearnerQuest,
   useHomebaseLearnerCases,
   useHomebaseLearnerWeek,
   useHomebaseLearnerCoach,
 } from "@/hooks/useHomebaseLearner";
+import type { CoachState }      from "@/hooks/useHomebaseLearner";
 import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
 
 // ── Bottom link cards ──────────────────────────────────────────────────────────
@@ -76,6 +77,91 @@ function RecordDemoCard() {
   );
 }
 
+// ── Inline team card (replaces right People panel) ────────────────────────────
+
+function TeamCard({ coachState }: { coachState: CoachState | undefined }) {
+  const coach             = coachState?.coach;
+  const cohortSlackChannel = coachState?.cohortSlackChannel ?? null;
+
+  if (!coach) {
+    return (
+      <div className="rounded-xl border border-border bg-white p-4 flex items-start gap-3">
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <Sparkles className="w-4 h-4 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">Penny — your companion</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5 leading-relaxed">
+            A coach will be matched once your program begins. Ask Penny anything in the bar above.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const firstName  = coach.name.split(" ")[0] ?? coach.name;
+  const slackDmUrl = coach.slackUserId
+    ? `https://slack.com/app_redirect?channel=${coach.slackUserId}`
+    : null;
+  const channelUrl = cohortSlackChannel
+    ? `https://slack.com/app_redirect?channel=${cohortSlackChannel}`
+    : null;
+
+  return (
+    <div className="rounded-xl border border-border bg-white p-4">
+      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+        Your Team
+      </p>
+      <div className="flex items-start gap-3 mb-3">
+        <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
+          <Users className="w-4 h-4 text-sky-600" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">{coach.name}</p>
+          <p className="text-[12px] text-muted-foreground">Your coach</p>
+        </div>
+        {coach.nextSession && (
+          <div className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-[11px] text-muted-foreground bg-muted/20 flex-shrink-0">
+            <CalendarClock className="w-3 h-3" />
+            {new Date(coach.nextSession).toLocaleDateString("en-US", {
+              weekday: "short", month: "short", day: "numeric",
+            })}
+          </div>
+        )}
+      </div>
+      <div className="flex gap-2 flex-wrap">
+        {slackDmUrl ? (
+          <a
+            href={slackDmUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted/30 transition-colors"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
+            Message {firstName}
+          </a>
+        ) : (
+          <span className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground">
+            <MessageSquare className="w-3.5 h-3.5" />
+            {coach.email}
+          </span>
+        )}
+        {channelUrl && cohortSlackChannel && (
+          <a
+            href={channelUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted/30 transition-colors"
+          >
+            <Hash className="w-3.5 h-3.5 text-muted-foreground" />
+            #{cohortSlackChannel.replace(/^#/, "")}
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── LearnerHomebase (exported) ────────────────────────────────────────────────
 
 interface LearnerHomebaseProps {
@@ -91,15 +177,10 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
 
   const stoneSet = questResult.data?.stoneSet ?? false;
 
-  const peoplePanel = (
-    <LearnerPeoplePanel coachState={coachResult.data} />
-  );
-
   return (
     <HomebaseShell
       audience={audience}
       displayName={displayName}
-      peoplePanel={peoplePanel}
     >
       <div className="flex flex-col gap-4 px-5 py-5 max-w-3xl mx-auto">
         {/* 1 — Today's Trail Quest */}
@@ -109,7 +190,7 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
           error={questResult.error}
         />
 
-        {/* 2 — Log Time (always visible; secondary button when stone not set) */}
+        {/* 2 — Log Time */}
         <LogTimeRow
           audience={audience}
           buttonVariant={stoneSet ? "primary" : "secondary"}
@@ -117,7 +198,6 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
 
         {/* 3 — Two-column grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Left column */}
           <div className="flex flex-col gap-4">
             <LearnerCasesCard
               isLoading={casesResult.isLoading}
@@ -126,8 +206,6 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
             />
             <DecisionLogCard />
           </div>
-
-          {/* Right column */}
           <div className="flex flex-col gap-4">
             <WeekItemsCard
               isLoading={weekResult.isLoading}
@@ -137,6 +215,9 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
             <RecordDemoCard />
           </div>
         </div>
+
+        {/* 4 — Team card (coach or Penny fallback) */}
+        <TeamCard coachState={coachResult.data} />
       </div>
     </HomebaseShell>
   );

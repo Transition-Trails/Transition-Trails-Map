@@ -34,6 +34,7 @@ import moduleDraftsRouter       from "./moduleDrafts";
 import homebaseRouter           from "./homebase";
 import adminUsersRouter         from "./adminUsers";
 import impersonateRouter        from "./impersonate";
+import slackOAuthRouter         from "./slackOAuth";
 import { requireStaff, requireAdmin, requireSuperAdmin, isSuperAdmin, effectiveIdentityMiddleware } from "../middlewares/requireAuth";
 import { db } from "@workspace/db";
 import { trailOsAuditLogTable } from "@workspace/db/schema";
@@ -76,6 +77,9 @@ const PUBLIC_PATHS: readonly string[] = [
   '/google/oauth/session', // prefix — matches /google/oauth/session/:id
   // Slack webhook (HMAC-authenticated by Slack's signature, not user session)
   '/slack/events',
+  // Slack user OAuth callback (browser redirect from Slack; session cookie is
+  // still sent but we identify the user via the in-memory state store instead)
+  '/slack/oauth/callback',
 ];
 
 // ── Global staff-auth middleware ──────────────────────────────────────────────
@@ -92,6 +96,12 @@ const staffAuthGate: RequestHandler = (req, res, next) => {
   // Homebase routes (/homebase/*) use requireHomebaseAuth, not staff auth.
   // The /auth/homebase/status endpoint is in PUBLIC_PATHS below (no auth needed).
   if (path.startsWith('/homebase')) return next();
+
+  // Slack homebase routes — OAuth flow and user data endpoints.
+  // requireHomebaseAuth on each individual route is the effective access control.
+  // Existing bot-only routes (/slack/validate, /slack/events) are NOT under these
+  // prefixes and remain subject to the staff gate and PUBLIC_PATHS.
+  if (path.startsWith('/slack/oauth') || path.startsWith('/slack/conversations')) return next();
 
   // Check against the public allowlist (exact match or path prefix).
   const isPublic = PUBLIC_PATHS.some(
@@ -217,5 +227,6 @@ router.use(moduleDraftsRouter);
 router.use(homebaseRouter);
 router.use(adminUsersRouter);
 router.use(impersonateRouter);
+router.use(slackOAuthRouter);
 
 export default router;
