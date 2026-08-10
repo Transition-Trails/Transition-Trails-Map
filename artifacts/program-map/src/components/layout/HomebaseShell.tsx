@@ -193,13 +193,13 @@ function WorkspaceDrawer({
         </a>
       </div>
 
-      {/* Build link (audience-specific) */}
+      {/* Build link (audience-specific) — always opens in a new tab so the
+          homebase stays open in the current tab regardless of destination. */}
       <div className="px-1.5 py-2 mt-auto">
         <a
           href={buildLink.href}
-          {...(buildLink.external !== false
-            ? { target: "_blank", rel: "noopener noreferrer" }
-            : {})}
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
           title={buildLink.label}
         >
