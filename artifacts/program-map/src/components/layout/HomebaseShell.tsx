@@ -35,6 +35,9 @@ import {
   Sheet,
   Video,
   StickyNote,
+  PenLine,
+  Dices,
+  BookOpen,
   Sparkles,
   ExternalLink,
   Users,
@@ -56,6 +59,12 @@ const GOOGLE_APPS = [
   { label: "Sheets",    Icon: Sheet,       href: "https://sheets.google.com"            },
   { label: "Meet",      Icon: Video,       href: "https://meet.google.com"              },
   { label: "Keep",      Icon: StickyNote,  href: "https://keep.google.com"              },
+];
+
+const COLLAB_APPS = [
+  { label: "Mural",           Icon: PenLine,   href: "https://app.mural.co/t/starthere9675/home" },
+  { label: "Planning Poker",  Icon: Dices,     href: "https://planningpoker.live"                },
+  { label: "Trailhead",       Icon: BookOpen,  href: "https://www.trailhead.com"                 },
 ];
 
 const BUILD_LINKS: Record<HomebaseAudience, { label: string; href: string; external?: boolean }> = {
@@ -193,6 +202,35 @@ function WorkspaceDrawer({
             )}
           </AnimatePresence>
         </a>
+      </div>
+
+      {/* Collaboration tools */}
+      <div className="flex flex-col gap-0.5 px-1.5 py-2 border-b border-border">
+        {COLLAB_APPS.map(({ label, Icon, href }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+            title={label}
+          >
+            <Icon className="w-4 h-4 flex-shrink-0" />
+            <AnimatePresence>
+              {open && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.12 }}
+                  className="text-sm whitespace-nowrap overflow-hidden"
+                >
+                  {label}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </a>
+        ))}
       </div>
 
       {/* Build link (audience-specific) — always opens in a new tab so the
