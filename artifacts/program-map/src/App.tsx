@@ -50,6 +50,7 @@ import SalesforceValidationCenter  from "@/pages/curriculum/SalesforceValidation
 import ProgramResources             from "@/pages/admin/ProgramResources";
 import IntegrationReadinessCenter   from "@/pages/admin/IntegrationReadinessCenter";
 import PeopleAccess               from "@/pages/admin/PeopleAccess";
+import UsersPage                  from "@/pages/admin/Users";
 import Admin   from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 import Phase1ReadinessDashboard from "@/pages/admin/Phase1ReadinessDashboard";
@@ -332,6 +333,7 @@ function Router() {
       {/* Administration */}
       <Route path="/admin/setup">             <Redirect to="/admin/integrations" /></Route>
       <Route path="/admin/people-access"     component={PeopleAccess} />
+      <Route path="/admin/users"             component={UsersPage} />
       <Route path="/admin/salesforce-arch"   component={SalesforceMapping} />
       <Route path="/admin/sf-validation"    component={SalesforceValidationCenter} />
       <Route path="/admin/people">           <Redirect to="/admin/people-access" /></Route>

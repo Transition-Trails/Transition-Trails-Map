@@ -3,6 +3,8 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { logger } from "../lib/logger.js";
 import { SF_API_VERSION } from "../lib/sfConstants.js";
+import { db } from "@workspace/db";
+import { trailOsAuditLogTable } from "@workspace/db/schema";
 
 // ── Passport User type declaration ────────────────────────────────────────────
 declare global {
@@ -105,6 +107,18 @@ router.get("/learner/auth/google/callback", (req, res, next): void => {
         req.session.learnerContactId     = contact.Id;
         req.session.learnerTrail         = contact.Penny_Trail__c;
         req.session.save(() => {
+          // Fire-and-forget audit log write — do not block the redirect
+          const ip = (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim()
+                   ?? req.socket.remoteAddress
+                   ?? null;
+          db.insert(trailOsAuditLogTable).values({
+            eventType:  'login',
+            actorEmail: (user.email ?? '').toLowerCase(),
+            audience:   'learner',
+            ipAddress:  ip,
+            metadata:   { source: 'learner_google_oauth', sfContactId: contact.Id },
+          }).catch(dbErr => logger.error({ dbErr }, 'learnerAuth: audit log write failed'));
+
           res.redirect("/learner/dashboard");
         });
       } catch (e) {

@@ -32,6 +32,8 @@ import { Router, type Request } from 'express';
 import crypto from 'crypto';
 import { getGroupsForUser } from '../lib/googleGroupsCache';
 import { logger } from '../lib/logger';
+import { db } from '@workspace/db';
+import { trailOsAuditLogTable } from '@workspace/db/schema';
 
 const router = Router();
 
@@ -357,6 +359,19 @@ router.get('/auth/google/callback', async (req, res) => {
         return;
       }
       logger.info({ email, tier, audience, groupCount: groups.length }, 'googleSignIn: sign-in complete');
+
+      // Fire-and-forget audit log write — do not block the redirect
+      const ip = (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim()
+               ?? req.socket.remoteAddress
+               ?? null;
+      db.insert(trailOsAuditLogTable).values({
+        eventType:  'login',
+        actorEmail: email.toLowerCase(),
+        audience:   audience ?? null,
+        ipAddress:  ip,
+        metadata:   { tier, source: 'google_sso', groupCount: groups.length },
+      }).catch(dbErr => logger.error({ dbErr }, 'googleSignIn: audit log write failed'));
+
       res.redirect('/');
     });
 

@@ -99,6 +99,7 @@ const navGroups: NavGroup[] = [
     items: [
       { id: 'admin-integrations',  path: '/admin/integrations',  label: 'Integrations'    },
       { id: 'admin-people-access', path: '/admin/people-access', label: 'People & Access'  },
+      { id: 'admin-users',         path: '/admin/users',         label: 'Users'            },
     ],
   },
 ];

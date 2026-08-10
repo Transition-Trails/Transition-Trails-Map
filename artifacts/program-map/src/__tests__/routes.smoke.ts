@@ -193,6 +193,7 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/admin/integrations/google-calendar/:tab',   kind: 'active' },
   { path: '/admin/integrations/secrets',                kind: 'active' },
   { path: '/admin/people-access',         kind: 'active' },
+  { path: '/admin/users',                 kind: 'active',   note: 'User Directory — all Trail OS users with status and last login' },
   { path: '/admin/people',                kind: 'redirect', target: '/admin/people-access' },
   { path: '/admin/integration-readiness', kind: 'active', note: 'Deep-link; not in sidebar' },
   { path: '/admin/salesforce-arch',       kind: 'active', note: 'Deep-link; not in sidebar' },

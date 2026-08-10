@@ -31,3 +31,4 @@ export * from "./moduleDrafts";
 export * from "./timeLogs";
 export * from "./volunteerProfiles";
 export * from "./coachProfiles";
+export * from "./auditLog";

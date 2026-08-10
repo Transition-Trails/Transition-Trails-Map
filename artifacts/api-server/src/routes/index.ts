@@ -32,6 +32,7 @@ import voiceoverRouter          from "./voiceover";
 import governanceRouter         from "./governance";
 import moduleDraftsRouter       from "./moduleDrafts";
 import homebaseRouter           from "./homebase";
+import adminUsersRouter         from "./adminUsers";
 import { requireStaff, requireAdmin } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
@@ -112,6 +113,8 @@ const ADMIN_PREFIXES: string[] = [
   '/admin/staff-users',   // GET /api/admin/staff-users — people picker
   '/admin/role-owners',    // GET/PATCH /api/admin/role-owners
   '/admin/persona-health', // GET/PATCH /api/admin/persona-health
+  '/admin/users',          // GET /api/admin/users — user directory
+  '/admin/audit-log',      // GET /api/admin/audit-log — login audit log
 ];
 
 router.use(ADMIN_PREFIXES as unknown as string, requireAdmin as RequestHandler);
@@ -151,5 +154,6 @@ router.use(voiceoverRouter);
 router.use(governanceRouter);
 router.use(moduleDraftsRouter);
 router.use(homebaseRouter);
+router.use(adminUsersRouter);
 
 export default router;
