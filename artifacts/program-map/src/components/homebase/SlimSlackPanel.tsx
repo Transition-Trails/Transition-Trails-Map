@@ -1119,12 +1119,34 @@ function ConnectedView({
     }
   }, [onTokenExpired, handleMissingScope]);
 
+  /**
+   * Silently re-fetch the conversation list bypassing the server-side cache.
+   * Called on every poll tick so new incoming DMs surface within one poll
+   * interval (~30 s) without a page reload.  Errors are swallowed — this is a
+   * best-effort refresh; the panel remains fully functional if it fails.
+   */
+  const fetchConversationsFresh = useCallback(async () => {
+    try {
+      const data = await apiGet<{ conversations: Conversation[] }>(
+        "/api/slack/conversations?fresh=1",
+      );
+      setConversations(data.conversations);
+    } catch {
+      // silently ignore — stale list is better than an error state
+    }
+  }, []);
+
   useEffect(() => {
     if (!selectedConv || !expanded) return;
     void fetchMessages(selectedConv.id);
-    pollRef.current = setInterval(() => void fetchMessages(selectedConv.id, true), 30_000);
+    pollRef.current = setInterval(() => {
+      void fetchMessages(selectedConv.id, true);
+      // Also refresh the conversation list so new incoming DMs appear without
+      // a page reload.  The server cache is bypassed via ?fresh=1.
+      void fetchConversationsFresh();
+    }, 30_000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
-  }, [selectedConv, expanded, fetchMessages]);
+  }, [selectedConv, expanded, fetchMessages, fetchConversationsFresh]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

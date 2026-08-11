@@ -529,9 +529,11 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
   const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
 
-  // Serve from cache if fresh
+  // Serve from cache if fresh — bypass when the client explicitly requests fresh data
+  // (e.g. the message-poll detected a new DM and needs up-to-date unread counts).
+  const bypassCache = req.query["fresh"] === "1";
   const cachedConvs = convCache.get(email);
-  if (cachedConvs && Date.now() - cachedConvs.fetchedAt < CONV_TTL_MS) {
+  if (!bypassCache && cachedConvs && Date.now() - cachedConvs.fetchedAt < CONV_TTL_MS) {
     res.json({ conversations: cachedConvs.data });
     return;
   }
