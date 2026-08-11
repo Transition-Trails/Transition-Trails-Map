@@ -57,6 +57,15 @@ declare module "express-session" {
     /** ISO date (YYYY-MM-DD) when learner last set today's stone. */
     homebaseStoneSet?:     string;
 
+    // ── User preferences ─────────────────────────────────────────────────────
+    /**
+     * Arbitrary small JSON blob for per-user UI preferences that should
+     * survive across devices (e.g. homebase card collapse state).
+     * Keys are namespaced by feature — e.g. `homebase:collapse:cases-card`.
+     * Values must be JSON-serialisable primitives (string / number / boolean).
+     */
+    userPrefs?: Record<string, unknown>;
+
     // ── Superadmin impersonation ──────────────────────────────────────────────
     /**
      * Set when a superadmin is viewing the platform as another user.
