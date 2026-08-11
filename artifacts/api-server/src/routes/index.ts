@@ -36,6 +36,7 @@ import adminUsersRouter         from "./adminUsers";
 import impersonateRouter        from "./impersonate";
 import slackOAuthRouter         from "./slackOAuth";
 import fathomRouter             from "./fathom";
+import casesRouter              from "./cases";
 import { requireStaff, requireAdmin, requireSuperAdmin, isSuperAdmin, effectiveIdentityMiddleware } from "../middlewares/requireAuth";
 import { db } from "@workspace/db";
 import { trailOsAuditLogTable } from "@workspace/db/schema";
@@ -239,5 +240,6 @@ router.use(adminUsersRouter);
 router.use(impersonateRouter);
 router.use(slackOAuthRouter);
 router.use(fathomRouter);
+router.use(casesRouter);
 
 export default router;

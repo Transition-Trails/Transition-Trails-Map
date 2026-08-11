@@ -108,6 +108,7 @@ import LearnerProgress    from "@/pages/learner/LearnerProgress";
 import HomebaseLanding    from "@/pages/homebase/HomebaseLanding";
 import TeamHomebase       from "@/pages/homebase/TeamHomebase";
 import TasksPage          from "@/pages/homebase/TasksPage";
+import CasesPage          from "@/pages/homebase/CasesPage";
 import { HomebaseShell }  from "@/components/layout/HomebaseShell";
 
 // ── TeamRoute — path-aware shell for team@ staff ──────────────────────────────
@@ -498,6 +499,20 @@ function InnerApp() {
       </Route>
       <Route path="/learner/progress">
         <LearnerRoute><LearnerProgress /></LearnerRoute>
+      </Route>
+
+      {/* /cases — staff only; homebase audiences are redirected to their root */}
+      <Route path="/cases">
+        {auth.isSignedIn ? (
+          auth.user?.audience ? (
+            // Coach / volunteer / learner / team don't manage SF cases
+            <Redirect to="/" />
+          ) : (
+            <AppShell><CasesPage /></AppShell>
+          )
+        ) : (
+          <SignInPage />
+        )}
       </Route>
 
       {/* /tasks — audience-dispatched so coach/volunteer get HomebaseShell, staff get AppShell */}
