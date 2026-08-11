@@ -357,14 +357,21 @@ function ConvItem({
 // ── Unreads section ───────────────────────────────────────────────────────────
 
 function UnreadsSection({ items, loading }: { items: UnreadItem[]; loading: boolean }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(() => {
+    try { const s = localStorage.getItem("slack-panel:unreads-open"); return s === null ? true : s === "true"; } catch { return true; }
+  });
+  const toggle = () => setOpen(o => {
+    const next = !o;
+    try { localStorage.setItem("slack-panel:unreads-open", String(next)); } catch {}
+    return next;
+  });
 
   if (!loading && items.length === 0) return null;
 
   return (
     <div className="mb-0.5">
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={toggle}
         className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-muted/20 transition-colors"
       >
         <ChevronDown className={`w-3 h-3 text-muted-foreground/50 flex-shrink-0 transition-transform duration-150 ${open ? "" : "-rotate-90"}`} />
@@ -405,14 +412,21 @@ function UnreadsSection({ items, loading }: { items: UnreadItem[]; loading: bool
 // ── Threads section ───────────────────────────────────────────────────────────
 
 function ThreadsSection({ items, loading }: { items: ThreadItem[]; loading: boolean }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(() => {
+    try { const s = localStorage.getItem("slack-panel:threads-open"); return s === null ? true : s === "true"; } catch { return true; }
+  });
+  const toggle = () => setOpen(o => {
+    const next = !o;
+    try { localStorage.setItem("slack-panel:threads-open", String(next)); } catch {}
+    return next;
+  });
 
   if (!loading && items.length === 0) return null;
 
   return (
     <div className="mb-0.5">
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={toggle}
         className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-muted/20 transition-colors"
       >
         <ChevronDown className={`w-3 h-3 text-muted-foreground/50 flex-shrink-0 transition-transform duration-150 ${open ? "" : "-rotate-90"}`} />
@@ -478,14 +492,22 @@ function ConvSection({
   defaultOpen?: boolean;
   presenceMap?: Map<string, "active" | "away">;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const lsKey = `slack-panel:section-open:${label.toLowerCase()}`;
+  const [open, setOpen] = useState(() => {
+    try { const s = localStorage.getItem(lsKey); return s === null ? defaultOpen : s === "true"; } catch { return defaultOpen; }
+  });
+  const toggle = () => setOpen(o => {
+    const next = !o;
+    try { localStorage.setItem(lsKey, String(next)); } catch {}
+    return next;
+  });
 
   if (items.length === 0) return null;
 
   return (
     <div className="mb-0.5">
       <button
-        onClick={() => setOpen(o => !o)}
+        onClick={toggle}
         className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-muted/20 transition-colors group"
       >
         <ChevronDown
