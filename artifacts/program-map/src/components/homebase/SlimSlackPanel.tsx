@@ -430,8 +430,6 @@ function ThreadsSection({ items, loading }: { items: ThreadItem[]; loading: bool
     return next;
   });
 
-  if (!loading && items.length === 0) return null;
-
   return (
     <div className="mb-0.5">
       <button
@@ -447,7 +445,12 @@ function ThreadsSection({ items, loading }: { items: ThreadItem[]; loading: bool
           : <span className="text-[10px] text-muted-foreground/40">{items.length}</span>
         }
       </button>
-      {open && !loading && (
+      {open && !loading && items.length === 0 && (
+        <p className="px-3 py-1.5 text-[11px] text-muted-foreground/50 italic">
+          No threads found in your workspace.
+        </p>
+      )}
+      {open && !loading && items.length > 0 && (
         <div className="pl-1 pr-1 pb-0.5 flex flex-col gap-0.5">
           {items.map(item => (
             <a
@@ -494,8 +497,6 @@ function CanvasesSection({ items, loading }: { items: CanvasItem[]; loading: boo
     return next;
   });
 
-  if (!loading && items.length === 0) return null;
-
   return (
     <div className="mb-0.5">
       <button
@@ -511,7 +512,12 @@ function CanvasesSection({ items, loading }: { items: CanvasItem[]; loading: boo
           : <span className="text-[10px] text-muted-foreground/40">{items.length}</span>
         }
       </button>
-      {open && !loading && (
+      {open && !loading && items.length === 0 && (
+        <p className="px-3 py-1.5 text-[11px] text-muted-foreground/50 italic">
+          No canvases found in your workspace.
+        </p>
+      )}
+      {open && !loading && items.length > 0 && (
         <div className="pl-1 pr-1 pb-0.5 flex flex-col gap-0.5">
           {items.map(item => (
             <a
