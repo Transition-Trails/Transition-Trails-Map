@@ -349,7 +349,7 @@ function ConnectedView({
     setConvLoading(true);
     setConvError(null);
 
-    apiGet<{ conversations: Conversation[] }>("/slack/conversations")
+    apiGet<{ conversations: Conversation[] }>("/api/slack/conversations")
       .then(data => {
         if (!cancelled) {
           setConversations(data.conversations);
@@ -379,7 +379,7 @@ function ConnectedView({
     setMsgError(null);
     try {
       const data = await apiGet<{ messages: Message[] }>(
-        `/slack/conversations/${convId}/history?limit=30`,
+        `/api/slack/conversations/${convId}/history?limit=30`,
       );
       // API returns newest-first; reverse for chronological display
       setMessages([...data.messages].reverse());
@@ -420,7 +420,7 @@ function ConnectedView({
     const text = composeText.trim();
     setComposeText("");
     try {
-      await apiPost(`/slack/conversations/${selectedConv.id}/messages`, { text });
+      await apiPost(`/api/slack/conversations/${selectedConv.id}/messages`, { text });
       // Optimistically refresh messages
       await fetchMessages(selectedConv.id, true);
     } catch (err: unknown) {
@@ -447,7 +447,7 @@ function ConnectedView({
   const handleDisconnect = async () => {
     setDisconnecting(true);
     try {
-      await apiDelete("/slack/oauth/disconnect");
+      await apiDelete("/api/slack/oauth/disconnect");
       onDisconnect();
     } finally {
       setDisconnecting(false);
@@ -587,7 +587,7 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
 
   const checkStatus = useCallback(() => {
     setStatus({ state: "loading" });
-    apiGet<{ connected: boolean; teamName?: string; slackUserId?: string }>("/slack/oauth/status")
+    apiGet<{ connected: boolean; teamName?: string; slackUserId?: string }>("/api/slack/oauth/status")
       .then(data => {
         if (data.connected && data.slackUserId) {
           setStatus({ state: "connected", teamName: data.teamName ?? null, slackUserId: data.slackUserId });
