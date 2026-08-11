@@ -1468,6 +1468,59 @@ router.post("/salesforce/governance/classroom-nudges", withClient(async (req, re
   res.status(201).json(result);
 }));
 
+// ── SF Record Search (for related-record picker) ───────────────────────────────
+
+/**
+ * GET /api/sf/records/search?q=:query
+ * SOSL search across Account, Case, Opportunity, and Task.
+ * Returns up to 5 results per object type, shaped for the UI picker.
+ */
+router.get("/sf/records/search", async (req, res) => {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) return res.status(401).json({ error: "Not connected to Salesforce." });
+
+  const q = (req.query["q"] as string | undefined)?.trim() ?? "";
+  if (q.length < 2) return res.json({ results: [] });
+
+  // Escape SOSL reserved characters: ? & | ! { } [ ] ( ) ^ ~ * : \ " ' + -
+  const escaped = q.replace(/[?&|!{}[\]()^~*:\\"'+\-]/g, "\\$&");
+
+  const sosl = `FIND {${escaped}*} IN NAME FIELDS RETURNING ` +
+    `Account(Id, Name LIMIT 5), ` +
+    `Case(Id, Subject, CaseNumber LIMIT 5), ` +
+    `Opportunity(Id, Name LIMIT 5), ` +
+    `Task(Id, Subject LIMIT 5)`;
+
+  try {
+    const res2 = await proxyFetch(
+      `/services/data/${SF_API_VERSION}/search?q=${encodeURIComponent(sosl)}`,
+      { headers: { Accept: "application/json" } },
+    );
+    if (!res2.ok) {
+      const text = await res2.text().catch(() => "");
+      return res.status(502).json({ error: `Salesforce search failed: ${text.slice(0, 200)}` });
+    }
+    const data = await res2.json() as {
+      searchRecords?: Array<{ Id: string; attributes?: { type?: string }; Name?: string; Subject?: string; CaseNumber?: string }>;
+    };
+
+    type SearchResult = { id: string; type: string; label: string; subtitle?: string };
+    const results: SearchResult[] = (data.searchRecords ?? []).map(r => {
+      const type = r.attributes?.type ?? "Record";
+      const label = type === "Case"
+        ? (r.Subject ?? "(no subject)")
+        : (r.Name ?? r.Subject ?? "(unnamed)");
+      const subtitle = type === "Case" && r.CaseNumber ? `Case #${r.CaseNumber}` : type;
+      return { id: r.Id, type, label, subtitle };
+    });
+
+    return res.json({ results });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: msg });
+  }
+});
+
 // ── SF Tasks API ───────────────────────────────────────────────────────────────
 
 /**
@@ -1594,8 +1647,8 @@ router.post("/sf/tasks", async (req, res) => {
     return res.status(401).json({ error: "Not connected to Salesforce. Visit /api/auth/salesforce/login to connect." });
   }
 
-  const { subject, description, dueDate, priority } = req.body as {
-    subject?: string; description?: string; dueDate?: string; priority?: string;
+  const { subject, description, dueDate, priority, whatId } = req.body as {
+    subject?: string; description?: string; dueDate?: string; priority?: string; whatId?: string;
   };
 
   if (!subject || !subject.trim()) {
@@ -1604,6 +1657,10 @@ router.post("/sf/tasks", async (req, res) => {
 
   if (dueDate !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
     return res.status(400).json({ error: "dueDate must be in YYYY-MM-DD format." });
+  }
+
+  if (whatId !== undefined && !/^[a-zA-Z0-9]{15,18}$/.test(whatId)) {
+    return res.status(400).json({ error: "whatId must be a valid Salesforce record ID." });
   }
 
   const VALID_PRIORITIES = ["High", "Normal", "Low"];
@@ -1616,6 +1673,7 @@ router.post("/sf/tasks", async (req, res) => {
   };
   if (description?.trim()) data["Description"] = description.trim();
   if (dueDate)             data["ActivityDate"] = dueDate;
+  if (whatId)              data["WhatId"]       = whatId;
 
   try {
     const result = await client.createRecord("Task", data);
