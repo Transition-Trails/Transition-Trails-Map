@@ -1420,8 +1420,13 @@ function CanvasView({
   const fetchCanvas = useCallback(async () => {
     setCanvasState({ status: "loading" });
     try {
-      const data = await apiGet<{ canvas: CanvasData | null }>(`/api/slack/conversations/${channelId}/canvas`);
-      if (data.canvas === null) {
+      const data = await apiGet<{ canvas: CanvasData | null; missingScope?: boolean }>(
+        `/api/slack/conversations/${channelId}/canvas`,
+      );
+      if (data.missingScope) {
+        // Token pre-dates canvases:read — show targeted reconnect prompt
+        setCanvasState({ status: "missing_scope" });
+      } else if (data.canvas === null) {
         setCanvasState({ status: "none" });
       } else {
         setCanvasState({ status: "loaded", canvas: data.canvas });
@@ -1488,11 +1493,11 @@ function CanvasView({
   if (canvasState.status === "missing_scope") {
     return (
       <div className="px-3 py-4 flex flex-col gap-3">
-        <div className="flex items-start gap-2 text-amber-600">
-          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2">
+          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-amber-500" />
           <div>
             <p className="text-[11px] font-semibold text-foreground leading-tight">
-              Canvas permissions needed
+              Reconnect Slack to enable canvas access
             </p>
             <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
               Your Slack connection was made before canvas access was added.

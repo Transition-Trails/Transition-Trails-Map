@@ -1082,7 +1082,9 @@ router.get("/slack/conversations/:id/canvas", requireSlackAuth, async (req, res)
         res.status(401).json({ error: "token_expired" }); return;
       }
       if (slackErr === "missing_scope") {
-        res.status(403).json({ error: "missing_scope", neededScope: "canvases:read" }); return;
+        // Existing tokens pre-date canvases:read; return a structured 200 so the
+        // frontend can show a targeted "reconnect" prompt instead of a generic error.
+        res.json({ canvas: null, missingScope: true }); return;
       }
       // Channel not found, archived, or inaccessible — treat as no canvas
       res.json({ canvas: null }); return;

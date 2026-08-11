@@ -503,6 +503,48 @@ describe('Slack OAuth routes', () => {
     expect(res.body).toMatchObject({ error: 'not_connected' });
   });
 
+  // ── Canvas route — missing_scope ─────────────────────────────────────────────
+  //
+  // Existing connected users won't have canvases:read in their stored token until
+  // they reconnect.  When conversations.info returns missing_scope, the route must
+  // return { canvas: null, missingScope: true } (HTTP 200) so the frontend can
+  // show a targeted "Reconnect Slack to enable canvas access" prompt instead of
+  // a confusing 502 or generic error.
+
+  it('35. GET /slack/conversations/:id/canvas — returns { canvas: null, missingScope: true } when conversations.info returns missing_scope', async () => {
+    setLearnerSession();
+
+    // Provide a valid encrypted token so the route proceeds past the not_connected guard.
+    // encryptToken uses SESSION_SECRET (falls back to the dev-only constant in test env).
+    const { encryptToken } = await import('../routes/slackOAuth.js');
+    const encryptedToken = encryptToken('xoxp-test-token-for-canvas-scope-test');
+
+    mockDbSelect.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([{ accessToken: encryptedToken }]),
+        }),
+      }),
+    });
+
+    // Simulate Slack returning missing_scope for conversations.info (token lacks canvases:read).
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ ok: false, error: 'missing_scope', needed: 'canvases:read' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+
+    try {
+      const res = await request(app).get('/api/slack/conversations/C12345/canvas');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({ canvas: null, missingScope: true });
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
   it('24. GET /slack/conversations — staff session (null googleAudience) returns not_connected, not another user\'s data', async () => {
     setStaffNullAudienceSession(); // staff email = 'staff@transitiontrails.org'; no token row in DB
 
