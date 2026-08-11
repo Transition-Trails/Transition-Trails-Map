@@ -511,6 +511,67 @@ describe('Slack OAuth routes', () => {
   // show a targeted "Reconnect Slack to enable canvas access" prompt instead of
   // a confusing 502 or generic error.
 
+  // ── Canvas route — token_expired (token revoked while canvas tab is open) ────
+  //
+  // Scenario: the user opens the Canvas tab while their stored Slack token is
+  // still valid, but the token is revoked server-side before the fetch resolves.
+  // Slack returns { ok: false, error: "token_revoked" } for conversations.info.
+  //
+  // Expected API behaviour: route returns 401 { error: "token_expired" }.
+  //
+  // Expected UI behaviour (code path in CanvasView, line ~1436):
+  //   catch (err) {
+  //     if (err instanceof ApiError && err.code === "token_expired") {
+  //       onTokenExpired();   // ← called immediately; no state update to "loading"
+  //       return;
+  //     }
+  //   }
+  // onTokenExpired() sets the parent's status to "token_expired" which mounts
+  // TokenExpiredView ("Reconnect Slack" prompt) and unmounts CanvasView — so the
+  // loading spinner is never left on screen.
+
+  it('36. GET /slack/conversations/:id/canvas — returns 401 { error: "token_expired" } when Slack returns token_revoked', async () => {
+    setLearnerSession();
+
+    // Provide a valid encrypted token so the route proceeds past the not_connected guard.
+    const { encryptToken } = await import('../routes/slackOAuth.js');
+    const encryptedToken = encryptToken('xoxp-test-token-for-revoked-canvas-test');
+
+    mockDbSelect.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([{ accessToken: encryptedToken }]),
+        }),
+      }),
+    });
+
+    // Simulate Slack returning token_revoked for conversations.info.
+    // This is the code path hit when the token is revoked while the canvas tab is open.
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ ok: false, error: 'token_revoked' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+
+    try {
+      const res = await request(app).get('/api/slack/conversations/C12345/canvas');
+
+      // Route must map token_revoked → 401 { error: "token_expired" } so the
+      // frontend CanvasView can call onTokenExpired() and render TokenExpiredView.
+      expect(res.status).toBe(401);
+      expect(res.body).toMatchObject({ error: 'token_expired' });
+
+      // Confirm the response carries no canvas payload — the spinner must not
+      // remain on screen because CanvasView's catch block calls onTokenExpired()
+      // immediately (before any state update) and returns, leaving no "loading"
+      // state behind.
+      expect(res.body.canvas).toBeUndefined();
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
   it('35. GET /slack/conversations/:id/canvas — returns { canvas: null, missingScope: true } when conversations.info returns missing_scope', async () => {
     setLearnerSession();
 
