@@ -572,6 +572,60 @@ describe('Slack OAuth routes', () => {
     }
   });
 
+  // ── History endpoint — token_expired (token revoked during polling) ──────────
+  //
+  // Scenario: the user has the Slack panel open and the 30-second message-history
+  // polling loop fires a GET /slack/conversations/:id/history request.  Meanwhile
+  // the stored Slack token has been revoked server-side.  Slack returns
+  // { ok: false, error: "token_revoked" } for conversations.history.
+  //
+  // Expected API behaviour: route returns 401 { error: "token_expired" } — the
+  // same shape as the canvas path — so the frontend ConnectedView can call
+  // onTokenExpired() and surface TokenExpiredView ("Reconnect Slack" prompt)
+  // instead of leaving the user stuck looking at stale messages.
+
+  it('37. GET /slack/conversations/:id/history — returns 401 { error: "token_expired" } when Slack returns token_revoked during polling', async () => {
+    setLearnerSession();
+
+    // Provide a valid encrypted token so the route proceeds past the not_connected guard.
+    const { encryptToken } = await import('../routes/slackOAuth.js');
+    const encryptedToken = encryptToken('xoxp-test-token-for-revoked-history-test');
+
+    mockDbSelect.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([{ accessToken: encryptedToken }]),
+        }),
+      }),
+    });
+
+    // Simulate Slack returning token_revoked for conversations.history.
+    // This is the code path hit when the token is revoked while the polling
+    // loop is running (ConnectedView's 30-second setInterval).
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ ok: false, error: 'token_revoked' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+
+    try {
+      const res = await request(app).get('/api/slack/conversations/C12345/history');
+
+      // Route must map token_revoked → 401 { error: "token_expired" } so the
+      // frontend ConnectedView polling loop can call onTokenExpired() and render
+      // TokenExpiredView — matching the same error shape as the canvas path.
+      expect(res.status).toBe(401);
+      expect(res.body).toMatchObject({ error: 'token_expired' });
+
+      // Confirm no messages payload is returned — the stale-message view must
+      // not remain; TokenExpiredView replaces it once onTokenExpired() is called.
+      expect(res.body.messages).toBeUndefined();
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  });
+
   it('35. GET /slack/conversations/:id/canvas — returns { canvas: null, missingScope: true } when conversations.info returns missing_scope', async () => {
     setLearnerSession();
 
