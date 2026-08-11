@@ -10,7 +10,6 @@ import {
   BarChart3, FileText, Bot,
   AlertTriangle, Calendar,
   RefreshCw, WifiOff, ChevronRight,
-  Home as HomeIcon,
 } from 'lucide-react';
 import { useSfOpsSummary, formatSyncAge, type SfCount } from '@/hooks/useSfOpsSummary';
 import {
@@ -89,8 +88,6 @@ export default function Home() {
   // deriveAudience runs), so check group membership directly instead.
   // teamGroup comes from the server (GOOGLE_GROUP_TEAM env var) so this check
   // stays correct if the group address is ever reconfigured.
-  const isTeam = user?.audience === 'team'
-    || (!!user?.teamGroup && !!user?.groups?.includes(user.teamGroup));
   const { visibleRecs } = useActionItems();
   const { domainHealthData, overallHealthScore, overallHealthLevel } = useHealthScores();
 
@@ -131,22 +128,6 @@ export default function Home() {
       {/* ── Scrollable body ── */}
       <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
 
-        {/* ── Back to Homebase (team users only) ── */}
-        {isTeam && (
-          <button
-            onClick={() => navigate('/homebase')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors text-left group"
-          >
-            <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-              <HomeIcon className="w-3.5 h-3.5 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-foreground leading-none">Back to Homebase</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Return to your daily workspace</p>
-            </div>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-          </button>
-        )}
 
         {/* ── EVERYDAY: compact metric strip ── */}
         {isEveryday && (

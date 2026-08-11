@@ -264,11 +264,21 @@ export function Sidebar() {
         </div>
 
         {/* Footer */}
-        <div className="px-1 xl:px-3 py-2 border-t border-sidebar-border flex-shrink-0">
+        <div className="px-1 xl:px-3 py-2 border-t border-sidebar-border flex-shrink-0 space-y-1">
+          {/* Homebase toggle — consistent with the Mission Control icon on the Homebase drawer */}
+          <button
+            onClick={() => setLocation('/homebase')}
+            className="w-full flex items-center justify-center xl:justify-start gap-2 xl:px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+            title="Back to Homebase"
+          >
+            <Home className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden xl:block text-[12px] whitespace-nowrap">Homebase</span>
+          </button>
+          {/* Version link */}
           <a
             href="/release-notes"
             onClick={(e) => { e.preventDefault(); window.history.pushState({}, "", "/release-notes"); window.dispatchEvent(new PopStateEvent("popstate")); }}
-            className="hidden xl:block text-[12px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors"
+            className="hidden xl:block text-[12px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors xl:px-2"
           >
             Trail OS v1.4 · Internal
           </a>

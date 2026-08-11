@@ -121,6 +121,21 @@ function TeamRoute() {
     </AppShell>
   );
 }
+
+// ── StaffRoute — path-aware shell for staff without a homebase audience ────────
+// At '/' or '/homebase' they land on TeamHomebase (their default workspace).
+// Any other admin path continues to show Mission Control (AppShell + Router).
+function StaffRoute({ displayName }: { displayName: string }) {
+  const [location] = useLocation();
+  if (location === "/" || location === "" || location === "/homebase") {
+    return <TeamHomebase displayName={displayName} />;
+  }
+  return (
+    <AppShell>
+      <Router />
+    </AppShell>
+  );
+}
 import AccessNotGranted   from "@/pages/AccessNotGranted";
 
 // queryClient is declared at module level above (next to the fetch interceptor)
@@ -481,13 +496,13 @@ function InnerApp() {
         <LearnerRoute><LearnerProgress /></LearnerRoute>
       </Route>
 
-      {/* /homebase — direct entry for team group members including superadmins.
-           Regular team users (audience='team') land here via TeamRoute at '/'.
-           Superadmins in the team group reach it via the "Back to Homebase" card.
-           Non-team signed-in users are redirected to '/'. */}
+      {/* /homebase — entry point for team audience, staff, and superadmins.
+           All signed-in staff (audience or no audience) land here instead of
+           Mission Control so Homebase is the default workspace for everyone. */}
       <Route path="/homebase">
         {auth.isSignedIn ? (
           auth.user?.audience === 'team'
+          || !auth.user?.audience                                               // staff without a homebase audience
           || (!!auth.user?.teamGroup && !!auth.user?.groups?.includes(auth.user.teamGroup)) ? (
             <TeamHomebase displayName={auth.user?.name ?? ''} />
           ) : (
@@ -508,9 +523,8 @@ function InnerApp() {
             auth.user.audience === "team" ? <TeamRoute /> : <HomebaseLanding />
           ) : (
             // ── Staff users (admin / power / everyday / superadmin) ───────
-            <AppShell>
-              <Router />
-            </AppShell>
+            // Default to Homebase at '/' or '/homebase'; Mission Control for all other paths.
+            <StaffRoute displayName={auth.user?.name ?? ""} />
           )
         ) : (
           <Switch>

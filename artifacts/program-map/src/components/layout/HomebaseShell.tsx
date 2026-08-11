@@ -231,33 +231,56 @@ function WorkspaceDrawer({
         ))}
       </div>
 
-      {/* Build link (audience-specific) */}
+      {/* Build link (audience-specific) — external links open in new tab; internal links navigate client-side */}
       <div className="px-1.5 py-2 mt-auto">
-        <a
-          href={buildLink.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
-          title={buildLink.label}
-        >
-          {buildLink.external !== false
-            ? <ExternalLink    className="w-4 h-4 flex-shrink-0" />
-            : <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
-          }
-          <AnimatePresence>
-            {open && (
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.12 }}
-                className="text-sm whitespace-nowrap overflow-hidden"
-              >
-                {buildLink.label}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </a>
+        {buildLink.external === false ? (
+          <button
+            onClick={() => {
+              window.history.pushState({}, "", buildLink.href);
+              window.dispatchEvent(new PopStateEvent("popstate"));
+            }}
+            className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+            title={buildLink.label}
+          >
+            <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
+            <AnimatePresence>
+              {open && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.12 }}
+                  className="text-sm whitespace-nowrap overflow-hidden"
+                >
+                  {buildLink.label}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+        ) : (
+          <a
+            href={buildLink.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+            title={buildLink.label}
+          >
+            <ExternalLink className="w-4 h-4 flex-shrink-0" />
+            <AnimatePresence>
+              {open && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.12 }}
+                  className="text-sm whitespace-nowrap overflow-hidden"
+                >
+                  {buildLink.label}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </a>
+        )}
       </div>
 
       </div>{/* end inner overflow-hidden content wrapper */}
