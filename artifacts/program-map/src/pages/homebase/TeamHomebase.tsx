@@ -136,11 +136,11 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
             <MeetingNotesCard />
           </div>
 
-          {/* Active Tasks — full width */}
-          <ActiveTasksCard />
-
-          {/* Open Cases — full width */}
-          <CasesCard />
+          {/* Active Tasks + Open Cases — side by side, 50/50 */}
+          <div className="grid grid-cols-2 gap-4 items-start">
+            <ActiveTasksCard />
+            <CasesCard />
+          </div>
         </div>
 
       </div>
