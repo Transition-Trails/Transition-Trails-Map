@@ -128,7 +128,7 @@ function TeamRoute() {
 function StaffRoute({ displayName }: { displayName: string }) {
   const [location] = useLocation();
   if (location === "/" || location === "" || location === "/homebase") {
-    return <TeamHomebase displayName={displayName} />;
+    return <TeamHomebase displayName={displayName} isStaff />;
   }
   return (
     <AppShell>
@@ -504,7 +504,10 @@ function InnerApp() {
           auth.user?.audience === 'team'
           || !auth.user?.audience                                               // staff without a homebase audience
           || (!!auth.user?.teamGroup && !!auth.user?.groups?.includes(auth.user.teamGroup)) ? (
-            <TeamHomebase displayName={auth.user?.name ?? ''} />
+            <TeamHomebase
+                displayName={auth.user?.name ?? ''}
+                isStaff={!auth.user?.audience}
+              />
           ) : (
             <Redirect to="/" />
           )
