@@ -95,7 +95,7 @@ export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
         align="start"
         sideOffset={8}
         className="p-0 shadow-2xl border-2 border-primary/25 rounded-xl overflow-hidden bg-white"
-        style={{ width: "320px" }}
+        style={{ width: "420px", maxWidth: "calc(100vw - 32px)" }}
       >
         {/* Accent strip */}
         <div className="h-1 w-full bg-gradient-to-r from-primary to-primary/40" />
@@ -121,11 +121,12 @@ export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
             AI Summary
           </p>
           {summaryText ? (
-            <div className="space-y-1.5 max-h-40 overflow-y-auto pr-0.5">
+            <div className="space-y-1.5 max-h-48 overflow-y-auto overflow-x-hidden pr-0.5">
               {summaryText.split("\n\n").map((para, i) => (
                 <p
                   key={i}
-                  className="text-[12px] text-foreground/80 leading-relaxed"
+                  className="text-[12px] text-foreground/80 leading-relaxed break-words"
+                  style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
                 >
                   {para}
                 </p>
@@ -144,7 +145,7 @@ export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
               Action Items
             </p>
-            <ul className="space-y-1.5 max-h-36 overflow-y-auto pr-0.5">
+            <ul className="space-y-1.5 max-h-40 overflow-y-auto overflow-x-hidden pr-0.5">
               {meeting.action_items.map((item, i) => (
                 <li key={i} className="flex items-start gap-2">
                   {item.completed ? (
@@ -152,7 +153,10 @@ export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
                   ) : (
                     <Square className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0 mt-0.5" />
                   )}
-                  <span className={`text-[12px] leading-snug ${item.completed ? "line-through text-muted-foreground/60" : "text-foreground/80"}`}>
+                  <span
+                    className={`text-[12px] leading-snug break-words ${item.completed ? "line-through text-muted-foreground/60" : "text-foreground/80"}`}
+                    style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
+                  >
                     {item.description}
                     {item.assigneeName && (
                       <span className="text-muted-foreground ml-1 not-line-through">
