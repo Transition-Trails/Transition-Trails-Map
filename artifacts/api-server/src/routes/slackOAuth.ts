@@ -648,14 +648,20 @@ router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res
 
     const rawMessages = (r["messages"] as Record<string, unknown>[]) ?? [];
 
-    // Collect unique user IDs to resolve
-    const userIds = [...new Set(
-      rawMessages
+    // Collect unique user IDs: senders + any <@USERID> mention tokens inside message text
+    const mentionIds = rawMessages.flatMap(m => {
+      const text = (m["text"] as string | undefined) ?? "";
+      return [...text.matchAll(/<@([UW][A-Z0-9]+)>/g)].map(match => match[1]!);
+    });
+
+    const userIds = [...new Set([
+      ...rawMessages
         .map(m => m["user"] as string | undefined)
         .filter((u): u is string => !!u),
-    )];
+      ...mentionIds,
+    ])];
 
-    // Resolve display names in parallel
+    // Resolve display names in parallel (resolveDisplayName is internally cached)
     const nameMap = new Map<string, string>();
     await Promise.all(
       userIds.map(async uid => {
@@ -664,9 +670,15 @@ router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res
       }),
     );
 
+    // Replace <@USERID> tokens in message text with @DisplayName
+    const resolveMentions = (text: string): string =>
+      text.replace(/<@([UW][A-Z0-9]+)>/g, (_, uid: string) =>
+        `@${nameMap.get(uid) ?? uid}`,
+      );
+
     const messages = rawMessages.map(m => ({
       ts:       m["ts"] as string,
-      text:     m["text"] as string,
+      text:     resolveMentions((m["text"] as string | undefined) ?? ""),
       userId:   (m["user"] as string | undefined) ?? null,
       userName: (m["user"] as string | undefined)
         ? (nameMap.get(m["user"] as string) ?? m["user"])
