@@ -10,6 +10,7 @@ import {
   type ReviewCycle,
 } from '@/hooks/useKnowledgeArticles';
 import { useKnowledgeSources } from '@/hooks/useKnowledgeSources';
+import { useSfOrgUrl } from '@/hooks/useSfOrgUrl';
 import { RichTextEditor } from '@/components/knowledge/RichTextEditor';
 import {
   ShieldCheck, PenLine, Plus, CheckCircle2, AlertCircle,
@@ -262,6 +263,7 @@ function ArticleEditor({
   isNew, article, onSave, onSubmitForReview, onApprove, onRequestChanges, onPublishToSf, onDelete, saving,
 }: ArticleEditorProps) {
   const { types: articleTypes, loading: typesLoading } = useArticleTypes();
+  const { data: sfOrgData } = useSfOrgUrl();
 
   const [title,       setTitle]       = useState(article?.title       ?? '');
   const [summary,     setSummary]     = useState(article?.summary     ?? '');
@@ -359,9 +361,27 @@ function ArticleEditor({
                 {article?.sfArticleId && (
                   <p className="text-[12px] font-mono text-foreground">ID: {article.sfArticleId}</p>
                 )}
-                <span className="flex items-center gap-1 text-[12px] text-[#2F6F7E]">
-                  <ExternalLink className="w-3 h-3" />Manage in Salesforce Knowledge
-                </span>
+                {(article?.sfVersionId || article?.sfArticleId) && (() => {
+                  const sfKnUrl = sfOrgData?.orgBaseUrl
+                    ? article?.sfVersionId
+                      ? `${sfOrgData.orgBaseUrl}/lightning/r/${article.articleType || 'Knowledge__kav'}/${article.sfVersionId}/view`
+                      : `${sfOrgData.orgBaseUrl}/lightning/r/KnowledgeArticle/${article.sfArticleId}/view`
+                    : null;
+                  return sfKnUrl ? (
+                    <a
+                      href={sfKnUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-[12px] text-[#2F6F7E] hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" />Manage in Salesforce Knowledge
+                    </a>
+                  ) : (
+                    <span className="flex items-center gap-1 text-[12px] text-[#2F6F7E]">
+                      <ExternalLink className="w-3 h-3" />Manage in Salesforce Knowledge
+                    </span>
+                  );
+                })()}
               </div>
             )}
           </div>
