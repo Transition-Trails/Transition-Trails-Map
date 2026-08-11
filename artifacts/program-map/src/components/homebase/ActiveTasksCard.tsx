@@ -17,6 +17,10 @@ import { useLocation } from "wouter";
 import { CreateTaskDrawer } from "./CreateTaskDrawer";
 import { TaskHoverCard } from "./TaskHoverCard";
 
+function applyStatusChange(tasks: SfTask[], id: string, status: string): SfTask[] {
+  return tasks.map(t => t.Id === id ? { ...t, Status: status } : t);
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface SfTask {
@@ -88,9 +92,10 @@ interface TaskRowProps {
   isCompleting: boolean;
   orgBaseUrl: string;
   onComplete: (task: SfTask) => void;
+  onStatusChange: (id: string, status: string) => void;
 }
 
-function TaskRow({ task, isCompleting, orgBaseUrl, onComplete }: TaskRowProps) {
+function TaskRow({ task, isCompleting, orgBaseUrl, onComplete, onStatusChange }: TaskRowProps) {
   const overdue = isOverdue(task.ActivityDate);
   return (
     <li className="flex items-start gap-3 py-3 border-b border-border/50 last:border-0">
@@ -106,8 +111,8 @@ function TaskRow({ task, isCompleting, orgBaseUrl, onComplete }: TaskRowProps) {
         }
       </button>
 
-      <TaskHoverCard task={task} orgBaseUrl={orgBaseUrl}>
-        <div className="flex-1 min-w-0 cursor-default">
+      <TaskHoverCard task={task} orgBaseUrl={orgBaseUrl} onStatusChange={onStatusChange}>
+        <div className="flex-1 min-w-0 cursor-pointer select-none">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-sm font-medium text-foreground leading-snug">
               {task.Subject ?? "Untitled task"}
@@ -256,13 +261,20 @@ export function ActiveTasksCard({ onCreated }: ActiveTasksCardProps) {
             </div>
           ) : (
             <ul className="divide-y divide-transparent">
-              {visibleTasks.map(task => (
+              {visibleTasks.map((task, i) => (
                 <TaskRow
-                  key={task.Id}
+                  key={task.Id || i}
                   task={task}
                   isCompleting={completing.has(task.Id)}
                   orgBaseUrl={orgBaseUrl}
                   onComplete={handleComplete}
+                  onStatusChange={(id, status) => {
+                    if (status === "Completed") {
+                      setCompleted(prev => new Set([...prev, id]));
+                    } else {
+                      setTasks(prev => applyStatusChange(prev, id, status));
+                    }
+                  }}
                 />
               ))}
             </ul>

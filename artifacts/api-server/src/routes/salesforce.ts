@@ -1579,6 +1579,51 @@ router.post("/sf/tasks", async (req, res) => {
 });
 
 /**
+ * PATCH /api/sf/tasks/:id/status
+ * Update a Task's Status field to any allowed value.
+ * Body: { status: "Not Started" | "In Progress" | "Deferred" | "Completed" }
+ */
+const ALLOWED_STATUSES = ["Not Started", "In Progress", "Deferred", "Completed"] as const;
+
+router.patch("/sf/tasks/:id/status", async (req, res) => {
+  let client: ISalesforceClient;
+  try {
+    client = getSalesforceClient(req);
+  } catch {
+    return res.status(401).json({ error: "Not connected to Salesforce." });
+  }
+
+  const { id } = req.params;
+  if (!id || !/^[a-zA-Z0-9]{15,18}$/.test(id)) {
+    return res.status(400).json({ error: "Invalid Task ID." });
+  }
+
+  const { status } = (req.body ?? {}) as { status?: string };
+  if (!status || !(ALLOWED_STATUSES as readonly string[]).includes(status)) {
+    return res.status(400).json({ error: `status must be one of: ${ALLOWED_STATUSES.join(", ")}` });
+  }
+
+  const sfUserId = req.session.sfUserId ?? "";
+  if (!sfUserId) {
+    return res.status(401).json({ error: "Salesforce user ID not found in session." });
+  }
+
+  try {
+    const owned = await client.query<{ Id: string }>(
+      `SELECT Id FROM Task WHERE Id = '${id}' AND OwnerId = '${sfUserId}' AND IsDeleted = false LIMIT 1`,
+    );
+    if (owned.records.length === 0) {
+      return res.status(404).json({ error: "Task not found." });
+    }
+    await client.updateRecord("Task", id, { Status: status });
+    return res.json({ success: true, status });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: msg });
+  }
+});
+
+/**
  * PATCH /api/sf/tasks/:id/complete
  * Mark a Task as Completed.
  */

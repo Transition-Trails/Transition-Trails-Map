@@ -16,6 +16,10 @@ import { CreateTaskDrawer } from "./CreateTaskDrawer";
 import { TaskHoverCard } from "./TaskHoverCard";
 import { useLocation } from "wouter";
 
+function applyStatusChange(tasks: SfTask[], id: string, status: string): SfTask[] {
+  return tasks.map(t => t.Id === id ? { ...t, Status: status } : t);
+}
+
 interface SfTask {
   Id: string;
   Subject: string | null;
@@ -175,8 +179,18 @@ export function TodayTasksCard() {
                       }
                     </button>
 
-                    <TaskHoverCard task={task} orgBaseUrl={orgBaseUrl}>
-                      <div className="flex-1 min-w-0 cursor-default">
+                    <TaskHoverCard
+                      task={{ ...task, Status: task.Status }}
+                      orgBaseUrl={orgBaseUrl}
+                      onStatusChange={(id, status) => {
+                        if (status === "Completed") {
+                          setCompleted(prev => new Set([...prev, id]));
+                        } else {
+                          setTasks(prev => applyStatusChange(prev, id, status));
+                        }
+                      }}
+                    >
+                      <div className="flex-1 min-w-0 cursor-pointer select-none">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm text-foreground leading-snug truncate">
                             {task.Subject ?? "Untitled task"}
