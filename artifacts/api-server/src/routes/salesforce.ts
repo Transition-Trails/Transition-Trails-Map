@@ -1483,6 +1483,14 @@ router.get("/sf/tasks", async (req, res) => {
     return res.status(401).json({ error: "Not connected to Salesforce. Visit /api/auth/salesforce/login to connect." });
   }
 
+  // Guard: sfUserId must be present so the query is scoped to this user only.
+  // Without it we cannot safely anchor the OwnerId filter and risk returning
+  // another user's tasks — the SF token alone does not tell us the user ID.
+  const sfUserId = req.session.sfUserId;
+  if (!sfUserId) {
+    return res.status(401).json({ error: "Salesforce user identity unavailable. Please reconnect at /api/auth/salesforce/login." });
+  }
+
   const statusParam = (req.query["status"] as string | undefined) ?? "active";
 
   let statusFilter: string;
@@ -1491,33 +1499,26 @@ router.get("/sf/tasks", async (req, res) => {
   } else if (statusParam === "all") {
     statusFilter = "Status != null";
   } else {
-    // active — open + in-progress
+    // active — open + in-progress (default)
     statusFilter = "Status IN ('Not Started', 'In Progress', 'Deferred')";
   }
 
+  const dateParam = req.query["date"] as string | undefined;
+  let dateFilter = "";
+  if (dateParam === "today") {
+    const today = new Date().toISOString().slice(0, 10);
+    dateFilter = ` AND ActivityDate = ${today}`;
+  }
+
+  // Single authoritative SOQL — always scoped to the authenticated user's ID.
+  const taskSoql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE IsDeleted = false AND OwnerId = '${sfUserId}' AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
+
   try {
-    const dateParam = req.query["date"] as string | undefined;
-    let dateFilter = "";
-    if (dateParam === "today") {
-      const today = new Date().toISOString().slice(0, 10);
-      dateFilter = ` AND ActivityDate = ${today}`;
-    }
-
-    // Always scope to the authenticated user's own Tasks using the session SF
-    // user ID.  Omitting OwnerId would expose colleagues' Task subjects and
-    // descriptions to any authenticated user depending on the org's sharing rules.
-    const sfUserId = req.session.sfUserId ?? "";
-    if (!sfUserId) {
-      return res.status(401).json({ error: "Salesforce user ID not found in session." });
-    }
-
-    const soql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE IsDeleted = false AND OwnerId = '${sfUserId}' AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
-
     const result = await client.query<{
       Id: string; Subject: string | null; Description: string | null;
       ActivityDate: string | null; Priority: string | null; Status: string | null;
       CreatedDate: string | null;
-    }>(soql);
+    }>(taskSoql);
 
     return res.json({ tasks: result.records, total: result.totalSize });
   } catch (e: unknown) {

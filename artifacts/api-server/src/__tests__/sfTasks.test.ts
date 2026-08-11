@@ -48,6 +48,8 @@ const {
   mockCreateRecordError,
   mockUpdateRecordError,
   lastCreateRecordData,
+  mockSfUserId,
+  lastQuerySoql,
 } = vi.hoisted(() => ({
   /** When non-null, createRecord returns this result. */
   mockCreateRecordResult: { value: { id: 'fake-task-id-001', success: true } as { id: string; success: boolean } },
@@ -57,6 +59,14 @@ const {
   mockUpdateRecordError: { value: null as Error | null },
   /** Captures the data argument passed to createRecord for inspection. */
   lastCreateRecordData: { value: null as Record<string, unknown> | null },
+  /**
+   * Controls the SF user ID visible to the GET /sf/tasks route.
+   * null  → getSalesforceClient throws → 401 (simulates absent/unauthenticated session)
+   * string → injected into req.session.sfUserId so the route can scope its SOQL query
+   */
+  mockSfUserId: { value: '005SF000001TestABC' as string | null },
+  /** Captures the SOQL string passed to client.query() for GET /sf/tasks assertions. */
+  lastQuerySoql: { value: null as string | null },
 }));
 
 // ── Mock salesforceOAuth (not exercised by this suite) ─────────────────────────
@@ -75,23 +85,32 @@ vi.mock('../lib/salesforceOAuth.js', () => ({
 // ── Mock getSalesforceClient ───────────────────────────────────────────────────
 
 vi.mock('../lib/getSalesforceClient.js', () => ({
-  getSalesforceClient: (_req: unknown) => ({
-    query: async <T>(_soql: string) => ({
-      totalSize: 0,
-      done: true,
-      records: [] as T[],
-    }),
-    createRecord: async (_object: string, data: Record<string, unknown>) => {
-      lastCreateRecordData.value = data;
-      if (mockCreateRecordError.value) throw mockCreateRecordError.value;
-      return mockCreateRecordResult.value;
-    },
-    updateRecord: async (_object: string, _id: string, _data: Record<string, unknown>) => {
-      if (mockUpdateRecordError.value) throw mockUpdateRecordError.value;
-      return undefined;
-    },
-    deleteRecord: async () => undefined,
-  }),
+  getSalesforceClient: (req: unknown) => {
+    // Simulate an absent or unauthenticated Salesforce session.
+    if (!mockSfUserId.value) {
+      throw new Error('Not authenticated with Salesforce. Visit /api/auth/salesforce/login to connect.');
+    }
+    // Inject sfUserId into the request session so the route's guard and SOQL
+    // builder see the same value that would be present in a real session.
+    const r = req as { session?: Record<string, unknown> };
+    if (r.session) r.session['sfUserId'] = mockSfUserId.value;
+    return {
+      query: async <T>(soql: string) => {
+        lastQuerySoql.value = soql;
+        return { totalSize: 0, done: true, records: [] as T[] };
+      },
+      createRecord: async (_object: string, data: Record<string, unknown>) => {
+        lastCreateRecordData.value = data;
+        if (mockCreateRecordError.value) throw mockCreateRecordError.value;
+        return mockCreateRecordResult.value;
+      },
+      updateRecord: async (_object: string, _id: string, _data: Record<string, unknown>) => {
+        if (mockUpdateRecordError.value) throw mockUpdateRecordError.value;
+        return undefined;
+      },
+      deleteRecord: async () => undefined,
+    };
+  },
 }));
 
 vi.mock('../lib/connectorSalesforceClient.js', () => ({
@@ -121,6 +140,8 @@ beforeEach(() => {
   mockCreateRecordError.value  = null;
   mockUpdateRecordError.value  = null;
   lastCreateRecordData.value   = null;
+  mockSfUserId.value           = '005SF000001TestABC';
+  lastQuerySoql.value          = null;
 });
 
 // ── V. POST route: subject validation ─────────────────────────────────────────
@@ -557,5 +578,125 @@ describe('PATCH /api/sf/tasks/:id/complete — ID format validation', () => {
 
     expect(res.status).toBe(500);
     expect(res.body.success).toBeUndefined();
+  });
+});
+
+// ── G. GET /sf/tasks: sfUserId guard ──────────────────────────────────────────
+//
+// When sfUserId is absent from the session the route must refuse immediately.
+// The mock simulates this by throwing from getSalesforceClient (the same path
+// that fires in production when SF credentials are missing).
+
+describe('GET /api/sf/tasks — sfUserId guard', () => {
+
+  test('G1: returns 401 when sfUserId is absent from session', async () => {
+    mockSfUserId.value = null;
+
+    const res = await request(app).get('/api/sf/tasks');
+
+    expect(res.status).toBe(401);
+  });
+
+  test('G1: 401 body contains an error field', async () => {
+    mockSfUserId.value = null;
+
+    const res = await request(app).get('/api/sf/tasks');
+
+    expect(res.status).toBe(401);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  test('G1: query() is never called when sfUserId is absent', async () => {
+    mockSfUserId.value = null;
+
+    await request(app).get('/api/sf/tasks');
+
+    // lastQuerySoql remains null — client.query() was never reached
+    expect(lastQuerySoql.value).toBeNull();
+  });
+
+  test('G1: successful request includes the sfUserId in the OwnerId filter', async () => {
+    // sfUserId is '005SF000001TestABC' (set in beforeEach)
+    const res = await request(app).get('/api/sf/tasks');
+
+    expect(res.status).toBe(200);
+    expect(lastQuerySoql.value).toContain("OwnerId = '005SF000001TestABC'");
+  });
+});
+
+// ── S. GET /sf/tasks: status filter SOQL WHERE clause ─────────────────────────
+
+describe('GET /api/sf/tasks — status filter', () => {
+
+  test('S1: ?status=completed produces Status = "Completed" clause', async () => {
+    const res = await request(app).get('/api/sf/tasks?status=completed');
+
+    expect(res.status).toBe(200);
+    expect(lastQuerySoql.value).toContain("Status = 'Completed'");
+  });
+
+  test('S1: ?status=completed does not include the active-status set', async () => {
+    await request(app).get('/api/sf/tasks?status=completed');
+
+    expect(lastQuerySoql.value).not.toContain('Not Started');
+  });
+
+  test('S2: ?status=all produces Status != null clause', async () => {
+    const res = await request(app).get('/api/sf/tasks?status=all');
+
+    expect(res.status).toBe(200);
+    expect(lastQuerySoql.value).toContain('Status != null');
+  });
+
+  test('S3: default (no status param) produces active-status IN clause', async () => {
+    const res = await request(app).get('/api/sf/tasks');
+
+    expect(res.status).toBe(200);
+    expect(lastQuerySoql.value).toContain("Status IN ('Not Started', 'In Progress', 'Deferred')");
+  });
+
+  test('S3: unknown status value falls through to the active-status default', async () => {
+    const res = await request(app).get('/api/sf/tasks?status=unknown_value');
+
+    expect(res.status).toBe(200);
+    expect(lastQuerySoql.value).toContain("Status IN ('Not Started', 'In Progress', 'Deferred')");
+  });
+});
+
+// ── D. GET /sf/tasks: date filter SOQL injection ──────────────────────────────
+
+describe('GET /api/sf/tasks — date filter', () => {
+
+  test('D1: ?date=today injects an ActivityDate filter', async () => {
+    const res = await request(app).get('/api/sf/tasks?date=today');
+
+    expect(res.status).toBe(200);
+    expect(lastQuerySoql.value).toContain('ActivityDate =');
+  });
+
+  test('D1: the injected ActivityDate value is today in YYYY-MM-DD format', async () => {
+    const todayIso = new Date().toISOString().slice(0, 10); // e.g. "2026-08-11"
+
+    await request(app).get('/api/sf/tasks?date=today');
+
+    expect(lastQuerySoql.value).toContain(`ActivityDate = ${todayIso}`);
+  });
+
+  test('D1: without ?date=today the SOQL contains no ActivityDate WHERE filter', async () => {
+    await request(app).get('/api/sf/tasks');
+
+    // ActivityDate appears in the SELECT list; we check only the filter form.
+    expect(lastQuerySoql.value).not.toContain('ActivityDate =');
+  });
+
+  test('D1: ?date=today can be combined with ?status=completed', async () => {
+    const todayIso = new Date().toISOString().slice(0, 10);
+
+    const res = await request(app).get('/api/sf/tasks?status=completed&date=today');
+
+    expect(res.status).toBe(200);
+    expect(lastQuerySoql.value).toContain("Status = 'Completed'");
+    expect(lastQuerySoql.value).toContain(`ActivityDate = ${todayIso}`);
   });
 });
