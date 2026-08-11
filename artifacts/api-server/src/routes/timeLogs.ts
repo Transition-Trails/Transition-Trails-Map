@@ -8,10 +8,10 @@
  */
 
 import { Router } from "express";
-import { db } from "../lib/db.js";
-import { timeLogsTable } from "../../../../lib/db/src/schema/index.js";
+import { db }             from "@workspace/db";
+import { timeLogsTable }  from "@workspace/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
-import { logger } from "../lib/logger.js";
+import { logger }         from "../lib/logger.js";
 
 const router = Router();
 
