@@ -74,6 +74,30 @@ Trail OS is a pnpm monorepo. Key rules:
 - TypeScript must pass clean (`0 errors`) before any PR merge.
 - Do not add leaf artifacts (e.g., `program-map`) to the root `tsconfig.json` references — that file is for libs only.
 
+#### Lib build dependency
+
+`lib/` packages (`lib/db`, `lib/api-zod`, etc.) are composite TypeScript projects whose
+compiled declarations live in their `dist/` directories. Artifact packages (`artifacts/api-server`,
+`artifacts/program-map`, etc.) import those declarations at typecheck time.
+
+The root `typecheck` script always rebuilds libs first:
+
+```
+pnpm run typecheck:libs   # tsc --build — rebuilds any lib whose source is newer than dist/
+pnpm -r ... typecheck     # artifact-level checks against fresh declarations
+```
+
+**Never skip `typecheck:libs`.** If `dist/` is stale (e.g. after `git pull` adds a column to
+`lib/db/src/schema/`) downstream typechecks will silently use the old declarations, hiding
+real errors or surfacing spurious ones.
+
+If you suspect the incremental build state (`.tsbuildinfo`) is corrupted — for example after
+a branch switch where timestamps are unreliable — force a clean lib rebuild before re-running:
+
+```bash
+pnpm run typecheck:libs:force   # tsc --build --force — ignores tsbuildinfo cache
+```
+
 ---
 
 ## Branch Conventions
