@@ -360,22 +360,18 @@ export function HomebaseShell({
         </main>
       </div>
 
-      {/* Right: Slack panel (learner / coach / volunteer only)
-          Team staff are already in Slack as workspace members; they don't need
-          a personal-auth panel inside Homebase. */}
-      {audience !== "team" && (
-        <motion.div
-          className="relative flex-shrink-0 flex flex-col border-l border-border bg-white overflow-hidden"
-          animate={{ width: rightOpen ? 320 : 40 }}
-          transition={{ type: "spring", damping: 28, stiffness: 300 }}
-        >
-          <SlimSlackPanel
-            open={rightOpen}
-            onToggle={toggleRight}
-            returnPath={location ?? "/"}
-          />
-        </motion.div>
-      )}
+      {/* Right: Slack panel — all audiences including team */}
+      <motion.div
+        className="relative flex-shrink-0 flex flex-col border-l border-border bg-white overflow-hidden"
+        animate={{ width: rightOpen ? 320 : 40 }}
+        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+      >
+        <SlimSlackPanel
+          open={rightOpen}
+          onToggle={toggleRight}
+          returnPath={location ?? "/"}
+        />
+      </motion.div>
     </div>
   );
 }
