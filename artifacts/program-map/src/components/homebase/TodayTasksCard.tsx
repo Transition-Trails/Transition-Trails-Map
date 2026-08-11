@@ -180,7 +180,7 @@ export function TodayTasksCard() {
                     </button>
 
                     <TaskHoverCard
-                      task={{ ...task, Status: task.Status }}
+                      task={task}
                       orgBaseUrl={orgBaseUrl}
                       onStatusChange={(id, status) => {
                         if (status === "Completed") {
@@ -188,6 +188,11 @@ export function TodayTasksCard() {
                         } else {
                           setTasks(prev => applyStatusChange(prev, id, status));
                         }
+                      }}
+                      onTaskUpdate={(id, updates) => {
+                        setTasks(prev => prev.map(t =>
+                          t.Id === id ? { ...t, ...updates } : t
+                        ));
                       }}
                     >
                       <div className="flex-1 min-w-0 cursor-pointer select-none">

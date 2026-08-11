@@ -93,9 +93,10 @@ interface TaskRowProps {
   orgBaseUrl: string;
   onComplete: (task: SfTask) => void;
   onStatusChange: (id: string, status: string) => void;
+  onTaskUpdate:   (id: string, updates: { ActivityDate?: string | null; Description?: string | null }) => void;
 }
 
-function TaskRow({ task, isCompleting, orgBaseUrl, onComplete, onStatusChange }: TaskRowProps) {
+function TaskRow({ task, isCompleting, orgBaseUrl, onComplete, onStatusChange, onTaskUpdate }: TaskRowProps) {
   const overdue = isOverdue(task.ActivityDate);
   return (
     <li className="flex items-start gap-3 py-3 border-b border-border/50 last:border-0">
@@ -111,7 +112,7 @@ function TaskRow({ task, isCompleting, orgBaseUrl, onComplete, onStatusChange }:
         }
       </button>
 
-      <TaskHoverCard task={task} orgBaseUrl={orgBaseUrl} onStatusChange={onStatusChange}>
+      <TaskHoverCard task={task} orgBaseUrl={orgBaseUrl} onStatusChange={onStatusChange} onTaskUpdate={onTaskUpdate}>
         <div className="flex-1 min-w-0 cursor-pointer select-none">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-sm font-medium text-foreground leading-snug">
@@ -274,6 +275,11 @@ export function ActiveTasksCard({ onCreated }: ActiveTasksCardProps) {
                     } else {
                       setTasks(prev => applyStatusChange(prev, id, status));
                     }
+                  }}
+                  onTaskUpdate={(id, updates) => {
+                    setTasks(prev => prev.map(t =>
+                      t.Id === id ? { ...t, ...updates } : t
+                    ));
                   }}
                 />
               ))}

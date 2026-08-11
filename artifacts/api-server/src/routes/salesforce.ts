@@ -1579,6 +1579,65 @@ router.post("/sf/tasks", async (req, res) => {
 });
 
 /**
+ * PATCH /api/sf/tasks/:id
+ * Update a Task's dueDate and/or description.
+ * Body: { dueDate?: "YYYY-MM-DD" | null, description?: string | null }
+ */
+router.patch("/sf/tasks/:id", async (req, res) => {
+  let client: ISalesforceClient;
+  try {
+    client = getSalesforceClient(req);
+  } catch {
+    return res.status(401).json({ error: "Not connected to Salesforce." });
+  }
+
+  const { id } = req.params;
+  if (!id || !/^[a-zA-Z0-9]{15,18}$/.test(id)) {
+    return res.status(400).json({ error: "Invalid Task ID." });
+  }
+
+  const sfUserId = req.session.sfUserId ?? "";
+  if (!sfUserId) {
+    return res.status(401).json({ error: "Salesforce user ID not found in session." });
+  }
+
+  const body = (req.body ?? {}) as { dueDate?: string | null; description?: string | null };
+  const updates: Record<string, string | null> = {};
+
+  if ("dueDate" in body) {
+    if (body.dueDate !== null && body.dueDate !== undefined) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(body.dueDate)) {
+        return res.status(400).json({ error: "dueDate must be YYYY-MM-DD or null." });
+      }
+      updates["ActivityDate"] = body.dueDate;
+    } else {
+      updates["ActivityDate"] = null;
+    }
+  }
+  if ("description" in body) {
+    updates["Description"] = body.description ?? null;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: "No updatable fields provided." });
+  }
+
+  try {
+    const owned = await client.query<{ Id: string }>(
+      `SELECT Id FROM Task WHERE Id = '${id}' AND OwnerId = '${sfUserId}' AND IsDeleted = false LIMIT 1`,
+    );
+    if (owned.records.length === 0) {
+      return res.status(404).json({ error: "Task not found." });
+    }
+    await client.updateRecord("Task", id, updates);
+    return res.json({ success: true, updates });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: msg });
+  }
+});
+
+/**
  * PATCH /api/sf/tasks/:id/status
  * Update a Task's Status field to any allowed value.
  * Body: { status: "Not Started" | "In Progress" | "Deferred" | "Completed" }
