@@ -19,6 +19,7 @@ import {
 import { useToast }        from "@/hooks/use-toast";
 import { useLocation }     from "wouter";
 import { useCollapsible }  from "@/hooks/useCollapsible";
+import { openSfAuthPopup } from "@/utils/openSfAuthPopup";
 import { CreateTaskDrawer } from "./CreateTaskDrawer";
 import { TaskHoverCard }   from "./TaskHoverCard";
 
@@ -157,15 +158,13 @@ export function TodayTasksCard() {
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Connect to Salesforce to see your tasks.
                   </p>
-                  <a
-                    href="/api/auth/salesforce/login"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={openSfAuthPopup}
                     className="inline-flex items-center gap-1.5 text-[12px] text-primary hover:text-primary/80 transition-colors font-medium"
                   >
                     <RefreshCw className="w-3 h-3" />
                     Reconnect Salesforce
-                  </a>
+                  </button>
                 </div>
               ) : visibleTasks.length === 0 ? (
                 <div className="py-4 text-center">

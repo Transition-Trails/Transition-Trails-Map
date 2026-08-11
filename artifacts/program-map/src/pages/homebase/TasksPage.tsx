@@ -13,6 +13,7 @@ import {
   CheckCircle2, ChevronsUpDown, ChevronUp, ChevronDown,
 } from "lucide-react";
 import { useToast }           from "@/hooks/use-toast";
+import { openSfAuthPopup }   from "@/utils/openSfAuthPopup";
 import { CreateTaskDrawer }   from "@/components/homebase/CreateTaskDrawer";
 import { TaskHoverCard }      from "@/components/homebase/TaskHoverCard";
 
@@ -370,15 +371,13 @@ export default function TasksPage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Connect your Salesforce account to manage tasks.
               </p>
-              <a
-                href="/api/auth/salesforce/login"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={openSfAuthPopup}
                 className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 Reconnect Salesforce
-              </a>
+              </button>
             </div>
 
           ) : tasks.length === 0 ? (

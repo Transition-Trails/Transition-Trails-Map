@@ -147,7 +147,9 @@ router.get("/callback", async (req, res): Promise<void> => {
         logger.info({ userId: identity.userId, username: identity.username, sfContactId }, "Salesforce OAuth complete");
         // FIX 1 — guard before redirect; a duplicate callback may have already responded
         if (!res.headersSent) {
-          res.redirect("/");
+          // Redirect to /connected so a popup window can reload the opener and
+          // close itself, instead of navigating the main app tab away.
+          res.redirect("/api/auth/salesforce/connected");
         } else {
           logger.warn("Headers already sent — skipping redirect after session save");
         }
@@ -172,6 +174,48 @@ router.get("/callback", async (req, res): Promise<void> => {
       logger.warn("Headers already sent — skipping 500 in outer callback catch");
     }
   }
+});
+
+// ── GET /connected ────────────────────────────────────────────────────────────
+// Returned after a successful OAuth callback.  When the flow ran in a popup
+// window this page reloads the opener and closes itself; when it ran in the
+// main tab it falls back to a plain redirect to "/".
+
+router.get("/connected", (_req, res): void => {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Salesforce Connected</title>
+  <style>
+    body { font-family: sans-serif; display: flex; align-items: center;
+           justify-content: center; min-height: 100vh; margin: 0;
+           background: #f9fafb; color: #374151; }
+    .box { text-align: center; padding: 2rem; }
+    .check { font-size: 3rem; margin-bottom: 1rem; }
+    p { font-size: 0.875rem; color: #6b7280; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="check">✓</div>
+    <p>Salesforce connected — closing…</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.location.reload();
+          window.close();
+          return;
+        }
+      } catch (_) { /* cross-origin guard — shouldn't happen */ }
+      // Fallback: not a popup, just navigate home.
+      window.location.replace('/');
+    })();
+  </script>
+</body>
+</html>`);
 });
 
 // ── GET /status ───────────────────────────────────────────────────────────────

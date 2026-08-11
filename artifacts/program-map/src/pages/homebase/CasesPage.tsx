@@ -13,6 +13,7 @@ import {
   ChevronsUpDown, ChevronUp, ChevronDown,
 } from "lucide-react";
 import { useToast }        from "@/hooks/use-toast";
+import { openSfAuthPopup } from "@/utils/openSfAuthPopup";
 import { CaseHoverCard }   from "@/components/homebase/CaseHoverCard";
 import type { SfCase }     from "@/components/homebase/CaseHoverCard";
 
@@ -344,15 +345,13 @@ export default function CasesPage() {
             <p className="text-sm text-muted-foreground">
               Connect your Salesforce account to view cases.
             </p>
-            <a
-              href="/api/auth/salesforce/login"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={openSfAuthPopup}
               className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 font-medium"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               Reconnect Salesforce
-            </a>
+            </button>
           </div>
 
         ) : cases.length === 0 ? (

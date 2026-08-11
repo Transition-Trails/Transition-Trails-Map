@@ -70,6 +70,7 @@ const PUBLIC_PATHS: readonly string[] = [
   // Salesforce auth flow (browser redirect round-trips, same reasoning)
   '/auth/salesforce/login',
   '/auth/salesforce/callback',
+  '/auth/salesforce/connected',
   '/auth/salesforce/status',
   '/auth/salesforce/logout',
   // Admin Google OAuth wizard (involves browser redirects from Google;
