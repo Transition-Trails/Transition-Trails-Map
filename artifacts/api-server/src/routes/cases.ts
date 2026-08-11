@@ -53,48 +53,64 @@ router.get("/sf/cases", async (req, res) => {
   const proxyFetch = getEffectiveSfFetch(req);
   const orgBaseUrl = proxyFetch ? await getOrgBaseUrl(proxyFetch) : "";
 
-  // Try with FollowUpDate; fall back gracefully if the field doesn't exist.
+  // Try with optional fields; fall back gracefully if any are unsupported.
   let records: Record<string, unknown>[] = [];
-  let followUpDateSupported = true;
+  let followUpDateSupported    = true;
+  let lastModifiedBySupported  = true;
 
-  const buildSoql = (withDate: boolean) =>
-    `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate` +
-    (withDate ? `, FollowUpDate` : ``) +
+  const buildSoql = (withFollowUp: boolean, withModifiedBy: boolean) =>
+    `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, LastActivityDate, LastModifiedDate` +
+    (withModifiedBy ? `, LastModifiedBy.Name` : ``) +
+    (withFollowUp   ? `, FollowUpDate`        : ``) +
     `, Owner.Name, Contact.Name, Account.Name ` +
     `FROM Case WHERE OwnerId = '${sfUserId}' ${statusClause} ` +
     `ORDER BY CreatedDate DESC LIMIT 50`;
 
-  try {
-    const result = await client.query<Record<string, unknown>>(buildSoql(true));
-    records = result.records;
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    // Field not found → retry without FollowUpDate
-    if (/FollowUpDate|No such column/i.test(msg)) {
-      followUpDateSupported = false;
-      try {
-        const result = await client.query<Record<string, unknown>>(buildSoql(false));
-        records = result.records;
-      } catch (e2: unknown) {
-        const msg2 = e2 instanceof Error ? e2.message : String(e2);
-        return res.status(500).json({ error: msg2 });
+  // Attempt order: full → no FollowUpDate → no LastModifiedBy → neither
+  const attempts: Array<[boolean, boolean]> = [
+    [true,  true ],
+    [false, true ],
+    [true,  false],
+    [false, false],
+  ];
+
+  let lastError = "";
+  for (const [withFollowUp, withModifiedBy] of attempts) {
+    try {
+      const result = await client.query<Record<string, unknown>>(buildSoql(withFollowUp, withModifiedBy));
+      records = result.records;
+      followUpDateSupported   = withFollowUp;
+      lastModifiedBySupported = withModifiedBy;
+      lastError = "";
+      break;
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      lastError = msg;
+      // Only continue if the failure is a missing-field error
+      if (!/FollowUpDate|LastModifiedBy|No such column|INVALID_FIELD/i.test(msg)) {
+        return res.status(500).json({ error: msg });
       }
-    } else {
-      return res.status(500).json({ error: msg });
     }
   }
 
+  if (lastError) {
+    return res.status(500).json({ error: lastError });
+  }
+
   const cases = records.map(r => ({
-    Id:           r["Id"]           as string,
-    CaseNumber:   r["CaseNumber"]   as string | null,
-    Subject:      r["Subject"]      as string | null,
-    Priority:     r["Priority"]     as string | null,
-    Status:       r["Status"]       as string | null,
-    CreatedDate:  r["CreatedDate"]  as string | null,
-    FollowUpDate: followUpDateSupported ? (r["FollowUpDate"] as string | null) : null,
-    OwnerName:    ((r["Owner"]   as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
-    ContactName:  ((r["Contact"] as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
-    AccountName:  ((r["Account"] as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
+    Id:                   r["Id"]               as string,
+    CaseNumber:           r["CaseNumber"]        as string | null,
+    Subject:              r["Subject"]           as string | null,
+    Priority:             r["Priority"]          as string | null,
+    Status:               r["Status"]            as string | null,
+    CreatedDate:          r["CreatedDate"]        as string | null,
+    LastActivityDate:     r["LastActivityDate"]   as string | null,
+    LastModifiedDate:     r["LastModifiedDate"]   as string | null,
+    LastModifiedByName:   lastModifiedBySupported ? (((r["LastModifiedBy"] as Record<string, unknown> | null)?.["Name"] as string | null) ?? null) : null,
+    FollowUpDate:         followUpDateSupported ? (r["FollowUpDate"] as string | null) : null,
+    OwnerName:            ((r["Owner"]   as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
+    ContactName:          ((r["Contact"] as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
+    AccountName:          ((r["Account"] as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
   }));
 
   return res.json({ cases, orgBaseUrl, followUpDateSupported });

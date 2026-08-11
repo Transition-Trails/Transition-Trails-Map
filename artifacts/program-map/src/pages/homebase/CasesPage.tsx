@@ -19,7 +19,7 @@ import type { SfCase }     from "@/components/homebase/CaseHoverCard";
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type FilterTab      = "open" | "all" | "closed";
-type SortField      = "CaseNumber" | "Subject" | "Status" | "OwnerName" | "Priority" | "CreatedDate";
+type SortField      = "CaseNumber" | "Subject" | "Status" | "OwnerName" | "Priority" | "CreatedDate" | "LastActivityDate";
 type SortDir        = "asc" | "desc";
 type StatusFilter   = "All" | "New" | "Working" | "Escalated" | "Closed";
 type PriorityFilter = "All" | "High" | "Medium" | "Low";
@@ -67,6 +67,20 @@ function ageLabel(dateStr: string | null): string {
   const days = Math.floor(ms / 86_400_000);
   if (days === 0) return "Today";
   if (days === 1) return "1d ago";
+  if (days < 30)  return `${days}d ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}yr ago`;
+}
+
+function activityLabel(dateStr: string | null): string {
+  if (!dateStr) return "—";
+  const ms   = Date.now() - new Date(dateStr).getTime();
+  const min  = Math.floor(ms / 60_000);
+  const hr   = Math.floor(ms / 3_600_000);
+  const days = Math.floor(ms / 86_400_000);
+  if (min  < 2)   return "Just now";
+  if (min  < 60)  return `${min}m ago`;
+  if (hr   < 24)  return `${hr}h ago`;
   if (days < 30)  return `${days}d ago`;
   if (days < 365) return `${Math.floor(days / 30)}mo ago`;
   return `${Math.floor(days / 365)}yr ago`;
@@ -149,6 +163,10 @@ export default function CasesPage() {
         case "Status":
           cmp = (STATUS_ORDER[a.Status ?? ""] ?? 0)
               - (STATUS_ORDER[b.Status ?? ""] ?? 0);
+          break;
+        case "LastActivityDate":
+          cmp = (a.LastActivityDate ?? a.LastModifiedDate ?? "")
+              .localeCompare(b.LastActivityDate ?? b.LastModifiedDate ?? "");
           break;
         case "CaseNumber":
           cmp = (a.CaseNumber ?? "").localeCompare(b.CaseNumber ?? "");
@@ -362,12 +380,13 @@ export default function CasesPage() {
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-border bg-muted/30">
-                <ColHeader field="CaseNumber" label="Case #"      className="w-28 pl-4" />
-                <ColHeader field="Subject"    label="Subject"     className="min-w-0" />
-                <ColHeader field="Status"     label="Status"      className="w-32" />
-                <ColHeader field="OwnerName"  label="Assigned To" className="w-36" />
-                <ColHeader field="Priority"   label="Priority"    className="w-24" />
-                <ColHeader field="CreatedDate" label="Age"        className="w-24 pr-4" />
+                <ColHeader field="CaseNumber"      label="Case #"        className="w-28 pl-4" />
+                <ColHeader field="Subject"         label="Subject"       className="min-w-0" />
+                <ColHeader field="Status"          label="Status"        className="w-32" />
+                <ColHeader field="OwnerName"       label="Assigned To"   className="w-36" />
+                <ColHeader field="Priority"        label="Priority"      className="w-24" />
+                <ColHeader field="LastActivityDate" label="Last Activity" className="w-40" />
+                <ColHeader field="CreatedDate"     label="Age"           className="w-24 pr-4" />
               </tr>
             </thead>
             <tbody>

@@ -21,16 +21,19 @@ import { useToast } from "@/hooks/use-toast";
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface SfCase {
-  Id:           string;
-  CaseNumber:   string | null;
-  Subject:      string | null;
-  Priority:     string | null;
-  Status:       string | null;
-  CreatedDate:  string | null;
-  FollowUpDate: string | null;
-  OwnerName:    string | null;
-  ContactName:  string | null;
-  AccountName:  string | null;
+  Id:                 string;
+  CaseNumber:         string | null;
+  Subject:            string | null;
+  Priority:           string | null;
+  Status:             string | null;
+  CreatedDate:        string | null;
+  LastActivityDate:   string | null;
+  LastModifiedDate:   string | null;
+  LastModifiedByName: string | null;
+  FollowUpDate:       string | null;
+  OwnerName:          string | null;
+  ContactName:        string | null;
+  AccountName:        string | null;
 }
 
 interface CaseHoverCardProps {
@@ -357,24 +360,42 @@ export function CaseHoverCard({
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 bg-muted/30 flex items-center justify-between">
-          {c.CreatedDate && (
-            <div className="flex items-center gap-1 text-[10px] text-muted-foreground/60">
-              <Clock className="w-3 h-3" />
-              <span>Created {formatDate(c.CreatedDate)}</span>
+        <div className="px-4 py-2.5 bg-muted/30 space-y-1.5">
+          {/* Last activity */}
+          {(c.LastActivityDate ?? c.LastModifiedDate) && (
+            <div className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              <span>
+                Last activity{" "}
+                <span className="font-medium text-foreground/70">
+                  {formatDate(c.LastActivityDate ?? c.LastModifiedDate)}
+                </span>
+                {c.LastModifiedByName && (
+                  <> · by <span className="font-medium text-foreground/70">{c.LastModifiedByName}</span></>
+                )}
+              </span>
             </div>
           )}
-          {sfLink && (
-            <a
-              href={sfLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 font-semibold transition-colors ml-auto"
-            >
-              Open in Salesforce
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
+
+          {/* Created + SF link */}
+          <div className="flex items-center justify-between">
+            {c.CreatedDate && (
+              <div className="flex items-center gap-1 text-[10px] text-muted-foreground/50">
+                <span>Created {formatDate(c.CreatedDate)}</span>
+              </div>
+            )}
+            {sfLink && (
+              <a
+                href={sfLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 font-semibold transition-colors ml-auto"
+              >
+                Open in Salesforce
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+          </div>
         </div>
       </PopoverContent>
     </Popover>

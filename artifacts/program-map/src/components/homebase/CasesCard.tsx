@@ -20,6 +20,22 @@ import { useCollapsible } from "@/hooks/useCollapsible";
 import { CaseHoverCard }  from "./CaseHoverCard";
 import type { SfCase }    from "./CaseHoverCard";
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function activityLabel(dateStr: string | null): string {
+  if (!dateStr) return "—";
+  const ms   = Date.now() - new Date(dateStr).getTime();
+  const min  = Math.floor(ms / 60_000);
+  const hr   = Math.floor(ms / 3_600_000);
+  const days = Math.floor(ms / 86_400_000);
+  if (min  < 2)   return "Just now";
+  if (min  < 60)  return `${min}m ago`;
+  if (hr   < 24)  return `${hr}h ago`;
+  if (days < 30)  return `${days}d ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}yr ago`;
+}
+
 // ── Badge styles ──────────────────────────────────────────────────────────────
 
 const STATUS_BADGE: Record<string, string> = {
@@ -187,6 +203,12 @@ export function CasesCard() {
                             {(c.ContactName ?? c.AccountName) && (
                               <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
                                 {c.ContactName ?? c.AccountName}
+                              </p>
+                            )}
+                            {(c.LastActivityDate ?? c.LastModifiedDate) && (
+                              <p className="text-[11px] text-muted-foreground/60 mt-0.5 truncate">
+                                Active {activityLabel(c.LastActivityDate ?? c.LastModifiedDate)}
+                                {c.LastModifiedByName ? ` · ${c.LastModifiedByName}` : ""}
                               </p>
                             )}
                           </div>
