@@ -50,6 +50,12 @@ const SCOPES = [
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getPublicBaseUrl(req: Request): string {
+  // APP_BASE_URL is the preferred stable override — set it to the deployed URL
+  // (e.g. https://your-app.replit.app) so the callback URI never changes between
+  // dev-domain rotations.  Falls back to REPLIT_DEV_DOMAIN for local dev, then
+  // the request Host header as a last resort.
+  const appBase   = process.env["APP_BASE_URL"];
+  if (appBase) return appBase.replace(/\/$/, "");
   const devDomain = process.env["REPLIT_DEV_DOMAIN"];
   if (devDomain) return `https://${devDomain}`;
   const proto = (req.headers["x-forwarded-proto"] as string | undefined) ?? "http";

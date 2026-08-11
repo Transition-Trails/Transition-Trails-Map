@@ -37,6 +37,8 @@ import {
   X,
   Bell,
   MessageCircle,
+  FileText,
+  Plus,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -725,8 +727,11 @@ function SearchResultRow({
   );
 }
 
-// ── Connected panel content ───────────────────────────────────────────────────
-
+interface CanvasData {
+  id:      string;
+  content: string;
+  title:   string;
+}
 function ConnectedView({
   teamName,
   returnPath,
@@ -771,6 +776,9 @@ function ConnectedView({
   const [searchResults,  setSearchResults]  = useState<SearchResult[]>([]);
   const [searchLoading,  setSearchLoading]  = useState(false);
 
+  // ── Canvas tab ────────────────────────────────────────────────────────────
+  const [activeTab,      setActiveTab]      = useState<"messages" | "canvas">("messages");
+
   // ── Missing-scope notice ──────────────────────────────────────────────────
   // When any API call fails with missing_scope we show an inline banner.
   // `retryAfterReconnect` is the action to replay once the user re-auths.
@@ -794,6 +802,11 @@ function ConnectedView({
   const pollRef         = useRef<ReturnType<typeof setInterval> | null>(null);
   const presencePollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const searchInputRef  = useRef<HTMLInputElement>(null);
+
+  // Reset to Messages tab when the selected conversation changes
+  useEffect(() => {
+    setActiveTab("messages");
+  }, [selectedConv?.id]);
 
   // Load conversation list on mount
   useEffect(() => {
@@ -1204,6 +1217,93 @@ function ConnectedView({
               </button>
             </div>
           )}
+          {/* ── Tab bar — channels only (DMs have no canvas) ── */}
+          {selectedConv?.type === "channel" && (
+            <div className="flex-shrink-0 flex border-b border-border bg-white">
+              {(["messages", "canvas"] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`flex-1 py-1.5 text-[11px] font-medium capitalize transition-colors border-b-2 ${
+                    activeTab === tab
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab === "canvas" ? (
+                    <span className="flex items-center justify-center gap-1">
+                      <FileText className="w-3 h-3" />Canvas
+                    </span>
+                  ) : "Messages"}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* ── Canvas tab ── */}
+          {selectedConv?.type === "channel" && activeTab === "canvas" ? (
+            <div className="flex-1 overflow-y-auto bg-white">
+              <CanvasView channelId={selectedConv.id} onTokenExpired={onTokenExpired} />
+            </div>
+          ) : (
+            <>
+              {/* ── Messages ── */}
+              <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-3 bg-white">
+                {!selectedConv ? (
+                  <p className="text-[11px] text-muted-foreground text-center pt-4">
+                    Select a conversation to see messages.
+                  </p>
+                ) : msgLoading ? (
+                  <div className="flex items-center justify-center py-6">
+                    <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : msgError ? (
+                  <div className="flex items-center gap-2 text-destructive text-[11px]">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    {msgError}
+                  </div>
+                ) : messages.length === 0 ? (
+                  <p className="text-[11px] text-muted-foreground text-center pt-4">No messages yet.</p>
+                ) : (
+                  messages.map(msg => (
+                    <MessageBubble
+                      key={msg.ts}
+                      msg={msg}
+                      channelId={selectedConv.id}
+                      onReacted={() => void fetchMessages(selectedConv.id, true)}
+                      onMissingScope={handleMissingScope}
+                    />
+                  ))
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* ── Compose bar ── */}
+              {selectedConv && (
+                <div className="flex-shrink-0 border-t border-border bg-white px-2 py-2 flex items-end gap-1.5">
+                  <textarea
+                    value={composeText}
+                    onChange={e => setComposeText(e.target.value)}
+                    onKeyDown={handleKey}
+                    placeholder="Message…"
+                    rows={2}
+                    className="flex-1 resize-none text-[12px] bg-muted/20 rounded-lg px-2.5 py-2 outline-none text-foreground placeholder:text-muted-foreground/50 border border-border focus:border-primary/40 transition-colors"
+                  />
+                  <button
+                    onClick={() => void handleSend()}
+                    disabled={!composeText.trim() || sending}
+                    className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors flex-shrink-0 mb-0.5"
+                    aria-label="Send"
+                  >
+                    {sending
+                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      : <Send className="w-3.5 h-3.5" />
+                    }
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </>
       )}
     </div>
@@ -1326,5 +1426,228 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+type CanvasState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "loaded"; canvas: CanvasData }
+  | { status: "none" }                      // channel has no canvas yet
+  | { status: "error"; message: string }
+  | { status: "unsupported" }              // paid plan required
+  | { status: "missing_scope" };           // token lacks canvases:read — needs re-auth
+
+function CanvasView({
+  channelId,
+  onTokenExpired,
+}: {
+  channelId:      string;
+  onTokenExpired: () => void;
+}) {
+  const [canvasState,   setCanvasState]   = useState<CanvasState>({ status: "idle" });
+  const [createText,    setCreateText]    = useState("");
+  const [creating,      setCreating]      = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
+  const fetchCanvas = useCallback(async () => {
+    setCanvasState({ status: "loading" });
+    try {
+      const data = await apiGet<{ canvas: CanvasData | null }>(`/api/slack/conversations/${channelId}/canvas`);
+      if (data.canvas === null) {
+        setCanvasState({ status: "none" });
+      } else {
+        setCanvasState({ status: "loaded", canvas: data.canvas });
+      }
+    } catch (err: unknown) {
+      if (err instanceof ApiError) {
+        if (err.code === "token_expired")  { onTokenExpired(); return; }
+        if (err.code === "missing_scope")  { setCanvasState({ status: "missing_scope" }); return; }
+        if (err.status === 403)            { setCanvasState({ status: "unsupported" }); return; }
+      }
+      setCanvasState({ status: "error", message: "Could not load canvas." });
+    }
+  }, [channelId, onTokenExpired]);
+
+  useEffect(() => {
+    void fetchCanvas();
+  }, [fetchCanvas]);
+
+  const handleCreate = useCallback(async () => {
+    if (creating) return;
+    setCreating(true);
+    try {
+      const result = await apiPost<{ ok: boolean; canvasId: string | null; alreadyExists?: boolean }>(
+        `/api/slack/conversations/${channelId}/canvas`,
+        { markdown: createText.trim() || undefined },
+      );
+      if (result.ok) {
+        setShowCreateForm(false);
+        setCreateText("");
+        // Re-fetch to get the newly-created canvas content
+        await fetchCanvas();
+      }
+    } catch (err: unknown) {
+      if (err instanceof ApiError) {
+        if (err.code === "token_expired") { onTokenExpired(); return; }
+        if (err.code === "missing_scope") { setCanvasState({ status: "missing_scope" }); return; }
+      }
+      // Surface error inside the form — don't crash the whole view
+      setCanvasState({ status: "error", message: "Could not create canvas." });
+    } finally {
+      setCreating(false);
+    }
+  }, [channelId, createText, creating, fetchCanvas, onTokenExpired]);
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
+  if (canvasState.status === "loading" || canvasState.status === "idle") {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (canvasState.status === "error") {
+    return (
+      <div className="flex items-center gap-2 text-destructive text-[11px] px-3 py-4">
+        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+        {canvasState.message}
+      </div>
+    );
+  }
+
+  if (canvasState.status === "missing_scope") {
+    return (
+      <div className="px-3 py-4 flex flex-col gap-3">
+        <div className="flex items-start gap-2 text-amber-600">
+          <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-[11px] font-semibold text-foreground leading-tight">
+              Canvas permissions needed
+            </p>
+            <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
+              Your Slack connection was made before canvas access was added.
+              Reconnect to grant the updated permissions.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={onTokenExpired}
+          className="self-start flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#4A154B] text-white text-[11px] font-medium hover:bg-[#611f69] transition-colors"
+        >
+          <ExternalLink className="w-3 h-3" />
+          Reconnect Slack
+        </button>
+      </div>
+    );
+  }
+
+  if (canvasState.status === "unsupported") {
+    return (
+      <div className="px-3 py-4 flex flex-col gap-1.5">
+        <p className="text-[11px] font-semibold text-foreground">Canvases unavailable</p>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          Slack Canvases require a paid plan (Pro, Business+, or Enterprise).
+          Upgrade your workspace to use this feature.
+        </p>
+      </div>
+    );
+  }
+
+  if (canvasState.status === "none") {
+    return (
+      <div className="px-3 py-4 flex flex-col gap-3">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <FileText className="w-4 h-4" />
+          <p className="text-[11px]">No canvas attached to this channel yet.</p>
+        </div>
+
+        {!showCreateForm ? (
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="flex items-center gap-1.5 text-[12px] font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Create canvas
+          </button>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
+              Initial content (markdown)
+            </p>
+            <textarea
+              value={createText}
+              onChange={e => setCreateText(e.target.value)}
+              placeholder={"# Channel Notes\n\nAdd your notes here…"}
+              rows={5}
+              className="resize-none text-[11px] bg-muted/20 rounded-lg px-2.5 py-2 outline-none text-foreground placeholder:text-muted-foreground/40 border border-border focus:border-primary/40 transition-colors font-mono"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => void handleCreate()}
+                disabled={creating}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-40"
+              >
+                {creating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+                Create
+              </button>
+              <button
+                onClick={() => { setShowCreateForm(false); setCreateText(""); }}
+                disabled={creating}
+                className="px-3 py-1.5 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors disabled:opacity-40"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // status === "loaded"
+  const { canvas } = canvasState;
+  const canvasUrl = `https://slack.com/canvas/${canvas.id}`;
+
+  return (
+    <div className="flex flex-col gap-2 px-3 py-3">
+      {/* Canvas header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <FileText className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+          <span className="text-[11px] font-semibold text-foreground truncate">{canvas.title}</span>
+        </div>
+        <a
+          href={canvasUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors flex-shrink-0"
+          title="Open in Slack"
+        >
+          <ExternalLink className="w-3 h-3" />
+          Edit in Slack
+        </a>
+      </div>
+
+      {/* Canvas content */}
+      {canvas.content ? (
+        <div className="rounded-md bg-muted/20 border border-border px-2.5 py-2 overflow-y-auto max-h-[320px]">
+          <pre className="text-[11px] text-foreground leading-relaxed whitespace-pre-wrap font-sans break-words">
+            {canvas.content}
+          </pre>
+        </div>
+      ) : (
+        <p className="text-[11px] text-muted-foreground italic">Canvas is empty — open in Slack to add content.</p>
+      )}
+
+      <button
+        onClick={() => void fetchCanvas()}
+        className="self-start text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+      >
+        Refresh
+      </button>
+    </div>
   );
 }

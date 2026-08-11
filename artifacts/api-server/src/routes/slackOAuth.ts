@@ -142,6 +142,8 @@ const USER_SCOPES = [
   "search:read",
   "users:read",
   "reactions:write",
+  "canvases:read",
+  "canvases:write",
 ].join(",");
 
 // ── In-memory state store (CSRF protection across the OAuth redirect) ─────────
@@ -996,6 +998,188 @@ router.get("/slack/threads", requireSlackAuth, async (req, res) => {
 
 // ── POST /slack/conversations/:channelId/messages/:ts/reactions ───────────────
 
+// ── Canvas text extraction ────────────────────────────────────────────────────
+//
+// Slack canvas sections use a nested rich-text block structure.  Each section
+// has an `elements` array of blocks (type "rich_text", "heading", etc.), each
+// block has its own `elements` array of inline objects, and leaf nodes carry
+// `{ type: "text", text: "…" }`.  There is no top-level `text` field on a
+// section — callers must recurse to collect the actual string content.
+
+function extractTextFromBlocks(node: unknown): string {
+  if (!Array.isArray(node)) return "";
+  return node.map((el): string => {
+    if (typeof el !== "object" || el === null) return "";
+    const e = el as Record<string, unknown>;
+
+    // Leaf: a text run
+    if (e["type"] === "text" && typeof e["text"] === "string") {
+      const text  = e["text"] as string;
+      const style = e["style"] as Record<string, unknown> | undefined;
+      if (style?.["bold"])   return `**${text}**`;
+      if (style?.["italic"]) return `_${text}_`;
+      if (style?.["code"])   return `\`${text}\``;
+      return text;
+    }
+
+    // List item: prefix with bullet
+    if (e["type"] === "rich_text_list_item" && Array.isArray(e["elements"])) {
+      return "• " + extractTextFromBlocks(e["elements"]);
+    }
+
+    // Any container element: recurse into its elements
+    if (Array.isArray(e["elements"])) {
+      return extractTextFromBlocks(e["elements"]);
+    }
+
+    return "";
+  }).join("");
+}
+
+// ── GET /slack/conversations/:id/canvas ──────────────────────────────────────
+//
+// Returns the canvas attached to a Slack channel, if one exists.
+// Requires canvases:read scope.
+//
+// Response shapes:
+//   { canvas: { id, content, title } }          — canvas found; content may be ""
+//   { canvas: null }                            — no canvas attached
+//   { error: "missing_scope" }   (HTTP 403)     — token lacks canvases:read
+//   { error: "token_expired" }   (HTTP 401)     — token invalid
+
+router.get("/slack/conversations/:id/canvas", requireSlackAuth, async (req, res) => {
+  const email = req.session.googleEmail;
+  if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
+
+  const channelId = String(req.params["id"]);
+
+  let token: string | null;
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack canvas DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
+
+  try {
+    // Step 1 — fetch channel info to discover attached canvas id
+    const infoR = await slackUserGet(token, "conversations.info", {
+      channel:               channelId,
+      include_all_metadata:  "true",
+    });
+
+    if (infoR["ok"] !== true) {
+      const slackErr = infoR["error"];
+      if (isTokenExpiredError(slackErr)) {
+        res.status(401).json({ error: "token_expired" }); return;
+      }
+      if (slackErr === "missing_scope") {
+        res.status(403).json({ error: "missing_scope", neededScope: "canvases:read" }); return;
+      }
+      // Channel not found, archived, or inaccessible — treat as no canvas
+      res.json({ canvas: null }); return;
+    }
+
+    const channelObj = infoR["channel"] as Record<string, unknown> | undefined;
+    const canvasObj  = channelObj?.["canvas"] as Record<string, unknown> | undefined;
+    const canvasId   = canvasObj?.["file_id"] as string | undefined;
+
+    if (!canvasId) {
+      res.json({ canvas: null }); return;
+    }
+
+    // Step 2 — fetch canvas sections via canvases.sections.lookup.
+    // Sections carry nested `elements` arrays (Slack rich-text block format);
+    // use extractTextFromBlocks() to walk the tree and collect plain text.
+    const sectionsR = await fetch("https://slack.com/api/canvases.sections.lookup", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({ canvas_id: canvasId, criteria: {} }),
+    });
+    const sectionsData = (await sectionsR.json()) as Record<string, unknown>;
+
+    if (sectionsData["ok"] !== true) {
+      const slackErr = sectionsData["error"];
+      if (isTokenExpiredError(slackErr)) {
+        res.status(401).json({ error: "token_expired" }); return;
+      }
+      if (slackErr === "missing_scope") {
+        res.status(403).json({ error: "missing_scope", neededScope: "canvases:read" }); return;
+      }
+      // Paid plan required or other transient error — surface canvas with no content
+      req.log.warn({ slackErr, canvasId }, "canvases.sections.lookup failed");
+      res.json({ canvas: { id: canvasId, content: "", title: "Channel Canvas" } }); return;
+    }
+
+    const sections = (sectionsData["sections"] as Array<Record<string, unknown>>) ?? [];
+
+    // Each section's readable text is extracted by walking its `elements` tree.
+    const content = sections
+      .map(s => extractTextFromBlocks(s["elements"]))
+      .filter(Boolean)
+      .join("\n\n");
+
+    res.json({ canvas: { id: canvasId, content, title: "Channel Canvas" } });
+  } catch (err) {
+    req.log.error({ err }, "slack canvas fetch error");
+    res.status(502).json({ error: "fetch_error" });
+  }
+});
+
+// ── POST /slack/conversations/:id/canvas ─────────────────────────────────────
+//
+// Creates a new canvas for the channel (or replaces content on an existing one).
+// Requires canvases:write scope.
+//
+// Request body: { markdown?: string }   — initial markdown content (optional)
+// Response:     { ok: true, canvasId: string }
+
+router.post("/slack/conversations/:id/canvas", requireSlackAuth, async (req, res) => {
+  const email = req.session.googleEmail;
+  if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
+
+  const channelId = String(req.params["id"]);
+  const markdown  = ((req.body as { markdown?: string })?.markdown ?? "").trim();
+
+  let token: string | null;
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack canvas create DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
+
+  try {
+    const payload: Record<string, unknown> = { channel_id: channelId };
+    if (markdown) {
+      payload["document_content"] = { type: "markdown", markdown };
+    }
+
+    const r = await fetch("https://slack.com/api/conversations.canvases.create", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body:    JSON.stringify(payload),
+    });
+    const result = (await r.json()) as { ok: boolean; error?: string; canvas_id?: string };
+
+    if (!result.ok) {
+      req.log.warn({ error: result.error, channelId }, "slack conversations.canvases.create failed");
+      if (isTokenExpiredError(result.error)) {
+        res.status(401).json({ ok: false, error: "token_expired" }); return;
+      }
+      if (result.error === "missing_scope") {
+        res.status(403).json({ ok: false, error: "missing_scope", neededScope: "canvases:write" }); return;
+      }
+      // canvas_already_exists — not a real error, return the existing canvas
+      if (result.error === "canvas_already_exists") {
+        res.json({ ok: true, canvasId: null, alreadyExists: true }); return;
+      }
+      res.status(502).json({ ok: false, error: result.error ?? "slack_api_error" }); return;
+    }
+
+    res.json({ ok: true, canvasId: result.canvas_id ?? null });
+  } catch (err) {
+    req.log.error({ err }, "slack canvas create error");
+    res.status(502).json({ ok: false, error: "fetch_error" });
+  }
+});
+
+// ── POST /slack/conversations/:channelId/messages/:ts/reactions ───────────────
+
 router.post("/slack/conversations/:channelId/messages/:ts/reactions", requireSlackAuth, async (req, res) => {
   const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
@@ -1036,7 +1220,6 @@ router.post("/slack/conversations/:channelId/messages/:ts/reactions", requireSla
     res.status(502).json({ ok: false, error: "fetch_error" });
   }
 });
-
 
 export default router;
 
