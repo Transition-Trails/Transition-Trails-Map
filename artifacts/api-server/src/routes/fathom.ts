@@ -63,7 +63,7 @@ async function fathomGet(
 
   const res = await fetch(url.toString(), {
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      "X-Api-Key": apiKey,
       Accept: "application/json",
     },
     signal: AbortSignal.timeout(12_000),

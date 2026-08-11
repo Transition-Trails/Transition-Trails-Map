@@ -88,7 +88,7 @@ export function TaskHoverCard({ task, orgBaseUrl, children }: TaskHoverCardProps
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
 
       <HoverCardContent
-        side="right"
+        side="left"
         align="start"
         sideOffset={12}
         className="w-72 p-0 shadow-lg border border-border/80 rounded-xl overflow-hidden"
