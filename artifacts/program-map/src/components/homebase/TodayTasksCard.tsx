@@ -135,6 +135,8 @@ export function TodayTasksCard() {
               </p>
               <a
                 href="/api/auth/salesforce/login"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-[12px] text-primary hover:text-primary/80 transition-colors font-medium"
               >
                 <RefreshCw className="w-3 h-3" />

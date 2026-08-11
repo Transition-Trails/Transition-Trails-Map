@@ -237,6 +237,8 @@ export default function TasksPage() {
               </p>
               <a
                 href="/api/auth/salesforce/login"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors font-medium"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
