@@ -329,6 +329,12 @@ function ConvItem({
   onSelect:  () => void;
   presence?: "active" | "away";
 }) {
+  // unreadCount > 0  → known unread (amber badge)
+  // unreadCount === undefined → unknown read state (small grey dot — DM shown defensively)
+  // unreadCount === 0 → read (no indicator; DM is filtered out before reaching this component)
+  const hasKnownUnread  = typeof conv.unreadCount === "number" && conv.unreadCount > 0;
+  const hasUnknownState = conv.unreadCount === undefined && (conv.type === "im" || conv.type === "mpim");
+
   return (
     <button
       onClick={onSelect}
@@ -348,9 +354,23 @@ function ConvItem({
           )}
         </span>
       )}
-      <span className={`truncate text-[12px] leading-tight ${selected ? "font-semibold" : "font-normal"}`}>
+      <span className={`truncate text-[12px] leading-tight flex-1 ${selected ? "font-semibold" : "font-normal"}`}>
         {conv.name}
       </span>
+      {hasKnownUnread && (
+        <span
+          className="flex-shrink-0 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-amber-500 text-white text-[9px] font-semibold px-1 leading-none"
+          title={`${conv.unreadCount} unread`}
+        >
+          {conv.unreadCount! > 99 ? "99+" : conv.unreadCount}
+        </span>
+      )}
+      {hasUnknownState && !hasKnownUnread && (
+        <span
+          className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-muted-foreground/30"
+          title="Read status unknown"
+        />
+      )}
     </button>
   );
 }
@@ -1284,7 +1304,9 @@ function ConnectedView({
                   icon={<User className="w-3 h-3" />}
                   items={conversations.filter(c =>
                     (c.type === "im" || c.type === "mpim") &&
-                    (c.unreadCount ?? 0) > 0 &&
+                    // Include when unread count is unknown (undefined) OR definitively > 0.
+                    // Exclude only when Slack has explicitly confirmed unread_count === 0.
+                    (c.unreadCount === undefined || c.unreadCount > 0) &&
                     !viewedDmIds.has(c.id)
                   )}
                   selectedId={selectedConv?.id ?? null}
