@@ -21,7 +21,7 @@ import type { SfCase }     from "@/components/homebase/CaseHoverCard";
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type FilterTab      = "open" | "all" | "closed";
-type SortField      = "CaseNumber" | "Subject" | "Status" | "OwnerName" | "Priority" | "CreatedDate" | "LastActivityDate";
+type SortField      = "CaseNumber" | "Subject" | "Status" | "OwnerName" | "Priority" | "CreatedDate" | "LastModifiedDate";
 type SortDir        = "asc" | "desc";
 type StatusFilter   = "All" | "New" | "Working" | "Escalated" | "Closed";
 type PriorityFilter = "All" | "High" | "Medium" | "Low";
@@ -184,9 +184,9 @@ export default function CasesPage() {
           cmp = (STATUS_ORDER[a.Status ?? ""] ?? 0)
               - (STATUS_ORDER[b.Status ?? ""] ?? 0);
           break;
-        case "LastActivityDate":
-          cmp = (a.LastActivityDate ?? a.LastModifiedDate ?? "")
-              .localeCompare(b.LastActivityDate ?? b.LastModifiedDate ?? "");
+        case "LastModifiedDate":
+          cmp = (a.LastModifiedDate ?? "")
+              .localeCompare(b.LastModifiedDate ?? "");
           break;
         case "CaseNumber":
           cmp = (a.CaseNumber ?? "").localeCompare(b.CaseNumber ?? "");
@@ -403,7 +403,7 @@ export default function CasesPage() {
                 <ColHeader field="Status"          label="Status"        className="w-32" />
                 <ColHeader field="OwnerName"       label="Assigned To"   className="w-36" />
                 <ColHeader field="Priority"        label="Priority"      className="w-24" />
-                <ColHeader field="LastActivityDate" label="Last Activity" className="w-40" />
+                <ColHeader field="LastModifiedDate" label="Last Modified" className="w-40" />
                 <ColHeader field="CreatedDate"     label="Age"           className="w-24" />
                 <th className="w-12 pr-4 py-2.5" />
               </tr>
@@ -474,7 +474,7 @@ export default function CasesPage() {
                     <td className="px-3 py-3.5 w-40 align-top">
                       <div className="flex flex-col gap-1">
                         <span className="text-[12px] text-muted-foreground whitespace-nowrap">
-                          {activityLabel(c.LastActivityDate ?? c.LastModifiedDate)}
+                          {activityLabel(c.LastModifiedDate)}
                         </span>
                         {timeSummary[c.Id] > 0 && (
                           <span className={`inline-flex items-center gap-0.5 self-start rounded px-1.5 py-0.5 text-[10px] font-medium ${

@@ -28,7 +28,6 @@ export interface SfCase {
   Priority:           string | null;
   Status:             string | null;
   CreatedDate:        string | null;
-  LastActivityDate?:  string | null;
   LastModifiedDate:   string | null;
   LastModifiedByName: string | null;
   FollowUpDate:       string | null;
@@ -363,14 +362,14 @@ export function CaseHoverCard({
 
         {/* Footer */}
         <div className="px-4 py-2.5 bg-muted/30 space-y-1.5">
-          {/* Last activity */}
-          {(c.LastActivityDate ?? c.LastModifiedDate) && (
+          {/* Last modified */}
+          {c.LastModifiedDate && (
             <div className="flex items-center gap-1 text-[10px] text-muted-foreground/70">
               <Clock className="w-3 h-3 flex-shrink-0" />
               <span>
-                Last activity{" "}
+                Last modified{" "}
                 <span className="font-medium text-foreground/70">
-                  {formatDate(c.LastActivityDate ?? c.LastModifiedDate)}
+                  {formatDate(c.LastModifiedDate)}
                 </span>
                 {c.LastModifiedByName && (
                   <> · by <span className="font-medium text-foreground/70">{c.LastModifiedByName}</span></>

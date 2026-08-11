@@ -224,9 +224,9 @@ export function CasesCard() {
                                 {c.ContactName ?? c.AccountName}
                               </p>
                             )}
-                            {(c.LastActivityDate ?? c.LastModifiedDate) && (
+                            {c.LastModifiedDate && (
                               <p className="text-[11px] text-muted-foreground/60 mt-0.5 truncate">
-                                Active {activityLabel(c.LastActivityDate ?? c.LastModifiedDate)}
+                                Modified {activityLabel(c.LastModifiedDate)}
                                 {c.LastModifiedByName ? ` · ${c.LastModifiedByName}` : ""}
                               </p>
                             )}
