@@ -21,7 +21,7 @@ import { encryptToken, decryptToken } from "./slackOAuth.js";
 
 const router = Router();
 
-const FATHOM_API = "https://api.fathom.ai/v1";
+const FATHOM_API = "https://api.fathom.ai/external/v1";
 
 // ── Per-user meeting cache (60 s TTL) ─────────────────────────────────────────
 
