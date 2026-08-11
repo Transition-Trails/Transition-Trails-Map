@@ -250,7 +250,7 @@ export default function TasksPage() {
   ];
 
   const PRIORITIES: PriorityFilter[] = ["All", "High", "Normal", "Low"];
-  const overdueCount = tasks.filter(t => isOverdue(t.ActivityDate)).length;
+  const overdueCount = tasks.filter(t => isOverdue(t.ActivityDate) && !completed.has(t.Id)).length;
   const filtersActive = priorityFilter !== "All" || overdueOnly;
 
   return (
