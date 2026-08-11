@@ -14,7 +14,7 @@
  *   GET  /slack/conversations/:id/history   — recent messages
  *   POST /slack/conversations/:id/messages  — send a message as the user
  *
- * All routes are guarded by requireHomebaseAuth (learner / coach / volunteer).
+ * All routes are guarded by requireSlackAuth (learner / coach / volunteer / team).
  * The OAuth callback is added to PUBLIC_PATHS in index.ts so Slack's browser
  * redirect lands correctly.
  */
@@ -86,7 +86,7 @@ const router = Router();
 // ensures a superadmin impersonating a learner is rejected at step 2, not
 // accidentally permitted because the effective audience looks like a learner.
 
-const SLACK_HOMEBASE_AUDIENCES = ["learner", "coach", "volunteer"] as const;
+const SLACK_HOMEBASE_AUDIENCES = ["learner", "coach", "volunteer", "team"] as const;
 
 const requireSlackAuth: RequestHandler = (req, res, next) => {
   // 1. Authentication
@@ -109,7 +109,7 @@ const requireSlackAuth: RequestHandler = (req, res, next) => {
   if (!audience || !SLACK_HOMEBASE_AUDIENCES.includes(audience as typeof SLACK_HOMEBASE_AUDIENCES[number])) {
     res.status(403).json({
       error:   "not_authorized",
-      message: "This resource is only available to Homebase users (learner, coach, or volunteer).",
+      message: "This resource is only available to Homebase users (learner, coach, volunteer, or team).",
     });
     return;
   }
