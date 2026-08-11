@@ -11,6 +11,7 @@ import { Router } from "express";
 import { getSalesforceClient }  from "../lib/getSalesforceClient.js";
 import { getEffectiveSfFetch }  from "../lib/salesforceOAuth.js";
 import { SF_API_VERSION }       from "../lib/sfConstants.js";
+import { logger }               from "../lib/logger.js";
 
 const router = Router();
 
@@ -54,45 +55,51 @@ router.get("/sf/cases", async (req, res) => {
   const orgBaseUrl = proxyFetch ? await getOrgBaseUrl(proxyFetch) : "";
 
   // Try with optional fields; fall back gracefully if any are unsupported.
+  // ALL fields added beyond the original base query are optional — including
+  // LastActivityDate and LastModifiedDate which were added later and may not
+  // be queryable in every org configuration.
   let records: Record<string, unknown>[] = [];
-  let followUpDateSupported    = true;
-  let lastModifiedBySupported  = true;
+  let followUpDateSupported    = false;
+  let lastModifiedBySupported  = false;
+  let activityDatesSupported   = false;
 
-  const buildSoql = (withFollowUp: boolean, withModifiedBy: boolean) =>
-    `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, LastActivityDate, LastModifiedDate` +
-    (withModifiedBy ? `, LastModifiedBy.Name` : ``) +
-    (withFollowUp   ? `, FollowUpDate`        : ``) +
+  const buildSoql = (withActivityDates: boolean, withModifiedBy: boolean, withFollowUp: boolean) =>
+    `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate` +
+    (withActivityDates ? `, LastActivityDate, LastModifiedDate` : ``) +
+    (withModifiedBy    ? `, LastModifiedBy.Name`                : ``) +
+    (withFollowUp      ? `, FollowUpDate`                       : ``) +
     `, Owner.Name, Contact.Name, Account.Name ` +
     `FROM Case WHERE OwnerId = '${sfUserId}' ${statusClause} ` +
     `ORDER BY CreatedDate DESC LIMIT 50`;
 
-  // Attempt order: full → no FollowUpDate → no LastModifiedBy → neither
-  const attempts: Array<[boolean, boolean]> = [
-    [true,  true ],
-    [false, true ],
-    [true,  false],
-    [false, false],
+  // Progressive fallback: richest → stripped.  Each attempt drops one layer
+  // of optional fields so we always land on a query the org can handle.
+  const attempts: Array<[boolean, boolean, boolean]> = [
+    [true,  true,  true ],  // all fields
+    [true,  false, false],  // activity dates only
+    [false, false, false],  // minimal (original base query — guaranteed safe)
   ];
 
-  // Work through all fallback combinations. Always try every variant —
-  // never bail early on a mid-chain error, because the real cause might be
-  // an optional field that the next variant drops.
   let lastError = "";
-  for (const [withFollowUp, withModifiedBy] of attempts) {
+  for (const [withActivityDates, withModifiedBy, withFollowUp] of attempts) {
     try {
-      const result = await client.query<Record<string, unknown>>(buildSoql(withFollowUp, withModifiedBy));
+      const result = await client.query<Record<string, unknown>>(
+        buildSoql(withActivityDates, withModifiedBy, withFollowUp)
+      );
       records = result.records;
-      followUpDateSupported   = withFollowUp;
+      activityDatesSupported  = withActivityDates;
       lastModifiedBySupported = withModifiedBy;
+      followUpDateSupported   = withFollowUp;
       lastError = "";
       break;
     } catch (e: unknown) {
       lastError = e instanceof Error ? e.message : String(e);
-      // Always continue to the next fallback variant.
+      logger.warn({ sfUserId, err: lastError }, "SOQL attempt failed, trying next fallback");
     }
   }
 
   if (lastError) {
+    logger.error({ sfUserId, err: lastError }, "All SOQL fallback attempts failed for /sf/cases");
     return res.status(500).json({ error: lastError });
   }
 
@@ -103,10 +110,10 @@ router.get("/sf/cases", async (req, res) => {
     Priority:             r["Priority"]          as string | null,
     Status:               r["Status"]            as string | null,
     CreatedDate:          r["CreatedDate"]        as string | null,
-    LastActivityDate:     r["LastActivityDate"]   as string | null,
-    LastModifiedDate:     r["LastModifiedDate"]   as string | null,
+    LastActivityDate:     activityDatesSupported  ? (r["LastActivityDate"]  as string | null) : null,
+    LastModifiedDate:     activityDatesSupported  ? (r["LastModifiedDate"]  as string | null) : null,
     LastModifiedByName:   lastModifiedBySupported ? (((r["LastModifiedBy"] as Record<string, unknown> | null)?.["Name"] as string | null) ?? null) : null,
-    FollowUpDate:         followUpDateSupported ? (r["FollowUpDate"] as string | null) : null,
+    FollowUpDate:         followUpDateSupported   ? (r["FollowUpDate"] as string | null) : null,
     OwnerName:            ((r["Owner"]   as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
     ContactName:          ((r["Contact"] as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
     AccountName:          ((r["Account"] as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
