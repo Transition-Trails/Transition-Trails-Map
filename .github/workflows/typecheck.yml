@@ -49,8 +49,78 @@ jobs:
         if: steps.lib-dist-cache.outputs.cache-hit != 'true'
         run: pnpm run typecheck:libs
 
+      # actions/checkout materializes source files with the runner's current
+      # timestamp, which is always newer than any cached dist timestamp. On a
+      # warm cache hit the check would therefore report every declaration stale.
+      # Normalizing to the HEAD-commit time (which predates the dist build)
+      # makes the mtime comparison reflect content age rather than runner clock.
+      # This is a no-op on a cold build because tsc will have just written dist
+      # files with timestamps later than the normalized source timestamps.
+      - name: Normalize lib source timestamps to git-commit time
+        if: steps.lib-dist-cache.outputs.cache-hit == 'true'
+        run: |
+          commit_time=$(git log -1 --format="%ci" HEAD)
+          git ls-files -z -- 'lib/' | xargs -0 touch -d "$commit_time"
+
       - name: Check lib package dists are up to date
         run: pnpm run typecheck:libs:check
 
       - name: Typecheck artifacts
         run: pnpm -r --filter "./artifacts/**" --filter "./scripts" --if-present run typecheck
+
+  verify-lib-dist-cache:
+    name: Verify lib dist freshness on warm cache
+    runs-on: ubuntu-latest
+    needs: typecheck
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "store=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.store }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Read-only restore with fail-on-cache-miss so a missing or mis-keyed
+      # cache entry surfaces as an explicit job failure rather than a silent
+      # pass via the build fallback.
+      - name: Restore lib dist cache (read-only, no build fallback)
+        uses: actions/cache/restore@v4
+        with:
+          path: lib/*/dist
+          key: ${{ runner.os }}-lib-dist-${{ hashFiles('lib/**/src/**', 'lib/**/tsconfig*.json', 'lib/**/package.json', 'pnpm-lock.yaml') }}
+          fail-on-cache-miss: true
+
+      # Normalize source timestamps to git-commit time for the same reason as
+      # the primary job: cache extraction preserves older dist mtimes while
+      # checkout gives sources the current runner timestamp.
+      - name: Normalize lib source timestamps to git-commit time
+        run: |
+          commit_time=$(git log -1 --format="%ci" HEAD)
+          git ls-files -z -- 'lib/' | xargs -0 touch -d "$commit_time"
+
+      # No build step here — we intentionally exercise the warm-cache path.
+      # If the restored dist is stale or incomplete, this step fails loudly.
+      - name: Check lib dist freshness (warm cache, no build fallback)
+        run: pnpm run typecheck:libs:check
