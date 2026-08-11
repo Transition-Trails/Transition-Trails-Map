@@ -1547,6 +1547,10 @@ router.post("/sf/tasks", async (req, res) => {
     return res.status(400).json({ error: "subject is required." });
   }
 
+  if (dueDate !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+    return res.status(400).json({ error: "dueDate must be in YYYY-MM-DD format." });
+  }
+
   const VALID_PRIORITIES = ["High", "Normal", "Low"];
   const resolvedPriority = VALID_PRIORITIES.includes(priority ?? "") ? priority : "Normal";
 

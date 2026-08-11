@@ -6,6 +6,8 @@
  *   V2. Empty / whitespace-only subject → 400 before createRecord is reached
  *   V3. Invalid priority value is normalised to "Normal"; 201 is returned
  *   V4. Valid priority values ("High", "Normal", "Low") are passed through
+ *   D1. Invalid dueDate format → 400 before createRecord is reached
+ *   D2. Valid YYYY-MM-DD dueDate passes through to createRecord
  *   P1. SF error on createRecord → 500 with error field surfaced to client
  *   P2. 500 body does not expose stack traces or raw SF XML/SOAP markup
  *
@@ -242,6 +244,94 @@ describe('POST /api/sf/tasks — priority normalisation', () => {
 
     expect(res.status).toBe(201);
     expect(lastCreateRecordData.value?.['Priority']).toBe('Normal');
+  });
+});
+
+// ── D1 / D2. POST route: dueDate format validation ────────────────────────────
+
+describe('POST /api/sf/tasks — dueDate format validation', () => {
+
+  // ── D1: invalid dueDate formats → 400 ────────────────────────────────────
+
+  test('D1: returns 400 when dueDate is a natural-language string', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called for invalid dueDate');
+
+    const res = await request(app)
+      .post('/api/sf/tasks')
+      .send({ subject: 'Test Task', dueDate: 'tomorrow' });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('D1: returns 400 when dueDate uses slashes (YYYY/MM/DD)', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called for slash-delimited dueDate');
+
+    const res = await request(app)
+      .post('/api/sf/tasks')
+      .send({ subject: 'Test Task', dueDate: '2026/08/11' });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('D1: returns 400 when dueDate is MM-DD-YYYY', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called for MM-DD-YYYY dueDate');
+
+    const res = await request(app)
+      .post('/api/sf/tasks')
+      .send({ subject: 'Test Task', dueDate: '08-11-2026' });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('D1: 400 body mentions "dueDate" when format is invalid', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called');
+
+    const res = await request(app)
+      .post('/api/sf/tasks')
+      .send({ subject: 'Test Task', dueDate: 'not-a-date' });
+
+    expect(res.status).toBe(400);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.toLowerCase()).toContain('duedate');
+  });
+
+  test('D1: createRecord is not reached when dueDate is invalid', async () => {
+    mockCreateRecordError.value = new Error('SENTINEL: createRecord must not be called for invalid dueDate');
+
+    const res = await request(app)
+      .post('/api/sf/tasks')
+      .send({ subject: 'Test Task', dueDate: 'tomorrow' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).not.toContain('SENTINEL');
+  });
+
+  // ── D2: valid YYYY-MM-DD passes through ───────────────────────────────────
+
+  test('D2: valid YYYY-MM-DD dueDate returns 201', async () => {
+    const res = await request(app)
+      .post('/api/sf/tasks')
+      .send({ subject: 'Test Task', dueDate: '2026-08-11' });
+
+    expect(res.status).toBe(201);
+  });
+
+  test('D2: valid dueDate is passed to createRecord as ActivityDate', async () => {
+    const res = await request(app)
+      .post('/api/sf/tasks')
+      .send({ subject: 'Test Task', dueDate: '2026-08-11' });
+
+    expect(res.status).toBe(201);
+    expect(lastCreateRecordData.value?.['ActivityDate']).toBe('2026-08-11');
+  });
+
+  test('D2: absent dueDate is accepted (no ActivityDate set)', async () => {
+    const res = await request(app)
+      .post('/api/sf/tasks')
+      .send({ subject: 'Test Task' });
+
+    expect(res.status).toBe(201);
+    expect(lastCreateRecordData.value?.['ActivityDate']).toBeUndefined();
   });
 });
 
