@@ -10,7 +10,7 @@
 import { Router } from "express";
 import { db }             from "@workspace/db";
 import { timeLogsTable }  from "@workspace/db/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { logger }         from "../lib/logger.js";
 
 const router = Router();
@@ -114,7 +114,7 @@ router.get("/time-logs/summary", async (req, res) => {
       })
       .from(timeLogsTable)
       .where(
-        sql`${timeLogsTable.sfObjectId} = ANY(${objectIds})`
+        inArray(timeLogsTable.sfObjectId, objectIds)
       )
       .groupBy(timeLogsTable.sfObjectId);
 

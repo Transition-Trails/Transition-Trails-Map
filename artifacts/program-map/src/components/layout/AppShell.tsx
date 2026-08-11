@@ -7,7 +7,6 @@ import { AskPennyPanel } from './AskPennyPanel';
 import { CalendarActionPanel } from './CalendarActionPanel';
 import { GmailActionPanel } from './GmailActionPanel';
 import { RailActionPanel } from '@/components/workspace/RailActionPanel';
-import { LogTimeModal } from '@/components/homebase/LogTimeModal';
 import { useAppContext } from '@/context/AppContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
@@ -42,18 +41,6 @@ function GlobalActionPanel() {
   );
 }
 
-function GlobalLogTimeModal() {
-  const { logTimeOpen, logTimePrefill, closeLogTime, onLogTimeSaved } = useAppContext();
-  return (
-    <LogTimeModal
-      open={logTimeOpen}
-      prefill={logTimePrefill}
-      onClose={closeLogTime}
-      onSaved={onLogTimeSaved}
-    />
-  );
-}
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground selection:bg-primary/20">
@@ -71,7 +58,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <CalendarActionPanel />
       <GmailActionPanel />
       <GlobalActionPanel />
-      <GlobalLogTimeModal />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider, useAppContext } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
+import { LogTimeModal } from "@/components/homebase/LogTimeModal";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 import SignInPage from "@/pages/SignIn";
 import { Map, ShieldOff } from "lucide-react";
@@ -436,6 +437,19 @@ function SignInLanding() {
   );
 }
 
+// ── Global Log Time modal — mounted once, outside any shell ──────────────────
+function GlobalLogTimeModal() {
+  const { logTimeOpen, logTimePrefill, closeLogTime, onLogTimeSaved } = useAppContext();
+  return (
+    <LogTimeModal
+      open={logTimeOpen}
+      prefill={logTimePrefill ?? undefined}
+      onClose={closeLogTime}
+      onSaved={onLogTimeSaved}
+    />
+  );
+}
+
 // ── Inner app — inside WouterRouter and QueryClientProvider ──────────────────
 function InnerApp() {
   const auth = useGoogleAuth();
@@ -472,6 +486,9 @@ function InnerApp() {
 
   return (
     <>
+      {/* Global modals — always mounted regardless of which shell is active */}
+      <GlobalLogTimeModal />
+
       {/* Impersonation banner — fixed amber strip, z-[200], above everything */}
       {isImpersonating && impersonatedUser && realEmail && (
         <ImpersonationBanner
