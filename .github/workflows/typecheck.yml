@@ -38,11 +38,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Compute lib dist paths from tsconfig references
+        id: lib-dist-paths
+        run: node scripts/get-lib-dist-paths.mjs
+
       - name: Restore lib dist cache
         id: lib-dist-cache
         uses: actions/cache@v4
         with:
-          path: lib/*/dist
+          path: ${{ steps.lib-dist-paths.outputs.paths }}
           key: ${{ runner.os }}-lib-dist-${{ hashFiles('lib/**/src/**', 'lib/**/tsconfig*.json', 'lib/**/package.json', 'pnpm-lock.yaml') }}
 
       - name: Build lib packages
