@@ -112,10 +112,16 @@ function MeetingRow({ meeting }: { meeting: FathomMeeting }) {
 
 export function MeetingNotesCard() {
   const [view,        setView]        = useState<ViewState>("checking");
-  const [meetings,    setMeetings]    = useState<FathomMeeting[]>([]);
+  const [allMeetings, setAllMeetings] = useState<FathomMeeting[]>([]);
+  const [showAll,     setShowAll]     = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [connectErr,  setConnectErr]  = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Derived: meetings visible given the current filter
+  const meetings = showAll
+    ? allMeetings
+    : allMeetings.filter(m => isThisWeek(m.started_at));
 
   // ── Status check on mount ──────────────────────────────────────────────────
 
@@ -159,11 +165,10 @@ export function MeetingNotesCard() {
       const data = await res.json() as { meetings: FathomMeeting[] };
       const all  = data.meetings ?? [];
 
-      // Filter to current week (Mon–Sun local time).
-      const thisWeek = all.filter(m => isThisWeek(m.started_at));
-
-      setMeetings(thisWeek);
-      setView(thisWeek.length ? "list" : "empty");
+      setAllMeetings(all);
+      // View state is determined by whether there's anything at all; the
+      // derived `meetings` variable handles per-filter display.
+      setView(all.length ? "list" : "empty");
     } catch {
       setView("error");
     }
@@ -206,7 +211,8 @@ export function MeetingNotesCard() {
     try {
       await fetch("/api/fathom/key", { method: "DELETE" });
     } catch { /* best-effort */ }
-    setMeetings([]);
+    setAllMeetings([]);
+    setShowAll(false);
     setApiKeyInput("");
     setConnectErr(null);
     setView("connect");
@@ -227,16 +233,43 @@ export function MeetingNotesCard() {
             </span>
           )}
         </div>
-        {(view === "list" || view === "empty") && (
-          <a
-            href="https://app.fathom.video"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Fathom →
-          </a>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Filter toggle — only when connected */}
+          {(view === "list" || view === "empty") && (
+            <div className="flex items-center rounded-md border border-border overflow-hidden text-[11px]">
+              <button
+                onClick={() => setShowAll(false)}
+                className={`px-2 py-0.5 transition-colors ${
+                  !showAll
+                    ? "bg-primary text-primary-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                This week
+              </button>
+              <button
+                onClick={() => setShowAll(true)}
+                className={`px-2 py-0.5 transition-colors ${
+                  showAll
+                    ? "bg-primary text-primary-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                All
+              </button>
+            </div>
+          )}
+          {(view === "list" || view === "empty") && (
+            <a
+              href="https://app.fathom.video"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Fathom →
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Body */}
@@ -301,7 +334,7 @@ export function MeetingNotesCard() {
         )}
 
         {/* Meetings list */}
-        {view === "list" && (
+        {view === "list" && meetings.length > 0 && (
           <ul>
             {meetings.map((m, i) => (
               <MeetingRow key={m.id || `meeting-${i}`} meeting={m} />
@@ -309,10 +342,14 @@ export function MeetingNotesCard() {
           </ul>
         )}
 
-        {/* Empty — no meetings this week */}
-        {view === "empty" && (
+        {/* Empty — no meetings match the active filter */}
+        {(view === "empty" || (view === "list" && meetings.length === 0)) && (
           <div className="py-5 text-center">
-            <p className="text-sm text-muted-foreground">No meetings recorded this week.</p>
+            <p className="text-sm text-muted-foreground">
+              {view === "empty" || allMeetings.length === 0
+                ? "No meetings recorded yet."
+                : "No meetings recorded this week."}
+            </p>
             <a
               href="https://app.fathom.video"
               target="_blank"
