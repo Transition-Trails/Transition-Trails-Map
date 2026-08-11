@@ -55,39 +55,35 @@ router.get("/sf/cases", async (req, res) => {
   const orgBaseUrl = proxyFetch ? await getOrgBaseUrl(proxyFetch) : "";
 
   // Try with optional fields; fall back gracefully if any are unsupported.
-  // ALL fields added beyond the original base query are optional — including
-  // LastActivityDate and LastModifiedDate which were added later and may not
-  // be queryable in every org configuration.
+  // LastModifiedDate is a standard Case field and is always included in the
+  // base query.  LastModifiedBy.Name and FollowUpDate are optional — they are
+  // dropped in the fallback attempt if the org does not support them.
   let records: Record<string, unknown>[] = [];
   let followUpDateSupported    = false;
   let lastModifiedBySupported  = false;
-  let activityDatesSupported   = false;
 
-  const buildSoql = (withActivityDates: boolean, withModifiedBy: boolean, withFollowUp: boolean) =>
-    `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate` +
-    (withActivityDates ? `, LastActivityDate, LastModifiedDate` : ``) +
-    (withModifiedBy    ? `, LastModifiedBy.Name`                : ``) +
-    (withFollowUp      ? `, FollowUpDate`                       : ``) +
+  const buildSoql = (withModifiedBy: boolean, withFollowUp: boolean) =>
+    `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, LastModifiedDate` +
+    (withModifiedBy ? `, LastModifiedBy.Name` : ``) +
+    (withFollowUp   ? `, FollowUpDate`        : ``) +
     `, Owner.Name, Contact.Name, Account.Name ` +
     `FROM Case WHERE OwnerId = '${sfUserId}' ${statusClause} ` +
     `ORDER BY CreatedDate DESC LIMIT 50`;
 
   // Progressive fallback: richest → stripped.  Each attempt drops one layer
   // of optional fields so we always land on a query the org can handle.
-  const attempts: Array<[boolean, boolean, boolean]> = [
-    [true,  true,  true ],  // all fields
-    [true,  false, false],  // activity dates only
-    [false, false, false],  // minimal (original base query — guaranteed safe)
+  const attempts: Array<[boolean, boolean]> = [
+    [true,  true ],  // all optional fields
+    [false, false],  // minimal (base query — guaranteed safe)
   ];
 
   let lastError = "";
-  for (const [withActivityDates, withModifiedBy, withFollowUp] of attempts) {
+  for (const [withModifiedBy, withFollowUp] of attempts) {
     try {
       const result = await client.query<Record<string, unknown>>(
-        buildSoql(withActivityDates, withModifiedBy, withFollowUp)
+        buildSoql(withModifiedBy, withFollowUp)
       );
       records = result.records;
-      activityDatesSupported  = withActivityDates;
       lastModifiedBySupported = withModifiedBy;
       followUpDateSupported   = withFollowUp;
       lastError = "";
@@ -110,8 +106,7 @@ router.get("/sf/cases", async (req, res) => {
     Priority:             r["Priority"]          as string | null,
     Status:               r["Status"]            as string | null,
     CreatedDate:          r["CreatedDate"]        as string | null,
-    LastActivityDate:     activityDatesSupported  ? (r["LastActivityDate"]  as string | null) : null,
-    LastModifiedDate:     activityDatesSupported  ? (r["LastModifiedDate"]  as string | null) : null,
+    LastModifiedDate:     r["LastModifiedDate"]  as string | null,
     LastModifiedByName:   lastModifiedBySupported ? (((r["LastModifiedBy"] as Record<string, unknown> | null)?.["Name"] as string | null) ?? null) : null,
     FollowUpDate:         followUpDateSupported   ? (r["FollowUpDate"] as string | null) : null,
     OwnerName:            ((r["Owner"]   as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,

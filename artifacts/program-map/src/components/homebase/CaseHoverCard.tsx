@@ -28,7 +28,7 @@ export interface SfCase {
   Priority:           string | null;
   Status:             string | null;
   CreatedDate:        string | null;
-  LastActivityDate:   string | null;
+  LastActivityDate?:  string | null;
   LastModifiedDate:   string | null;
   LastModifiedByName: string | null;
   FollowUpDate:       string | null;
