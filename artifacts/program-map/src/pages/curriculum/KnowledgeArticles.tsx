@@ -40,7 +40,7 @@ export default function KnowledgeArticles() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {filtered.map(article => {
             const statusCfg = CONTENT_STATUS_CONFIG[article.status];
             return (

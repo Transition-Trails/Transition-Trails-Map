@@ -549,7 +549,7 @@ export default function GoogleOAuthFlow() {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4 max-w-3xl">
+        <div className="p-4 space-y-4">
 
           {/* 5-step readiness ladder */}
           <div className="rounded-lg border border-border bg-white p-5 overflow-x-auto">

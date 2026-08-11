@@ -252,7 +252,7 @@ const FUTURE_SECTIONS = [
 export default function OrgMemory() {
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
+      <div className="p-5 space-y-5">
 
         <div>
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">

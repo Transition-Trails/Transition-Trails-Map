@@ -46,7 +46,7 @@ const PREVIEW_CARDS = [
 export default function Intelligence() {
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-3xl space-y-5">
+      <div className="p-6 space-y-5">
 
         <div className="flex items-center gap-2 flex-wrap">
           <span className="inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold  border bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]">

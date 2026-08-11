@@ -889,7 +889,7 @@ function TestBenchPanel({ template }: { template: PromptTemplate }) {
 function VariablesView() {
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-4xl">
+      <div className="p-6">
         <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
           Variables are dynamic tokens that Penny substitutes at runtime. Each maps to a data source — Salesforce, LMS, User Input, Calendar, or Penny's own generated context.
         </p>
@@ -917,7 +917,7 @@ function VariablesView() {
 function OutputFormatsView() {
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-4xl">
+      <div className="p-6">
         <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
           Output formats define the shape of every response Penny delivers — from coaching messages to executive summaries. Each template is bound to exactly one format.
         </p>
@@ -969,7 +969,7 @@ function SourceRulesView({ templates }: { templates: PromptTemplate[] }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-4xl">
+      <div className="p-6">
         <p className="text-[13px] text-muted-foreground mb-4 leading-relaxed">
           Source rules control which knowledge sources Penny may consult for each template — Required, Preferred, Optional, or Forbidden.
         </p>

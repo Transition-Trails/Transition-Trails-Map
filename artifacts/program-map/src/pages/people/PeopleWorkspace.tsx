@@ -23,7 +23,7 @@ function OverviewTab({ item }: { item: PersonaOrRole }) {
   const r = item as Role;
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-3xl">
+      <div className="p-5 space-y-4">
         {isPersona ? (
           <>
             <p className="text-[14px] text-muted-foreground leading-relaxed italic border-l-4 border-primary/20 pl-4">{p.purpose}</p>
@@ -78,7 +78,7 @@ function ResponsibilitiesTab({ item }: { item: PersonaOrRole }) {
   const responsibilities = isPersona ? (p.coreResponsibilities ?? []) : ((r as any).coreResponsibilities ?? (r as any).responsibilities ?? []);
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         {responsibilities.length > 0 ? (
           <ul className="space-y-2">
             {responsibilities.map((resp: string, i: number) => (
@@ -115,7 +115,7 @@ function ProgramsTab({ item }: { item: PersonaOrRole }) {
   const progs = isPersona ? (p.relatedPrograms ?? []) : ((r as any).relatedPrograms ?? ['Foundations Trail', 'Guided Trail']);
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <p className="text-[14px] text-muted-foreground">Programs this {isPersona ? 'persona' : 'role'} participates in or is related to.</p>
         {progs.length > 0 ? (
           <div className="space-y-2">
@@ -142,7 +142,7 @@ function PennyTabP({ item }: { item: PersonaOrRole }) {
   const caps = isPersona ? (p.relatedPennyCapabilities ?? []) : ((r as any).relatedPennyCapabilities ?? []);
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <p className="text-[14px] text-muted-foreground">{TERMS.aiAssistant} capabilities linked to this {isPersona ? 'persona' : 'role'}.</p>
         {caps.length > 0 ? (
           <div className="space-y-2">
@@ -170,7 +170,7 @@ function HealthTabP({ item }: { item: PersonaOrRole }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         {[
           { label:'Overall Health',      health: health === 'healthy' ? 'healthy' as const : health === 'needs-attention' ? 'needs-attention' as const : 'incomplete' as const, note: health.replace('-',' ') },
           { label:'Blueprint',           health: blueprintStatus === 'complete' ? 'healthy' as const : blueprintStatus === 'draft' ? 'needs-attention' as const : 'incomplete' as const, note: blueprintStatus.charAt(0).toUpperCase() + blueprintStatus.slice(1) },

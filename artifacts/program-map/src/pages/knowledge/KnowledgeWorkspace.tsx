@@ -23,7 +23,7 @@ function OverviewTab({ src }: { src: KnowledgeSource }) {
   const trustCfg = TRUST_LEVEL_CONFIG[src.trustLevel];
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-3xl">
+      <div className="p-5 space-y-4">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[14px] font-bold border ${typeCfg?.cls ?? 'bg-muted text-muted-foreground border-border'}`}>
             {src.type}
@@ -188,7 +188,7 @@ function GovernanceTab({ src }: { src: KnowledgeSource }) {
   const isActive = src.syncStatus === 'Live' || src.syncStatus === 'Manual';
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-3xl">
+      <div className="p-5 space-y-4">
         <div className="space-y-2">
           {[
             { label: 'Trust Review',           status: src.trustLevel !== 'Unverified' ? 'healthy' as const : 'needs-attention' as const, note: src.trustLevel !== 'Unverified' ? 'Trust level assigned' : `Trust review required before ${TERMS.aiAssistant} activation` },
@@ -230,7 +230,7 @@ function PennyAssetsTab({ src }: { src: KnowledgeSource }) {
   const caps = capMap[(src as any).id] ?? [];
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <p className="text-[14px] text-muted-foreground">{TERMS.aiAssistant} capabilities and prompts that depend on this knowledge source.</p>
         {caps.length > 0 ? (
           <div className="space-y-2">
@@ -260,7 +260,7 @@ function RelatedProgramsTab({ src: _src }: { src: KnowledgeSource }) {
   ];
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <p className="text-[14px] text-muted-foreground">Programs that reference this knowledge source in their curriculum or {TERMS.aiAssistant} integration.</p>
         <div className="space-y-2">
           {programs.map(prog => (
@@ -295,7 +295,7 @@ function RelationshipsTabKS({ src }: { src: KnowledgeSource }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <p className="text-[14px] text-muted-foreground">Digital Twin relationships — programs, {TERMS.aiAssistant} capabilities, and graph connections for this source.</p>
         <RelationshipCard title="Programs"                      icon={GraduationCap} items={programItems}                   viewAllHref="/program"               emptyMessage="No programs linked" />
         <RelationshipCard title={`${TERMS.aiAssistant} Capabilities`} icon={Brain}  items={capMap[(src as any).id] ?? []}  viewAllHref="/penny"                 emptyMessage="No capabilities depend on this source" />
@@ -312,7 +312,7 @@ function HealthTabKS({ src }: { src: KnowledgeSource }) {
   const cfg = HEALTH_CONFIG[healthKey] ?? HEALTH_CONFIG['Healthy'];
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <div className="flex items-center gap-2 mb-4">
           <span className={`inline-flex items-center px-2 py-1 rounded border text-[14px] font-bold ${cfg.cls}`}>
             {(src as any).health ?? 'Healthy'}

@@ -22,7 +22,7 @@ export default function CurriculumCohorts() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {curriculumCohorts.map(cohort => {
             const statusCfg = CONTENT_STATUS_CONFIG[cohort.status];
             const atRisk = (cohort.atRiskLearners as number) || 0;

@@ -91,7 +91,7 @@ export default function LearnerQuest() {
 
   return (
     <LearnerShell>
-      <div className="p-4 space-y-4 max-w-2xl mx-auto pb-6">
+      <div className="p-4 space-y-4 pb-6">
 
         {/* ── Loading ────────────────────────────────────────────────────── */}
         {loading && (

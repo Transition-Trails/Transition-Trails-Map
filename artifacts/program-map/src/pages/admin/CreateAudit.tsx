@@ -240,7 +240,7 @@ export default function CreateAudit() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-4 max-w-5xl mx-auto space-y-4">
+      <div className="p-4 space-y-4">
 
         {/* Header */}
         <div>

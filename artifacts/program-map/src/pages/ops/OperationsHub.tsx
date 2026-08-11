@@ -427,7 +427,7 @@ function IntelligenceView() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-4 space-y-8 max-w-4xl">
+      <div className="p-4 space-y-8">
 
         {/* ── Scorecards ──────────────────────────────────────────────────── */}
         <section>

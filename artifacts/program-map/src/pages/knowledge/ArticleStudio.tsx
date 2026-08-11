@@ -225,7 +225,7 @@ function EditForm({ article, onSave, onSubmit, onDelete, saving }: EditFormProps
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-4 max-w-3xl">
+        <div className="p-5 space-y-4">
 
           {/* Unsaved warning */}
           {dirty && !isNew && (
@@ -371,7 +371,7 @@ function ReviewPane({ article, onApprove, onRequestChanges, saving }: ReviewPane
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-5 max-w-3xl">
+        <div className="p-5 space-y-5">
           {/* Metadata */}
           <div className="space-y-1">
             {article.category && (
@@ -478,7 +478,7 @@ function PublishPane({ article, onPublish, saving }: PublishPaneProps) {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-4 max-w-2xl">
+        <div className="p-5 space-y-4">
           <div className="rounded-lg border border-border bg-background p-4 space-y-2">
             {article.category && (
               <p className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase">{article.category}</p>

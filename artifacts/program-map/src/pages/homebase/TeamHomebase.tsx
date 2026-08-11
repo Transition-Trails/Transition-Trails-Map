@@ -22,7 +22,9 @@ import {
 } from "lucide-react";
 import { HomebaseShell } from "@/components/layout/HomebaseShell";
 import { useTierFlags }  from "@/hooks/useTierFlags";
-import { TodayTasksCard } from "@/components/homebase/TodayTasksCard";
+import { TodayTasksCard }    from "@/components/homebase/TodayTasksCard";
+import { TodayMeetingsCard } from "@/components/homebase/TodayMeetingsCard";
+import { ActiveTasksCard }   from "@/components/homebase/ActiveTasksCard";
 
 interface TeamHomebaseProps {
   displayName: string;
@@ -80,7 +82,7 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
 
   return (
     <HomebaseShell audience="team" displayName={displayName}>
-      <div className="px-6 py-8 max-w-3xl mx-auto space-y-8">
+      <div className="px-6 py-8 space-y-8">
 
         {/* Greeting */}
         <div>
@@ -120,12 +122,21 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
           </div>
         </div>
 
-        {/* Today's Tasks */}
-        <div>
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-            Today's tasks
+        {/* Today snapshot — Tasks + Meetings side by side at 1/3 each */}
+        <div className="space-y-4">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+            Today
           </p>
-          <TodayTasksCard />
+
+          <div className="grid grid-cols-3 gap-4 items-start">
+            <TodayTasksCard />
+            <TodayMeetingsCard />
+            {/* Third column reserved for future card */}
+            <div />
+          </div>
+
+          {/* Active Tasks — full width */}
+          <ActiveTasksCard />
         </div>
 
       </div>

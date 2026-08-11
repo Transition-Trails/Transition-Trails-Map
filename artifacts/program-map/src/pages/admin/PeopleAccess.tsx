@@ -643,7 +643,7 @@ function AccessTiersTab({
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-6 max-w-5xl">
+      <div className="p-5 space-y-6">
 
         {/* Auth live notice */}
         <div className="flex items-center gap-3 p-3 rounded-lg border border-[#9FC3AE] bg-[#E6F0EA]">
@@ -1086,7 +1086,7 @@ function RoleOwnersTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 max-w-3xl space-y-5">
+      <div className="p-5 space-y-5">
 
         {/* Status banner */}
         <div className={`flex items-start gap-3 rounded-lg border px-4 py-3 ${

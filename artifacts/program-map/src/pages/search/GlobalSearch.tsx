@@ -125,7 +125,7 @@ function EmptyState({
     : 'Your accessible programs, knowledge sources, and Penny capabilities.';
 
   return (
-    <div className="max-w-xl mx-auto pt-8 px-4 pb-12">
+    <div className="pt-8 px-4 pb-12">
       <p className="text-[14px] font-semibold text-foreground mb-1">{heading}</p>
       <p className="text-[14px] text-muted-foreground mb-6">{sub}</p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

@@ -177,7 +177,7 @@ function OverviewTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 max-w-2xl space-y-4">
+      <div className="p-5 space-y-4">
 
         {/* Live status */}
         <div className={`rounded-lg border px-4 py-3 flex items-center justify-between gap-3 ${
@@ -287,7 +287,7 @@ function PennyAssetsSetupTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 max-w-2xl space-y-5">
+      <div className="p-5 space-y-5">
 
         {/* Live status banner */}
         <div className={`rounded-lg border px-4 py-3 flex items-center justify-between gap-3 ${

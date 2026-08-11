@@ -390,7 +390,7 @@ export default function AdminSetup() {
 
       {/* ── Content ── */}
       <ScrollArea className="flex-1">
-        <div className="p-4 max-w-5xl space-y-6">
+        <div className="p-4 space-y-6">
 
           {/* ── Section 1: Live Connections ── */}
           <div>

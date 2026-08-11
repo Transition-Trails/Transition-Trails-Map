@@ -503,7 +503,7 @@ function ObjectWorkspace({ obj, onNavigate }: { obj: SelectedObject; onNavigate:
         ))}
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-3xl space-y-4">
+        <div className="p-5 space-y-4">
 
           {wsTab === 'overview' && (
             <div className="space-y-4">
@@ -660,7 +660,7 @@ function EntryGrid({ onSelect }: { onSelect: (obj: SelectedObject) => void }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-4 max-w-3xl">
+      <div className="p-4">
         {/* Framing */}
         <div className="mb-3">
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">{TERMS.digitalTwin} · Explore</p>
@@ -858,7 +858,7 @@ function ImpactTab({ selected, onSelect, onNavigate }: {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-3 max-w-3xl">
+        <div className="p-5 space-y-3">
           {areas.map(area => (
             <div key={area.area} className="rounded-lg border border-border bg-white overflow-hidden">
               <div className={`flex items-center gap-2.5 px-4 py-2.5 border-b border-border ${SEV_CONFIG[area.severity].cls}`}>
@@ -892,7 +892,7 @@ function ImpactTab({ selected, onSelect, onNavigate }: {
 function GovernanceTab({ onNavigate }: { onNavigate: (p: string) => void }) {
   return (
     <ScrollArea className="h-full">
-      <div className="p-4 max-w-3xl space-y-4">
+      <div className="p-4 space-y-4">
 
         <div>
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">{TERMS.digitalTwin} · Governance</p>

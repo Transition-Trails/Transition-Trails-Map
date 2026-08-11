@@ -35,7 +35,7 @@ function SoTBadge({ sys }: { sys: string }) {
 function ArchitectureOverview() {
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 space-y-6 max-w-3xl">
+      <div className="p-6 space-y-6">
         <div>
           <h2 className="text-base font-bold text-foreground mb-1">What is the Unified Object Model?</h2>
           <p className="text-[14px] text-muted-foreground leading-relaxed">

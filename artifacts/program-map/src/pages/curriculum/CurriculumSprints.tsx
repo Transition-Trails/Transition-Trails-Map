@@ -28,7 +28,7 @@ export default function CurriculumSprints() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {curriculumSprints.map(sprint => {
             const statusCfg = CONTENT_STATUS_CONFIG[sprint.status];
             const resolveCls = RESOLVE_COLORS[sprint.resolvePhase as string] || 'bg-slate-50 text-slate-800 border-slate-200';

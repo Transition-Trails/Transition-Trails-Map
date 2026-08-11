@@ -191,7 +191,7 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
       audience={audience}
       displayName={displayName}
     >
-      <div className="flex flex-col gap-4 px-5 py-5 max-w-3xl mx-auto">
+      <div className="flex flex-col gap-4 px-5 py-5">
 
         {/* 1 — This month band */}
         <ThisMonthBand

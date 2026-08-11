@@ -104,7 +104,7 @@ export default function TrailOSOverview() {
 
       {/* ── Content ── */}
       <ScrollArea className="flex-1">
-        <div className="p-4 max-w-5xl space-y-5">
+        <div className="p-4 space-y-5">
 
           {/* ── Platform Capabilities ── */}
           {activeTab === 'capabilities' && (

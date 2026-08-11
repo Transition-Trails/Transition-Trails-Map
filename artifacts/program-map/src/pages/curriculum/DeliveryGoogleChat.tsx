@@ -18,7 +18,7 @@ export default function DeliveryGoogleChat() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {curriculumGoogleChatUpdates.map(update => {
             const statusCfg = CONTENT_STATUS_CONFIG[update.status];
             return (

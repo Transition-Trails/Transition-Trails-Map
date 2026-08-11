@@ -41,7 +41,7 @@ export default function CurriculumAssessments() {
 
       {/* Table content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-5 py-4 space-y-4">
+        <div className="px-5 py-4 space-y-4">
           <div className="rounded-xl border border-border bg-white overflow-hidden">
             <div className="grid grid-cols-[1fr_140px_70px_70px_70px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
               {['Assessment', 'Type', 'Qs', 'Pass %', 'Penny'].map(h => (

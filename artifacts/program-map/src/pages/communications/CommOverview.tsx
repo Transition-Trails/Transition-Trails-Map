@@ -86,7 +86,7 @@ export default function CommOverview() {
 
   return (
     <div className="h-full overflow-y-auto p-6 bg-muted/20">
-      <div className="max-w-4xl mx-auto space-y-10">
+      <div className="space-y-10">
 
         {/* Header */}
         <div>

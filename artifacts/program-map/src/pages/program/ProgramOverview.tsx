@@ -146,7 +146,7 @@ export default function ProgramOverview() {
   if (isEveryday) {
     return (
       <ScrollArea className="h-full">
-        <div className="p-5 space-y-4 max-w-2xl">
+        <div className="p-5 space-y-4">
           <Eyebrow>Your Programs</Eyebrow>
           <div className="space-y-2">
             {programs

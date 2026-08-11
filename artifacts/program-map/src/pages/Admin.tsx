@@ -141,7 +141,7 @@ function AdminHome({ onNavigate }: { onNavigate: (v: AdminView) => void }) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <ScrollArea className="flex-1">
-        <div className="p-4 max-w-4xl">
+        <div className="p-4">
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div>
@@ -676,7 +676,7 @@ function ProgramEditor({ id }: { id: string }) {
         onCancel={() => { setForm({ ...original }); markCanceled(); }}
       />
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-7 max-w-2xl">
+        <div className="p-5 space-y-7">
 
           <FormSection title="Core Info">
             <FormRow label="Program Name">
@@ -752,7 +752,7 @@ function DocumentEditor({ id }: { id: string }) {
         onCancel={() => { setForm({ ...original }); markCanceled(); }}
       />
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-7 max-w-2xl">
+        <div className="p-5 space-y-7">
 
           <FormSection title="Core Info">
             <FormRow label="Document Name">
@@ -888,7 +888,7 @@ function ResolvePhaseEditor({ id }: { id: string }) {
         onCancel={() => { setForm({ ...original }); markCanceled(); }}
       />
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-7 max-w-2xl">
+        <div className="p-5 space-y-7">
 
           <FormSection title="Core Info">
             <div className="grid grid-cols-4 gap-3">
@@ -966,7 +966,7 @@ function PennyCapabilityEditor({ id }: { id: string }) {
         onCancel={() => { setForm({ ...original }); markCanceled(); }}
       />
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-7 max-w-2xl">
+        <div className="p-5 space-y-7">
 
           <FormSection title="Core Info">
             <FormRow label="Capability Name">
@@ -1048,7 +1048,7 @@ function TrailOsCapabilityEditor({ id }: { id: string }) {
         onCancel={() => { setForm({ ...original }); markCanceled(); }}
       />
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-7 max-w-2xl">
+        <div className="p-5 space-y-7">
 
           <FormSection title="Core Info">
             <FormRow label="Capability Name">
@@ -1120,7 +1120,7 @@ function SalesforceEditor() {
         <Badge variant="outline" className="text-[14px] text-muted-foreground border-border">Future State</Badge>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-6 max-w-xl">
+        <div className="p-5 space-y-6">
           <div className="p-4 rounded-lg bg-muted/40 border border-border/60 text-sm text-muted-foreground leading-relaxed">
             The Salesforce Cases Kanban is a future-state feature. When connected, it will display live Salesforce case data
             alongside the program pipeline. No configuration is active yet.

@@ -926,7 +926,7 @@ export default function IntegrationSecretsAudit() {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4 max-w-4xl">
+        <div className="p-4 space-y-4">
 
           {/* Security notice */}
           <div className="rounded-lg border border-[#9FC3AE] bg-[#E6F0EA] px-4 py-3 flex gap-3">

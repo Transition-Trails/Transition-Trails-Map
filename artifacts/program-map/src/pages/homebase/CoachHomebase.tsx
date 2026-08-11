@@ -166,7 +166,7 @@ export default function CoachHomebase({
       audience={audience}
       displayName={displayName}
     >
-      <div className="flex flex-col gap-4 px-5 py-5 max-w-3xl mx-auto">
+      <div className="flex flex-col gap-4 px-5 py-5">
 
         {/* 1 — Level header strip */}
         <div className="flex items-center justify-between">

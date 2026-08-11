@@ -165,7 +165,7 @@ export default function CurriculumModules() {
       </div>
 
       <ScrollArea className="flex-1">
-      <div className="p-5 max-w-5xl space-y-5">
+      <div className="p-5 space-y-5">
 
         {/* ── LIVE VIEW ── */}
         {viewMode === 'live' && (

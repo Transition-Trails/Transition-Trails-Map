@@ -66,7 +66,7 @@ export default function PennyContentAssistant() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-6xl space-y-5">
+        <div className="p-5 space-y-5">
 
           {/* Main workspace — 2 columns */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">

@@ -66,7 +66,7 @@ function OverviewTab({ p }: { p: Program }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
+      <div className="p-5 space-y-5">
         {p.executiveSummary && (
           <div className="text-[14px] text-muted-foreground italic leading-relaxed border-l-4 border-primary/20 pl-4 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mb-0.5 [&_strong]:font-semibold" dangerouslySetInnerHTML={{ __html: p.executiveSummary }} />
         )}
@@ -135,7 +135,7 @@ function BlueprintTab({ p }: { p: Program }) {
   const isCompliant = p.confidence === 'confirmed';
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
+      <div className="p-5 space-y-5">
         <div className={`rounded-lg border px-4 py-3 ${isCompliant ? 'border-[#9FC3AE] bg-[#E6F0EA]' : 'border-[#FFD08A] bg-[#FFF3E0]'}`}>
           <p className={`text-[14px] font-bold  mb-1 ${isCompliant ? 'text-[#2F6B3F]' : 'text-[#CC8400]'}`}>
             Blueprint Compliance — {isCompliant ? 'Confirmed' : 'Needs Review'}
@@ -220,7 +220,7 @@ function CurriculumTab({ programName }: { programName: string }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
+      <div className="p-5 space-y-5">
 
         {/* Course header */}
         <div className="rounded-lg border border-border bg-background px-4 py-3 space-y-1">
@@ -328,7 +328,7 @@ function PennyTab({ p }: { p: Program }) {
   const isActive = status === 'Active';
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-3xl">
+      <div className="p-5 space-y-4">
         <p className="text-[14px] text-muted-foreground">
           {isEveryday
             ? `${TERMS.aiAssistant} features available in this program to help you with coaching, feedback, and learning activities.`
@@ -417,7 +417,7 @@ function SystemsTab({ p }: { p: Program }) {
   ];
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         {systems.map(s => (
           <div key={s.name} className={`rounded-lg border p-3 ${s.cls}`}>
             <div className="flex items-center justify-between mb-1">
@@ -444,7 +444,7 @@ function HealthTab({ p }: { p: Program }) {
   ] as const;
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         {indicators.map(ind => (
           <div key={ind.label} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
             <div className="flex items-center gap-2.5">

@@ -110,7 +110,7 @@ export default function SalesforceMapping() {
 
       {/* ── Content ── */}
       <ScrollArea className="flex-1">
-        <div className="p-4 max-w-5xl space-y-5">
+        <div className="p-4 space-y-5">
 
           {/* ── Visual Map — 2-col compact cards ── */}
           {view === 'visual' && (

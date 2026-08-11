@@ -18,7 +18,7 @@ export default function LearningAssessments() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {curriculumAssessments.map(asmnt => {
             const statusCfg = CONTENT_STATUS_CONFIG[asmnt.status];
             return (

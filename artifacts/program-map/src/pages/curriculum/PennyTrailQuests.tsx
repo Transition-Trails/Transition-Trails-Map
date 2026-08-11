@@ -19,7 +19,7 @@ export default function PennyTrailQuests() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-4">
+        <div className="p-5 space-y-4">
           {curriculumTrailQuests.map(quest => {
             const statusCfg = CONTENT_STATUS_CONFIG[quest.status];
             return (

@@ -946,7 +946,7 @@ export default function LearnerDetail({ params }: { params?: { contactId?: strin
   return (
     <>
       <ScrollArea className="h-full">
-        <div className="max-w-3xl mx-auto">
+        <div className="">
 
           {/* ── Back + header ──────────────────────────────────────────── */}
           <div className="flex items-center gap-3 px-6 pt-5 pb-3 border-b border-border sticky top-0 bg-background z-10">

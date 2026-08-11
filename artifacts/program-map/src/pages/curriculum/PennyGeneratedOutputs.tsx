@@ -56,7 +56,7 @@ export default function PennyGeneratedOutputs() {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-4">
+        <div className="p-5 space-y-4">
           {/* Module context */}
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
             <div className="flex items-center gap-2 mb-2">

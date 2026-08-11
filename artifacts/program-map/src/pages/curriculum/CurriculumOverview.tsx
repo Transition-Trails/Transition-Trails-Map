@@ -52,7 +52,7 @@ export default function CurriculumOverview() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-6">
+        <div className="p-5 space-y-6">
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[

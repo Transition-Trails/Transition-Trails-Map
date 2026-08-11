@@ -13,7 +13,7 @@ export default function PennyTemplates() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-4xl space-y-4">
+        <div className="p-5 space-y-4">
           <p className="text-[14px] text-muted-foreground">
             This section has moved. {TERMS.aiAssistant} content generation is now managed in the {TERMS.aiAssistant} Content Assistant — Content Workshop.
           </p>

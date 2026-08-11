@@ -117,7 +117,7 @@ export default function Assessments() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 space-y-6 max-w-5xl">
+      <div className="p-6 space-y-6">
 
         {/* Header */}
         <div className="space-y-3">

@@ -969,7 +969,7 @@ export default function PennyCapabilityRegistry() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="p-6 max-w-6xl mx-auto w-full space-y-5 pb-20">
+        <div className="p-6 w-full space-y-5 pb-20">
 
           {/* Active capabilities */}
           {active.length > 0 && (

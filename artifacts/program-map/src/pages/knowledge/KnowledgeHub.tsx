@@ -321,7 +321,7 @@ function ArticleEditor({
           <StatusBadge status={status} />
         </div>
         <ScrollArea className="flex-1">
-          <div className="p-5 space-y-4 max-w-2xl">
+          <div className="p-5 space-y-4">
             {article?.category && (
               <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wide">{article.category}</p>
             )}
@@ -380,7 +380,7 @@ function ArticleEditor({
           <StatusBadge status={status} />
         </div>
         <ScrollArea className="flex-1">
-          <div className="p-5 space-y-4 max-w-3xl">
+          <div className="p-5 space-y-4">
             {article?.category && (
               <p className="text-[11px] font-semibold text-muted-foreground/50 uppercase tracking-wide">{article.category}</p>
             )}
@@ -490,7 +490,7 @@ function ArticleEditor({
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-4 max-w-3xl">
+        <div className="p-5 space-y-4">
           {dirty && !isNew && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-amber-200 bg-amber-50 text-amber-700 text-[12px]">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />

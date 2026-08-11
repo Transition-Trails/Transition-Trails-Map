@@ -19,7 +19,7 @@ export default function CommCalendar() {
 
   return (
     <div className="h-full overflow-y-auto p-6 bg-muted/20">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="space-y-8">
 
         <div>
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Communications & Collaboration</p>

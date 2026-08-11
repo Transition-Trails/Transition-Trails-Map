@@ -102,7 +102,7 @@ function OverviewTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 space-y-6 max-w-4xl">
+      <div className="p-6 space-y-6">
 
         <div className="flex items-center gap-2 mb-1">
           <p className="text-[14px] font-bold  text-muted-foreground/60">Governance</p>

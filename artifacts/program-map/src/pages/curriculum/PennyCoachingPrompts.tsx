@@ -18,7 +18,7 @@ export default function PennyCoachingPrompts() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {curriculumCoachingPrompts.map(prompt => {
             const statusCfg = CONTENT_STATUS_CONFIG[prompt.status];
             return (

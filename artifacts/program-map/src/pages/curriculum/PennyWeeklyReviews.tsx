@@ -18,7 +18,7 @@ export default function PennyWeeklyReviews() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-4">
+        <div className="p-5 space-y-4">
           {curriculumWeeklyReviews.map(review => {
             const statusCfg = CONTENT_STATUS_CONFIG[review.status];
             return (

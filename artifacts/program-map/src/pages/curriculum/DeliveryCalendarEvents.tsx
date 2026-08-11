@@ -25,7 +25,7 @@ export default function DeliveryCalendarEvents() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {curriculumCalendarEvents.map(event => {
             const statusCfg = CONTENT_STATUS_CONFIG[event.status];
             const typeCls = EVENT_TYPE_COLORS[event.eventType as string] || 'bg-slate-50 text-slate-700 border-slate-200';

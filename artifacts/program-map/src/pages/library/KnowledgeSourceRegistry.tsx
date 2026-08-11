@@ -269,7 +269,7 @@ function OverviewView() {
   const P1 = sources.filter(s => s.integrationPriority === 'P1');
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-6 max-w-3xl">
+      <div className="p-5 space-y-6">
 
         {/* Hero */}
         <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
@@ -511,7 +511,7 @@ function RelationshipsView() {
 
       {/* Map */}
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-5 max-w-2xl">
+        <div className="p-5 space-y-5">
           {!src && <p className="text-[14px] text-muted-foreground py-8 text-center">Loading sources…</p>}
           {src && typeCfg && Icon && <>
 
@@ -626,7 +626,7 @@ function RetrievalMapView() {
 
       {/* Map */}
       <ScrollArea className="flex-1">
-        <div className="p-5 space-y-5 max-w-2xl">
+        <div className="p-5 space-y-5">
 
           {/* Header */}
           <div className="rounded-xl border border-secondary/20 bg-secondary/5 p-4">

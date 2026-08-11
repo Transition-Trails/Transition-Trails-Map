@@ -86,7 +86,7 @@ function OverviewTab({ cap, status, onStatusChange }: { cap: PennyCapability; st
   const isOperational = cap.maturity === 'Operational' || cap.maturity === 'Integrated';
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-3xl">
+      <div className="p-5 space-y-4">
         {/* Badges row */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`inline-flex items-center px-2 py-0.5 rounded text-[14px] font-bold  border ${statusCfg.badgeCls}`}>
@@ -150,7 +150,7 @@ function PromptsTab({ cap }: { cap: PennyCapability }) {
   const prompts = promptMap[cap.id] ?? [];
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <p className="text-[14px] text-muted-foreground">Prompt templates that power this capability. Manage templates in Prompt Studio.</p>
         {prompts.length > 0 ? (
           prompts.map(prompt => (
@@ -181,7 +181,7 @@ function SourcesTab({ cap }: { cap: PennyCapability }) {
   const sources = sourceMap[cap.id] ?? [];
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <p className="text-[14px] text-muted-foreground">Knowledge sources this capability depends on. All sources require trust review before Penny activation.</p>
         {sources.length > 0 ? (
           <div className="rounded-lg border border-border overflow-hidden">
@@ -226,7 +226,7 @@ function QualityTab({ cap }: { cap: PennyCapability }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-3xl">
+      <div className="p-5 space-y-4">
         {isOperational ? (
           <>
             <div className="flex items-center gap-4">
@@ -263,7 +263,7 @@ function HealthTab({ cap, status }: { cap: PennyCapability; status: CapabilitySt
   const isOp = cap.maturity === 'Operational' || cap.maturity === 'Integrated';
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         {[
           { label:'Capability Status',    health: status === 'Live' ? 'healthy' as const : status === 'Ready' ? 'healthy' as const : 'needs-attention' as const, note: status },
           { label:'Capability Readiness', health: isOp ? 'healthy' as const : 'needs-attention' as const, note:cap.maturity },
@@ -309,7 +309,7 @@ function RelationshipsTab({ cap }: { cap: PennyCapability }) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-3xl">
+      <div className="p-5 space-y-3">
         <p className="text-[14px] text-muted-foreground">Digital Twin relationships — programs, knowledge sources, and integrations connected to this capability.</p>
         <RelationshipCard title="Programs"          icon={GraduationCap} items={programMap[cap.id]  ?? []} viewAllHref="/digital-twin/penny-network" emptyMessage="No programs linked" />
         <RelationshipCard title="Knowledge Sources" icon={BookOpen}      items={knowledgeMap[cap.id] ?? []} viewAllHref="/knowledge"                 emptyMessage="No knowledge sources linked" />

@@ -37,7 +37,7 @@ export default function CurriculumPrograms() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-      <div className="p-5 max-w-5xl space-y-5">
+      <div className="p-5 space-y-5">
 
         {/* ── Live from Salesforce ── */}
         <section>

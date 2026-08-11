@@ -59,7 +59,7 @@ export default function AccessRolesMatrix({ onBack }: AccessRolesMatrixProps) {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 max-w-5xl space-y-8">
+      <div className="p-6 space-y-8">
 
         {/* ── Header ─────────────────────────────────────────────────── */}
         <div>

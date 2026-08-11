@@ -53,7 +53,7 @@ export default function LearningLessons() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-2">
+        <div className="p-5 space-y-2">
           {filtered.map(lesson => {
             const statusCfg = CONTENT_STATUS_CONFIG[lesson.status];
             const typeCls = LESSON_TYPE_COLORS[lesson.lessonType as string] || 'bg-slate-50 text-slate-700 border-slate-200';

@@ -182,7 +182,7 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
       audience={audience}
       displayName={displayName}
     >
-      <div className="flex flex-col gap-4 px-5 py-5 max-w-3xl mx-auto">
+      <div className="flex flex-col gap-4 px-5 py-5">
         {/* 1 — Today's Trail Quest */}
         <CairnBand
           isLoading={questResult.isLoading}

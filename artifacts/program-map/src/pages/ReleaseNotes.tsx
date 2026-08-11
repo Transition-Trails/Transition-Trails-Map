@@ -236,7 +236,7 @@ export default function ReleaseNotes() {
 
         {/* ── Release content ── */}
         <ScrollArea className="flex-1">
-          <div className="px-8 py-6 max-w-2xl">
+          <div className="px-8 py-6">
             {/* Version heading */}
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center gap-2">

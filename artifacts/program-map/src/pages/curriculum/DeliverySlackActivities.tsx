@@ -26,7 +26,7 @@ export default function DeliverySlackActivities() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {curriculumSlackActivities.map(activity => {
             const statusCfg = CONTENT_STATUS_CONFIG[activity.status];
             const typeCls = ACTIVITY_TYPE_COLORS[activity.activityType as string] || 'bg-slate-50 text-slate-700 border-slate-200';

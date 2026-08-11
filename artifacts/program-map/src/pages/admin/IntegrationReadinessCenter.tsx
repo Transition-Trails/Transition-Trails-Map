@@ -229,7 +229,7 @@ function IntegrationDetail({ i, onOpenBrief }: { i: Integration; onOpenBrief: ()
 function OverviewView() {
   return (
     <ScrollArea className="h-full">
-      <div className="p-4 space-y-4 max-w-3xl">
+      <div className="p-4 space-y-4">
 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-2">
@@ -399,7 +399,7 @@ function DataFlowView() {
   const selected = dataFlowNodes.find(n => n.id === selectedId);
   return (
     <ScrollArea className="h-full">
-      <div className="p-4 space-y-4 max-w-3xl">
+      <div className="p-4 space-y-4">
 
         {/* Central architecture diagram */}
         <div className="rounded-xl border border-border bg-white p-5">
@@ -617,7 +617,7 @@ function FieldMappingView() {
         </ScrollArea>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-3xl space-y-4">
+        <div className="p-5 space-y-4">
           <div className={`rounded-xl border p-3 ${DOMAIN_CONFIG[int.domain].cls}`}>
             <p className="text-[14px] font-bold">{int.name}</p>
             <p className="text-[14px] text-muted-foreground">{int.fieldMappings.length} field mapping{int.fieldMappings.length !== 1 ? 's' : ''}</p>
@@ -768,7 +768,7 @@ function TestingChecklistView() {
         </ScrollArea>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-xl space-y-4">
+        <div className="p-5 space-y-4">
           <div className={`rounded-xl border p-3 ${DOMAIN_CONFIG[int.domain].cls}`}>
             <div className="flex items-center justify-between">
               <p className="text-[14px] font-bold">{int.name}</p>
@@ -921,7 +921,7 @@ function LaunchPlanView() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-2xl space-y-4">
+        <div className="p-5 space-y-4">
           <div>
             <div className="flex items-start justify-between gap-2">
               <div>

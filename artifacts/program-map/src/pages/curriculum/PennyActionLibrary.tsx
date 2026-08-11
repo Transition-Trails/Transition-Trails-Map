@@ -49,7 +49,7 @@ export default function PennyActionLibrary() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {filtered.map((action, idx) => {
             const catCfg = ACTION_CATEGORY_CONFIG[action.category];
             return (

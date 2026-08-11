@@ -24,7 +24,7 @@ export default function LearningResources() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-5xl space-y-3">
+        <div className="p-5 space-y-3">
           {curriculumResources.map(res => {
             const statusCfg = CONTENT_STATUS_CONFIG[res.status];
             const typeCls = TYPE_COLORS[res.resourceType as string] || 'bg-slate-50 text-slate-700 border-slate-200';

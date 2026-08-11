@@ -34,7 +34,7 @@ export default function ContentRequests() {
         </div>
       </div>
       <ScrollArea className="flex-1">
-        <div className="p-5 max-w-4xl space-y-6">
+        <div className="p-5 space-y-6">
 
           {/* Current phase notice */}
           <div className="rounded-xl border border-primary/20 bg-primary/5 px-5 py-4">

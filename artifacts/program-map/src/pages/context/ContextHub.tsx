@@ -26,7 +26,7 @@ function EmptyContextState({ label }: { label: string }) {
   const [, setLocation] = useLocation();
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-xl">
+      <div className="p-5 space-y-4">
         <div className="rounded-lg border border-border bg-muted/30 px-4 py-3">
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">No Active Context</p>
           <p className="text-[14px] text-foreground leading-relaxed mb-3">
@@ -83,7 +83,7 @@ function OverviewTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-5 max-w-3xl">
+      <div className="p-5 space-y-5">
         <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
           <p className="text-[14px] font-bold  text-primary/60 mb-1">Workspace Context Engine</p>
           <p className="text-[14px] text-foreground leading-relaxed">
@@ -201,7 +201,7 @@ function RelationshipsTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-4 max-w-2xl">
+      <div className="p-5 space-y-4">
         <div>
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Relationships</p>
           <p className="text-[14px] font-semibold text-foreground mb-0.5">{activeContext.name}</p>
@@ -274,7 +274,7 @@ function HealthTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-2xl">
+      <div className="p-5 space-y-3">
         <div>
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Health</p>
           <p className="text-[14px] font-semibold text-foreground mb-0.5">{activeContext.name}</p>
@@ -322,7 +322,7 @@ function ActivityTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-2xl">
+      <div className="p-5 space-y-3">
         <div>
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Activity</p>
           <p className="text-[14px] text-muted-foreground">Session context activity. Full audit history is available in Administration.</p>
@@ -368,7 +368,7 @@ function ImpactTab() {
   const [, setLocation] = useLocation();
   return (
     <ScrollArea className="h-full">
-      <div className="p-5 space-y-3 max-w-2xl">
+      <div className="p-5 space-y-3">
         <div>
           <p className="text-[14px] font-bold  text-muted-foreground/50 mb-1">Impact</p>
           <p className="text-[14px] text-muted-foreground">How setting <strong className="text-foreground">{activeContext.name}</strong> as context affects each workspace.</p>
