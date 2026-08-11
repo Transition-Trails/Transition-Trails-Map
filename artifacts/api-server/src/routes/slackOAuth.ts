@@ -139,6 +139,9 @@ const USER_SCOPES = [
   "mpim:read",
   "mpim:history",
   "chat:write",
+  "search:read",
+  "users:read",
+  "reactions:write",
 ].join(",");
 
 // ── In-memory state store (CSRF protection across the OAuth redirect) ─────────
@@ -505,6 +508,7 @@ export interface ConversationItem {
   type:      "im" | "mpim" | "channel";
   name:      string;
   isPrivate: boolean;
+  userId?:   string;   // DM partner's Slack user ID (im type only) — used for presence lookups
 }
 
 // ── GET /slack/conversations ──────────────────────────────────────────────────
@@ -563,10 +567,10 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
         const id     = ch["id"] as string;
 
         if (isIm) {
-          // DM partner user ID — resolve to display name
-          const userId    = ch["user"] as string | undefined;
+          // DM partner user ID — resolve to display name and expose for presence lookups
+          const userId      = ch["user"] as string | undefined;
           const partnerName = userId ? await resolveDisplayName(token!, userId) : "Direct Message";
-          return { id, type: "im", name: partnerName, isPrivate: true };
+          return { id, type: "im", name: partnerName, isPrivate: true, userId };
         }
 
         if (isMpim) {
@@ -668,6 +672,8 @@ router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res
         ? (nameMap.get(m["user"] as string) ?? m["user"])
         : (m["username"] as string | undefined) ?? "Unknown",
       isBot:    m["bot_id"] !== undefined || m["subtype"] === "bot_message",
+      reactions: ((m["reactions"] as Array<{ name: string; count: number; users: string[] }> | undefined) ?? [])
+        .map(r => ({ name: r.name, count: r.count, users: r.users ?? [] })),
     }));
 
     res.json({ messages, hasMore: r["has_more"] === true });
@@ -737,6 +743,136 @@ router.post("/slack/conversations/:id/messages", requireSlackAuth, async (req, r
     res.json({ ok: true, ts: result.ts });
   } catch (err) {
     req.log.error({ err }, "slack send fetch error");
+    res.status(502).json({ ok: false, error: "fetch_error" });
+  }
+});
+
+// ── Presence cache ────────────────────────────────────────────────────────────
+// Keyed by Slack userId.  Kept for 60 s to avoid hammering the API.
+const presenceCache = new Map<string, { presence: string; fetchedAt: number }>();
+const PRESENCE_TTL_MS = 60_000;
+
+// ── GET /slack/users/:userId/presence ─────────────────────────────────────────
+
+router.get("/slack/users/:userId/presence", requireSlackAuth, async (req, res) => {
+  const email = req.session.googleEmail;
+  if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
+
+  const userId = String(req.params["userId"]);
+
+  const cached = presenceCache.get(userId);
+  if (cached && Date.now() - cached.fetchedAt < PRESENCE_TTL_MS) {
+    res.json({ presence: cached.presence });
+    return;
+  }
+
+  let token: string | null;
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack presence DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
+
+  try {
+    const r = await slackUserGet(token, "users.getPresence", { user: userId });
+    if (r["ok"] !== true) {
+      res.status(502).json({ error: String(r["error"] ?? "slack_api_error") }); return;
+    }
+    const presence = String(r["presence"] ?? "away");
+    presenceCache.set(userId, { presence, fetchedAt: Date.now() });
+    res.json({ presence });
+  } catch (err) {
+    req.log.error({ err }, "slack presence fetch error");
+    res.status(502).json({ error: "fetch_error" });
+  }
+});
+
+// ── GET /slack/search ─────────────────────────────────────────────────────────
+
+router.get("/slack/search", requireSlackAuth, async (req, res) => {
+  const email = req.session.googleEmail;
+  if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
+
+  const query = ((req.query["q"] as string | undefined) ?? "").trim();
+  if (!query || query.length < 2) { res.json({ results: [] }); return; }
+
+  let token: string | null;
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack search DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
+
+  try {
+    const r = await slackUserGet(token, "search.messages", {
+      query,
+      count: "20",
+      sort:  "timestamp",
+    });
+
+    if (r["ok"] !== true) {
+      const slackErr = r["error"];
+      if (isTokenExpiredError(slackErr)) {
+        res.status(401).json({ error: "token_expired" }); return;
+      }
+      res.status(502).json({ error: String(slackErr ?? "slack_api_error") }); return;
+    }
+
+    // Slack returns results under messages.matches
+    const rawMatches = ((r["messages"] as Record<string, unknown> | undefined)?.["matches"] as Record<string, unknown>[]) ?? [];
+
+    const results = rawMatches.map(m => {
+      const ch = m["channel"] as Record<string, unknown> | undefined;
+      return {
+        ts:          m["ts"] as string,
+        text:        m["text"] as string,
+        userId:      (m["user"] as string | undefined) ?? null,
+        userName:    (m["username"] as string | undefined) ?? (m["user"] as string | undefined) ?? "Unknown",
+        channelId:   ch?.["id"] as string | undefined,
+        channelName: ch?.["name"] as string | undefined,
+        permalink:   m["permalink"] as string | undefined,
+      };
+    });
+
+    res.json({ results });
+  } catch (err) {
+    req.log.error({ err }, "slack search fetch error");
+    res.status(502).json({ error: "fetch_error" });
+  }
+});
+
+// ── POST /slack/conversations/:channelId/messages/:ts/reactions ───────────────
+
+router.post("/slack/conversations/:channelId/messages/:ts/reactions", requireSlackAuth, async (req, res) => {
+  const email = req.session.googleEmail;
+  if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
+
+  const channelId = String(req.params["channelId"]);
+  const ts        = String(req.params["ts"]);
+  const name      = ((req.body as { name?: string })?.name ?? "").trim().replace(/:/g, "");
+
+  if (!name) { res.status(400).json({ error: "emoji_name_required" }); return; }
+
+  let token: string | null;
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack reaction DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
+
+  try {
+    const r = await fetch("https://slack.com/api/reactions.add", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({ channel: channelId, timestamp: ts, name }),
+    });
+    const result = (await r.json()) as { ok: boolean; error?: string };
+
+    // "already_reacted" is not a real error — idempotent success
+    if (!result.ok && result.error !== "already_reacted") {
+      if (isTokenExpiredError(result.error)) {
+        res.status(401).json({ ok: false, error: "token_expired" }); return;
+      }
+      res.status(502).json({ ok: false, error: result.error ?? "slack_api_error" }); return;
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    req.log.error({ err }, "slack reactions.add error");
     res.status(502).json({ ok: false, error: "fetch_error" });
   }
 });

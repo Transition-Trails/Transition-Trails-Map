@@ -32,6 +32,9 @@ import {
   Loader2,
   AlertCircle,
   User,
+  Search,
+  Smile,
+  X,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -41,15 +44,43 @@ interface Conversation {
   type:      "im" | "mpim" | "channel";
   name:      string;
   isPrivate: boolean;
+  userId?:   string;   // DM partner's Slack user ID — used for presence
+}
+
+interface Reaction {
+  name:  string;
+  count: number;
+  users: string[];
 }
 
 interface Message {
-  ts:       string;
-  text:     string;
-  userId:   string | null;
-  userName: string;
-  isBot:    boolean;
+  ts:        string;
+  text:      string;
+  userId:    string | null;
+  userName:  string;
+  isBot:     boolean;
+  reactions: Reaction[];
 }
+
+interface SearchResult {
+  ts:          string;
+  text:        string;
+  userId:      string | null;
+  userName:    string;
+  channelId?:  string;
+  channelName?: string;
+  permalink?:  string;
+}
+
+// Common emojis available in the reaction picker
+const REACTION_EMOJIS: Array<{ emoji: string; name: string }> = [
+  { emoji: "👍", name: "thumbsup" },
+  { emoji: "❤️",  name: "heart" },
+  { emoji: "😂", name: "joy" },
+  { emoji: "🎉", name: "tada" },
+  { emoji: "🤔", name: "thinking_face" },
+  { emoji: "✅", name: "white_check_mark" },
+];
 
 // ── Slack wordmark SVG (official brand colours) ───────────────────────────────
 
@@ -141,7 +172,18 @@ async function apiPost<T>(path: string, body: unknown): Promise<T> {
 
 // ── Message bubble ────────────────────────────────────────────────────────────
 
-function MessageBubble({ msg }: { msg: Message }) {
+function MessageBubble({
+  msg,
+  channelId,
+  onReacted,
+}: {
+  msg:       Message;
+  channelId: string | null;
+  onReacted: () => void;
+}) {
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [reacting,   setReacting]   = useState(false);
+
   const time = (() => {
     try {
       const d = new Date(parseFloat(msg.ts) * 1000);
@@ -149,17 +191,71 @@ function MessageBubble({ msg }: { msg: Message }) {
     } catch { return ""; }
   })();
 
+  const handleReact = useCallback(async (emojiName: string) => {
+    if (!channelId || reacting) return;
+    setPickerOpen(false);
+    setReacting(true);
+    try {
+      await apiPost(`/api/slack/conversations/${channelId}/messages/${msg.ts}/reactions`, { name: emojiName });
+      onReacted();
+    } catch { /* ignore — already_reacted is silent */ }
+    finally { setReacting(false); }
+  }, [channelId, msg.ts, reacting, onReacted]);
+
   return (
-    <div className="flex flex-col gap-0.5 group">
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-[11px] font-semibold text-foreground leading-tight truncate max-w-[140px]">
+    <div className="flex flex-col gap-0.5 group relative">
+      <div className="flex items-center gap-1.5">
+        <span className="text-[11px] font-semibold text-foreground leading-tight truncate max-w-[130px]">
           {msg.userName}
         </span>
         <span className="text-[10px] text-muted-foreground/60 flex-shrink-0">{time}</span>
+        {channelId && (
+          <button
+            onClick={() => setPickerOpen(o => !o)}
+            className="opacity-0 group-hover:opacity-100 ml-auto flex-shrink-0 p-0.5 rounded text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/30 transition-all"
+            title="Add reaction"
+          >
+            <Smile className="w-3 h-3" />
+          </button>
+        )}
       </div>
+
       <p className="text-[12px] text-foreground leading-relaxed break-words whitespace-pre-wrap">
         {msg.text}
       </p>
+
+      {/* Existing reactions */}
+      {msg.reactions.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-0.5">
+          {msg.reactions.map(r => (
+            <button
+              key={r.name}
+              onClick={() => void handleReact(r.name)}
+              className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-muted/40 hover:bg-primary/10 border border-border text-[11px] transition-colors"
+              title={`:${r.name}:`}
+            >
+              <span>{REACTION_EMOJIS.find(e => e.name === r.name)?.emoji ?? "🙂"}</span>
+              <span className="text-muted-foreground ml-0.5">{r.count}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Emoji picker */}
+      {pickerOpen && (
+        <div className="absolute right-0 top-5 z-20 bg-white border border-border rounded-lg shadow-lg p-1.5 flex gap-0.5">
+          {REACTION_EMOJIS.map(({ emoji, name }) => (
+            <button
+              key={name}
+              onClick={() => void handleReact(name)}
+              className="w-7 h-7 flex items-center justify-center rounded hover:bg-muted/40 text-base leading-none transition-colors"
+              title={`:${name}:`}
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -170,10 +266,12 @@ function ConvItem({
   conv,
   selected,
   onSelect,
+  presence,
 }: {
-  conv:     Conversation;
-  selected: boolean;
-  onSelect: () => void;
+  conv:      Conversation;
+  selected:  boolean;
+  onSelect:  () => void;
+  presence?: "active" | "away";
 }) {
   return (
     <button
@@ -184,10 +282,16 @@ function ConvItem({
           : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
       }`}
     >
-      {conv.type === "channel"
-        ? <Hash className={`w-3 h-3 flex-shrink-0 ${selected ? "text-primary" : "text-muted-foreground/60"}`} />
-        : <span className={`w-3 h-3 flex-shrink-0 rounded-full border-2 ${selected ? "border-primary bg-primary/20" : "border-muted-foreground/40"}`} />
-      }
+      {conv.type === "channel" ? (
+        <Hash className={`w-3 h-3 flex-shrink-0 ${selected ? "text-primary" : "text-muted-foreground/60"}`} />
+      ) : (
+        <span className="relative flex-shrink-0 w-3 h-3">
+          <span className={`absolute inset-0 rounded-full border-2 ${selected ? "border-primary bg-primary/20" : "border-muted-foreground/40"}`} />
+          {presence && (
+            <span className={`absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border border-white ${presence === "active" ? "bg-green-500" : "bg-muted-foreground/30"}`} />
+          )}
+        </span>
+      )}
       <span className={`truncate text-[12px] leading-tight ${selected ? "font-semibold" : "font-normal"}`}>
         {conv.name}
       </span>
@@ -204,13 +308,15 @@ function ConvSection({
   selectedId,
   onSelect,
   defaultOpen = true,
+  presenceMap,
 }: {
-  label:       string;
-  icon:        React.ReactNode;
-  items:       Conversation[];
-  selectedId:  string | null;
-  onSelect:    (conv: Conversation) => void;
+  label:        string;
+  icon:         React.ReactNode;
+  items:        Conversation[];
+  selectedId:   string | null;
+  onSelect:     (conv: Conversation) => void;
   defaultOpen?: boolean;
+  presenceMap?: Map<string, "active" | "away">;
 }) {
   const [open, setOpen] = useState(defaultOpen);
 
@@ -238,6 +344,7 @@ function ConvSection({
               conv={conv}
               selected={selectedId === conv.id}
               onSelect={() => onSelect(conv)}
+              presence={conv.userId ? presenceMap?.get(conv.userId) : undefined}
             />
           ))}
         </div>
@@ -365,6 +472,51 @@ function UnconnectedView({
   );
 }
 
+// ── Search result row ─────────────────────────────────────────────────────────
+
+function SearchResultRow({
+  result,
+  onSelectChannel,
+}: {
+  result:          SearchResult;
+  onSelectChannel: (channelId: string, channelName: string) => void;
+}) {
+  const time = (() => {
+    try {
+      const d = new Date(parseFloat(result.ts) * 1000);
+      return d.toLocaleDateString([], { month: "short", day: "numeric" });
+    } catch { return ""; }
+  })();
+
+  const handleClick = () => {
+    if (result.channelId) {
+      onSelectChannel(result.channelId, result.channelName ?? result.channelId);
+    } else if (result.permalink) {
+      window.open(result.permalink, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className="w-full text-left px-3 py-2.5 hover:bg-muted/20 transition-colors flex flex-col gap-0.5"
+    >
+      <div className="flex items-center gap-1.5">
+        {result.channelName ? (
+          <span className="text-[10px] font-semibold text-primary flex items-center gap-0.5">
+            <Hash className="w-2.5 h-2.5" />{result.channelName}
+          </span>
+        ) : (
+          <span className="text-[10px] font-semibold text-muted-foreground">DM</span>
+        )}
+        <span className="text-[10px] text-muted-foreground/60 ml-auto">{time}</span>
+      </div>
+      <p className="text-[11px] font-medium text-foreground leading-none">{result.userName}</p>
+      <p className="text-[11px] text-muted-foreground leading-snug line-clamp-2">{result.text}</p>
+    </button>
+  );
+}
+
 // ── Connected panel content ───────────────────────────────────────────────────
 
 function ConnectedView({
@@ -378,18 +530,32 @@ function ConnectedView({
   onTokenExpired: () => void;
   expanded:       boolean;
 }) {
-  const [conversations,     setConversations]     = useState<Conversation[]>([]);
-  const [convLoading,       setConvLoading]       = useState(true);
-  const [convError,         setConvError]         = useState<string | null>(null);
-  const [selectedConv,      setSelectedConv]      = useState<Conversation | null>(null);
-  const [messages,          setMessages]          = useState<Message[]>([]);
-  const [msgLoading,        setMsgLoading]        = useState(false);
-  const [msgError,          setMsgError]          = useState<string | null>(null);
-  const [composeText,       setComposeText]       = useState("");
-  const [sending,           setSending]           = useState(false);
-  const [disconnecting,     setDisconnecting]     = useState(false);
-  const messagesEndRef                            = useRef<HTMLDivElement>(null);
-  const pollRef                                   = useRef<ReturnType<typeof setInterval> | null>(null);
+  // ── Conversation list ─────────────────────────────────────────────────────
+  const [conversations,  setConversations]  = useState<Conversation[]>([]);
+  const [convLoading,    setConvLoading]    = useState(true);
+  const [convError,      setConvError]      = useState<string | null>(null);
+  const [selectedConv,   setSelectedConv]   = useState<Conversation | null>(null);
+
+  // ── Messages ──────────────────────────────────────────────────────────────
+  const [messages,       setMessages]       = useState<Message[]>([]);
+  const [msgLoading,     setMsgLoading]     = useState(false);
+  const [msgError,       setMsgError]       = useState<string | null>(null);
+  const [composeText,    setComposeText]    = useState("");
+  const [sending,        setSending]        = useState(false);
+  const [disconnecting,  setDisconnecting]  = useState(false);
+
+  // ── Presence ──────────────────────────────────────────────────────────────
+  const [presenceMap,    setPresenceMap]    = useState<Map<string, "active" | "away">>(new Map());
+
+  // ── Search ────────────────────────────────────────────────────────────────
+  const [searchActive,   setSearchActive]   = useState(false);
+  const [searchQuery,    setSearchQuery]    = useState("");
+  const [searchResults,  setSearchResults]  = useState<SearchResult[]>([]);
+  const [searchLoading,  setSearchLoading]  = useState(false);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const pollRef        = useRef<ReturnType<typeof setInterval> | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Load conversation list on mount
   useEffect(() => {
@@ -409,18 +575,55 @@ function ConnectedView({
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        if (err instanceof ApiError && err.code === "token_expired") {
-          onTokenExpired();
-          return;
-        }
+        if (err instanceof ApiError && err.code === "token_expired") { onTokenExpired(); return; }
         setConvError("Could not load conversations.");
       })
-      .finally(() => {
-        if (!cancelled) setConvLoading(false);
-      });
+      .finally(() => { if (!cancelled) setConvLoading(false); });
 
     return () => { cancelled = true; };
   }, [expanded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch presence for DM partners once conversations load
+  useEffect(() => {
+    const dmConvs = conversations.filter(c => c.type === "im" && c.userId);
+    if (dmConvs.length === 0) return;
+
+    void Promise.allSettled(
+      dmConvs.map(c =>
+        apiGet<{ presence: string }>(`/api/slack/users/${c.userId!}/presence`)
+          .then(({ presence }) => ({ userId: c.userId!, presence })),
+      ),
+    ).then(results => {
+      setPresenceMap(prev => {
+        const next = new Map(prev);
+        for (const r of results) {
+          if (r.status === "fulfilled") {
+            next.set(r.value.userId, r.value.presence === "active" ? "active" : "away");
+          }
+        }
+        return next;
+      });
+    });
+  }, [conversations]);
+
+  // Search — debounced 400 ms
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!q || q.length < 2) { setSearchResults([]); setSearchLoading(false); return; }
+    setSearchLoading(true);
+    const timer = setTimeout(() => {
+      apiGet<{ results: SearchResult[] }>(`/api/slack/search?q=${encodeURIComponent(q)}`)
+        .then(data => setSearchResults(data.results))
+        .catch(() => setSearchResults([]))
+        .finally(() => setSearchLoading(false));
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Auto-focus search input when opened
+  useEffect(() => {
+    if (searchActive) setTimeout(() => searchInputRef.current?.focus(), 50);
+  }, [searchActive]);
 
   // Load + poll messages when a conversation is selected
   const fetchMessages = useCallback(async (convId: string, silent = false) => {
@@ -430,13 +633,9 @@ function ConnectedView({
       const data = await apiGet<{ messages: Message[] }>(
         `/api/slack/conversations/${convId}/history?limit=30`,
       );
-      // API returns newest-first; reverse for chronological display
       setMessages([...data.messages].reverse());
     } catch (err: unknown) {
-      if (err instanceof ApiError && err.code === "token_expired") {
-        onTokenExpired();
-        return;
-      }
+      if (err instanceof ApiError && err.code === "token_expired") { onTokenExpired(); return; }
       setMsgError("Could not load messages.");
     } finally {
       setMsgLoading(false);
@@ -445,20 +644,11 @@ function ConnectedView({
 
   useEffect(() => {
     if (!selectedConv || !expanded) return;
-
     void fetchMessages(selectedConv.id);
-
-    // Poll every 30 s
-    pollRef.current = setInterval(() => {
-      void fetchMessages(selectedConv.id, true);
-    }, 30_000);
-
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
+    pollRef.current = setInterval(() => void fetchMessages(selectedConv.id, true), 30_000);
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [selectedConv, expanded, fetchMessages]);
 
-  // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -470,16 +660,11 @@ function ConnectedView({
     setComposeText("");
     try {
       await apiPost(`/api/slack/conversations/${selectedConv.id}/messages`, { text });
-      // Optimistically refresh messages
       await fetchMessages(selectedConv.id, true);
     } catch (err: unknown) {
       if (err instanceof ApiError && err.code === "token_expired") {
-        // Preserve draft so user doesn't lose their message, then show reconnect.
-        setComposeText(text);
-        onTokenExpired();
-        return;
+        setComposeText(text); onTokenExpired(); return;
       }
-      // Put the text back for any other send failure
       setComposeText(text);
     } finally {
       setSending(false);
@@ -487,21 +672,16 @@ function ConnectedView({
   }, [composeText, selectedConv, sending, fetchMessages, onTokenExpired]);
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      void handleSend();
-    }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void handleSend(); }
   };
 
   const handleDisconnect = async () => {
     setDisconnecting(true);
-    try {
-      await apiDelete("/api/slack/oauth/disconnect");
-      onDisconnect();
-    } finally {
-      setDisconnecting(false);
-    }
+    try { await apiDelete("/api/slack/oauth/disconnect"); onDisconnect(); }
+    finally { setDisconnecting(false); }
   };
+
+  const closeSearch = () => { setSearchActive(false); setSearchQuery(""); setSearchResults([]); };
 
   const slackOpenUrl = selectedConv
     ? `https://slack.com/app_redirect?channel=${selectedConv.id}`
@@ -509,119 +689,187 @@ function ConnectedView({
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Header */}
-      <div className="flex-shrink-0 flex items-center justify-between px-3 py-2 border-b border-border bg-white">
-        <div className="flex items-center gap-2 min-w-0">
-          <SlackIcon size={16} />
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold text-foreground leading-tight truncate">
-              {teamName ?? "Slack"}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <a
-            href={slackOpenUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
-            title="Open in Slack"
-          >
-            <ExternalLink className="w-3 h-3" />
-          </a>
-          <button
-            onClick={() => void handleDisconnect()}
-            disabled={disconnecting}
-            className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors disabled:opacity-40"
-            title="Disconnect Slack"
-          >
-            <LogOut className="w-3 h-3" />
-          </button>
-        </div>
-      </div>
 
-      {/* Conversation list — collapsible Channels + DMs */}
-      <div className="flex-shrink-0 border-b border-border bg-white overflow-y-auto py-1.5 px-1.5" style={{ maxHeight: "45%" }}>
-        {convLoading ? (
-          <div className="flex items-center justify-center py-3">
-            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-          </div>
-        ) : convError ? (
-          <p className="text-[11px] text-destructive px-2 py-2">{convError}</p>
-        ) : conversations.length === 0 ? (
-          <p className="text-[11px] text-muted-foreground px-2 py-2">No conversations found.</p>
+      {/* ── Header ── */}
+      <div className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 border-b border-border bg-white">
+        {searchActive ? (
+          <>
+            <Search className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search messages…"
+              className="flex-1 text-[12px] bg-transparent outline-none text-foreground placeholder:text-muted-foreground/50"
+            />
+            <button
+              onClick={closeSearch}
+              className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+              title="Cancel search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </>
         ) : (
           <>
-            <ConvSection
-              label="Channels"
-              icon={<Hash className="w-3 h-3" />}
-              items={conversations.filter(c => c.type === "channel")}
-              selectedId={selectedConv?.id ?? null}
-              onSelect={setSelectedConv}
-              defaultOpen={true}
-            />
-            <ConvSection
-              label="Direct Messages"
-              icon={<User className="w-3 h-3" />}
-              items={conversations.filter(c => c.type === "im" || c.type === "mpim")}
-              selectedId={selectedConv?.id ?? null}
-              onSelect={setSelectedConv}
-              defaultOpen={true}
-            />
+            <SlackIcon size={16} />
+            <p className="text-[11px] font-semibold text-foreground leading-tight truncate flex-1 min-w-0">
+              {teamName ?? "Slack"}
+            </p>
+            <div className="flex items-center gap-0.5 flex-shrink-0">
+              <button
+                onClick={() => setSearchActive(true)}
+                className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+                title="Search messages"
+              >
+                <Search className="w-3 h-3" />
+              </button>
+              <a
+                href={slackOpenUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+                title="Open in Slack"
+              >
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <button
+                onClick={() => void handleDisconnect()}
+                disabled={disconnecting}
+                className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors disabled:opacity-40"
+                title="Disconnect Slack"
+              >
+                <LogOut className="w-3 h-3" />
+              </button>
+            </div>
           </>
         )}
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-3 bg-white">
-        {!selectedConv ? (
-          <p className="text-[11px] text-muted-foreground text-center pt-4">
-            Select a conversation to see messages.
-          </p>
-        ) : msgLoading ? (
-          <div className="flex items-center justify-center py-6">
-            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-          </div>
-        ) : msgError ? (
-          <div className="flex items-center gap-2 text-destructive text-[11px]">
-            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-            {msgError}
-          </div>
-        ) : messages.length === 0 ? (
-          <p className="text-[11px] text-muted-foreground text-center pt-4">
-            No messages yet.
-          </p>
-        ) : (
-          messages.map(msg => (
-            <MessageBubble key={msg.ts} msg={msg} />
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Compose bar */}
-      {selectedConv && (
-        <div className="flex-shrink-0 border-t border-border bg-white px-2 py-2 flex items-end gap-1.5">
-          <textarea
-            value={composeText}
-            onChange={e => setComposeText(e.target.value)}
-            onKeyDown={handleKey}
-            placeholder="Message…"
-            rows={2}
-            className="flex-1 resize-none text-[12px] bg-muted/20 rounded-lg px-2.5 py-2 outline-none text-foreground placeholder:text-muted-foreground/50 border border-border focus:border-primary/40 transition-colors"
-          />
-          <button
-            onClick={() => void handleSend()}
-            disabled={!composeText.trim() || sending}
-            className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors flex-shrink-0 mb-0.5"
-            aria-label="Send"
-          >
-            {sending
-              ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              : <Send className="w-3.5 h-3.5" />
-            }
-          </button>
+      {/* ── Search results view ── */}
+      {searchActive ? (
+        <div className="flex-1 overflow-y-auto bg-white">
+          {!searchQuery.trim() || searchQuery.trim().length < 2 ? (
+            <p className="text-[11px] text-muted-foreground px-3 py-4 text-center">
+              Type at least 2 characters to search.
+            </p>
+          ) : searchLoading ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            </div>
+          ) : searchResults.length === 0 ? (
+            <p className="text-[11px] text-muted-foreground px-3 py-4 text-center">
+              No results for &ldquo;{searchQuery}&rdquo;.
+            </p>
+          ) : (
+            <div className="flex flex-col divide-y divide-border">
+              {searchResults.map(r => (
+                <SearchResultRow
+                  key={`${r.channelId ?? "dm"}-${r.ts}`}
+                  result={r}
+                  onSelectChannel={(channelId) => {
+                    const conv = conversations.find(c => c.id === channelId);
+                    if (conv) { setSelectedConv(conv); closeSearch(); }
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
+      ) : (
+        <>
+          {/* ── Conversation list ── */}
+          <div
+            className="flex-shrink-0 border-b border-border bg-white overflow-y-auto py-1.5 px-1.5"
+            style={{ maxHeight: "45%" }}
+          >
+            {convLoading ? (
+              <div className="flex items-center justify-center py-3">
+                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              </div>
+            ) : convError ? (
+              <p className="text-[11px] text-destructive px-2 py-2">{convError}</p>
+            ) : conversations.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground px-2 py-2">No conversations found.</p>
+            ) : (
+              <>
+                <ConvSection
+                  label="Channels"
+                  icon={<Hash className="w-3 h-3" />}
+                  items={conversations.filter(c => c.type === "channel")}
+                  selectedId={selectedConv?.id ?? null}
+                  onSelect={setSelectedConv}
+                  defaultOpen={true}
+                />
+                <ConvSection
+                  label="Direct Messages"
+                  icon={<User className="w-3 h-3" />}
+                  items={conversations.filter(c => c.type === "im" || c.type === "mpim")}
+                  selectedId={selectedConv?.id ?? null}
+                  onSelect={setSelectedConv}
+                  defaultOpen={true}
+                  presenceMap={presenceMap}
+                />
+              </>
+            )}
+          </div>
+
+          {/* ── Messages ── */}
+          <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-3 bg-white">
+            {!selectedConv ? (
+              <p className="text-[11px] text-muted-foreground text-center pt-4">
+                Select a conversation to see messages.
+              </p>
+            ) : msgLoading ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              </div>
+            ) : msgError ? (
+              <div className="flex items-center gap-2 text-destructive text-[11px]">
+                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                {msgError}
+              </div>
+            ) : messages.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground text-center pt-4">No messages yet.</p>
+            ) : (
+              messages.map(msg => (
+                <MessageBubble
+                  key={msg.ts}
+                  msg={msg}
+                  channelId={selectedConv.id}
+                  onReacted={() => void fetchMessages(selectedConv.id, true)}
+                />
+              ))
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* ── Compose bar ── */}
+          {selectedConv && (
+            <div className="flex-shrink-0 border-t border-border bg-white px-2 py-2 flex items-end gap-1.5">
+              <textarea
+                value={composeText}
+                onChange={e => setComposeText(e.target.value)}
+                onKeyDown={handleKey}
+                placeholder="Message…"
+                rows={2}
+                className="flex-1 resize-none text-[12px] bg-muted/20 rounded-lg px-2.5 py-2 outline-none text-foreground placeholder:text-muted-foreground/50 border border-border focus:border-primary/40 transition-colors"
+              />
+              <button
+                onClick={() => void handleSend()}
+                disabled={!composeText.trim() || sending}
+                className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors flex-shrink-0 mb-0.5"
+                aria-label="Send"
+              >
+                {sending
+                  ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  : <Send className="w-3.5 h-3.5" />
+                }
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
