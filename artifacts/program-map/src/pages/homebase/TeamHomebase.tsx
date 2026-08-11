@@ -19,7 +19,10 @@ import {
   Sparkles,
   ShieldCheck,
   Zap,
+  Plus,
+  ExternalLink,
 } from "lucide-react";
+import { Link } from "wouter";
 import { HomebaseShell } from "@/components/layout/HomebaseShell";
 import { useTierFlags }  from "@/hooks/useTierFlags";
 import { TodayTasksCard }    from "@/components/homebase/TodayTasksCard";
@@ -36,34 +39,34 @@ interface TeamHomebaseProps {
 
 // Generic links for team@ audience members
 const TEAM_QUICK_LINKS = [
-  { label: "Programs",  desc: "Program map and health",         href: "/program",                    icon: LayoutDashboard },
-  { label: "People",    desc: "Learners, coaches, volunteers",  href: "/admin/people",               icon: Users           },
-  { label: "Calendar",  desc: "Upcoming sessions and events",   href: "https://calendar.google.com", icon: CalendarDays,   external: true },
-  { label: "Slack",     desc: "Team channels",                  href: "https://slack.com",           icon: MessageSquare,  external: true },
+  { label: "Programs",  href: "/program",                    icon: LayoutDashboard },
+  { label: "People",    href: "/admin/people",               icon: Users           },
+  { label: "Calendar",  href: "https://calendar.google.com", icon: CalendarDays,   external: true },
+  { label: "Slack",     href: "https://slack.com",           icon: MessageSquare,  external: true },
 ];
 
 // Staff links — admin / superadmin
 const ADMIN_QUICK_LINKS = [
-  { label: "Operations",        desc: "Demand queue and system health",    href: "/operations/demand",       icon: Activity       },
-  { label: "Penny Studio",      desc: "Prompts, capabilities, and intel",  href: "/penny/prompts",           icon: Sparkles       },
-  { label: "Phase 1 Readiness", desc: "Integration and launch checklist",  href: "/admin/phase1-readiness",  icon: ShieldCheck    },
-  { label: "People & Access",   desc: "Learners, coaches, and volunteers", href: "/admin/people",            icon: Users          },
+  { label: "Operations",   href: "/operations/demand",      icon: Activity    },
+  { label: "Penny Studio", href: "/penny/prompts",          icon: Sparkles    },
+  { label: "Readiness",    href: "/admin/phase1-readiness", icon: ShieldCheck },
+  { label: "People",       href: "/admin/people",           icon: Users       },
 ];
 
 // Staff links — power
 const POWER_QUICK_LINKS = [
-  { label: "Programs",    desc: "Program map and health",           href: "/program",           icon: LayoutDashboard },
-  { label: "Penny",       desc: "AI assistant and capabilities",    href: "/penny",             icon: Sparkles        },
-  { label: "Knowledge",   desc: "Articles, briefs, and sources",    href: "/knowledge",         icon: BookOpen        },
-  { label: "Operations",  desc: "Demand queue and health checks",   href: "/operations/demand", icon: Activity        },
+  { label: "Programs",   href: "/program",           icon: LayoutDashboard },
+  { label: "Penny",      href: "/penny",             icon: Sparkles        },
+  { label: "Knowledge",  href: "/knowledge",         icon: BookOpen        },
+  { label: "Operations", href: "/operations/demand", icon: Activity        },
 ];
 
 // Staff links — everyday
 const EVERYDAY_QUICK_LINKS = [
-  { label: "Programs",       desc: "Program map and health",         href: "/program",       icon: LayoutDashboard },
-  { label: "Knowledge",      desc: "Articles and knowledge briefs",  href: "/knowledge",     icon: BookOpen        },
-  { label: "Collaboration",  desc: "Channels, signals, and comms",   href: "/collaboration", icon: MessageSquare   },
-  { label: "Penny",          desc: "AI assistant for quick answers", href: "/penny",         icon: Zap             },
+  { label: "Programs",      href: "/program",       icon: LayoutDashboard },
+  { label: "Knowledge",     href: "/knowledge",     icon: BookOpen        },
+  { label: "Collaboration", href: "/collaboration", icon: MessageSquare   },
+  { label: "Penny",         href: "/penny",         icon: Zap             },
 ];
 
 export default function TeamHomebase({ displayName, isStaff = false }: TeamHomebaseProps) {
@@ -84,44 +87,60 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
 
   return (
     <HomebaseShell audience="team" displayName={displayName}>
-      <div className="px-6 py-8 space-y-8">
+      <div className="px-6 py-8 space-y-6">
 
-        {/* Greeting */}
-        <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-            Team Homebase
-          </p>
-          <h1 className="text-2xl font-semibold text-foreground">
-            Good to see you, {firstName}.
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Your daily workspace.
-          </p>
+        {/* Greeting + Submit a Case — same row */}
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+              Team Homebase
+            </p>
+            <h1 className="text-2xl font-semibold text-foreground">
+              Good to see you, {firstName}.
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Your daily workspace.
+            </p>
+          </div>
+
+          {/* Submit a Case */}
+          <a
+            href="https://transitiontrails.my.salesforce.com/500/e"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm mt-1"
+          >
+            <Plus className="w-4 h-4" />
+            Submit a Case
+          </a>
         </div>
 
-        {/* Quick links */}
-        <div>
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-            Quick access
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            {quickLinks.map(({ label, desc, href, icon: Icon, external }) => (
+        {/* Quick access — compact horizontal chips */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {quickLinks.map(({ label, href, icon: Icon, external }) =>
+            external ? (
               <a
                 key={label}
                 href={href}
-                {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="flex items-start gap-3 p-4 rounded-lg border border-border bg-white hover:border-primary/30 hover:shadow-sm transition-all"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-white text-sm text-foreground hover:border-primary/40 hover:bg-muted/50 transition-all"
               >
-                <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Icon className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground">{label}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{desc}</p>
-                </div>
+                <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+                {label}
+                <ExternalLink className="w-3 h-3 text-muted-foreground/60 ml-0.5" />
               </a>
-            ))}
-          </div>
+            ) : (
+              <Link
+                key={label}
+                href={href}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-white text-sm text-foreground hover:border-primary/40 hover:bg-muted/50 transition-all"
+              >
+                <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+                {label}
+              </Link>
+            )
+          )}
         </div>
 
         {/* Today snapshot — Tasks + Meetings side by side at 1/3 each */}
