@@ -104,14 +104,23 @@ const requireSlackAuth: RequestHandler = (req, res, next) => {
     return;
   }
 
-  // 3. Audience guard — allow homebase audiences (learner/coach/volunteer) and
-  //    staff sessions.  Staff sessions have googleAudience = null/undefined so
-  //    we only block if the value is explicitly set to something unrecognised.
+  // 3. Audience check — three permitted states:
+  //    a) null   — staff-only session (googleAudience explicitly null); allowed so staff can
+  //                connect their own Slack accounts without a homebase audience.
+  //    b) a recognised homebase audience string — learner / coach / volunteer / team.
+  //    c) undefined / absent — session has no audience at all; rejected.
+  //
+  // NOTE: do NOT collapse `null` and `undefined` here with a falsy check.  null means
+  // "staff, no homebase" (allowed).  undefined means "unauthenticated audience" (blocked).
+  // Using `!audience` would silently block null — this was the original regression.
   const audience = req.session.googleAudience;
-  if (audience != null && !SLACK_HOMEBASE_AUDIENCES.includes(audience as typeof SLACK_HOMEBASE_AUDIENCES[number])) {
+  const hasValidAudience =
+    audience === null ||   // staff-only (permitted)
+    (audience !== undefined && SLACK_HOMEBASE_AUDIENCES.includes(audience));
+  if (!hasValidAudience) {
     res.status(403).json({
       error:   "not_authorized",
-      message: "This resource is not available for your account type.",
+      message: "This resource is only available to Homebase users (learner, coach, volunteer, or team) or staff.",
     });
     return;
   }
@@ -242,14 +251,14 @@ async function resolveDisplayName(token: string, userId: string): Promise<string
 // ── GET /slack/oauth/authorize ────────────────────────────────────────────────
 
 router.get("/slack/oauth/authorize", requireSlackAuth, (req, res) => {
-  const clientId = process.env["SLACK_CLIENT_ID"];
+  const clientId     = process.env["SLACK_CLIENT_ID"];
   if (!clientId) {
     res.status(503).json({ error: "SLACK_CLIENT_ID not configured" });
     return;
   }
 
   // Use the REAL signed-in identity — not the impersonated one (already rejected above).
-  const email = req.session.googleEmail;
+  const email = req.session.googleEmail;   // real identity; impersonation rejected above
   if (!email) {
     res.status(401).json({ error: "No authenticated user" });
     return;

@@ -139,6 +139,24 @@ function setStaffOnlySession() {
   });
 }
 
+/**
+ * Session for a staff member whose googleAudience is explicitly null.
+ *
+ * Per the session type (`googleAudience?: ... | null`), null means "staff, no
+ * homebase account" and is distinct from undefined (absent / unrecognised).
+ * requireSlackAuth must allow null through so staff can connect their own Slack
+ * accounts.  This is the session shape that triggered the regression twice:
+ *   - once when "team" was missing from SLACK_HOMEBASE_AUDIENCES, and
+ *   - once when a `!audience` short-circuit treated null the same as undefined.
+ */
+function setStaffNullAudienceSession() {
+  Object.assign(mockSession, {
+    googleEmail:    'staff@transitiontrails.org',
+    googleAudience: null,
+    googleGroups:   ['trailosmembers'],
+  });
+}
+
 /** Superadmin session impersonating a learner (has homebase audience via impersonation) */
 function setImpersonatingSession() {
   Object.assign(mockSession, {
@@ -331,6 +349,34 @@ describe('Slack OAuth routes', () => {
     // The send operation never returns ok:true — the message is not sent.
     expect(res.status).not.toBe(200);
     expect(res.body.ok).not.toBe(true);
+  });
+
+  // ── Staff (null googleAudience) regression tests ────────────────────────────
+  //
+  // These tests exist specifically to catch a recurring regression where a
+  // falsy check on googleAudience (`!audience`) silently blocks staff sessions
+  // whose googleAudience is explicitly null.
+  //
+  // Staff users have googleAudience = null (not undefined / absent).
+  // requireSlackAuth must treat null as "allowed" and undefined as "blocked".
+  // If someone adds `!audience` or collapses null/undefined again, both tests
+  // below will fail with 403, surfacing the regression before it reaches prod.
+
+  it('21. GET /slack/oauth/status — 200 for staff session with null googleAudience', async () => {
+    setStaffNullAudienceSession();
+    const res = await request(app).get('/api/slack/oauth/status');
+    // Staff (googleAudience: null) must be allowed through, not rejected with 403.
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ connected: false });
+  });
+
+  it('22. GET /slack/oauth/authorize — 302 redirect for staff session with null googleAudience', async () => {
+    setStaffNullAudienceSession();
+    process.env['SLACK_CLIENT_ID'] = 'test-client-id';
+    const res = await request(app).get('/api/slack/oauth/authorize');
+    // Staff (googleAudience: null) must reach the Slack redirect, not get a 403.
+    expect(res.status).toBe(302);
+    expect(res.headers['location']).toContain('slack.com/oauth/v2/authorize');
   });
 });
 

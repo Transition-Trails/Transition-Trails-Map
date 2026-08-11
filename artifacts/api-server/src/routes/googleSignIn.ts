@@ -350,7 +350,9 @@ router.get('/auth/google/callback', async (req, res) => {
     req.session.googleGroups       = groups;
     req.session.googleGroupsExpiry = Date.now() + 5 * 60 * 1000;
     req.session.googleTier         = tier;
-    req.session.googleAudience     = audience ?? undefined;
+    // null = staff (no homebase audience) — stored as null, NOT coerced to undefined.
+    // requireSlackAuth distinguishes null (staff, permitted) from undefined (absent, rejected).
+    req.session.googleAudience     = audience;
 
     req.session.save((err) => {
       if (err) {
@@ -441,7 +443,9 @@ router.get('/auth/google/me', async (req, res) => {
         req.session.googleGroups       = groups;
         req.session.googleGroupsExpiry = now + 5 * 60 * 1000;
         req.session.googleTier         = tier;
-        req.session.googleAudience     = audience ?? undefined;
+        // null = staff (no homebase audience) — stored as null, NOT coerced to undefined.
+        // requireSlackAuth distinguishes null (staff, permitted) from undefined (absent, rejected).
+        req.session.googleAudience     = audience;
         // Fire-and-forget save — we'll already return the fresh data below
         req.session.save(() => {});
       }
