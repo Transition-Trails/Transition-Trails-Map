@@ -96,28 +96,47 @@ function mtime(filePath) {
 // ---------------------------------------------------------------------------
 
 /**
- * Check one lib. Returns an array of error strings (empty = all good).
+ * Check one lib. Returns { errors: string[], skipped: boolean }.
+ * errors is empty on success or skip; skipped=true means the lib was not checked.
  */
 function checkLib(refPath) {
   const libDir = resolve(WORKSPACE_ROOT, refPath.replace(/^\.\//, ""));
   const tsconfigPath = join(libDir, "tsconfig.json");
 
   if (!ts.sys.fileExists(tsconfigPath)) {
-    return []; // no tsconfig — not a TS composite project, skip
+    console.warn(
+      `SKIP  [${refPath}]: no tsconfig.json found — lib will not be dist-checked.`
+    );
+    return { errors: [], skipped: true };
   }
 
   let parsed, configDir;
   try {
     ({ parsed, configDir } = resolveCompilerOptions(tsconfigPath));
   } catch (err) {
-    return [`[${refPath}] Could not parse tsconfig.json: ${err.message}`];
+    return { errors: [`[${refPath}] Could not parse tsconfig.json: ${err.message}`], skipped: false };
   }
 
   const opts = parsed.options;
 
   // Only check composite projects that emit declarations into an outDir.
-  if (!opts.composite || !opts.outDir) {
-    return [];
+  if (!opts.composite && !opts.outDir) {
+    console.warn(
+      `SKIP  [${refPath}]: tsconfig.json is missing both composite:true and outDir — lib will not be dist-checked.`
+    );
+    return { errors: [], skipped: true };
+  }
+  if (!opts.composite) {
+    console.warn(
+      `SKIP  [${refPath}]: tsconfig.json is missing composite:true — lib will not be dist-checked.`
+    );
+    return { errors: [], skipped: true };
+  }
+  if (!opts.outDir) {
+    console.warn(
+      `SKIP  [${refPath}]: tsconfig.json is missing outDir — lib will not be dist-checked.`
+    );
+    return { errors: [], skipped: true };
   }
 
   // Collect all input .ts source files (exclude .d.ts files themselves).
@@ -126,7 +145,7 @@ function checkLib(refPath) {
   );
 
   if (sourceFiles.length === 0) {
-    return [`[${refPath}] No source .ts files found — nothing to check.`];
+    return { errors: [`[${refPath}] No source .ts files found — nothing to check.`], skipped: false };
   }
 
   const errors = [];
@@ -177,7 +196,7 @@ function checkLib(refPath) {
     console.log(`OK    [${refPath}]: ${dtsCount} .d.ts file(s) checked — all up to date.`);
   }
 
-  return errors;
+  return { errors, skipped: false };
 }
 
 // ---------------------------------------------------------------------------
@@ -202,10 +221,13 @@ if (references.length === 0) {
 
 let totalErrors = 0;
 let totalChecked = 0;
+let totalSkipped = 0;
 
 for (const refPath of references) {
-  const errs = checkLib(refPath);
-  if (errs.length > 0) {
+  const { errors: errs, skipped } = checkLib(refPath);
+  if (skipped) {
+    totalSkipped++;
+  } else if (errs.length > 0) {
     for (const e of errs) {
       console.error(`ERROR ${e}`);
     }
@@ -222,6 +244,7 @@ if (totalErrors > 0) {
   process.exit(1);
 }
 
+const skippedNote = totalSkipped > 0 ? `, ${totalSkipped} skipped (missing tsconfig or composite config)` : "";
 console.log(
-  `\nAll ${totalChecked} composite lib package(s) have fresh, complete dist/ declarations.`
+  `\nAll ${totalChecked} composite lib package(s) have fresh, complete dist/ declarations${skippedNote}.`
 );
