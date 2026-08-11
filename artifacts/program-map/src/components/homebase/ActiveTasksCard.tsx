@@ -5,17 +5,21 @@
  * undated tasks at the end). Completing a task optimistically removes it from
  * the list and PATCHes the SF record. Hovering a task opens a detail card
  * with full description + a direct Salesforce link.
+ *
+ * The card header is a collapse toggle — state persists in localStorage.
  */
 
 import { useState, useEffect, useCallback } from "react";
 import {
   CheckSquare, Square, Loader2, Plus, RefreshCw,
   CheckCircle2, Calendar, AlertCircle,
+  ChevronDown, ChevronRight,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useToast }        from "@/hooks/use-toast";
+import { useLocation }     from "wouter";
+import { useCollapsible }  from "@/hooks/useCollapsible";
 import { CreateTaskDrawer } from "./CreateTaskDrawer";
-import { TaskHoverCard } from "./TaskHoverCard";
+import { TaskHoverCard }   from "./TaskHoverCard";
 
 function applyStatusChange(tasks: SfTask[], id: string, status: string): SfTask[] {
   return tasks.map(t => t.Id === id ? { ...t, Status: status } : t);
@@ -155,6 +159,8 @@ interface ActiveTasksCardProps {
 export function ActiveTasksCard({ onCreated }: ActiveTasksCardProps) {
   const { toast } = useToast();
   const [, nav]   = useLocation();
+  const [isOpen, toggle] = useCollapsible("active-tasks", true);
+
   const [tasks,         setTasks]         = useState<SfTask[]>([]);
   const [orgBaseUrl,    setOrgBaseUrl]    = useState("");
   const [loading,       setLoading]       = useState(true);
@@ -198,21 +204,28 @@ export function ActiveTasksCard({ onCreated }: ActiveTasksCardProps) {
   }
 
   const visibleTasks = tasks.filter(t => !completed.has(t.Id));
+  const Chevron      = isOpen ? ChevronDown : ChevronRight;
 
   return (
     <>
       <div className="rounded-xl border border-border bg-white overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b border-border/60">
-          <div className="flex items-center gap-2">
-            <CheckSquare className="w-4 h-4 text-muted-foreground" />
+          <button
+            onClick={toggle}
+            className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+            aria-expanded={isOpen}
+          >
+            <Chevron     className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <CheckSquare className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             <span className="text-sm font-semibold text-foreground">Active Tasks</span>
             {!loading && !sfUnavailable && visibleTasks.length > 0 && (
               <span className="inline-flex items-center justify-center min-w-[20px] h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold px-1.5">
                 {visibleTasks.length}
               </span>
             )}
-          </div>
+          </button>
+
           <div className="flex items-center gap-1">
             <button
               onClick={() => setDrawerOpen(true)}
@@ -230,61 +243,67 @@ export function ActiveTasksCard({ onCreated }: ActiveTasksCardProps) {
           </div>
         </div>
 
-        {/* Body */}
-        <div className="px-5">
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+        {/* Collapsible body */}
+        <div
+          className={`grid transition-all duration-200 ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+        >
+          <div className="overflow-hidden">
+            <div className="px-5">
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                </div>
+              ) : sfUnavailable ? (
+                <div className="py-6 text-center space-y-2">
+                  <p className="text-sm text-muted-foreground">Connect to Salesforce to see your tasks.</p>
+                  <a
+                    href="/api/auth/salesforce/login"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-[12px] text-primary hover:text-primary/80 transition-colors font-medium"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    Reconnect Salesforce
+                  </a>
+                </div>
+              ) : visibleTasks.length === 0 ? (
+                <div className="py-8 text-center space-y-2">
+                  <CheckCircle2 className="w-7 h-7 text-muted-foreground/25 mx-auto" />
+                  <p className="text-sm text-muted-foreground">No open tasks.</p>
+                  <button
+                    onClick={() => setDrawerOpen(true)}
+                    className="text-[12px] text-primary hover:text-primary/80 transition-colors"
+                  >
+                    + Add one
+                  </button>
+                </div>
+              ) : (
+                <ul className="divide-y divide-transparent">
+                  {visibleTasks.map((task, i) => (
+                    <TaskRow
+                      key={task.Id || i}
+                      task={task}
+                      isCompleting={completing.has(task.Id)}
+                      orgBaseUrl={orgBaseUrl}
+                      onComplete={handleComplete}
+                      onStatusChange={(id, status) => {
+                        if (status === "Completed") {
+                          setCompleted(prev => new Set([...prev, id]));
+                        } else {
+                          setTasks(prev => applyStatusChange(prev, id, status));
+                        }
+                      }}
+                      onTaskUpdate={(id, updates) => {
+                        setTasks(prev => prev.map(t =>
+                          t.Id === id ? { ...t, ...updates } : t
+                        ));
+                      }}
+                    />
+                  ))}
+                </ul>
+              )}
             </div>
-          ) : sfUnavailable ? (
-            <div className="py-6 text-center space-y-2">
-              <p className="text-sm text-muted-foreground">Connect to Salesforce to see your tasks.</p>
-              <a
-                href="/api/auth/salesforce/login"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[12px] text-primary hover:text-primary/80 transition-colors font-medium"
-              >
-                <RefreshCw className="w-3 h-3" />
-                Reconnect Salesforce
-              </a>
-            </div>
-          ) : visibleTasks.length === 0 ? (
-            <div className="py-8 text-center space-y-2">
-              <CheckCircle2 className="w-7 h-7 text-muted-foreground/25 mx-auto" />
-              <p className="text-sm text-muted-foreground">No open tasks.</p>
-              <button
-                onClick={() => setDrawerOpen(true)}
-                className="text-[12px] text-primary hover:text-primary/80 transition-colors"
-              >
-                + Add one
-              </button>
-            </div>
-          ) : (
-            <ul className="divide-y divide-transparent">
-              {visibleTasks.map((task, i) => (
-                <TaskRow
-                  key={task.Id || i}
-                  task={task}
-                  isCompleting={completing.has(task.Id)}
-                  orgBaseUrl={orgBaseUrl}
-                  onComplete={handleComplete}
-                  onStatusChange={(id, status) => {
-                    if (status === "Completed") {
-                      setCompleted(prev => new Set([...prev, id]));
-                    } else {
-                      setTasks(prev => applyStatusChange(prev, id, status));
-                    }
-                  }}
-                  onTaskUpdate={(id, updates) => {
-                    setTasks(prev => prev.map(t =>
-                      t.Id === id ? { ...t, ...updates } : t
-                    ));
-                  }}
-                />
-              ))}
-            </ul>
-          )}
+          </div>
         </div>
       </div>
 

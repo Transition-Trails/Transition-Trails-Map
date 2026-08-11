@@ -1,18 +1,16 @@
 /**
  * MeetingNotesCard
  *
- * Team Homebase (staff only) card that surfaces the current user's recent
- * Fathom meeting recordings.  Each staff member connects their own personal
- * Fathom API key — the card then lists their most-recent meetings with a
- * direct "Open notes" link.
+ * Team Homebase (staff only) card that surfaces the current user's Fathom
+ * meeting recordings from the current calendar week (Monday–Sunday).
  *
  * States:
  *   checking    — checking /api/fathom/status on mount
  *   connect     — not connected; inline form to enter the API key
  *   connecting  — PUT in flight
  *   loading     — connected; fetching meetings
- *   empty       — connected; no recordings found
- *   list        — connected; showing up to 10 meetings
+ *   empty       — connected; no recordings this week
+ *   list        — connected; showing this-week meetings
  *   error       — Fathom API call failed
  */
 
@@ -23,7 +21,6 @@ import type { FathomMeetingDetail } from "./MeetingPopover";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-// Re-export shape used throughout this file; includes summary + action_items
 type FathomMeeting = FathomMeetingDetail;
 
 type ViewState =
@@ -34,6 +31,33 @@ type ViewState =
   | "empty"
   | "list"
   | "error";
+
+// ── Week helpers ──────────────────────────────────────────────────────────────
+
+/** Returns the Monday 00:00:00 and Sunday 23:59:59 of the current local week. */
+function getThisWeekBounds(): { start: Date; end: Date } {
+  const now = new Date();
+  const day = now.getDay(); // 0 = Sun, 1 = Mon, …
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+
+  const monday = new Date(now);
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(monday.getDate() + diffToMonday);
+
+  const sunday = new Date(monday);
+  sunday.setDate(sunday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  return { start: monday, end: sunday };
+}
+
+function isThisWeek(iso: string | undefined): boolean {
+  if (!iso) return false;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return false;
+  const { start, end } = getThisWeekBounds();
+  return d >= start && d <= end;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -125,7 +149,6 @@ export function MeetingNotesCard() {
     try {
       const res = await fetch("/api/fathom/meetings");
       if (res.status === 401) {
-        // Key was revoked server-side
         setView("connect");
         return;
       }
@@ -134,8 +157,13 @@ export function MeetingNotesCard() {
         return;
       }
       const data = await res.json() as { meetings: FathomMeeting[] };
-      setMeetings(data.meetings ?? []);
-      setView(data.meetings?.length ? "list" : "empty");
+      const all  = data.meetings ?? [];
+
+      // Filter to current week (Mon–Sun local time).
+      const thisWeek = all.filter(m => isThisWeek(m.started_at));
+
+      setMeetings(thisWeek);
+      setView(thisWeek.length ? "list" : "empty");
     } catch {
       setView("error");
     }
@@ -281,10 +309,10 @@ export function MeetingNotesCard() {
           </ul>
         )}
 
-        {/* Empty */}
+        {/* Empty — no meetings this week */}
         {view === "empty" && (
           <div className="py-5 text-center">
-            <p className="text-sm text-muted-foreground">No recordings yet.</p>
+            <p className="text-sm text-muted-foreground">No meetings recorded this week.</p>
             <a
               href="https://app.fathom.video"
               target="_blank"

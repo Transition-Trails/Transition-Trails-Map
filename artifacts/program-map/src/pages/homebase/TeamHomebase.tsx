@@ -26,6 +26,7 @@ import { TodayTasksCard }    from "@/components/homebase/TodayTasksCard";
 import { TodayMeetingsCard } from "@/components/homebase/TodayMeetingsCard";
 import { ActiveTasksCard }   from "@/components/homebase/ActiveTasksCard";
 import { MeetingNotesCard }  from "@/components/homebase/MeetingNotesCard";
+import { CasesCard }         from "@/components/homebase/CasesCard";
 
 interface TeamHomebaseProps {
   displayName: string;
@@ -137,6 +138,9 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
 
           {/* Active Tasks — full width */}
           <ActiveTasksCard />
+
+          {/* Open Cases — full width */}
+          <CasesCard />
         </div>
 
       </div>
