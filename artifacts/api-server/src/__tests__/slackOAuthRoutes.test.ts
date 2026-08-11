@@ -24,6 +24,9 @@
  * 14.  POST /api/slack/conversations/:id/messages — 400 when text is empty
  * 15.  encryptToken / decryptToken round-trip
  * 16-20. Impersonation — 403 for every Slack data route when superadmin is impersonating
+ * 21-22. Staff null-audience regression — 200/302 for staff with googleAudience: null
+ * 23.  DELETE /api/slack/oauth/disconnect — staff session deletes only its own row
+ * 24.  GET /api/slack/conversations — staff session returns not_connected, not another user's data
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -74,6 +77,23 @@ const { mockDbSelect, mockDbInsert, mockDbDelete } = vi.hoisted(() => {
   const mockDbInsert = vi.fn();
   const mockDbDelete = vi.fn();
   return { mockDbSelect, mockDbInsert, mockDbDelete };
+});
+
+// ── drizzle-orm eq spy ────────────────────────────────────────────────────────
+// Wraps the real eq() so tests can assert which column value (email) was passed
+// to the WHERE clause — without needing to decode the opaque SQL expression object.
+
+const { mockEq } = vi.hoisted(() => {
+  const mockEq = vi.fn();
+  return { mockEq };
+});
+
+vi.mock('drizzle-orm', async (importOriginal) => {
+  const original = await importOriginal<typeof import('drizzle-orm')>();
+  // Forward the call to the real eq so the mock DB chain still works, but also
+  // record the arguments so tests can inspect (column, value) pairs.
+  mockEq.mockImplementation((...args: Parameters<typeof original.eq>) => original.eq(...args));
+  return { ...original, eq: mockEq };
 });
 
 function resetDbMocks() {
@@ -377,6 +397,63 @@ describe('Slack OAuth routes', () => {
     // Staff (googleAudience: null) must reach the Slack redirect, not get a 403.
     expect(res.status).toBe(302);
     expect(res.headers['location']).toContain('slack.com/oauth/v2/authorize');
+  });
+
+  // ── Staff isolation tests ───────────────────────────────────────────────────
+  //
+  // These tests confirm that a staff session (googleAudience: null) cannot affect
+  // another user's token row, even if effectiveEmail resolution were refactored in
+  // future.  The disconnect route's WHERE clause must always be keyed to the real
+  // authenticated session email (req.session.googleEmail), never to any other value
+  // that could be derived from the request.
+  //
+  // Test 23 verifies the WHERE key by inspecting mockEq's captured call arguments.
+  // If a future refactor changes effectiveEmail resolution so the wrong email leaks
+  // into the DELETE query, the assertion on mockEq will fail before it reaches prod.
+  //
+  // Test 24 verifies the conversations endpoint treats a staff session as
+  // "not connected" (staff have no Slack token row) and never falls through to
+  // return another user's token data.
+
+  it('23. DELETE /slack/oauth/disconnect — staff session deletes only its own token row', async () => {
+    setStaffNullAudienceSession(); // staff email = 'staff@transitiontrails.org'
+
+    const res = await request(app).delete('/api/slack/oauth/disconnect');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ ok: true });
+
+    // The route calls eq(slackUserTokensTable.userEmail, email) to build the WHERE
+    // clause.  Inspect mockEq's recorded calls to confirm the second argument (the
+    // email value) matches the staff session email — not a learner's email or any
+    // other value that could come from an effectiveEmail lookup.
+    const emailArgs = mockEq.mock.calls
+      .map(([, val]: [unknown, unknown]) => val)
+      .filter((v): v is string => typeof v === 'string');
+
+    expect(emailArgs).toContain('staff@transitiontrails.org');
+    expect(emailArgs).not.toContain('learner@example.com');
+    expect(emailArgs).not.toContain('coach@example.com');
+  });
+
+  it('24. GET /slack/conversations — staff session (null googleAudience) returns not_connected, not another user\'s data', async () => {
+    setStaffNullAudienceSession(); // staff email = 'staff@transitiontrails.org'; no token row in DB
+
+    // Default resetDbMocks() leaves the DB returning [] — no token for this user.
+    const res = await request(app).get('/api/slack/conversations');
+
+    // Staff have no Slack token; the route must return not_connected (403).
+    // If it accidentally fell back to another user's token the status would be 200.
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({ error: 'not_connected' });
+
+    // Double-check: the DB lookup must have used the staff email, not a learner's email.
+    const emailArgs = mockEq.mock.calls
+      .map(([, val]: [unknown, unknown]) => val)
+      .filter((v): v is string => typeof v === 'string');
+
+    expect(emailArgs).toContain('staff@transitiontrails.org');
+    expect(emailArgs).not.toContain('learner@example.com');
+    expect(emailArgs).not.toContain('coach@example.com');
   });
 });
 
