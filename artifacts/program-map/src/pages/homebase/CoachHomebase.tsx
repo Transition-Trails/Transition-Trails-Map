@@ -23,6 +23,7 @@ import { ArtefactsCard }      from "@/components/homebase/ArtefactsCard";
 import { SquadGrid }          from "@/components/homebase/SquadGrid";
 import { CoachCasesCard }     from "@/components/homebase/CoachCasesCard";
 import { CoachWeekCard }      from "@/components/homebase/CoachWeekCard";
+import { TodayTasksCard }     from "@/components/homebase/TodayTasksCard";
 import { Shield, MessageSquare, Hash, Users } from "lucide-react";
 import {
   useCoachPennyPrepared,
@@ -209,7 +210,10 @@ export default function CoachHomebase({
           coachLevel={coachLevel}
         />
 
-        {/* 6 — Two-column grid */}
+        {/* 6 — Today's Tasks */}
+        <TodayTasksCard />
+
+        {/* 7 — Two-column grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <CoachCasesCard
             isLoading={casesResult.isLoading}
@@ -219,7 +223,7 @@ export default function CoachHomebase({
           <CoachWeekCard />
         </div>
 
-        {/* 7 — Lead team card */}
+        {/* 8 — Lead team card */}
         <LeadTeamCard leadState={leadResult.data} coachLevel={coachLevel} />
       </div>
     </HomebaseShell>

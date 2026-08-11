@@ -24,6 +24,7 @@ import { VolunteerCasesCard }   from "@/components/homebase/VolunteerCasesCard";
 import { WaysToHelpCard }       from "@/components/homebase/WaysToHelpCard";
 import { GrowthCard }           from "@/components/homebase/GrowthCard";
 import { ShareablesCard }       from "@/components/homebase/ShareablesCard";
+import { TodayTasksCard }       from "@/components/homebase/TodayTasksCard";
 import {
   useVolunteerMonth,
   useVolunteerCases,
@@ -221,7 +222,10 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
           <RecordProcessCard />
         </div>
 
-        {/* 5 — Cases + Growth */}
+        {/* 5 — Today's Tasks */}
+        <TodayTasksCard />
+
+        {/* 6 — Cases + Growth */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="flex flex-col gap-4">
             <VolunteerCasesCard

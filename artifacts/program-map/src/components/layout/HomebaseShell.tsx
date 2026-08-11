@@ -45,6 +45,7 @@ import {
   Send,
   Briefcase,
   LayoutDashboard,
+  CheckSquare,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
@@ -146,6 +147,35 @@ function WorkspaceDrawer({
           )}
         </AnimatePresence>
       </div>
+
+      {/* Tasks — coach and volunteer only */}
+      {(audience === "coach" || audience === "volunteer") && (
+        <div className="px-1.5 py-2 border-b border-border">
+          <button
+            onClick={() => {
+              window.history.pushState({}, "", "/tasks");
+              window.dispatchEvent(new PopStateEvent("popstate"));
+            }}
+            className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+            title="My Tasks"
+          >
+            <CheckSquare className="w-4 h-4 flex-shrink-0" />
+            <AnimatePresence>
+              {open && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.12 }}
+                  className="text-sm whitespace-nowrap overflow-hidden"
+                >
+                  My Tasks
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+        </div>
+      )}
 
       {/* Google apps */}
       <div className="flex flex-col gap-0.5 px-1.5 py-2 border-b border-border">

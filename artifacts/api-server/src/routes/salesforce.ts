@@ -1485,9 +1485,10 @@ router.get("/sf/tasks", async (req, res) => {
 
   // Guard: sfUserId must be present so the query is scoped to this user only.
   // Without it we cannot safely anchor the OwnerId filter and risk returning
-  // another user's tasks — the SF token alone does not tell us the user ID.
+  // another user's tasks. The regex ensures the value is a well-formed SF ID
+  // (alphanumeric, 15–18 chars) and not an injection artefact.
   const sfUserId = req.session.sfUserId;
-  if (!sfUserId) {
+  if (!sfUserId || !/^[a-zA-Z0-9]{15,18}$/.test(sfUserId)) {
     return res.status(401).json({ error: "Salesforce user identity unavailable. Please reconnect at /api/auth/salesforce/login." });
   }
 

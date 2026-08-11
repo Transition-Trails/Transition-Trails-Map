@@ -173,11 +173,6 @@ router.post("/penny/ask", async (req, res) => {
     return;
   }
 
-  try {
-    const soql =
-      "SELECT Id, Source__c, Prompt_Mode__c, CreatedDate " +
-      "FROM Penny_Interaction_Log__c " +
-      "ORDER BY CreatedDate DESC LIMIT 5";
   let sfContactId: string | null = null;
   // isLearnerContact tracks whether sfContactId refers to a learner's Contact
   // (for SF logging decisions) — it is SEPARATE from audience identity, which
@@ -444,10 +439,10 @@ router.post("/penny/ask", async (req, res) => {
 
       if (!claudeResp.ok) {
         // Explicit failure — log with full detail so the issue is visible in
-        // logs immediately.  Do NOT fall back to Gemini.
-      const errBody = await resp.json().catch(() => ({})) as { error?: { message?: string } };
+        // logs immediately. Do NOT fall back to Gemini.
+        const errBody = await claudeResp.json().catch(() => ({})) as { error?: { type?: string; message?: string } };
         const errType = errBody.error?.type ?? 'unknown';
-          const errMsg = e instanceof Error ? e.message : String(e);
+        const errMsg  = errBody.error?.message ?? `Anthropic API returned HTTP ${claudeResp.status}`;
         logger.error(
           {
             status:    claudeResp.status,
@@ -481,18 +476,18 @@ router.post("/penny/ask", async (req, res) => {
         });
       }
 
-    const durationMs  = Date.now() - start;
-    const { shouldWriteToSf } = persistInteraction(text, model, durationMs);
+      const durationMs = Date.now() - start;
+      const { shouldWriteToSf } = persistInteraction(claudeText, claudeModel, durationMs);
 
-    return res.json({
-      reply: text,
-      model,
-      durationMs,
-      layersPresent,
-      contextMeta: buildContextMeta(shouldWriteToSf),
-    });
-  } catch (e: unknown) {
-    const isTimeout = e instanceof Error && e.name === "TimeoutError";
+      return res.json({
+        reply: claudeText,
+        model: claudeModel,
+        durationMs,
+        layersPresent,
+        contextMeta: buildContextMeta(shouldWriteToSf),
+      });
+    } catch (e: unknown) {
+      const isTimeout = e instanceof Error && e.name === "TimeoutError";
       // Log with ERROR severity so Anthropic outages appear in log searches.
       // Do NOT fall back to Gemini.
       logger.error(
@@ -612,7 +607,7 @@ router.post("/penny/ask", async (req, res) => {
     });
   } catch (e: unknown) {
     const isTimeout = e instanceof Error && e.name === "TimeoutError";
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = e instanceof Error ? e.message : String(e);
     return res.status(502).json({ error: msg });
   }
 });
@@ -1035,5 +1030,3 @@ router.get("/penny/sf-recent-logs", async (req, res): Promise<void> => {
 });
 
 export default router;
-
-    const provider    = deriveProvider(model);

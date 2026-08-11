@@ -108,6 +108,7 @@ import LearnerProgress    from "@/pages/learner/LearnerProgress";
 import HomebaseLanding    from "@/pages/homebase/HomebaseLanding";
 import TeamHomebase       from "@/pages/homebase/TeamHomebase";
 import TasksPage          from "@/pages/homebase/TasksPage";
+import { HomebaseShell }  from "@/components/layout/HomebaseShell";
 
 // ── TeamRoute — path-aware shell for team@ staff ──────────────────────────────
 // At '/' they see TeamHomebase; any admin path shows Mission Control (AppShell).
@@ -347,8 +348,7 @@ function Router() {
       <Route path="/trail-os-overview"       component={TrailOSOverview} />
       <Route path="/release-notes"           component={ReleaseNotes} />
 
-      {/* Tasks */}
-      <Route path="/tasks" component={TasksPage} />
+      {/* Tasks — removed from Router(); handled audience-aware in InnerApp outer Switch */}
 
       {/* Administration */}
       <Route path="/admin/setup">             <Redirect to="/admin/integrations" /></Route>
@@ -498,6 +498,24 @@ function InnerApp() {
       </Route>
       <Route path="/learner/progress">
         <LearnerRoute><LearnerProgress /></LearnerRoute>
+      </Route>
+
+      {/* /tasks — audience-dispatched so coach/volunteer get HomebaseShell, staff get AppShell */}
+      <Route path="/tasks">
+        {auth.isSignedIn ? (
+          (auth.user?.audience === "coach" || auth.user?.audience === "volunteer") ? (
+            <HomebaseShell
+              audience={auth.user.audience}
+              displayName={auth.user?.name ?? ""}
+            >
+              <TasksPage />
+            </HomebaseShell>
+          ) : (
+            <AppShell><TasksPage /></AppShell>
+          )
+        ) : (
+          <SignInPage />
+        )}
       </Route>
 
       {/* /homebase — entry point for team audience, staff, and superadmins.
