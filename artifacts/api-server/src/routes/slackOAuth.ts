@@ -980,12 +980,12 @@ router.get("/slack/threads", requireSlackAuth, async (req, res) => {
         });
         if (histR["ok"] !== true) return;
 
-        const cutoff30d   = Date.now() / 1000 - 30 * 24 * 60 * 60;
+        const cutoff90d   = Date.now() / 1000 - 90 * 24 * 60 * 60;
         const messages = (histR["messages"] as Record<string, unknown>[]) ?? [];
         for (const msg of messages) {
           const replyCount  = (msg["reply_count"] as number | undefined) ?? 0;
           const latestReply = (msg["latest_reply"] as string | undefined) ?? (msg["ts"] as string);
-          if (replyCount > 0 && parseFloat(latestReply) >= cutoff30d) {
+          if (replyCount > 0 && parseFloat(latestReply) >= cutoff90d) {
             allThreads.push({
               channelId,
               channelName,
@@ -1010,7 +1010,7 @@ router.get("/slack/threads", requireSlackAuth, async (req, res) => {
 // ── GET /slack/canvases ───────────────────────────────────────────────────────
 // Lists all Slack Canvas pages the user has access to (standalone + channel-
 // attached), filtered to the last 30 days and sorted by most recently updated.
-// Uses files.list with types=spaces (Slack's internal type name for canvases).
+// Uses files.list with types=canvas (the correct Slack API type name).
 
 router.get("/slack/canvases", requireSlackAuth, async (req, res) => {
   const email = req.session.googleEmail;
@@ -1025,7 +1025,7 @@ router.get("/slack/canvases", requireSlackAuth, async (req, res) => {
     const cutoff30d = Date.now() / 1000 - 30 * 24 * 60 * 60;
 
     const r = await slackUserGet(token, "files.list", {
-      types: "spaces",
+      types: "canvas",
       count: "100",
     });
 
