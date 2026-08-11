@@ -9,11 +9,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  CheckSquare, Square, Loader2, Plus, RefreshCw,
+  Square, Loader2, Plus, RefreshCw,
   CheckCircle2, Calendar, AlertCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CreateTaskDrawer } from "@/components/homebase/CreateTaskDrawer";
+import { TaskHoverCard } from "@/components/homebase/TaskHoverCard";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -79,13 +80,14 @@ interface TaskRowProps {
   isCompleted: boolean;
   isCompleting: boolean;
   onComplete: (task: SfTask) => void;
+  orgBaseUrl: string;
 }
 
-function TaskRow({ task, isCompleted, isCompleting, onComplete }: TaskRowProps) {
+function TaskRow({ task, isCompleted, isCompleting, onComplete, orgBaseUrl }: TaskRowProps) {
   const overdue = !isCompleted && isOverdue(task.ActivityDate);
   return (
     <li className="flex items-start gap-3 py-3.5 border-b border-border last:border-0">
-      {/* Checkbox */}
+      {/* Checkbox — outside hover trigger so clicking it doesn't open SF link */}
       <button
         onClick={() => { if (!isCompleted) onComplete(task); }}
         disabled={isCompleting || isCompleted}
@@ -104,33 +106,35 @@ function TaskRow({ task, isCompleted, isCompleting, onComplete }: TaskRowProps) 
         }
       </button>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start gap-2 flex-wrap">
-          <p className={`text-sm font-medium leading-snug ${isCompleted ? "text-muted-foreground line-through" : "text-foreground"}`}>
-            {task.Subject ?? "Untitled task"}
-          </p>
-          <PriorityBadge priority={task.Priority} />
-        </div>
-
-        {task.Description && (
-          <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
-            {task.Description}
-          </p>
-        )}
-
-        {/* Due date */}
-        {task.ActivityDate && (
-          <div className={`flex items-center gap-1.5 mt-1.5 text-[12px] ${overdue ? "text-rose-600" : "text-muted-foreground"}`}>
-            {overdue
-              ? <AlertCircle className="w-3 h-3 flex-shrink-0" />
-              : <Calendar    className="w-3 h-3 flex-shrink-0" />
-            }
-            <span className="font-medium">{relativeDate(task.ActivityDate)}</span>
-            <span className="text-muted-foreground/60">· {absoluteDate(task.ActivityDate)}</span>
+      {/* Content wrapped in hover card */}
+      <TaskHoverCard task={task} orgBaseUrl={orgBaseUrl}>
+        <div className="flex-1 min-w-0 cursor-default">
+          <div className="flex items-start gap-2 flex-wrap">
+            <p className={`text-sm font-medium leading-snug ${isCompleted ? "text-muted-foreground line-through" : "text-foreground"}`}>
+              {task.Subject ?? "Untitled task"}
+            </p>
+            <PriorityBadge priority={task.Priority} />
           </div>
-        )}
-      </div>
+
+          {task.Description && (
+            <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-2 leading-relaxed">
+              {task.Description}
+            </p>
+          )}
+
+          {/* Due date */}
+          {task.ActivityDate && (
+            <div className={`flex items-center gap-1.5 mt-1.5 text-[12px] ${overdue ? "text-rose-600" : "text-muted-foreground"}`}>
+              {overdue
+                ? <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                : <Calendar    className="w-3 h-3 flex-shrink-0" />
+              }
+              <span className="font-medium">{relativeDate(task.ActivityDate)}</span>
+              <span className="text-muted-foreground/60">· {absoluteDate(task.ActivityDate)}</span>
+            </div>
+          )}
+        </div>
+      </TaskHoverCard>
     </li>
   );
 }
@@ -146,6 +150,7 @@ export default function TasksPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [completing, setCompleting] = useState<Set<string>>(new Set());
   const [completed, setCompleted]   = useState<Set<string>>(new Set());
+  const [orgBaseUrl, setOrgBaseUrl] = useState<string>("");
 
   const load = useCallback(async (tab: FilterTab) => {
     setLoading(true);
@@ -155,8 +160,9 @@ export default function TasksPage() {
       const res = await fetch(`/api/sf/tasks?status=${statusParam}`);
       if (res.status === 401) { setSfUnavailable(true); setLoading(false); return; }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json() as { tasks: SfTask[] };
+      const data = await res.json() as { tasks: SfTask[]; orgBaseUrl?: string };
       setTasks(data.tasks ?? []);
+      if (data.orgBaseUrl) setOrgBaseUrl(data.orgBaseUrl);
       setCompleted(new Set()); // reset local optimistic state when data refreshes
     } catch {
       setSfUnavailable(true);
@@ -274,6 +280,7 @@ export default function TasksPage() {
                   isCompleted={completed.has(task.Id) || task.Status === "Completed"}
                   isCompleting={completing.has(task.Id)}
                   onComplete={handleComplete}
+                  orgBaseUrl={orgBaseUrl}
                 />
               ))}
             </ul>
