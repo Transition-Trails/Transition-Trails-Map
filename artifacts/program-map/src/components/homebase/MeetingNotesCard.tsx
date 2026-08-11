@@ -18,6 +18,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { FileText, Loader2, ExternalLink, Key, AlertCircle } from "lucide-react";
 import { MeetingPopover } from "./MeetingPopover";
 import type { FathomMeetingDetail } from "./MeetingPopover";
+import { useMeetingFilter } from "../../hooks/useMeetingFilter";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -113,7 +114,7 @@ function MeetingRow({ meeting }: { meeting: FathomMeeting }) {
 export function MeetingNotesCard() {
   const [view,        setView]        = useState<ViewState>("checking");
   const [allMeetings, setAllMeetings] = useState<FathomMeeting[]>([]);
-  const [showAll,     setShowAll]     = useState(false);
+  const [showAll,     setFilter]      = useMeetingFilter();
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [connectErr,  setConnectErr]  = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -212,7 +213,7 @@ export function MeetingNotesCard() {
       await fetch("/api/fathom/key", { method: "DELETE" });
     } catch { /* best-effort */ }
     setAllMeetings([]);
-    setShowAll(false);
+    setFilter(false);
     setApiKeyInput("");
     setConnectErr(null);
     setView("connect");
@@ -238,7 +239,7 @@ export function MeetingNotesCard() {
           {(view === "list" || view === "empty") && (
             <div className="flex items-center rounded-md border border-border overflow-hidden text-[11px]">
               <button
-                onClick={() => setShowAll(false)}
+                onClick={() => setFilter(false)}
                 className={`px-2 py-0.5 transition-colors ${
                   !showAll
                     ? "bg-primary text-primary-foreground font-medium"
@@ -248,7 +249,7 @@ export function MeetingNotesCard() {
                 This week
               </button>
               <button
-                onClick={() => setShowAll(true)}
+                onClick={() => setFilter(true)}
                 className={`px-2 py-0.5 transition-colors ${
                   showAll
                     ? "bg-primary text-primary-foreground font-medium"
