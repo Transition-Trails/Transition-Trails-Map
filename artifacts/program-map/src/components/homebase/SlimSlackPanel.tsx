@@ -489,26 +489,29 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
 
   return (
     <>
-      {/* Collapsed strip — always visible (40px) */}
+      {/* Collapsed strip — clicking anywhere here opens the panel */}
       {!open && (
-        <div className="flex flex-col items-center gap-2 pt-3 pb-2">
-          <div className="w-7 h-7 flex items-center justify-center" title="Slack">
-            {collapsedIcon}
-          </div>
-        </div>
+        <button
+          onClick={onToggle}
+          className="w-full flex flex-col items-center gap-2 pt-3 pb-2 hover:bg-muted/20 transition-colors cursor-pointer"
+          aria-label="Expand Slack panel"
+          title={status.state === "connected" ? "Slack (connected)" : "Connect Slack"}
+        >
+          {collapsedIcon}
+          <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-muted-foreground" />
+        </button>
       )}
 
-      {/* Toggle chevron — always visible */}
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-center py-2.5 border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors flex-shrink-0"
-        aria-label={open ? "Collapse Slack panel" : "Expand Slack panel"}
-      >
-        {open
-          ? <ChevronDown className="w-4 h-4 rotate-90" />
-          : <ChevronDown className="w-4 h-4 -rotate-90" />
-        }
-      </button>
+      {/* Collapse chevron — shown when panel is open */}
+      {open && (
+        <button
+          onClick={onToggle}
+          className="w-full flex items-center justify-center py-2 border-b border-border text-muted-foreground hover:text-foreground hover:bg-muted/20 transition-colors flex-shrink-0"
+          aria-label="Collapse Slack panel"
+        >
+          <ChevronDown className="w-4 h-4 rotate-90" />
+        </button>
+      )}
 
       {/* Expanded content */}
       <AnimatePresence>
