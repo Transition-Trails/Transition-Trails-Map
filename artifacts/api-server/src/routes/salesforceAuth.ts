@@ -16,6 +16,57 @@ const router = Router();
 
 const SF_TOKEN_TTL_MS = 7_200_000; // Salesforce access tokens expire in 2 hours
 
+// Inline HTML served directly from the OAuth callback response.
+// Serving it inline (rather than via a redirect to /connected) avoids
+// the Vite dev-proxy base-path problem: a redirect to /api/auth/salesforce/connected
+// loses the /program-map prefix and lands on a 404, so postMessage never fires.
+const CONNECTED_HTML = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Salesforce Connected</title>
+  <style>
+    body { font-family: sans-serif; display: flex; align-items: center;
+           justify-content: center; min-height: 100vh; margin: 0;
+           background: #f9fafb; color: #374151; }
+    .box { text-align: center; padding: 2rem; }
+    .check { font-size: 3rem; margin-bottom: 1rem; }
+    p { font-size: 0.875rem; color: #6b7280; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="check">✓</div>
+    <p>Salesforce connected — closing…</p>
+  </div>
+  <script>
+    (function () {
+      // Salesforce sets Cross-Origin-Opener-Policy: same-origin on their auth
+      // pages, which severs window.opener after the cross-origin navigation.
+      // postMessage to window.opener therefore silently fails.
+      //
+      // Instead: write a localStorage key — the storage event fires on every
+      // same-origin window/iframe (including the Replit preview iframe running
+      // the SPA) without needing an opener reference.
+      try {
+        localStorage.setItem('sf-auth-ts', String(Date.now()));
+      } catch (_) {}
+
+      // Also try postMessage as a belt-and-suspenders (works if COOP wasn't set).
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage({ type: 'sf-auth-complete' }, '*');
+        }
+      } catch (_) {}
+
+      setTimeout(function () {
+        try { window.close(); } catch (_) {}
+      }, 600);
+    })();
+  </script>
+</body>
+</html>`;
+
+
 // ── GET /login ────────────────────────────────────────────────────────────────
 
 router.get("/login", (req, res): void => {
@@ -145,13 +196,16 @@ router.get("/callback", async (req, res): Promise<void> => {
           return;
         }
         logger.info({ userId: identity.userId, username: identity.username, sfContactId }, "Salesforce OAuth complete");
-        // FIX 1 — guard before redirect; a duplicate callback may have already responded
+        // FIX 1 — guard before responding; a duplicate callback may have already responded
         if (!res.headersSent) {
-          // Redirect to /connected so a popup window can reload the opener and
-          // close itself, instead of navigating the main app tab away.
-          res.redirect("/api/auth/salesforce/connected");
+          // Send the success HTML directly from the callback response.
+          // A redirect to /connected would lose the Vite dev-proxy base-path
+          // prefix (e.g. /program-map/api/…) and the popup would land on a
+          // 404, never firing the postMessage that refreshes the main app.
+          res.setHeader("Content-Type", "text/html; charset=utf-8");
+          res.send(CONNECTED_HTML);
         } else {
-          logger.warn("Headers already sent — skipping redirect after session save");
+          logger.warn("Headers already sent — skipping success response after session save");
         }
       });
     } catch (err) {

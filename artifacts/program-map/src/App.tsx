@@ -582,17 +582,33 @@ function InnerApp() {
 }
 
 function App() {
-  // Listen for the postMessage that the Salesforce OAuth popup sends after
-  // auth completes. The popup can't reliably reload window.opener across
-  // Replit's preview iframe boundaries, so we do the reload here instead.
+  // Reload the app when the Salesforce OAuth popup completes.
+  //
+  // Two listeners for belt-and-suspenders:
+  // 1. storage event — reliable even when Salesforce's COOP header severs
+  //    window.opener in the popup (postMessage to opener silently fails).
+  //    The popup writes a localStorage key; the storage event fires on all
+  //    same-origin windows/iframes (including this preview iframe) except
+  //    the one that made the write.
+  // 2. message event — works when COOP wasn't set (direct popup opener).
   useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.key === "sf-auth-ts") {
+        localStorage.removeItem("sf-auth-ts");
+        window.location.reload();
+      }
+    }
     function onMessage(e: MessageEvent) {
       if (e.data?.type === "sf-auth-complete") {
         window.location.reload();
       }
     }
+    window.addEventListener("storage", onStorage);
     window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("message", onMessage);
+    };
   }, []);
 
   return (
