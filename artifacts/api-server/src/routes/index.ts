@@ -108,7 +108,8 @@ const staffAuthGate: RequestHandler = (req, res, next) => {
     path.startsWith('/slack/users') ||
     path.startsWith('/slack/search') ||
     path.startsWith('/slack/unreads') ||
-    path.startsWith('/slack/threads')
+    path.startsWith('/slack/threads') ||
+    path.startsWith('/slack/canvases')
   ) return next();
 
   // Check against the public allowlist (exact match or path prefix).

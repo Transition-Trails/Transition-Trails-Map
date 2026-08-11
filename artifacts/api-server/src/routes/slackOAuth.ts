@@ -1007,6 +1007,60 @@ router.get("/slack/threads", requireSlackAuth, async (req, res) => {
   }
 });
 
+// ── GET /slack/canvases ───────────────────────────────────────────────────────
+// Lists all Slack Canvas pages the user has access to (standalone + channel-
+// attached), filtered to the last 30 days and sorted by most recently updated.
+// Uses files.list with types=spaces (Slack's internal type name for canvases).
+
+router.get("/slack/canvases", requireSlackAuth, async (req, res) => {
+  const email = req.session.googleEmail;
+  if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
+
+  let token: string | null;
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack canvases DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
+
+  try {
+    const cutoff30d = Date.now() / 1000 - 30 * 24 * 60 * 60;
+
+    const r = await slackUserGet(token, "files.list", {
+      types: "spaces",
+      count: "100",
+    });
+
+    if (r["ok"] !== true) {
+      const slackErr = r["error"];
+      req.log.warn({ error: slackErr }, "slack files.list (canvases) failed");
+      if (isTokenExpiredError(slackErr)) { res.status(401).json({ error: "token_expired" }); return; }
+      if (isMissingScopeError(slackErr)) { res.status(403).json({ error: "missing_scope", needed: parseMissingScopes(r) }); return; }
+      res.status(502).json({ error: String(slackErr ?? "slack_api_error") }); return;
+    }
+
+    const rawFiles = (r["files"] as Record<string, unknown>[]) ?? [];
+
+    const canvases = rawFiles
+      .filter(f => {
+        const updated = (f["updated"] as number | undefined) ?? (f["timestamp"] as number | undefined) ?? 0;
+        return updated >= cutoff30d;
+      })
+      .map(f => ({
+        id:          f["id"] as string,
+        title:       ((f["title"] as string | undefined) || (f["name"] as string | undefined) || "Untitled canvas"),
+        permalink:   (f["permalink"] as string | undefined) ?? "",
+        updatedAt:   (f["updated"] as number | undefined) ?? (f["timestamp"] as number | undefined) ?? 0,
+        channelId:   (f["channel_id"] as string | undefined) ?? null,
+        channelName: (f["channel_name"] as string | undefined) ?? null,
+      }))
+      .sort((a, b) => b.updatedAt - a.updatedAt);
+
+    res.json({ canvases });
+  } catch (err) {
+    req.log.error({ err }, "slack canvases fetch error");
+    res.status(502).json({ error: "fetch_error" });
+  }
+});
+
 // ── POST /slack/conversations/:channelId/messages/:ts/reactions ───────────────
 
 // ── Canvas text extraction ────────────────────────────────────────────────────

@@ -354,6 +354,15 @@ function ConvItem({
   );
 }
 
+interface CanvasItem {
+  id:          string;
+  title:       string;
+  permalink:   string;
+  updatedAt:   number;  // Unix seconds
+  channelId:   string | null;
+  channelName: string | null;
+}
+
 // ── Unreads section ───────────────────────────────────────────────────────────
 
 function UnreadsSection({ items, loading }: { items: UnreadItem[]; loading: boolean }) {
@@ -465,6 +474,66 @@ function ThreadsSection({ items, loading }: { items: ThreadItem[]; loading: bool
                   <MessageCircle className="w-2.5 h-2.5" />{item.replyCount}
                 </span>
               </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Canvases section ──────────────────────────────────────────────────────────
+
+function CanvasesSection({ items, loading }: { items: CanvasItem[]; loading: boolean }) {
+  const [open, setOpen] = useState(() => {
+    try { const s = localStorage.getItem("slack-panel:canvases-open"); return s === null ? true : s === "true"; } catch { return true; }
+  });
+  const toggle = () => setOpen(o => {
+    const next = !o;
+    try { localStorage.setItem("slack-panel:canvases-open", String(next)); } catch {}
+    return next;
+  });
+
+  if (!loading && items.length === 0) return null;
+
+  return (
+    <div className="mb-0.5">
+      <button
+        onClick={toggle}
+        className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-muted/20 transition-colors"
+      >
+        <ChevronDown className={`w-3 h-3 text-muted-foreground/50 flex-shrink-0 transition-transform duration-150 ${open ? "" : "-rotate-90"}`} />
+        <span className="flex items-center gap-1 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase flex-1 text-left">
+          <FileText className="w-3 h-3" />Canvases
+        </span>
+        {loading
+          ? <Loader2 className="w-2.5 h-2.5 animate-spin text-muted-foreground/40 flex-shrink-0" />
+          : <span className="text-[10px] text-muted-foreground/40">{items.length}</span>
+        }
+      </button>
+      {open && !loading && (
+        <div className="pl-1 pr-1 pb-0.5 flex flex-col gap-0.5">
+          {items.map(item => (
+            <a
+              key={item.id}
+              href={item.permalink || `https://slack.com/app_redirect?channel=${item.channelId ?? ""}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex flex-col gap-0.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+            >
+              <div className="flex items-center gap-1.5">
+                <FileText className="w-2.5 h-2.5 flex-shrink-0 text-muted-foreground/50" />
+                <span className="text-[12px] font-medium text-foreground/90 truncate flex-1">{item.title}</span>
+                <span className="flex-shrink-0 text-[10px] text-muted-foreground/50">
+                  {relativeTime(String(item.updatedAt))}
+                </span>
+              </div>
+              {item.channelName && (
+                <div className="flex items-center gap-1 pl-4">
+                  <Hash className="w-2.5 h-2.5 text-muted-foreground/40 flex-shrink-0" />
+                  <span className="text-[10px] text-muted-foreground/60 truncate">{item.channelName}</span>
+                </div>
+              )}
             </a>
           ))}
         </div>
@@ -789,8 +858,12 @@ function ConnectedView({
   const [unreadsLoading, setUnreadsLoading] = useState(true);
 
   // ── Threads ───────────────────────────────────────────────────────────────
-  const [threads,        setThreads]        = useState<ThreadItem[]>([]);
-  const [threadsLoading, setThreadsLoading] = useState(true);
+  const [threads,         setThreads]         = useState<ThreadItem[]>([]);
+  const [threadsLoading,  setThreadsLoading]  = useState(true);
+
+  // ── Canvases ──────────────────────────────────────────────────────────────
+  const [canvases,        setCanvases]        = useState<CanvasItem[]>([]);
+  const [canvasesLoading, setCanvasesLoading] = useState(true);
 
   // ── Search ────────────────────────────────────────────────────────────────
   const [searchActive,   setSearchActive]   = useState(false);
@@ -938,6 +1011,17 @@ function ConnectedView({
         // silently discard — threads are non-critical
       })
       .finally(() => { if (!cancelled) setThreadsLoading(false); });
+
+    setCanvasesLoading(true);
+    apiGet<{ canvases: CanvasItem[] }>("/api/slack/canvases")
+      .then(data => { if (!cancelled) setCanvases(data.canvases); })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.code === "token_expired") { onTokenExpired(); return; }
+        if (err instanceof ApiError && err.code === "missing_scope") { handleMissingScope(); return; }
+        // silently discard — canvases are non-critical
+      })
+      .finally(() => { if (!cancelled) setCanvasesLoading(false); });
 
     return () => { cancelled = true; };
   }, [expanded]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -1148,9 +1232,10 @@ function ConnectedView({
             className="flex-shrink-0 border-b border-border bg-white overflow-y-auto py-1.5 px-1.5"
             style={{ maxHeight: "55%" }}
           >
-            {/* Unreads + Threads render independently — non-blocking */}
+            {/* Unreads, Threads, Canvases — independent, non-blocking */}
             <UnreadsSection items={unreads} loading={unreadsLoading} />
             <ThreadsSection items={threads} loading={threadsLoading} />
+            <CanvasesSection items={canvases} loading={canvasesLoading} />
 
             {/* Channels & DMs */}
             {convLoading ? (
