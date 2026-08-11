@@ -274,7 +274,9 @@ export function MeetingNotesCard() {
         {/* Meetings list */}
         {view === "list" && (
           <ul>
-            {meetings.map(m => <MeetingRow key={m.id} meeting={m} />)}
+            {meetings.map((m, i) => (
+              <MeetingRow key={m.id || `meeting-${i}`} meeting={m} />
+            ))}
           </ul>
         )}
 

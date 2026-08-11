@@ -197,13 +197,19 @@ router.get("/fathom/meetings", async (req, res) => {
     // Fathom may return { data: [...] } or { items: [...] } — handle both
     const raw: unknown[] = data.data ?? data.items ?? (Array.isArray(data) ? data as unknown[] : []);
 
-    const meetings: FathomMeeting[] = raw.map((m: unknown) => {
-      const item = m as Record<string, unknown>;
+    const meetings: FathomMeeting[] = raw.map((m: unknown, idx: number) => {
+      const item       = m as Record<string, unknown>;
+      const title      = String(item["title"] ?? item["name"] ?? item["summary"] ?? "Untitled meeting");
+      const started_at = String(item["started_at"] ?? item["created_at"] ?? item["date"] ?? "");
+      // Use the API-provided id when present; fall back to a stable composite key
+      // so React never receives duplicate or empty key props.
+      const rawId = item["id"] ?? item["uuid"] ?? item["call_id"] ?? "";
+      const id    = rawId ? String(rawId) : `fathom-${idx}-${started_at || title.slice(0, 20)}`;
       return {
-        id:         String(item["id"] ?? ""),
-        title:      String(item["title"] ?? item["name"] ?? item["summary"] ?? "Untitled meeting"),
-        started_at: String(item["started_at"] ?? item["created_at"] ?? item["date"] ?? ""),
-        share_url:  String(item["share_url"] ?? item["url"] ?? item["link"] ?? ""),
+        id,
+        title,
+        started_at,
+        share_url: String(item["share_url"] ?? item["url"] ?? item["link"] ?? ""),
       };
     });
 
