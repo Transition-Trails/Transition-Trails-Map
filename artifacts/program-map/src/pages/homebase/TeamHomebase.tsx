@@ -25,6 +25,7 @@ import { useTierFlags }  from "@/hooks/useTierFlags";
 import { TodayTasksCard }    from "@/components/homebase/TodayTasksCard";
 import { TodayMeetingsCard } from "@/components/homebase/TodayMeetingsCard";
 import { ActiveTasksCard }   from "@/components/homebase/ActiveTasksCard";
+import { MeetingNotesCard }  from "@/components/homebase/MeetingNotesCard";
 
 interface TeamHomebaseProps {
   displayName: string;
@@ -131,8 +132,7 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
           <div className="grid grid-cols-3 gap-4 items-start">
             <TodayTasksCard />
             <TodayMeetingsCard />
-            {/* Third column reserved for future card */}
-            <div />
+            <MeetingNotesCard />
           </div>
 
           {/* Active Tasks — full width */}

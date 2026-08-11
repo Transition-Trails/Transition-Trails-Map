@@ -33,3 +33,4 @@ export * from "./volunteerProfiles";
 export * from "./coachProfiles";
 export * from "./auditLog";
 export * from "./slackUserTokens";
+export * from "./fathomUserKeys";
