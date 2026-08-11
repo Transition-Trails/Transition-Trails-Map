@@ -276,7 +276,7 @@ router.get("/slack/oauth/authorize", requireSlackAuth, (req, res) => {
   }
 
   // Use the REAL signed-in identity — not the impersonated one (already rejected above).
-  const email = req.session.googleEmail;   // real identity; impersonation rejected above
+  const email = req.session.googleEmail;
   if (!email) {
     res.status(401).json({ error: "No authenticated user" });
     return;
@@ -439,7 +439,7 @@ router.get("/slack/oauth/callback", async (req, res) => {
 // ── GET /slack/oauth/status ───────────────────────────────────────────────────
 
 router.get("/slack/oauth/status", requireSlackAuth, async (req, res) => {
-  const email = req.session.googleEmail;   // real identity; impersonation rejected above
+  const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ connected: false }); return; }
 
   try {
@@ -468,7 +468,7 @@ router.get("/slack/oauth/status", requireSlackAuth, async (req, res) => {
 // ── DELETE /slack/oauth/disconnect ────────────────────────────────────────────
 
 router.delete("/slack/oauth/disconnect", requireSlackAuth, async (req, res) => {
-  const email = req.session.googleEmail;   // real identity; impersonation rejected above
+  const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ ok: false }); return; }
 
   try {
@@ -514,7 +514,7 @@ export interface ConversationItem {
 // ── GET /slack/conversations ──────────────────────────────────────────────────
 
 router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
-  const email = req.session.googleEmail;   // real identity; impersonation rejected above
+  const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
 
   // Serve from cache if fresh
@@ -525,35 +525,24 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
   }
 
   let token: string | null;
-  try {
-    token = await getTokenForUser(email);
-  } catch (err) {
-    req.log.error({ err }, "slack conversations DB error");
-    res.status(500).json({ error: "db_error" });
-    return;
-  }
-
-  if (!token) {
-    res.status(403).json({ error: "not_connected" });
-    return;
-  }
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack conversations DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
   try {
-    // Fetch DMs, group DMs, and channels in one call
     const r = await slackUserGet(token, "conversations.list", {
-      types:            "im,mpim,private_channel,public_channel",
-      limit:            "100",
-      exclude_archived: "true",
+      types: "im,mpim,public_channel,private_channel",
+      limit: "200",
     });
 
     if (r["ok"] !== true) {
-      const slackErr = r["error"];
+      const slackErr = String(r["error"] ?? "slack_api_error");
       req.log.warn({ error: slackErr }, "slack conversations.list failed");
       if (isTokenExpiredError(slackErr)) {
         res.status(401).json({ error: "token_expired", message: "Slack token is no longer valid. Please reconnect." });
         return;
       }
-      res.status(502).json({ error: String(slackErr ?? "slack_api_error") });
+      res.status(502).json({ error: slackErr });
       return;
     }
 
@@ -568,9 +557,9 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
 
         if (isIm) {
           // DM partner user ID — resolve to display name and expose for presence lookups
-          const userId      = ch["user"] as string | undefined;
-          const partnerName = userId ? await resolveDisplayName(token!, userId) : "Direct Message";
-          return { id, type: "im", name: partnerName, isPrivate: true, userId };
+          const dmUserId    = ch["user"] as string | undefined;
+          const partnerName = dmUserId ? await resolveDisplayName(token!, dmUserId) : "Direct Message";
+          return { id, type: "im", name: partnerName, isPrivate: true, userId: dmUserId };
         }
 
         if (isMpim) {
@@ -609,40 +598,28 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
 // ── GET /slack/conversations/:id/history ─────────────────────────────────────
 
 router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res) => {
-  const email = req.session.googleEmail;   // real identity; impersonation rejected above
+  const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
 
   const channelId = String(req.params["id"]);
   const limit     = Math.min(Number(req.query["limit"] ?? 30), 50).toString();
 
   let token: string | null;
-  try {
-    token = await getTokenForUser(email);
-  } catch (err) {
-    req.log.error({ err }, "slack history DB error");
-    res.status(500).json({ error: "db_error" });
-    return;
-  }
-
-  if (!token) {
-    res.status(403).json({ error: "not_connected" });
-    return;
-  }
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack history DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
   try {
-    const r = await slackUserGet(token, "conversations.history", {
-      channel: channelId,
-      limit,
-    });
+    const r = await slackUserGet(token, "conversations.history", { channel: channelId, limit });
 
     if (r["ok"] !== true) {
-      const slackErr = r["error"];
+      const slackErr = String(r["error"] ?? "slack_api_error");
       req.log.warn({ error: slackErr, channelId }, "slack conversations.history failed");
       if (isTokenExpiredError(slackErr)) {
         res.status(401).json({ error: "token_expired", message: "Slack token is no longer valid. Please reconnect." });
         return;
       }
-      res.status(502).json({ error: String(slackErr ?? "slack_api_error") });
+      res.status(502).json({ error: slackErr });
       return;
     }
 
@@ -665,8 +642,8 @@ router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res
     const nameMap = new Map<string, string>();
     await Promise.all(
       userIds.map(async uid => {
-        const name = await resolveDisplayName(token!, uid);
-        nameMap.set(uid, name);
+        const displayName = await resolveDisplayName(token!, uid);
+        nameMap.set(uid, displayName);
       }),
     );
 
@@ -698,7 +675,7 @@ router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res
 // ── POST /slack/conversations/:id/messages ────────────────────────────────────
 
 router.post("/slack/conversations/:id/messages", requireSlackAuth, async (req, res) => {
-  const email = req.session.googleEmail;   // real identity; impersonation rejected above
+  const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
 
   const channelId = String(req.params["id"]);
@@ -710,32 +687,15 @@ router.post("/slack/conversations/:id/messages", requireSlackAuth, async (req, r
   }
 
   let token: string | null;
-  try {
-    token = await getTokenForUser(email);
-  } catch (err) {
-    req.log.error({ err }, "slack send DB error");
-    res.status(500).json({ error: "db_error" });
-    return;
-  }
-
-  if (!token) {
-    res.status(403).json({ error: "not_connected" });
-    return;
-  }
+  try { token = await getTokenForUser(email); }
+  catch (err) { req.log.error({ err }, "slack send DB error"); res.status(500).json({ error: "db_error" }); return; }
+  if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
   try {
     const r = await fetch("https://slack.com/api/chat.postMessage", {
       method:  "POST",
-      headers: {
-        Authorization:  `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        channel:       channelId,
-        text,
-        unfurl_links:  false,
-        unfurl_media:  false,
-      }),
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({ channel: channelId, text }),
     });
     const result = (await r.json()) as { ok: boolean; error?: string; ts?: string };
 
@@ -760,7 +720,10 @@ router.post("/slack/conversations/:id/messages", requireSlackAuth, async (req, r
 });
 
 // ── Presence cache ────────────────────────────────────────────────────────────
-// Keyed by Slack userId.  Kept for 60 s to avoid hammering the API.
+// Keyed by `${googleEmail}:${slackUserId}` so entries are strictly per
+// authenticated user.  A plain slackUserId key would allow any authenticated
+// Homebase user (including those not connected to Slack) to read cached values
+// belonging to someone else's session.
 const presenceCache = new Map<string, { presence: string; fetchedAt: number }>();
 const PRESENCE_TTL_MS = 60_000;
 
@@ -772,24 +735,40 @@ router.get("/slack/users/:userId/presence", requireSlackAuth, async (req, res) =
 
   const userId = String(req.params["userId"]);
 
-  const cached = presenceCache.get(userId);
-  if (cached && Date.now() - cached.fetchedAt < PRESENCE_TTL_MS) {
-    res.json({ presence: cached.presence });
-    return;
-  }
-
+  // Verify the requester has a live Slack connection BEFORE consulting the
+  // cache.  This prevents unauthenticated-to-Slack users from reading cached
+  // presence data that was populated by another user's session.
   let token: string | null;
   try { token = await getTokenForUser(email); }
   catch (err) { req.log.error({ err }, "slack presence DB error"); res.status(500).json({ error: "db_error" }); return; }
   if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
+  // Cache key is scoped to the authenticated Google account so entries cannot
+  // leak across users or workspaces.
+  const cacheKey = `${email}:${userId}`;
+  const cached = presenceCache.get(cacheKey);
+  if (cached && Date.now() - cached.fetchedAt < PRESENCE_TTL_MS) {
+    res.json({ presence: cached.presence });
+    return;
+  }
+
   try {
     const r = await slackUserGet(token, "users.getPresence", { user: userId });
     if (r["ok"] !== true) {
-      res.status(502).json({ error: String(r["error"] ?? "slack_api_error") }); return;
+      const slackErr = String(r["error"] ?? "slack_api_error");
+      // missing_scope means the stored token was authorised before users:read
+      // was added to the scope list — tell the client to prompt a reconnect so
+      // the user re-authorises with the full scope set.
+      if (slackErr === "missing_scope") {
+        res.status(403).json({ error: "missing_scope" }); return;
+      }
+      if (isTokenExpiredError(slackErr)) {
+        res.status(401).json({ error: "token_expired" }); return;
+      }
+      res.status(502).json({ error: slackErr }); return;
     }
     const presence = String(r["presence"] ?? "away");
-    presenceCache.set(userId, { presence, fetchedAt: Date.now() });
+    presenceCache.set(cacheKey, { presence, fetchedAt: Date.now() });
     res.json({ presence });
   } catch (err) {
     req.log.error({ err }, "slack presence fetch error");
@@ -812,18 +791,14 @@ router.get("/slack/search", requireSlackAuth, async (req, res) => {
   if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
   try {
-    const r = await slackUserGet(token, "search.messages", {
-      query,
-      count: "20",
-      sort:  "timestamp",
-    });
+    const r = await slackUserGet(token, "search.messages", { query, count: "20" });
 
     if (r["ok"] !== true) {
-      const slackErr = r["error"];
+      const slackErr = String(r["error"] ?? "slack_api_error");
       if (isTokenExpiredError(slackErr)) {
         res.status(401).json({ error: "token_expired" }); return;
       }
-      res.status(502).json({ error: String(slackErr ?? "slack_api_error") }); return;
+      res.status(502).json({ error: slackErr }); return;
     }
 
     // Slack returns results under messages.matches

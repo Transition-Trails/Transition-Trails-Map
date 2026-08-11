@@ -553,9 +553,10 @@ function ConnectedView({
   const [searchResults,  setSearchResults]  = useState<SearchResult[]>([]);
   const [searchLoading,  setSearchLoading]  = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const pollRef        = useRef<ReturnType<typeof setInterval> | null>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef   = useRef<HTMLDivElement>(null);
+  const pollRef          = useRef<ReturnType<typeof setInterval> | null>(null);
+  const presencePollRef  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const searchInputRef   = useRef<HTMLInputElement>(null);
 
   // Load conversation list on mount
   useEffect(() => {
@@ -583,9 +584,12 @@ function ConnectedView({
     return () => { cancelled = true; };
   }, [expanded]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch presence for DM partners once conversations load
-  useEffect(() => {
-    const dmConvs = conversations.filter(c => c.type === "im" && c.userId);
+  // Fetch presence for all DM partners and merge into presenceMap.
+  // If any request comes back with missing_scope or token_expired the stored
+  // token pre-dates users:read being in the scope list — trigger the reconnect
+  // banner so the user re-authorises with the full scope set.
+  const fetchPresence = useCallback((convList: Conversation[]) => {
+    const dmConvs = convList.filter(c => c.type === "im" && c.userId);
     if (dmConvs.length === 0) return;
 
     void Promise.allSettled(
@@ -594,6 +598,14 @@ function ConnectedView({
           .then(({ presence }) => ({ userId: c.userId!, presence })),
       ),
     ).then(results => {
+      const needsReconnect = results.some(
+        r =>
+          r.status === "rejected" &&
+          r.reason instanceof ApiError &&
+          (r.reason.code === "missing_scope" || r.reason.code === "token_expired"),
+      );
+      if (needsReconnect) { onTokenExpired(); return; }
+
       setPresenceMap(prev => {
         const next = new Map(prev);
         for (const r of results) {
@@ -604,7 +616,27 @@ function ConnectedView({
         return next;
       });
     });
-  }, [conversations]);
+  }, [onTokenExpired]);
+
+  // Initial presence fetch when conversations load; then re-poll every 2 minutes
+  // while the panel is expanded. The interval is cleared on collapse or unmount.
+  useEffect(() => {
+    if (!expanded || conversations.length === 0) return;
+
+    fetchPresence(conversations);
+
+    presencePollRef.current = setInterval(
+      () => fetchPresence(conversations),
+      2 * 60_000,
+    );
+
+    return () => {
+      if (presencePollRef.current) {
+        clearInterval(presencePollRef.current);
+        presencePollRef.current = null;
+      }
+    };
+  }, [conversations, expanded, fetchPresence]);
 
   // Search — debounced 400 ms
   useEffect(() => {
