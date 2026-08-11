@@ -9,11 +9,12 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  Square, Loader2, Plus, RefreshCw,
+  Square, Loader2, Plus, RefreshCw, Clock,
   CheckCircle2, ChevronsUpDown, ChevronUp, ChevronDown,
 } from "lucide-react";
 import { useToast }           from "@/hooks/use-toast";
 import { openSfAuthPopup }   from "@/utils/openSfAuthPopup";
+import { useAppContext }     from "@/context/AppContext";
 import { CreateTaskDrawer }   from "@/components/homebase/CreateTaskDrawer";
 import { TaskHoverCard }      from "@/components/homebase/TaskHoverCard";
 
@@ -93,6 +94,7 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 
 export default function TasksPage() {
   const { toast } = useToast();
+  const { openLogTime } = useAppContext();
 
   // Remote state
   const [tasks,         setTasks]         = useState<SfTask[]>([]);
@@ -420,7 +422,8 @@ export default function TasksPage() {
                   <ColHeader field="Subject"      label="Task"     className="min-w-0" />
                   <ColHeader field="Status"       label="Status"   className="w-36" />
                   <ColHeader field="ActivityDate" label="Due Date" className="w-48" />
-                  <ColHeader field="Priority"     label="Priority" className="w-24 pr-4" />
+                  <ColHeader field="Priority"     label="Priority" className="w-24" />
+                  <th className="w-12 pr-4 py-2.5" />
                 </tr>
               </thead>
               <tbody>
@@ -434,7 +437,7 @@ export default function TasksPage() {
                   return (
                     <tr
                       key={task.Id}
-                      className={`border-b border-border/50 last:border-0 transition-colors hover:bg-muted/10 ${
+                      className={`group/row border-b border-border/50 last:border-0 transition-colors hover:bg-muted/10 ${
                         isComp ? "opacity-60" : ""
                       }`}
                     >
@@ -497,10 +500,21 @@ export default function TasksPage() {
                       </td>
 
                       {/* Priority */}
-                      <td className="px-3 pr-4 py-3.5 w-24 align-top">
+                      <td className="px-3 py-3.5 w-24 align-top">
                         <span className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[11px] font-medium ${priCls}`}>
                           {task.Priority ?? "Normal"}
                         </span>
+                      </td>
+
+                      {/* Log Time */}
+                      <td className="pr-4 py-3.5 w-12 align-top text-right">
+                        <button
+                          onClick={() => openLogTime({ sfObjectType: "task", sfObjectId: task.Id, sfObjectName: task.Subject ?? "Task" })}
+                          title="Log time against this task"
+                          className="opacity-0 group-hover/row:opacity-100 p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                        >
+                          <Clock className="w-3.5 h-3.5" />
+                        </button>
                       </td>
                     </tr>
                   );

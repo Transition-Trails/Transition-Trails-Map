@@ -8,6 +8,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Clock, Search, Briefcase, Building2, CheckSquare, TrendingUp, Loader2 } from "lucide-react";
+import type { LogTimePrefill } from "@/context/AppContext";
 
 interface SfResult {
   id:       string;
@@ -17,9 +18,10 @@ interface SfResult {
 }
 
 interface LogTimeModalProps {
-  open:    boolean;
-  onClose: () => void;
-  onSaved: () => void;
+  open:     boolean;
+  prefill?: LogTimePrefill;
+  onClose:  () => void;
+  onSaved:  () => void;
 }
 
 const TYPE_ICON: Record<string, React.ElementType> = {
@@ -67,7 +69,7 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function LogTimeModal({ open, onClose, onSaved }: LogTimeModalProps) {
+export function LogTimeModal({ open, prefill, onClose, onSaved }: LogTimeModalProps) {
   const [query,    setQuery]    = useState("");
   const [results,  setResults]  = useState<SfResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -80,15 +82,20 @@ export function LogTimeModal({ open, onClose, onSaved }: LogTimeModalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Reset state when modal opens
+  // Reset state when modal opens; pre-select if prefill provided
   useEffect(() => {
     if (open) {
-      setQuery(""); setResults([]); setSelected(null);
+      setQuery(""); setResults([]);
       setMinutes(null); setNotes(""); setWorkDate(todayIso());
       setError(""); setSaving(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
+      if (prefill) {
+        setSelected({ id: prefill.sfObjectId, type: prefill.sfObjectType, name: prefill.sfObjectName, subtitle: "" });
+      } else {
+        setSelected(null);
+        setTimeout(() => inputRef.current?.focus(), 100);
+      }
     }
-  }, [open]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const search = useCallback((q: string) => {
     if (q.length < 2) { setResults([]); return; }

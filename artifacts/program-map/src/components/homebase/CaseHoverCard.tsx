@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { ExternalLink, Clock, Loader2, Check, User, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAppContext } from "@/context/AppContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -91,6 +92,7 @@ export function CaseHoverCard({
   children,
 }: CaseHoverCardProps) {
   const { toast } = useToast();
+  const { openLogTime } = useAppContext();
   const [open, setOpen] = useState(false);
 
   // Status
@@ -377,24 +379,34 @@ export function CaseHoverCard({
             </div>
           )}
 
-          {/* Created + SF link */}
+          {/* Created + actions */}
           <div className="flex items-center justify-between">
             {c.CreatedDate && (
               <div className="flex items-center gap-1 text-[10px] text-muted-foreground/50">
                 <span>Created {formatDate(c.CreatedDate)}</span>
               </div>
             )}
-            {sfLink && (
-              <a
-                href={sfLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 font-semibold transition-colors ml-auto"
+            <div className="flex items-center gap-3 ml-auto">
+              <button
+                onClick={() => { setOpen(false); openLogTime({ sfObjectType: "case", sfObjectId: c.Id, sfObjectName: c.Subject ?? `Case #${c.CaseNumber ?? c.Id}` }); }}
+                className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary font-semibold transition-colors"
+                title="Log time against this case"
               >
-                Open in Salesforce
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
+                <Clock className="w-3 h-3" />
+                Log Time
+              </button>
+              {sfLink && (
+                <a
+                  href={sfLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 font-semibold transition-colors"
+                >
+                  Open in Salesforce
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </PopoverContent>

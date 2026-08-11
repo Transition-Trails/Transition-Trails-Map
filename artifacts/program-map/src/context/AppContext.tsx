@@ -17,6 +17,12 @@ export type RecOverride = {
   priority?: 'critical' | 'high' | 'medium' | 'low';
 };
 
+export type LogTimePrefill = {
+  sfObjectType: "case" | "account" | "task" | "opportunity";
+  sfObjectId:   string;
+  sfObjectName: string;
+} | null;
+
 export type SelectedItemType =
   | 'program' | 'penny' | 'trailOs' | 'resolve' | 'demand' | 'demandRequest' | 'document'
   | 'commProvider' | 'commRoute' | 'commTemplate'
@@ -76,6 +82,12 @@ interface AppState {
   setGmailPanelOpen: (v: boolean) => void;
   pendingPennyQuery: string | null;
   setPendingPennyQuery: (q: string | null) => void;
+  logTimeOpen:    boolean;
+  logTimePrefill: LogTimePrefill;
+  openLogTime:    (prefill?: LogTimePrefill) => void;
+  closeLogTime:   () => void;
+  logTimeSavedAt: number;
+  onLogTimeSaved: () => void;
   mobileSidebarOpen: boolean;
   setMobileSidebarOpen: (v: boolean) => void;
   setActivePage: (page: string) => void;
@@ -189,6 +201,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [gmailPanelOpen,    setGmailPanelOpen]      = useState(false);
   const [pendingPennyQuery, setPendingPennyQuery]   = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [logTimeOpen,    setLogTimeOpen]    = useState(false);
+  const [logTimePrefill, setLogTimePrefill] = useState<LogTimePrefill>(null);
+  const [logTimeSavedAt, setLogTimeSavedAt] = useState(0);
+  const openLogTime  = (prefill?: LogTimePrefill) => { setLogTimePrefill(prefill ?? null); setLogTimeOpen(true); };
+  const closeLogTime = () => { setLogTimeOpen(false); setLogTimePrefill(null); };
+  const onLogTimeSaved = () => { setLogTimeSavedAt(n => n + 1); closeLogTime(); };
 
   const [activeContext, setActiveContextRaw]  = useState<ActiveContext | null>(null);
   const [recentContexts, setRecentContexts]   = useState<ActiveContext[]>([]);
@@ -330,6 +348,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       gmailPanelOpen, setGmailPanelOpen,
       pendingPennyQuery, setPendingPennyQuery,
       mobileSidebarOpen, setMobileSidebarOpen,
+      logTimeOpen, logTimePrefill, openLogTime, closeLogTime,
+      logTimeSavedAt, onLogTimeSaved,
       setActivePage, setActiveLens, setUserTier, setSelectedItem, setSearchOpen,
       setActiveContext,
       updateProgram, updateDocument, updateResolvePhase,

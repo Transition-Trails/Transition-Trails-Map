@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { ExternalLink, Clock, Loader2, Check, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAppContext } from "@/context/AppContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -79,6 +80,7 @@ function formatCreated(dateStr: string | null): string {
 
 export function TaskHoverCard({ task, orgBaseUrl, onStatusChange, onTaskUpdate, children }: TaskHoverCardProps) {
   const { toast }  = useToast();
+  const { openLogTime } = useAppContext();
   const [open, setOpen] = useState(false);
 
   // Status
@@ -315,17 +317,27 @@ export function TaskHoverCard({ task, orgBaseUrl, onStatusChange, onTaskUpdate, 
               <span>Created {formatCreated(task.CreatedDate)}</span>
             </div>
           )}
-          {sfLink && (
-            <a
-              href={sfLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 font-semibold transition-colors ml-auto"
+          <div className="flex items-center gap-3 ml-auto">
+            <button
+              onClick={() => { setOpen(false); openLogTime({ sfObjectType: "task", sfObjectId: task.Id, sfObjectName: task.Subject ?? "Task" }); }}
+              className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary font-semibold transition-colors"
+              title="Log time against this task"
             >
-              Open in Salesforce
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          )}
+              <Clock className="w-3 h-3" />
+              Log Time
+            </button>
+            {sfLink && (
+              <a
+                href={sfLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-[11px] text-primary hover:text-primary/80 font-semibold transition-colors"
+              >
+                Open in Salesforce
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+          </div>
         </div>
       </PopoverContent>
     </Popover>

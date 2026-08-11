@@ -6,7 +6,6 @@
  * left drawer or the prominent card below.
  */
 
-import { useState } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -24,13 +23,13 @@ import {
 import { Link } from "wouter";
 import { HomebaseShell }    from "@/components/layout/HomebaseShell";
 import { useTierFlags }     from "@/hooks/useTierFlags";
+import { useAppContext }    from "@/context/AppContext";
 import { TodayTasksCard }   from "@/components/homebase/TodayTasksCard";
 import { TodayMeetingsCard } from "@/components/homebase/TodayMeetingsCard";
 import { ActiveTasksCard }  from "@/components/homebase/ActiveTasksCard";
 import { MeetingNotesCard } from "@/components/homebase/MeetingNotesCard";
 import { CasesCard }        from "@/components/homebase/CasesCard";
 import { MyTimeCard }       from "@/components/homebase/MyTimeCard";
-import { LogTimeModal }     from "@/components/homebase/LogTimeModal";
 
 interface TeamHomebaseProps {
   displayName: string;
@@ -68,9 +67,7 @@ const EVERYDAY_QUICK_LINKS = [
 export default function TeamHomebase({ displayName, isStaff = false }: TeamHomebaseProps) {
   const firstName = displayName.split(" ")[0] || "there";
   const { isAdminOrAbove, isPower, isEveryday } = useTierFlags();
-
-  const [logTimeOpen,   setLogTimeOpen]   = useState(false);
-  const [timeRefreshKey, setTimeRefreshKey] = useState(0);
+  const { openLogTime, logTimeSavedAt } = useAppContext();
 
   let quickLinks = TEAM_QUICK_LINKS;
   if (isStaff) {
@@ -100,7 +97,7 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
           <div className="flex items-center gap-2 flex-shrink-0 mt-1">
             {/* Log Time */}
             <button
-              onClick={() => setLogTimeOpen(true)}
+              onClick={() => openLogTime()}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-white text-sm font-medium text-foreground hover:border-primary/40 hover:bg-muted/40 transition-colors shadow-sm"
             >
               <Clock className="w-4 h-4 text-muted-foreground" />
@@ -167,17 +164,11 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
           </div>
 
           {/* My Time Logs */}
-          <MyTimeCard refreshKey={timeRefreshKey} />
+          <MyTimeCard refreshKey={logTimeSavedAt} />
         </div>
 
       </div>
 
-      {/* Log Time slide-over */}
-      <LogTimeModal
-        open={logTimeOpen}
-        onClose={() => setLogTimeOpen(false)}
-        onSaved={() => setTimeRefreshKey(k => k + 1)}
-      />
     </HomebaseShell>
   );
 }

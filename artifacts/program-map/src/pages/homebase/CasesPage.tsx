@@ -9,11 +9,12 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  Loader2, RefreshCw, Briefcase,
+  Loader2, RefreshCw, Briefcase, Clock,
   ChevronsUpDown, ChevronUp, ChevronDown,
 } from "lucide-react";
 import { useToast }        from "@/hooks/use-toast";
 import { openSfAuthPopup } from "@/utils/openSfAuthPopup";
+import { useAppContext }   from "@/context/AppContext";
 import { CaseHoverCard }   from "@/components/homebase/CaseHoverCard";
 import type { SfCase }     from "@/components/homebase/CaseHoverCard";
 
@@ -100,6 +101,7 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 
 export default function CasesPage() {
   const { toast } = useToast();
+  const { openLogTime } = useAppContext();
 
   // Remote state
   const [cases,              setCases]              = useState<SfCase[]>([]);
@@ -385,7 +387,8 @@ export default function CasesPage() {
                 <ColHeader field="OwnerName"       label="Assigned To"   className="w-36" />
                 <ColHeader field="Priority"        label="Priority"      className="w-24" />
                 <ColHeader field="LastActivityDate" label="Last Activity" className="w-40" />
-                <ColHeader field="CreatedDate"     label="Age"           className="w-24 pr-4" />
+                <ColHeader field="CreatedDate"     label="Age"           className="w-24" />
+                <th className="w-12 pr-4 py-2.5" />
               </tr>
             </thead>
             <tbody>
@@ -396,7 +399,7 @@ export default function CasesPage() {
                 return (
                   <tr
                     key={c.Id}
-                    className="border-b border-border/50 last:border-0 transition-colors hover:bg-muted/10"
+                    className="group/row border-b border-border/50 last:border-0 transition-colors hover:bg-muted/10"
                   >
                     {/* Case # */}
                     <td className="pl-4 px-3 py-3.5 w-28 align-top">
@@ -451,8 +454,19 @@ export default function CasesPage() {
                     </td>
 
                     {/* Age */}
-                    <td className="px-3 pr-4 py-3.5 w-24 align-top text-[12px] text-muted-foreground whitespace-nowrap">
+                    <td className="px-3 py-3.5 w-24 align-top text-[12px] text-muted-foreground whitespace-nowrap">
                       {ageLabel(c.CreatedDate)}
+                    </td>
+
+                    {/* Log Time */}
+                    <td className="pr-4 py-3.5 w-12 align-top text-right">
+                      <button
+                        onClick={() => openLogTime({ sfObjectType: "case", sfObjectId: c.Id, sfObjectName: c.Subject ?? `Case #${c.CaseNumber ?? c.Id}` })}
+                        title="Log time against this case"
+                        className="opacity-0 group-hover/row:opacity-100 p-1.5 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                      >
+                        <Clock className="w-3.5 h-3.5" />
+                      </button>
                     </td>
                   </tr>
                 );
