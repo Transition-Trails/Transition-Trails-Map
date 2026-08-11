@@ -44,11 +44,12 @@ import {
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface Conversation {
-  id:        string;
-  type:      "im" | "mpim" | "channel";
-  name:      string;
-  isPrivate: boolean;
-  userId?:   string;   // DM partner's Slack user ID — used for presence
+  id:           string;
+  type:         "im" | "mpim" | "channel";
+  name:         string;
+  isPrivate:    boolean;
+  userId?:      string;   // DM partner's Slack user ID — used for presence
+  unreadCount?: number;   // Unread message count from Slack; undefined = unknown
 }
 
 interface Reaction {
@@ -558,14 +559,16 @@ function ConvSection({
   onSelect,
   defaultOpen = true,
   presenceMap,
+  emptyMessage,
 }: {
-  label:        string;
-  icon:         React.ReactNode;
-  items:        Conversation[];
-  selectedId:   string | null;
-  onSelect:     (conv: Conversation) => void;
-  defaultOpen?: boolean;
-  presenceMap?: Map<string, "active" | "away">;
+  label:         string;
+  icon:          React.ReactNode;
+  items:         Conversation[];
+  selectedId:    string | null;
+  onSelect:      (conv: Conversation) => void;
+  defaultOpen?:  boolean;
+  presenceMap?:  Map<string, "active" | "away">;
+  emptyMessage?: string; // When provided, show this instead of returning null when items is empty
 }) {
   const lsKey = `slack-panel:section-open:${label.toLowerCase()}`;
   const [open, setOpen] = useState(() => {
@@ -577,7 +580,7 @@ function ConvSection({
     return next;
   });
 
-  if (items.length === 0) return null;
+  if (items.length === 0 && !emptyMessage) return null;
 
   return (
     <div className="mb-0.5">
@@ -595,15 +598,19 @@ function ConvSection({
       </button>
       {open && (
         <div className="pl-1 pr-1 pb-0.5 flex flex-col gap-0.5">
-          {items.map(conv => (
-            <ConvItem
-              key={conv.id}
-              conv={conv}
-              selected={selectedId === conv.id}
-              onSelect={() => onSelect(conv)}
-              presence={conv.userId ? presenceMap?.get(conv.userId) : undefined}
-            />
-          ))}
+          {items.length === 0 && emptyMessage ? (
+            <p className="text-[10px] text-muted-foreground/50 px-2 py-1.5">{emptyMessage}</p>
+          ) : (
+            items.map(conv => (
+              <ConvItem
+                key={conv.id}
+                conv={conv}
+                selected={selectedId === conv.id}
+                onSelect={() => onSelect(conv)}
+                presence={conv.userId ? presenceMap?.get(conv.userId) : undefined}
+              />
+            ))
+          )}
         </div>
       )}
     </div>
@@ -847,6 +854,16 @@ function ConnectedView({
   const [convLoading,    setConvLoading]    = useState(true);
   const [convError,      setConvError]      = useState<string | null>(null);
   const [selectedConv,   setSelectedConv]   = useState<Conversation | null>(null);
+  // Track DMs opened this session so they drop off the unread-filtered list immediately
+  const [viewedDmIds,    setViewedDmIds]    = useState<Set<string>>(new Set());
+
+  /** Single entry-point for selecting any conversation. Marks DMs as viewed. */
+  const selectConv = useCallback((conv: Conversation | null) => {
+    setSelectedConv(conv);
+    if (conv && (conv.type === "im" || conv.type === "mpim")) {
+      setViewedDmIds(prev => new Set(prev).add(conv.id));
+    }
+  }, []);
 
   // ── Messages ──────────────────────────────────────────────────────────────
   const [messages,       setMessages]       = useState<Message[]>([]);
@@ -921,7 +938,7 @@ function ConnectedView({
         if (!cancelled) {
           setConversations(data.conversations);
           if (data.conversations.length > 0 && !selectedConv) {
-            setSelectedConv(data.conversations[0] ?? null);
+            selectConv(data.conversations[0] ?? null);
           }
         }
       })
@@ -1224,7 +1241,7 @@ function ConnectedView({
                   result={r}
                   onSelectChannel={(channelId) => {
                     const conv = conversations.find(c => c.id === channelId);
-                    if (conv) { setSelectedConv(conv); closeSearch(); }
+                    if (conv) { selectConv(conv); closeSearch(); }
                   }}
                 />
               ))}
@@ -1259,17 +1276,22 @@ function ConnectedView({
                   icon={<Hash className="w-3 h-3" />}
                   items={conversations.filter(c => c.type === "channel")}
                   selectedId={selectedConv?.id ?? null}
-                  onSelect={setSelectedConv}
+                  onSelect={selectConv}
                   defaultOpen={true}
                 />
                 <ConvSection
                   label="Direct Messages"
                   icon={<User className="w-3 h-3" />}
-                  items={conversations.filter(c => c.type === "im" || c.type === "mpim")}
+                  items={conversations.filter(c =>
+                    (c.type === "im" || c.type === "mpim") &&
+                    (c.unreadCount ?? 0) > 0 &&
+                    !viewedDmIds.has(c.id)
+                  )}
                   selectedId={selectedConv?.id ?? null}
-                  onSelect={setSelectedConv}
+                  onSelect={selectConv}
                   defaultOpen={true}
                   presenceMap={presenceMap}
+                  emptyMessage="No unread messages"
                 />
               </>
             )}

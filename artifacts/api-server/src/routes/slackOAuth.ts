@@ -515,11 +515,12 @@ const convCache = new Map<string, ConvCacheEntry>();
 const CONV_TTL_MS = 60_000;
 
 export interface ConversationItem {
-  id:        string;
-  type:      "im" | "mpim" | "channel";
-  name:      string;
-  isPrivate: boolean;
-  userId?:   string;   // DM partner's Slack user ID (im type only) — used for presence lookups
+  id:          string;
+  type:        "im" | "mpim" | "channel";
+  name:        string;
+  isPrivate:   boolean;
+  userId?:     string;   // DM partner's Slack user ID (im type only) — used for presence lookups
+  unreadCount?: number;  // Raw unread_count from Slack — undefined means unknown, 0 means read
 }
 
 // ── GET /slack/conversations ──────────────────────────────────────────────────
@@ -575,15 +576,18 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
           // DM partner user ID — resolve to display name and expose for presence lookups
           const dmUserId    = ch["user"] as string | undefined;
           const partnerName = dmUserId ? await resolveDisplayName(token!, dmUserId) : "Direct Message";
-          return { id, type: "im", name: partnerName, isPrivate: true, userId: dmUserId };
+          const unreadCount = typeof ch["unread_count"] === "number" ? (ch["unread_count"] as number) : undefined;
+          return { id, type: "im", name: partnerName, isPrivate: true, userId: dmUserId, unreadCount };
         }
 
         if (isMpim) {
+          const unreadCount = typeof ch["unread_count"] === "number" ? (ch["unread_count"] as number) : undefined;
           return {
             id,
             type:      "mpim",
             name:      (ch["name"] as string | undefined) ?? "Group DM",
             isPrivate: true,
+            unreadCount,
           };
         }
 
