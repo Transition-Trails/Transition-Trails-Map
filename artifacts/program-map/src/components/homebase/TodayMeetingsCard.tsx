@@ -26,26 +26,25 @@ interface CalEvent {
   start: GCalDateTime;
   end: GCalDateTime;
   htmlLink: string;
+  /** Resolved server-side from conferenceData / hangoutLink. */
+  meetLink: string | null;
   status: string;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const MEET_RE = /https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}/i;
+const MEET_RE = /https:\/\/meet\.google\.com\/[^\s"'<>]+/i;
 
-/** Extract the first Google Meet URL from location or description (may be HTML). */
-function extractMeetLink(ev: CalEvent): string | null {
-  // Try location first (most events put the hangouts URL there)
-  if (MEET_RE.test(ev.location)) {
-    const m = ev.location.match(MEET_RE);
-    return m ? m[0] : null;
-  }
-  // Fall back to scanning description (may be HTML)
-  if (ev.description && MEET_RE.test(ev.description)) {
-    const m = ev.description.match(MEET_RE);
-    return m ? m[0] : null;
-  }
-  return null;
+/**
+ * Return the Meet join URL for an event.
+ * Prefers the server-resolved meetLink; falls back to regex scanning
+ * location/description for events with non-standard conferenceData.
+ */
+function getMeetLink(ev: CalEvent): string | null {
+  if (ev.meetLink) return ev.meetLink;
+  const candidates = [ev.location, ev.description].join(" ");
+  const m = candidates.match(MEET_RE);
+  return m ? m[0] : null;
 }
 
 function formatTime(dt: GCalDateTime): string {
@@ -84,7 +83,7 @@ function stripHtml(html: string): string {
 // ── Event row ─────────────────────────────────────────────────────────────────
 
 function MeetingRow({ ev }: { ev: CalEvent }) {
-  const meetLink  = extractMeetLink(ev);
+  const meetLink  = getMeetLink(ev);
   const now       = isHappeningNow(ev);
   const startTime = formatTime(ev.start);
   const endTime   = formatTime(ev.end);

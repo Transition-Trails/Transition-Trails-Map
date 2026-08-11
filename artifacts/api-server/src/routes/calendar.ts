@@ -55,6 +55,17 @@ interface GCalAttendee {
 
 interface GCalDateTime { dateTime?: string; date?: string; timeZone?: string; }
 
+interface GCalConferenceEntryPoint {
+  entryPointType: string; // "video" | "phone" | "sip" | "more"
+  uri: string;
+  label?: string;
+}
+
+interface GCalConferenceData {
+  entryPoints?: GCalConferenceEntryPoint[];
+  conferenceSolution?: { name?: string };
+}
+
 interface GCalEvent {
   id: string;
   summary?: string;
@@ -64,6 +75,8 @@ interface GCalEvent {
   end:   GCalDateTime;
   attendees?: GCalAttendee[];
   htmlLink: string;
+  hangoutLink?: string;           // legacy field — still populated by Google
+  conferenceData?: GCalConferenceData;
   status: string;
 }
 
@@ -76,6 +89,8 @@ export interface CalendarEventOut {
   end:   GCalDateTime;
   attendees: GCalAttendee[];
   htmlLink: string;
+  /** Google Meet join URL, if the event has one. Null otherwise. */
+  meetLink: string | null;
   status: string;
   isTrailTalk: boolean;
   isPendingResponse: boolean;
@@ -98,7 +113,7 @@ router.get("/calendar/events", async (_req, res) => {
       singleEvents:  "true",
       orderBy:       "startTime",
       maxResults:    "10",
-      fields:        "items(id,summary,description,location,start,end,attendees,htmlLink,status)",
+      fields:        "items(id,summary,description,location,start,end,attendees,htmlLink,hangoutLink,conferenceData,status)",
     });
 
     const calResp = await fetch(
@@ -124,6 +139,13 @@ router.get("/calendar/events", async (_req, res) => {
       const attendees = ev.attendees ?? [];
       const selfEntry = attendees.find(a => a.self);
 
+      // Resolve Meet link: prefer conferenceData video entry point,
+      // fall back to the legacy hangoutLink field.
+      const videoEntry = ev.conferenceData?.entryPoints?.find(
+        ep => ep.entryPointType === "video",
+      );
+      const meetLink: string | null = videoEntry?.uri ?? ev.hangoutLink ?? null;
+
       return {
         id:                ev.id,
         summary,
@@ -133,6 +155,7 @@ router.get("/calendar/events", async (_req, res) => {
         end:               ev.end,
         attendees,
         htmlLink:          ev.htmlLink,
+        meetLink,
         status:            ev.status,
         isTrailTalk:       /trail\s*talk/i.test(summary),
         isPendingResponse: !!selfEntry && selfEntry.responseStatus === "needsAction",
