@@ -53,12 +53,17 @@ vi.mock('connect-pg-simple', () => ({
 }));
 
 vi.mock('../middlewares/requireAuth.js', () => ({
-  requireStaff:          (_req: unknown, _res: unknown, next: () => void) => next(),
-  requireAdmin:          (_req: unknown, _res: unknown, next: () => void) => next(),
-  requireHomebaseAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
-  isStaff:               () => true,
-  isAdmin:               () => true,
-  isSuperAdmin:          () => false,
+  requireStaff:               (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireAdmin:               (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireSuperAdmin:          (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireHomebaseAuth:        (_req: unknown, _res: unknown, next: () => void) => next(),
+  effectiveIdentityMiddleware: (_req: unknown, _res: unknown, next: () => void) => next(),
+  isStaff:                    () => true,
+  isAdmin:                    () => true,
+  isSuperAdmin:               () => false,
+  getStaffGroups:             () => [],
+  getAdminGroups:             () => [],
+  getTeamGroup:               () => null,
   TRAIL_OS_STAFF_GROUPS: [],
   TRAIL_OS_ADMIN_GROUPS: [],
 }));
@@ -127,7 +132,10 @@ const ORIG_ENV = { ...process.env };
 beforeEach(() => {
   for (const k of Object.keys(mockSession)) delete mockSession[k];
   process.env = { ...ORIG_ENV };
-  process.env['GEMINI_API_KEY'] = 'test-gemini-key';
+  process.env['GEMINI_API_KEY']    = 'test-gemini-key';
+  // Staff (internal) sessions now route to Claude — set a test key so those
+  // code paths reach the fetch mock rather than returning 503 immediately.
+  process.env['ANTHROPIC_API_KEY'] = 'sk-ant-test-key-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
   // Remove SF env so we don't make real SF calls
   delete process.env['SALESFORCE_INSTANCE_URL'];
   delete process.env['SF_SERVICE_TOKEN'];
@@ -191,9 +199,27 @@ function makeEmptySfResponse(): Response {
   } as Response;
 }
 
+function makeClaudeOk(reply = 'ok'): Response {
+  const body = { content: [{ type: 'text', text: reply }] };
+  return {
+    ok: true, status: 200, statusText: 'OK',
+    headers: new Headers({ 'Content-Type': 'application/json' }),
+    json:        async () => body,
+    text:        async () => JSON.stringify(body),
+    redirected:  false, type: 'basic' as Response['type'], url: '',
+    clone:       () => makeClaudeOk(reply),
+    arrayBuffer: async () => new ArrayBuffer(0),
+    blob:        async () => new Blob(),
+    formData:    async () => new FormData(),
+    body: null, bodyUsed: false,
+  } as Response;
+}
+
 function stubFetch() {
   const spy = vi.fn().mockImplementation(async (url: string) => {
     if (url.includes('generativelanguage.googleapis.com')) return makeGeminiOk();
+    // Staff (internal) sessions now route to Claude — return a valid Anthropic response
+    if (url.includes('anthropic.com')) return makeClaudeOk();
     return makeEmptySfResponse();
   });
   vi.stubGlobal('fetch', spy);

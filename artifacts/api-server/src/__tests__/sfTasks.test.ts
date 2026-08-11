@@ -97,6 +97,16 @@ vi.mock('../lib/getSalesforceClient.js', () => ({
     return {
       query: async <T>(soql: string) => {
         lastQuerySoql.value = soql;
+        // The PATCH /:id/complete route runs an ownership check:
+        //   SELECT Id FROM Task WHERE Id = '<taskId>' AND OwnerId = '<userId>' ...
+        // The mock returns empty records by default, which causes the route to
+        // return 404 ("task not found / not yours"). For the I2 (success) and
+        // I3 (SF error) tests we need the ownership check to pass so execution
+        // reaches updateRecord. Detect this pattern and return a matching record.
+        const ownershipMatch = /FROM Task WHERE Id = '([^']+)'/.exec(soql);
+        if (ownershipMatch) {
+          return { totalSize: 1, done: true, records: [{ Id: ownershipMatch[1] }] as unknown as T[] };
+        }
         return { totalSize: 0, done: true, records: [] as T[] };
       },
       createRecord: async (_object: string, data: Record<string, unknown>) => {
@@ -115,7 +125,12 @@ vi.mock('../lib/getSalesforceClient.js', () => ({
 
 vi.mock('../lib/connectorSalesforceClient.js', () => ({
   ConnectorSalesforceClient: class {
-    async query<T>(_soql: string) {
+    async query<T>(soql: string) {
+      // Mirror the ownership-check fix applied to getSalesforceClient above.
+      const ownershipMatch = /FROM Task WHERE Id = '([^']+)'/.exec(soql);
+      if (ownershipMatch) {
+        return { totalSize: 1, done: true, records: [{ Id: ownershipMatch[1] }] as unknown as T[] };
+      }
       return { totalSize: 0, done: true, records: [] as T[] };
     }
     async createRecord(_object: string, data: Record<string, unknown>) {

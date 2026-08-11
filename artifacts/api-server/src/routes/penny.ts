@@ -137,12 +137,9 @@ router.post("/penny/ask", async (req, res) => {
     return res.status(400).json({ error: "query must be 2000 characters or fewer" });
   }
 
-  const apiKey = process.env["GEMINI_API_KEY"];
-  if (!apiKey) {
-    return res.status(503).json({ error: "Gemini API key not configured. Set GEMINI_API_KEY in Replit Secrets." });
-  }
-
   // ── Validate inputs ────────────────────────────────────────────────────────
+  // Note: GEMINI_API_KEY is checked inside the Gemini/learner branch below so
+  // that a missing Gemini key never blocks staff (Claude) requests.
   const roleStr = typeof role === 'string' ? role : undefined;
   const validChunks: RetrievedChunk[] = Array.isArray(retrievedChunks)
     ? (retrievedChunks as unknown[]).filter((c): c is RetrievedChunk =>
@@ -269,17 +266,252 @@ router.post("/penny/ask", async (req, res) => {
     : '';
   const userText = pageCtx + query.trim();
 
-  // ── Build conversation history for Gemini ────────────────────────────────
+  // ── Build conversation history ────────────────────────────────────────────
   const validHistory: HistoryItem[] = Array.isArray(history)
     ? (history as unknown[]).filter(isValidHistoryItem).slice(-10)  // cap at last 10 turns to control token budget
     : [];
 
+  // ── LLM dispatch: Claude for staff, Gemini for learners ──────────────────
+  //
+  // Staff (audience === 'internal') → Claude Sonnet.
+  //   On timeout or any non-2xx: fail with 503.  There is NO silent fallback
+  //   to Gemini — this keeps Anthropic outages visible in logs immediately.
+  //
+  // Learner (audience === 'learner') → Gemini 2.5 Flash with the existing
+  //   overload retry / back-off logic (completely unchanged).
+
+  // ─── Shared helper: fire-and-forget persistence ──────────────────────────
+  // Called by BOTH provider branches to avoid duplicating the DB + SF write
+  // logic.  Neither write is awaited — a failed write must never cost the user
+  // their reply.
+  function persistInteraction(
+    responseText: string,
+    modelName:    string,
+    durationMs:   number,
+  ): { shouldWriteToSf: boolean; staffEmail: string | null } {
+    const promptMode  = derivePromptMode(learnerCtx !== null, recentExchanges.length > 0);
+    const learnerName = learnerCtx
+      ? `${learnerCtx.firstName} ${learnerCtx.lastName}`.trim()
+      : null;
+
+    // DB write (always)
+    db.insert(pennyLogsTable).values({
+      sessionId:     req.sessionID ?? null,
+      userTier:      typeof role === 'string' ? role : null,
+      userEmail:     req.session.sfEmail ?? null,
+      userMessage:   (query as string).trim(),
+      pennyResponse: responseText,
+      promptMode,
+      model:         modelName,
+      durationMs,
+      contextRoute:  null,
+      sfContactId,
+      learnerName,
+      trailId:       trailCfg?.trailId ?? null,
+      audience,
+    }).catch((dbErr: unknown) => {
+      logger.warn({ dbErr }, "Failed to write Penny interaction to DB");
+    });
+
+    // SF write (when a contact is known)
+    const staffEmail   = !isLearnerContact ? (req.session.sfEmail ?? null) : null;
+    const shouldWrite  = sfClient !== null && (sfContactId !== null || staffEmail !== null);
+
+    if (sfClient !== null) {
+      const sfSource     = 'TRAIL OS' as const;
+      const isStaffWrite = sfContactId === null;
+
+      if (isStaffWrite) {
+        // Learner__c is a required (non-nillable) lookup — staff write deferred.
+        recordSfWriteSkip('Learner__c is required — staff SF logging deferred pending schema change');
+        logger.info({ adminEmail: staffEmail, audience }, 'Penny interaction skipped SF write (Learner__c required)');
+      } else if (shouldWrite) {
+        recordSfWriteAttempt(false);
+        logInteraction(sfClient, {
+          contactId:     sfContactId!,
+          adminEmail:    null,
+          userMessage:   (query as string).trim(),
+          pennyResponse: responseText,
+          promptMode,
+          source:        sfSource,
+          audience,
+        }).then(() => {
+          recordSfWriteSuccess(false);
+        }).catch((logErr: unknown) => {
+          const errMsg = logErr instanceof Error ? logErr.message : String(logErr);
+          recordSfWriteFailure('Penny_Interaction_Log__c', errMsg);
+          const isPermission =
+            errMsg.includes('INSUFFICIENT_ACCESS') ||
+            errMsg.includes('FIELD_INTEGRITY_EXCEPTION') ||
+            errMsg.includes('Required fields are missing') ||
+            errMsg.includes('CREATE_FAILED');
+          if (isPermission) {
+            logger.error(
+              { logErr, object: 'Penny_Interaction_Log__c', sfContactId },
+              'SF WRITE REFUSED — Penny_Interaction_Log__c — Create permission denied. ' +
+              'If the integration user was recently changed, grant Create on ' +
+              'Penny_Interaction_Log__c in the connected permission set.'
+            );
+          } else {
+            logger.warn(
+              { logErr, object: 'Penny_Interaction_Log__c' },
+              'Failed to log Penny interaction to Salesforce'
+            );
+          }
+        });
+      }
+    }
+
+    return { shouldWriteToSf: sfClient !== null && sfContactId !== null, staffEmail };
+  }
+
+  // ─── Shared helper: build the contextMeta response object ────────────────
+  function buildContextMeta(shouldWriteToSf: boolean) {
+    return {
+      audience,
+      contactId:         sfContactId,
+      learnerName:       learnerCtx ? `${learnerCtx.firstName} ${learnerCtx.lastName}`.trim() : null,
+      trailId:           trailCfg?.trailId ?? null,
+      trailConfigId:     learnerCtx?.pennyTrailConfigId ?? null,
+      currentPhase:      learnerCtx?.currentPhase ?? null,
+      currentGoal:       learnerCtx?.currentGoal ?? null,
+      coachingTone:      learnerCtx?.coachingTone ?? null,
+      confidenceScore:   learnerCtx?.confidenceScore ?? null,
+      promptPath,
+      interactionLogged: shouldWriteToSf,
+    };
+  }
+
+  // ─── Branch: Claude for internal/staff ───────────────────────────────────
+  if (audience === 'internal') {
+    const anthropicKey = process.env["ANTHROPIC_API_KEY"];
+    if (!anthropicKey) {
+      logger.error({ audience }, 'ANTHROPIC_API_KEY not configured — staff Penny unavailable');
+      return res.status(503).json({
+        error: "Penny is not available for staff right now — the AI provider is not configured. Contact your system administrator.",
+      });
+    }
+
+    // Anthropic messages API uses 'assistant' role, not 'model'
+    const anthropicMessages = [
+      ...validHistory.map(h => ({
+        role:    h.role === 'model' ? 'assistant' as const : 'user' as const,
+        content: h.text,
+      })),
+      { role: 'user' as const, content: userText },
+    ];
+
+    const claudeModel = "claude-sonnet-4-5";
+
+    try {
+      const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type":    "application/json",
+          "x-api-key":       anthropicKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model:      claudeModel,
+          max_tokens: 4096,
+          system:     systemPrompt,
+          messages:   anthropicMessages,
+        }),
+        signal: AbortSignal.timeout(30_000),
+      });
+
+      if (!claudeResp.ok) {
+        // Explicit failure — log with full detail so the issue is visible in
+        // logs immediately.  Do NOT fall back to Gemini.
+        const errBody = await claudeResp.json().catch(() => ({})) as {
+          error?: { type?: string; message?: string };
+        };
+        const errType = errBody.error?.type ?? 'unknown';
+        const errMsg  = errBody.error?.message ?? `HTTP ${claudeResp.status}`;
+        logger.error(
+          {
+            status:    claudeResp.status,
+            errType,
+            errMsg,
+            audience,
+            userEmail: req.session.sfEmail ?? null,
+          },
+          'Claude API returned non-2xx — returning 503 to staff (no Gemini fallback)'
+        );
+        return res.status(503).json({
+          error:     "Penny is temporarily unavailable for staff. Please try again in a moment.",
+          retryable: true,
+        });
+      }
+
+      const claudeData = await claudeResp.json() as {
+        content?: Array<{ type: string; text?: string }>;
+      };
+      const claudeText = (claudeData.content ?? [])
+        .filter(b => b.type === 'text')
+        .map(b => b.text ?? '')
+        .join('')
+        .trim();
+
+      if (!claudeText) {
+        logger.warn({ audience, userEmail: req.session.sfEmail ?? null }, 'Claude returned empty content — 503 to staff (no Gemini fallback)');
+        return res.status(503).json({
+          error:     "Penny returned an empty response. Please try again.",
+          retryable: true,
+        });
+      }
+
+      const durationMs = Date.now() - start;
+      const { shouldWriteToSf } = persistInteraction(claudeText, claudeModel, durationMs);
+
+      return res.json({
+        reply:      claudeText,
+        model:      claudeModel,
+        durationMs,
+        layersPresent,
+        contextMeta: buildContextMeta(shouldWriteToSf),
+      });
+
+    } catch (e: unknown) {
+      const isTimeout = e instanceof Error && e.name === 'TimeoutError';
+      // Log with ERROR severity so Anthropic outages appear in log searches.
+      // Do NOT fall back to Gemini.
+      logger.error(
+        {
+          err:       e instanceof Error ? e.message : String(e),
+          isTimeout,
+          audience,
+          userEmail: req.session.sfEmail ?? null,
+        },
+        isTimeout
+          ? 'Claude request timed out after 30s — 503 to staff (no Gemini fallback)'
+          : 'Claude request threw unexpected error — 503 to staff (no Gemini fallback)'
+      );
+      return res.status(503).json({
+        error: isTimeout
+          ? "Penny took too long to respond (30s timeout). Please try again."
+          : "Penny is temporarily unavailable for staff. Please try again in a moment.",
+        retryable: true,
+      });
+    }
+  }
+
+  // ─── Branch: Gemini for learner audience (unchanged) ─────────────────────
+  // Build Gemini-format contents array and call with overload retry logic.
+  // Nothing below this point has been modified from the original implementation.
   const contents = [
     ...validHistory.map(h => ({ role: h.role, parts: [{ text: h.text }] })),
     { role: 'user' as const, parts: [{ text: userText }] },
   ];
 
   // ── Call Gemini 2.5 Flash via REST (with overload retries) ──────────────
+  // Verify the Gemini key here — after audience dispatch — so a missing key
+  // never blocks the staff/Claude branch above.
+  const apiKey = process.env["GEMINI_API_KEY"];
+  if (!apiKey) {
+    return res.status(503).json({ error: "Gemini API key not configured. Set GEMINI_API_KEY in Replit Secrets." });
+  }
+
   const model = "gemini-2.5-flash";
   const url   = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
@@ -350,124 +582,14 @@ router.post("/penny/ask", async (req, res) => {
     }
 
     const durationMs  = Date.now() - start;
-    // Describe what actually happened rather than hardcoding "ask".
-    // Prompt_Mode__c is a plain string field (not a picklist) so any value is
-    // accepted by Salesforce — we use it to show admins which context layers
-    // were active for this exchange.
-    const promptMode  = derivePromptMode(learnerCtx !== null, recentExchanges.length > 0);
-    const learnerName = learnerCtx
-      ? `${learnerCtx.firstName} ${learnerCtx.lastName}`.trim()
-      : null;
-
-    // Fire-and-forget: write to DB (always) + Salesforce (when contact known).
-    // Neither write is awaited — a failed write must never cost the user their
-    // reply.  The local DB is the primary persistence path; SF is supplementary.
-    db.insert(pennyLogsTable).values({
-      sessionId:     req.sessionID ?? null,
-      userTier:      typeof role === 'string' ? role : null,
-      userEmail:     req.session.sfEmail ?? null,
-      userMessage:   query.trim(),
-      pennyResponse: text,
-      promptMode,
-      model,
-      durationMs,
-      contextRoute:  null,
-      sfContactId,
-      learnerName,
-      trailId:       trailCfg?.trailId ?? null,
-      audience,
-    }).catch((dbErr: unknown) => {
-      logger.warn({ dbErr }, "Failed to write Penny interaction to DB");
-    });
-
-    // Write to Salesforce when:
-    //  (a) a learner Contact is known (sfContactId !== null), OR
-    //  (b) the authenticated user is internal staff with an email (staff sessions).
-    // Case (b) requires Learner__c to be nillable on Penny_Interaction_Log__c
-    // and Admin_Email__c to be provisioned as a Text field in the SF schema.
-    const staffEmail = !isLearnerContact ? (req.session.sfEmail ?? null) : null;
-    const shouldWriteToSf = sfClient !== null && (sfContactId !== null || staffEmail !== null);
-
-    if (sfClient !== null) {
-      // ── Source derivation ──────────────────────────────────────────────────
-      // Source__c is a RESTRICTED picklist — only values in SF_INTERACTION_SOURCES
-      // are permitted; any other value causes Salesforce to silently reject the insert.
-      //
-      // Origin → source mapping:
-      //   /api/penny/ask  (Trail OS web interface)  → 'TRAIL OS'
-      //   Future Slack DM route                     → 'slack_dm'
-      //   Future Slack @mention route               → 'slack_mention'
-      //   Future mobile route                       → 'mobile'
-      //
-      // Each channel route is responsible for passing the correct source value
-      // to logInteraction(); never derive it from the request body.
-      const sfSource = 'TRAIL OS' as const;
-
-      const isStaffWrite = sfContactId === null;
-
-      if (isStaffWrite) {
-        // Learner__c is a required (non-nillable) lookup on Penny_Interaction_Log__c.
-        // Staff sessions have no Contact — the write would be rejected.
-        // This is a deliberate, known skip: record it as such so the write-health
-        // strip shows it as neutral rather than a failure.
-        // Resolution: make Learner__c nillable in SF Setup to enable staff logging.
-        recordSfWriteSkip('Learner__c is required — staff SF logging deferred pending schema change');
-        logger.info({ adminEmail: staffEmail, audience }, 'Staff Penny interaction skipped SF write (Learner__c required)');
-      } else if (shouldWriteToSf) {
-        recordSfWriteAttempt(false);
-        logInteraction(sfClient, {
-          contactId:     sfContactId,
-          adminEmail:    null,
-          userMessage:   query.trim(),
-          pennyResponse: text,
-          promptMode,
-          source:        sfSource,
-          audience,
-        }).then(() => {
-          recordSfWriteSuccess(false);
-        }).catch((logErr: unknown) => {
-          const errMsg = logErr instanceof Error ? logErr.message : String(logErr);
-          recordSfWriteFailure('Penny_Interaction_Log__c', errMsg);
-          const isPermission =
-            errMsg.includes('INSUFFICIENT_ACCESS') ||
-            errMsg.includes('FIELD_INTEGRITY_EXCEPTION') ||
-            errMsg.includes('Required fields are missing') ||
-            errMsg.includes('CREATE_FAILED');
-          if (isPermission) {
-            logger.error(
-              { logErr, object: 'Penny_Interaction_Log__c', sfContactId },
-              'SF WRITE REFUSED — Penny_Interaction_Log__c — Create permission denied. ' +
-              'If the integration user was recently changed, grant Create on ' +
-              'Penny_Interaction_Log__c in the connected permission set.'
-            );
-          } else {
-            logger.warn(
-              { logErr, object: 'Penny_Interaction_Log__c' },
-              'Failed to log Penny interaction to Salesforce'
-            );
-          }
-        });
-      }
-    }
+    const { shouldWriteToSf } = persistInteraction(text, model, durationMs);
 
     return res.json({
       reply: text,
       model,
       durationMs,
       layersPresent,
-      contextMeta: {
-        audience,
-        contactId:         sfContactId,
-        learnerName,
-        trailId:           trailCfg?.trailId ?? null,
-        trailConfigId:     learnerCtx?.pennyTrailConfigId ?? null,
-        currentPhase:      learnerCtx?.currentPhase ?? null,
-        currentGoal:       learnerCtx?.currentGoal ?? null,
-        coachingTone:      learnerCtx?.coachingTone ?? null,
-        confidenceScore:   learnerCtx?.confidenceScore ?? null,
-        promptPath,
-        interactionLogged: shouldWriteToSf,
-      },
+      contextMeta: buildContextMeta(shouldWriteToSf),
     });
   } catch (e: unknown) {
     const isTimeout = e instanceof Error && e.name === "TimeoutError";

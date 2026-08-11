@@ -200,6 +200,13 @@ function SourcesSection({ sources }: { sources: Source[] }) {
   );
 }
 
+/** Maps a raw model ID from the API to a short display name. */
+function friendlyModelName(modelId: string): string {
+  if (modelId.startsWith('claude'))  return 'Claude Sonnet';
+  if (modelId.startsWith('gemini'))  return 'Gemini 2.5 Flash';
+  return modelId;
+}
+
 function makeSeed(): Message[] {
   return [{
     role: 'penny',
@@ -249,6 +256,10 @@ export function AskPennyPanel() {
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [lastMs, setLastMs]     = useState<number | null>(null);
+  // Tracks the model name returned by the last successful response so the
+  // header stays accurate when staff (Claude) and learners (Gemini) share a
+  // session or the provider changes between deploys.
+  const [activeModel, setActiveModel] = useState<string>('Gemini 2.5 Flash');
   const bottomRef      = useRef<HTMLDivElement>(null);
   const inputRef       = useRef<HTMLInputElement>(null);
   const pendingFireRef = useRef(false);
@@ -339,7 +350,7 @@ export function AskPennyPanel() {
         }),
       });
 
-      const data = await resp.json() as { reply?: string; error?: string; durationMs?: number; retryable?: boolean };
+      const data = await resp.json() as { reply?: string; error?: string; durationMs?: number; retryable?: boolean; model?: string };
 
       if (!resp.ok || data.error) {
         setMessages(prev => [...prev, {
@@ -348,6 +359,7 @@ export function AskPennyPanel() {
         }]);
       } else {
         setLastMs(data.durationMs ?? null);
+        if (data.model) setActiveModel(friendlyModelName(data.model));
         setMessages(prev => [...prev, {
           role: 'penny',
           content: data.reply!,
@@ -417,7 +429,7 @@ export function AskPennyPanel() {
                     <p className="text-[14px] font-semibold text-foreground leading-none">{TERMS.aiAssistant}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#E6F0EA]0" />
-                      <span className="text-[14px] text-muted-foreground">Live · Gemini 2.5 Flash</span>
+                      <span className="text-[14px] text-muted-foreground">Live · {activeModel}</span>
                     </div>
                   </div>
                 </div>
@@ -584,7 +596,7 @@ export function AskPennyPanel() {
                   {ROLE_LABELS[userTier] ?? userTier} · Enter to send
                 </span>
                 <span className="text-[14px] text-muted-foreground/40 flex items-center gap-1">
-                  <Zap className="w-2.5 h-2.5" /> Gemini 2.5 Flash
+                  <Zap className="w-2.5 h-2.5" /> {activeModel}
                 </span>
               </div>
             </div>
