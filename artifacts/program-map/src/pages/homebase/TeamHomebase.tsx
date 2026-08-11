@@ -78,10 +78,10 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
 
   return (
     <HomebaseShell audience="team" displayName={displayName}>
-      <div className="px-6 py-8 space-y-6">
+      <div className="px-4 py-6 lg:px-6 lg:py-8 space-y-5 min-w-0">
 
         {/* Greeting + action buttons — same row */}
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
               Team Homebase
@@ -145,26 +145,25 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
           )}
         </div>
 
-        {/* Today snapshot */}
-        <div className="space-y-4">
+        {/* Card grid — two uniform rows of three */}
+        <div className="space-y-3 min-w-0">
           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
             Today
           </p>
 
-          <div className="grid grid-cols-3 gap-4 items-start">
-            <TodayTasksCard />
-            <TodayMeetingsCard />
-            <MeetingNotesCard />
+          {/* Row 1 */}
+          <div className="grid grid-cols-3 gap-3 items-start min-w-0">
+            <div className="min-w-0"><TodayTasksCard /></div>
+            <div className="min-w-0"><TodayMeetingsCard /></div>
+            <div className="min-w-0"><MeetingNotesCard /></div>
           </div>
 
-          {/* Active Tasks + Open Cases — 50/50 */}
-          <div className="grid grid-cols-2 gap-4 items-start">
-            <ActiveTasksCard />
-            <CasesCard />
+          {/* Row 2 */}
+          <div className="grid grid-cols-3 gap-3 items-start min-w-0">
+            <div className="min-w-0"><ActiveTasksCard /></div>
+            <div className="min-w-0"><CasesCard /></div>
+            <div className="min-w-0"><MyTimeCard refreshKey={logTimeSavedAt} /></div>
           </div>
-
-          {/* My Time Logs */}
-          <MyTimeCard refreshKey={logTimeSavedAt} />
         </div>
 
       </div>
