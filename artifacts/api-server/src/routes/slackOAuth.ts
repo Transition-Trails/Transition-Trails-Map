@@ -232,6 +232,15 @@ function isTokenExpiredError(slackError: unknown): boolean {
   return typeof slackError === "string" && SLACK_TOKEN_ERRORS.has(slackError);
 }
 
+/**
+ * Returns true when the Slack API response indicates the stored token is
+ * missing one or more OAuth scopes required for the requested method.
+ * The frontend uses this to show a targeted "reconnect to add permissions"
+ * prompt instead of a generic error.
+ */
+function isMissingScopeError(slackError: unknown): boolean {
+  return slackError === "missing_scope";
+}
 /** Call Slack Web API with a user or bot token (GET methods). */
 async function slackUserGet(
   token:  string,
@@ -518,7 +527,7 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
   if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
 
   // Serve from cache if fresh
-  const cached = convCache.get(email);
+  const cached = presenceCache.get(cacheKey);
   if (cached && Date.now() - cached.fetchedAt < CONV_TTL_MS) {
     res.json({ conversations: cached.data });
     return;
@@ -526,25 +535,31 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
 
   let token: string | null;
   try { token = await getTokenForUser(email); }
-  catch (err) { req.log.error({ err }, "slack conversations DB error"); res.status(500).json({ error: "db_error" }); return; }
+  catch (err) { req.log.error({ err }, "slack reaction DB error"); res.status(500).json({ error: "db_error" }); return; }
   if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
   try {
-    const r = await slackUserGet(token, "conversations.list", {
-      types: "im,mpim,public_channel,private_channel",
-      limit: "200",
+    const r = await fetch("https://slack.com/api/reactions.add", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({ channel: channelId, timestamp: ts, name }),
     });
 
     if (r["ok"] !== true) {
-      const slackErr = String(r["error"] ?? "slack_api_error");
+      const slackErr = r["error"];
       req.log.warn({ error: slackErr }, "slack conversations.list failed");
       if (isTokenExpiredError(slackErr)) {
         res.status(401).json({ error: "token_expired", message: "Slack token is no longer valid. Please reconnect." });
         return;
       }
-      res.status(502).json({ error: slackErr });
+      if (isMissingScopeError(slackErr)) {
+        res.status(403).json({ error: "missing_scope", needed: parseMissingScopes(r) });
+        return;
+      }
+      res.status(502).json({ error: String(slackErr ?? "slack_api_error") });
       return;
     }
+
 
     const rawChannels = (r["channels"] as Record<string, unknown>[]) ?? [];
 
@@ -601,27 +616,36 @@ router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res
   const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
 
-  const channelId = String(req.params["id"]);
+  const channelId = String(req.params["channelId"]);
   const limit     = Math.min(Number(req.query["limit"] ?? 30), 50).toString();
 
   let token: string | null;
   try { token = await getTokenForUser(email); }
-  catch (err) { req.log.error({ err }, "slack history DB error"); res.status(500).json({ error: "db_error" }); return; }
+  catch (err) { req.log.error({ err }, "slack reaction DB error"); res.status(500).json({ error: "db_error" }); return; }
   if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
   try {
-    const r = await slackUserGet(token, "conversations.history", { channel: channelId, limit });
+    const r = await fetch("https://slack.com/api/reactions.add", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({ channel: channelId, timestamp: ts, name }),
+    });
 
     if (r["ok"] !== true) {
-      const slackErr = String(r["error"] ?? "slack_api_error");
+      const slackErr = r["error"];
       req.log.warn({ error: slackErr, channelId }, "slack conversations.history failed");
       if (isTokenExpiredError(slackErr)) {
         res.status(401).json({ error: "token_expired", message: "Slack token is no longer valid. Please reconnect." });
         return;
       }
-      res.status(502).json({ error: slackErr });
+      if (isMissingScopeError(slackErr)) {
+        res.status(403).json({ error: "missing_scope", needed: parseMissingScopes(r) });
+        return;
+      }
+      res.status(502).json({ error: String(slackErr ?? "slack_api_error") });
       return;
     }
+
 
     const rawMessages = (r["messages"] as Record<string, unknown>[]) ?? [];
 
@@ -678,7 +702,7 @@ router.post("/slack/conversations/:id/messages", requireSlackAuth, async (req, r
   const email = req.session.googleEmail;
   if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
 
-  const channelId = String(req.params["id"]);
+  const channelId = String(req.params["channelId"]);
   const text      = ((req.body as { text?: string })?.text ?? "").trim();
 
   if (!text) {
@@ -688,21 +712,25 @@ router.post("/slack/conversations/:id/messages", requireSlackAuth, async (req, r
 
   let token: string | null;
   try { token = await getTokenForUser(email); }
-  catch (err) { req.log.error({ err }, "slack send DB error"); res.status(500).json({ error: "db_error" }); return; }
+  catch (err) { req.log.error({ err }, "slack reaction DB error"); res.status(500).json({ error: "db_error" }); return; }
   if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
   try {
-    const r = await fetch("https://slack.com/api/chat.postMessage", {
+    const r = await fetch("https://slack.com/api/reactions.add", {
       method:  "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body:    JSON.stringify({ channel: channelId, text }),
+      body:    JSON.stringify({ channel: channelId, timestamp: ts, name }),
     });
-    const result = (await r.json()) as { ok: boolean; error?: string; ts?: string };
+    const result = (await r.json()) as { ok: boolean; error?: string };
 
     if (!result.ok) {
       req.log.warn({ error: result.error, channelId }, "slack chat.postMessage failed");
       if (isTokenExpiredError(result.error)) {
         res.status(401).json({ ok: false, error: "token_expired", message: "Slack token is no longer valid. Please reconnect." });
+        return;
+      }
+      if (isMissingScopeError(result.error)) {
+        res.status(403).json({ ok: false, error: "missing_scope", needed: parseMissingScopes(result as unknown as Record<string, unknown>) });
         return;
       }
       res.status(502).json({ ok: false, error: result.error ?? "slack_api_error" });
@@ -753,19 +781,21 @@ router.get("/slack/users/:userId/presence", requireSlackAuth, async (req, res) =
   }
 
   try {
-    const r = await slackUserGet(token, "users.getPresence", { user: userId });
+    const r = await fetch("https://slack.com/api/reactions.add", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({ channel: channelId, timestamp: ts, name }),
+    });
+
     if (r["ok"] !== true) {
-      const slackErr = String(r["error"] ?? "slack_api_error");
-      // missing_scope means the stored token was authorised before users:read
-      // was added to the scope list — tell the client to prompt a reconnect so
-      // the user re-authorises with the full scope set.
-      if (slackErr === "missing_scope") {
-        res.status(403).json({ error: "missing_scope" }); return;
-      }
+      const slackErr = r["error"];
       if (isTokenExpiredError(slackErr)) {
         res.status(401).json({ error: "token_expired" }); return;
       }
-      res.status(502).json({ error: slackErr }); return;
+      if (isMissingScopeError(slackErr)) {
+        res.status(403).json({ error: "missing_scope", needed: parseMissingScopes(r) }); return;
+      }
+      res.status(502).json({ error: String(slackErr ?? "slack_api_error") }); return;
     }
     const presence = String(r["presence"] ?? "away");
     presenceCache.set(cacheKey, { presence, fetchedAt: Date.now() });
@@ -787,18 +817,25 @@ router.get("/slack/search", requireSlackAuth, async (req, res) => {
 
   let token: string | null;
   try { token = await getTokenForUser(email); }
-  catch (err) { req.log.error({ err }, "slack search DB error"); res.status(500).json({ error: "db_error" }); return; }
+  catch (err) { req.log.error({ err }, "slack reaction DB error"); res.status(500).json({ error: "db_error" }); return; }
   if (!token) { res.status(403).json({ error: "not_connected" }); return; }
 
   try {
-    const r = await slackUserGet(token, "search.messages", { query, count: "20" });
+    const r = await fetch("https://slack.com/api/reactions.add", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({ channel: channelId, timestamp: ts, name }),
+    });
 
     if (r["ok"] !== true) {
-      const slackErr = String(r["error"] ?? "slack_api_error");
+      const slackErr = r["error"];
       if (isTokenExpiredError(slackErr)) {
         res.status(401).json({ error: "token_expired" }); return;
       }
-      res.status(502).json({ error: slackErr }); return;
+      if (isMissingScopeError(slackErr)) {
+        res.status(403).json({ error: "missing_scope", needed: parseMissingScopes(r) }); return;
+      }
+      res.status(502).json({ error: String(slackErr ?? "slack_api_error") }); return;
     }
 
     // Slack returns results under messages.matches
@@ -854,6 +891,9 @@ router.post("/slack/conversations/:channelId/messages/:ts/reactions", requireSla
       if (isTokenExpiredError(result.error)) {
         res.status(401).json({ ok: false, error: "token_expired" }); return;
       }
+      if (isMissingScopeError(result.error)) {
+        res.status(403).json({ ok: false, error: "missing_scope", needed: parseMissingScopes(result as unknown as Record<string, unknown>) }); return;
+      }
       res.status(502).json({ ok: false, error: result.error ?? "slack_api_error" }); return;
     }
 
@@ -864,4 +904,17 @@ router.post("/slack/conversations/:channelId/messages/:ts/reactions", requireSla
   }
 });
 
+
 export default router;
+
+/**
+ * Parse the `needed` field from a Slack missing_scope response body.
+ * Slack returns it as a comma-separated string (e.g. "search:read,users:read").
+ * Returns an array of scope strings, or an empty array if unavailable.
+ */
+function parseMissingScopes(body: Record<string, unknown>): string[] {
+  const raw = body["needed"];
+  if (typeof raw === "string") return raw.split(",").map(s => s.trim()).filter(Boolean);
+  if (Array.isArray(raw)) return (raw as unknown[]).map(String);
+  return [];
+}

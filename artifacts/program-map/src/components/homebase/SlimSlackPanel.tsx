@@ -120,26 +120,38 @@ function SlackIcon({ size = 20, muted = false }: { size?: number; muted?: boolea
 const BASE = (import.meta.env.BASE_URL as string).replace(/\/$/, "");
 
 /**
- * Typed fetch error that carries the HTTP status and the server-side error
- * code parsed from the JSON body (when available).  Callers can inspect
- * `err.code === "token_expired"` to show targeted reconnect prompts instead
- * of generic error strings.
+ * Typed fetch error that carries the HTTP status, the server-side error code,
+ * and — for `missing_scope` errors — the list of scopes the token is missing.
+ * Callers can inspect `err.code === "token_expired"` or
+ * `err.code === "missing_scope"` to show targeted reconnect prompts.
  */
 class ApiError extends Error {
-  constructor(public readonly status: number, public readonly code: string | null) {
+  constructor(
+    public readonly status: number,
+    public readonly code: string | null,
+    public readonly needed?: string[],
+  ) {
     super(`HTTP ${status}${code ? ` (${code})` : ""}`);
   }
 }
 
+/** Parse a `needed` field from a Slack error body into a string array. */
+function parseNeeded(body: { needed?: string | string[] }): string[] | undefined {
+  if (!body.needed) return undefined;
+  if (Array.isArray(body.needed)) return body.needed as string[];
+  return String(body.needed).split(",").map(s => s.trim()).filter(Boolean);
+}
 async function apiGet<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { credentials: "include" });
   if (!res.ok) {
     let code: string | null = null;
+    let needed: string[] | undefined;
     try {
-      const body = await res.clone().json() as { error?: string };
-      code = body.error ?? null;
+      const body = await res.clone().json() as { error?: string; needed?: string | string[] };
+      code   = body.error ?? null;
+      needed = parseNeeded(body);
     } catch { /* ignore parse failure */ }
-    throw new ApiError(res.status, code);
+    throw new ApiError(res.status, code, needed);
   }
   return res.json() as Promise<T>;
 }
@@ -161,11 +173,13 @@ async function apiPost<T>(path: string, body: unknown): Promise<T> {
   });
   if (!res.ok) {
     let code: string | null = null;
+    let needed: string[] | undefined;
     try {
-      const b = await res.clone().json() as { error?: string };
-      code = b.error ?? null;
+      const b = await res.clone().json() as { error?: string; needed?: string | string[] };
+      code   = b.error ?? null;
+      needed = parseNeeded(b);
     } catch { /* ignore */ }
-    throw new ApiError(res.status, code);
+    throw new ApiError(res.status, code, needed);
   }
   return res.json() as Promise<T>;
 }
@@ -176,10 +190,13 @@ function MessageBubble({
   msg,
   channelId,
   onReacted,
+  onMissingScope,
 }: {
-  msg:       Message;
-  channelId: string | null;
-  onReacted: () => void;
+  msg:            Message;
+  channelId:      string | null;
+  onReacted:      () => void;
+  /** Called with a retry thunk when reactions.add fails with missing_scope. */
+  onMissingScope?: (retry: () => void) => void;
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [reacting,   setReacting]   = useState(false);
@@ -198,9 +215,16 @@ function MessageBubble({
     try {
       await apiPost(`/api/slack/conversations/${channelId}/messages/${msg.ts}/reactions`, { name: emojiName });
       onReacted();
-    } catch { /* ignore — already_reacted is silent */ }
+    } catch (err) {
+      if (err instanceof ApiError && err.code === "missing_scope") {
+        // Pass a retry thunk so the reaction fires automatically after reconnect
+        onMissingScope?.(() => void handleReact(emojiName));
+        return;
+      }
+      // "already_reacted" and other errors are silently ignored — idempotent
+    }
     finally { setReacting(false); }
-  }, [channelId, msg.ts, reacting, onReacted]);
+  }, [channelId, msg.ts, reacting, onReacted, onMissingScope]);
 
   return (
     <div className="flex flex-col gap-0.5 group relative">
@@ -413,8 +437,58 @@ function TokenExpiredView({
   );
 }
 
-// ── Unconnected state ─────────────────────────────────────────────────────────
+/**
+ * Subtle inline banner shown when the stored token lacks one or more OAuth
+ * scopes required by a new feature (e.g. search:read, users:read,
+ * reactions:write).  Distinct from TokenExpiredView — the connection itself is
+ * still valid; only new permissions are needed.
+ *
+ * Clicking "Reconnect" opens the same OAuth popup as the initial connect flow.
+ * When the popup closes the caller's `onReconnected` fires so the failing
+ * feature can retry automatically.
+ */
+function MissingScopeNotice({
+  returnPath,
+  onReconnected,
+}: {
+  returnPath:   string;
+  onReconnected: () => void;
+}) {
+  const authorizeUrl = `${BASE}/api/slack/oauth/authorize?return=${encodeURIComponent(returnPath)}`;
 
+  const handleReconnect = useCallback(() => {
+    const popup = window.open(
+      authorizeUrl,
+      "slack-oauth",
+      "width=620,height=720,scrollbars=yes,resizable=yes",
+    );
+    if (!popup) {
+      window.open(authorizeUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    const timer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(timer);
+        onReconnected();
+      }
+    }, 600);
+  }, [authorizeUrl, onReconnected]);
+
+  return (
+    <div className="flex-shrink-0 flex items-center gap-2 px-3 py-2 bg-amber-50 border-b border-amber-200 text-[11px]">
+      <AlertCircle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+      <span className="flex-1 text-amber-800 leading-snug">
+        Some features need updated permissions.
+      </span>
+      <button
+        onClick={handleReconnect}
+        className="flex-shrink-0 text-amber-700 underline underline-offset-2 hover:text-amber-900 font-medium transition-colors"
+      >
+        Reconnect
+      </button>
+    </div>
+  );
+}
 function UnconnectedView({
   returnPath,
   onConnected,
@@ -521,11 +595,13 @@ function SearchResultRow({
 
 function ConnectedView({
   teamName,
+  returnPath,
   onDisconnect,
   onTokenExpired,
   expanded,
 }: {
   teamName:       string | null;
+  returnPath:     string;
   onDisconnect:   () => void;
   onTokenExpired: () => void;
   expanded:       boolean;
@@ -553,10 +629,29 @@ function ConnectedView({
   const [searchResults,  setSearchResults]  = useState<SearchResult[]>([]);
   const [searchLoading,  setSearchLoading]  = useState(false);
 
-  const messagesEndRef   = useRef<HTMLDivElement>(null);
-  const pollRef          = useRef<ReturnType<typeof setInterval> | null>(null);
-  const presencePollRef  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const searchInputRef   = useRef<HTMLInputElement>(null);
+  // ── Missing-scope notice ──────────────────────────────────────────────────
+  // When any API call fails with missing_scope we show an inline banner.
+  // `retryAfterReconnect` is the action to replay once the user re-auths.
+  const [missingScope,    setMissingScope]   = useState(false);
+  const retryAfterReconnectRef = useRef<(() => void) | null>(null);
+
+  /** Call this whenever a Slack API returns missing_scope. */
+  const handleMissingScope = useCallback((retry?: () => void) => {
+    retryAfterReconnectRef.current = retry ?? null;
+    setMissingScope(true);
+  }, []);
+
+  /** Called when the OAuth popup closes after a reconnect attempt. */
+  const handleReconnected = useCallback(() => {
+    setMissingScope(false);
+    retryAfterReconnectRef.current?.();
+    retryAfterReconnectRef.current = null;
+  }, []);
+
+  const messagesEndRef  = useRef<HTMLDivElement>(null);
+  const pollRef         = useRef<ReturnType<typeof setInterval> | null>(null);
+  const presencePollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const searchInputRef  = useRef<HTMLInputElement>(null);
 
   // Load conversation list on mount
   useEffect(() => {
@@ -577,6 +672,7 @@ function ConnectedView({
       .catch((err: unknown) => {
         if (cancelled) return;
         if (err instanceof ApiError && err.code === "token_expired") { onTokenExpired(); return; }
+        if (err instanceof ApiError && err.code === "missing_scope") { handleMissingScope(); return; }
         setConvError("Could not load conversations.");
       })
       .finally(() => { if (!cancelled) setConvLoading(false); });
@@ -585,9 +681,8 @@ function ConnectedView({
   }, [expanded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch presence for all DM partners and merge into presenceMap.
-  // If any request comes back with missing_scope or token_expired the stored
-  // token pre-dates users:read being in the scope list — trigger the reconnect
-  // banner so the user re-authorises with the full scope set.
+  // missing_scope means the stored token pre-dates users:read — show the
+  // reconnect banner. token_expired triggers the full re-auth flow.
   const fetchPresence = useCallback((convList: Conversation[]) => {
     const dmConvs = convList.filter(c => c.type === "im" && c.userId);
     if (dmConvs.length === 0) return;
@@ -598,27 +693,29 @@ function ConnectedView({
           .then(({ presence }) => ({ userId: c.userId!, presence })),
       ),
     ).then(results => {
-      const needsReconnect = results.some(
-        r =>
-          r.status === "rejected" &&
-          r.reason instanceof ApiError &&
-          (r.reason.code === "missing_scope" || r.reason.code === "token_expired"),
-      );
-      if (needsReconnect) { onTokenExpired(); return; }
+      let sawMissingScope = false;
+      let sawTokenExpired = false;
 
       setPresenceMap(prev => {
         const next = new Map(prev);
         for (const r of results) {
           if (r.status === "fulfilled") {
             next.set(r.value.userId, r.value.presence === "active" ? "active" : "away");
+          } else if (r.reason instanceof ApiError) {
+            if (r.reason.code === "missing_scope") sawMissingScope = true;
+            if (r.reason.code === "token_expired")  sawTokenExpired = true;
           }
         }
         return next;
       });
-    });
-  }, [onTokenExpired]);
 
-  // Initial presence fetch when conversations load; then re-poll every 2 minutes
+      // Fire side-effects outside of the state updater
+      if (sawTokenExpired) { onTokenExpired(); return; }
+      if (sawMissingScope) handleMissingScope();
+    });
+  }, [onTokenExpired, handleMissingScope]);
+
+  // Initial presence fetch when conversations load; re-poll every 2 minutes
   // while the panel is expanded. The interval is cleared on collapse or unmount.
   useEffect(() => {
     if (!expanded || conversations.length === 0) return;
@@ -644,13 +741,23 @@ function ConnectedView({
     if (!q || q.length < 2) { setSearchResults([]); setSearchLoading(false); return; }
     setSearchLoading(true);
     const timer = setTimeout(() => {
-      apiGet<{ results: SearchResult[] }>(`/api/slack/search?q=${encodeURIComponent(q)}`)
+      const doSearch = () =>
+        apiGet<{ results: SearchResult[] }>(`/api/slack/search?q=${encodeURIComponent(q)}`);
+      doSearch()
         .then(data => setSearchResults(data.results))
-        .catch(() => setSearchResults([]))
+        .catch((err: unknown) => {
+          if (err instanceof ApiError && err.code === "missing_scope") {
+            handleMissingScope(() => {
+              // After reconnect, re-run the search automatically
+              doSearch().then(d => setSearchResults(d.results)).catch(() => setSearchResults([]));
+            });
+          }
+          setSearchResults([]);
+        })
         .finally(() => setSearchLoading(false));
     }, 400);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, handleMissingScope]);
 
   // Auto-focus search input when opened
   useEffect(() => {
@@ -668,11 +775,15 @@ function ConnectedView({
       setMessages([...data.messages].reverse());
     } catch (err: unknown) {
       if (err instanceof ApiError && err.code === "token_expired") { onTokenExpired(); return; }
+      if (err instanceof ApiError && err.code === "missing_scope") {
+        handleMissingScope(() => void fetchMessages(convId, silent));
+        return;
+      }
       setMsgError("Could not load messages.");
     } finally {
       setMsgLoading(false);
     }
-  }, [onTokenExpired]);
+  }, [onTokenExpired, handleMissingScope]);
 
   useEffect(() => {
     if (!selectedConv || !expanded) return;
@@ -697,11 +808,17 @@ function ConnectedView({
       if (err instanceof ApiError && err.code === "token_expired") {
         setComposeText(text); onTokenExpired(); return;
       }
+      if (err instanceof ApiError && err.code === "missing_scope") {
+        setComposeText(text);
+        // Retry sends the message automatically after reconnect — text is already restored
+        handleMissingScope(() => void handleSend());
+        return;
+      }
       setComposeText(text);
     } finally {
       setSending(false);
     }
-  }, [composeText, selectedConv, sending, fetchMessages, onTokenExpired]);
+  }, [composeText, selectedConv, sending, fetchMessages, onTokenExpired, handleMissingScope]);
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void handleSend(); }
@@ -721,6 +838,14 @@ function ConnectedView({
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
+
+      {/* ── Missing-scope inline notice ── */}
+      {missingScope && (
+        <MissingScopeNotice
+          returnPath={returnPath}
+          onReconnected={handleReconnected}
+        />
+      )}
 
       {/* ── Header ── */}
       <div className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 border-b border-border bg-white">
@@ -871,6 +996,7 @@ function ConnectedView({
                   msg={msg}
                   channelId={selectedConv.id}
                   onReacted={() => void fetchMessages(selectedConv.id, true)}
+                  onMissingScope={handleMissingScope}
                 />
               ))
             )}
@@ -1013,6 +1139,7 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
             ) : (
               <ConnectedView
                 teamName={status.teamName}
+                returnPath={returnPath}
                 onDisconnect={() => setStatus({ state: "unconnected" })}
                 onTokenExpired={() => setStatus({ state: "token_expired" })}
                 expanded={open}
