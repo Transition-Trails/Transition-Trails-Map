@@ -386,7 +386,15 @@ interface CanvasItem {
 
 // ── Unreads section ───────────────────────────────────────────────────────────
 
-function UnreadsSection({ items, loading }: { items: UnreadItem[]; loading: boolean }) {
+function UnreadsSection({
+  items,
+  loading,
+  viewedDmIds,
+}: {
+  items:       UnreadItem[];
+  loading:     boolean;
+  viewedDmIds: Set<string>;
+}) {
   const [open, setOpen] = useState(() => {
     try { const s = localStorage.getItem("slack-panel:unreads-open"); return s === null ? true : s === "true"; } catch { return true; }
   });
@@ -396,7 +404,12 @@ function UnreadsSection({ items, loading }: { items: UnreadItem[]; loading: bool
     return next;
   });
 
-  if (!loading && items.length === 0) return null;
+  // Optimistically hide any DM/MPIM the user has already opened this session
+  const visibleItems = items.filter(
+    item => !(item.type === "im" || item.type === "mpim") || !viewedDmIds.has(item.id),
+  );
+
+  if (!loading && visibleItems.length === 0) return null;
 
   return (
     <div className="mb-0.5">
@@ -410,12 +423,12 @@ function UnreadsSection({ items, loading }: { items: UnreadItem[]; loading: bool
         </span>
         {loading
           ? <Loader2 className="w-2.5 h-2.5 animate-spin text-muted-foreground/40 flex-shrink-0" />
-          : <span className="text-[10px] text-muted-foreground/40">{items.length}</span>
+          : <span className="text-[10px] text-muted-foreground/40">{visibleItems.length}</span>
         }
       </button>
       {open && !loading && (
         <div className="pl-1 pr-1 pb-0.5 flex flex-col gap-0.5">
-          {items.map(item => (
+          {visibleItems.map(item => (
             <a
               key={item.id}
               href={`https://slack.com/app_redirect?channel=${item.id}`}
@@ -1307,7 +1320,7 @@ function ConnectedView({
             style={{ maxHeight: "55%" }}
           >
             {/* Unreads, Threads, Canvases — independent, non-blocking */}
-            <UnreadsSection items={unreads} loading={unreadsLoading} />
+            <UnreadsSection items={unreads} loading={unreadsLoading} viewedDmIds={viewedDmIds} />
             <ThreadsSection items={threads} loading={threadsLoading} />
             <CanvasesSection items={canvases} loading={canvasesLoading} />
 
