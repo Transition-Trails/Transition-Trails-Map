@@ -25,11 +25,19 @@ const FATHOM_API = "https://api.fathom.ai/external/v1";
 
 // ── Per-user meeting cache (60 s TTL) ─────────────────────────────────────────
 
+interface FathomActionItem {
+  description: string;
+  completed: boolean;
+  assigneeName: string | null;
+}
+
 interface FathomMeeting {
   id: string;
   title: string;
   started_at: string;   // ISO-8601
   share_url: string;
+  summary: string | null;
+  action_items: FathomActionItem[];
 }
 
 interface CacheEntry {
@@ -38,6 +46,101 @@ interface CacheEntry {
 }
 
 const meetingsCache = new Map<string, CacheEntry>();
+
+// ── Meeting normaliser (exported for unit tests) ──────────────────────────────
+
+/**
+ * Normalise a single raw meeting object from any Fathom list-response shape
+ * into the canonical FathomMeeting record.
+ *
+ * Field-path fallbacks are intentionally wide because Fathom's external API
+ * evolves and the field names differ slightly between API versions.
+ */
+export function normalizeMeeting(raw: unknown, idx: number): FathomMeeting {
+  const item = (raw ?? {}) as Record<string, unknown>;
+
+  // ── Identity fields ────────────────────────────────────────────────────────
+  const rawId = item["id"] ?? item["uuid"] ?? item["call_id"] ?? "";
+  const started_at = String(
+    item["started_at"] ?? item["created_at"] ?? item["date"] ?? "",
+  );
+  // title can collide with the string "summary" field — prefer explicit title/name
+  const title = String(
+    item["title"] ?? item["name"] ?? item["call_name"] ?? "Untitled meeting",
+  );
+  const id = rawId
+    ? String(rawId)
+    : `fathom-${idx}-${started_at || title.slice(0, 20)}`;
+  const share_url = String(
+    item["share_url"] ?? item["url"] ?? item["link"] ?? item["recording_url"] ?? "",
+  );
+
+  // ── AI Summary ────────────────────────────────────────────────────────────
+  // Fathom may return the summary as:
+  //   • item.default_summary.markdown_formatted   (v1 shape)
+  //   • item.summary  (string)
+  //   • item.ai_summary (string)
+  //   • item.default_summary.text (fallback)
+  let summary: string | null = null;
+
+  const defaultSummary = item["default_summary"];
+  if (defaultSummary && typeof defaultSummary === "object") {
+    const ds = defaultSummary as Record<string, unknown>;
+    const candidate =
+      (typeof ds["markdown_formatted"] === "string" ? ds["markdown_formatted"] : null) ??
+      (typeof ds["text"]               === "string" ? ds["text"]               : null) ??
+      (typeof ds["content"]            === "string" ? ds["content"]            : null);
+    if (candidate && candidate.trim()) summary = candidate.trim();
+  }
+
+  if (!summary) {
+    const topLevel =
+      (typeof item["summary"]    === "string" ? item["summary"]    : null) ??
+      (typeof item["ai_summary"] === "string" ? item["ai_summary"] : null);
+    if (topLevel && topLevel.trim()) summary = topLevel.trim();
+  }
+
+  // ── Action items ──────────────────────────────────────────────────────────
+  // Fathom may return action items as:
+  //   • item.action_items  (array)
+  //   • item.tasks         (array — alternate naming)
+  // Each item may have:
+  //   • description / text / content
+  //   • completed / is_completed / done
+  //   • assignee.name / assignee_name / owner
+  const rawItems =
+    (Array.isArray(item["action_items"]) ? item["action_items"] :
+     Array.isArray(item["tasks"])        ? item["tasks"]        : []) as unknown[];
+
+  const action_items: FathomActionItem[] = rawItems.map((ai: unknown) => {
+    const a = (ai ?? {}) as Record<string, unknown>;
+
+    const description = String(
+      a["description"] ?? a["text"] ?? a["content"] ?? a["title"] ?? "",
+    );
+
+    const completed = Boolean(
+      a["completed"] ?? a["is_completed"] ?? a["done"] ?? false,
+    );
+
+    // assignee can be an object { name } or a plain string
+    let assigneeName: string | null = null;
+    const assigneeField = a["assignee"] ?? a["assigned_to"] ?? a["owner"];
+    if (typeof assigneeField === "string" && assigneeField.trim()) {
+      assigneeName = assigneeField.trim();
+    } else if (assigneeField && typeof assigneeField === "object") {
+      const ao = assigneeField as Record<string, unknown>;
+      const n = ao["name"] ?? ao["full_name"] ?? ao["display_name"];
+      if (typeof n === "string" && n.trim()) assigneeName = n.trim();
+    } else if (typeof a["assignee_name"] === "string" && (a["assignee_name"] as string).trim()) {
+      assigneeName = (a["assignee_name"] as string).trim();
+    }
+
+    return { description, completed, assigneeName };
+  });
+
+  return { id, title, started_at, share_url, summary, action_items };
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -189,29 +292,19 @@ router.get("/fathom/meetings", async (req, res) => {
   }
 
   try {
-    const data = await fathomGet(apiKey, "/meetings", { page_size: "10" }) as {
-      data?: FathomMeeting[];
-      items?: FathomMeeting[];  // handle alternate response shapes
+    const data = await fathomGet(apiKey, "/meetings", {
+      page_size:           "10",
+      include_summary:     "true",
+      include_action_items: "true",
+    }) as {
+      data?: unknown[];
+      items?: unknown[];  // handle alternate response shapes
     };
 
     // Fathom may return { data: [...] } or { items: [...] } — handle both
     const raw: unknown[] = data.data ?? data.items ?? (Array.isArray(data) ? data as unknown[] : []);
 
-    const meetings: FathomMeeting[] = raw.map((m: unknown, idx: number) => {
-      const item       = m as Record<string, unknown>;
-      const title      = String(item["title"] ?? item["name"] ?? item["summary"] ?? "Untitled meeting");
-      const started_at = String(item["started_at"] ?? item["created_at"] ?? item["date"] ?? "");
-      // Use the API-provided id when present; fall back to a stable composite key
-      // so React never receives duplicate or empty key props.
-      const rawId = item["id"] ?? item["uuid"] ?? item["call_id"] ?? "";
-      const id    = rawId ? String(rawId) : `fathom-${idx}-${started_at || title.slice(0, 20)}`;
-      return {
-        id,
-        title,
-        started_at,
-        share_url: String(item["share_url"] ?? item["url"] ?? item["link"] ?? ""),
-      };
-    });
+    const meetings: FathomMeeting[] = raw.map(normalizeMeeting);
 
     // Sort newest first
     meetings.sort((a, b) => b.started_at.localeCompare(a.started_at));
