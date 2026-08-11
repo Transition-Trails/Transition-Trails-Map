@@ -1490,7 +1490,7 @@ type CanvasState =
   | { status: "unsupported" }              // paid plan required
   | { status: "missing_scope" };           // token lacks canvases:read — needs re-auth
 
-function CanvasView({
+export function CanvasView({
   channelId,
   onTokenExpired,
 }: {

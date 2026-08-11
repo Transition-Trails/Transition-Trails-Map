@@ -1496,7 +1496,6 @@ router.get("/sf/tasks", async (req, res) => {
   }
 
   try {
-    // OwnerId matches the current user; also catch today-scoped if ?date=today
     const dateParam = req.query["date"] as string | undefined;
     let dateFilter = "";
     if (dateParam === "today") {
@@ -1504,24 +1503,21 @@ router.get("/sf/tasks", async (req, res) => {
       dateFilter = ` AND ActivityDate = ${today}`;
     }
 
-    const soql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE OwnerId = '${req.session.sfUserId ?? "ME"}' AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
+    // Always scope to the authenticated user's own Tasks using the session SF
+    // user ID.  Omitting OwnerId would expose colleagues' Task subjects and
+    // descriptions to any authenticated user depending on the org's sharing rules.
+    const sfUserId = req.session.sfUserId ?? "";
+    if (!sfUserId) {
+      return res.status(401).json({ error: "Salesforce user ID not found in session." });
+    }
 
-    // Use session userId if available, otherwise use SOQL CurrentUser binding
-    const whoSoql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE OwnerId IN (SELECT Id FROM User WHERE Username = '${req.session.sfUsername ?? "__NONE__"}') AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
+    const soql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE IsDeleted = false AND OwnerId = '${sfUserId}' AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
 
-    // Try with "ME" keyword first (works when token is user-scoped)
-    const meSoql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE IsDeleted = false AND OwnerId = '${req.session.sfUserId ?? ""}' AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
-
-    // Simpler: just fetch tasks where IsClosed matches
-    const simpleSoql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE IsDeleted = false AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
-
-    // We use the simpleSoql and rely on SF's implicit "current user" for tasks in personal objects
-    // For production: Task in SOQL already scopes to the running user's visible records by sharing
     const result = await client.query<{
       Id: string; Subject: string | null; Description: string | null;
       ActivityDate: string | null; Priority: string | null; Status: string | null;
       CreatedDate: string | null;
-    }>(simpleSoql);
+    }>(soql);
 
     return res.json({ tasks: result.records, total: result.totalSize });
   } catch (e: unknown) {
@@ -1588,7 +1584,24 @@ router.patch("/sf/tasks/:id/complete", async (req, res) => {
     return res.status(400).json({ error: "Invalid Task ID." });
   }
 
+  const sfUserId = req.session.sfUserId ?? "";
+  if (!sfUserId) {
+    return res.status(401).json({ error: "Salesforce user ID not found in session." });
+  }
+
   try {
+    // Verify the Task exists AND is owned by the current user before mutating.
+    // Without this check any authenticated user could complete a colleague's task
+    // if org sharing rules make it visible (IDOR).
+    const owned = await client.query<{ Id: string }>(
+      `SELECT Id FROM Task WHERE Id = '${id}' AND OwnerId = '${sfUserId}' AND IsDeleted = false LIMIT 1`,
+    );
+    if (owned.records.length === 0) {
+      // Return 404 — do not distinguish "not found" from "not yours" to avoid
+      // leaking the existence of another user's Task.
+      return res.status(404).json({ error: "Task not found." });
+    }
+
     await client.updateRecord("Task", id, { Status: "Completed" });
     return res.json({ success: true });
   } catch (e: unknown) {

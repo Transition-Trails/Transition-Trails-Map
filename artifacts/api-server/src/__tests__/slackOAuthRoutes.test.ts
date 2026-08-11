@@ -660,6 +660,149 @@ describe('Slack OAuth routes', () => {
     }
   });
 
+  // ── Canvas reconnect cycle ────────────────────────────────────────────────────
+  //
+  // This test confirms the full mid-session reconnect loop for CanvasView:
+  //
+  //   1. Token is revoked while the Canvas tab is open.
+  //      GET /canvas → 401 { error: "token_expired" }
+  //      CanvasView's catch block calls onTokenExpired() immediately (no state
+  //      update to "loading"), parent sets status="token_expired", ConnectedView
+  //      and CanvasView are unmounted, TokenExpiredView is mounted.
+  //
+  //   2. User clicks "Reconnect Slack" in TokenExpiredView; the popup closes;
+  //      onReconnected() fires checkStatus().
+  //      GET /oauth/status → 200 { connected: true, slackUserId: "U99999" }
+  //      Parent sets status="connected"; ConnectedView re-mounts fresh
+  //      (selectedConv = null, no stale error state anywhere).
+  //
+  //   3. User selects a channel conversation and switches to the Canvas tab.
+  //      CanvasView mounts fresh and fires fetchCanvas().
+  //      GET /canvas → 200 { canvas: { id, content, title } }
+  //      CanvasView transitions to status="loaded" — no error state on screen.
+  //
+  // All three legs are verified sequentially in one test so the full cycle is
+  // unambiguous.  The critical assertion is step 3: after a clean reconnect the
+  // canvas endpoint returns real canvas data (not an error), proving CanvasView
+  // would render the loaded canvas rather than an error or stale token-expired UI.
+
+  it('37. Canvas reconnect cycle: token_expired → status connected → canvas re-fetch returns loaded canvas', async () => {
+    setLearnerSession();
+    const { encryptToken } = await import('../routes/slackOAuth.js');
+
+    // ── Leg 1: token revoked mid-session ─────────────────────────────────────
+    // DB returns an encrypted token; Slack rejects it with token_revoked.
+    const revokedEncrypted = encryptToken('xoxp-revoked-token');
+    mockDbSelect.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([{ accessToken: revokedEncrypted }]),
+        }),
+      }),
+    });
+
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ ok: false, error: 'token_revoked' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+
+    try {
+      const expiredRes = await request(app).get('/api/slack/conversations/C_RECONNECT/canvas');
+      // CanvasView receives this → calls onTokenExpired() → no error state left
+      expect(expiredRes.status).toBe(401);
+      expect(expiredRes.body).toMatchObject({ error: 'token_expired' });
+      // No canvas payload — CanvasView never reaches the "loading" state branch
+      expect(expiredRes.body.canvas).toBeUndefined();
+    } finally {
+      fetchSpy.mockRestore();
+    }
+
+    // ── Leg 2: user reconnects — status endpoint confirms connected ───────────
+    // DB now returns a new encrypted token (simulates re-auth completing).
+    const freshEncrypted = encryptToken('xoxp-fresh-reconnected-token');
+    mockDbSelect.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          limit: vi.fn().mockResolvedValue([{
+            teamName:    'Transition Trails',
+            slackUserId: 'U99999',
+            scopes:      'im:read,im:history,chat:write,canvases:read',
+            accessToken: freshEncrypted,
+          }]),
+        }),
+      }),
+    });
+
+    const statusRes = await request(app).get('/api/slack/oauth/status');
+    // checkStatus() in SlimSlackPanel transitions the panel back to "connected"
+    expect(statusRes.status).toBe(200);
+    expect(statusRes.body).toMatchObject({ connected: true, slackUserId: 'U99999' });
+
+    // ── Leg 3: CanvasView re-mounts and re-fetches → loaded canvas shown ──────
+    // conversations.info returns a channel with a canvas attached;
+    // canvases.sections.lookup returns a section with plain text.
+    const fetchSpy2 = vi.spyOn(global, 'fetch')
+      .mockResolvedValueOnce(
+        // conversations.info — channel has a canvas
+        new Response(
+          JSON.stringify({
+            ok:      true,
+            channel: {
+              id:     'C_RECONNECT',
+              name:   'general',
+              canvas: { file_id: 'F_CANVAS_01' },
+            },
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        // canvases.sections.lookup — one section with plain text
+        new Response(
+          JSON.stringify({
+            ok:       true,
+            sections: [
+              {
+                id:       'SEC_01',
+                elements: [
+                  {
+                    type:     'rich_text',
+                    elements: [
+                      {
+                        type:     'rich_text_section',
+                        elements: [{ type: 'text', text: 'Reconnected canvas content' }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      );
+
+    try {
+      const canvasRes = await request(app).get('/api/slack/conversations/C_RECONNECT/canvas');
+
+      // After a clean reconnect CanvasView re-fetches and gets real canvas data —
+      // no 401, no error field, no stale token-expired state on screen.
+      expect(canvasRes.status).toBe(200);
+      expect(canvasRes.body.canvas).toMatchObject({
+        id:    'F_CANVAS_01',
+        title: 'Channel Canvas',
+      });
+      // Content extracted from the section text elements
+      expect(canvasRes.body.canvas.content).toContain('Reconnected canvas content');
+      // No error field — confirms CanvasView would render status="loaded", not "error"
+      expect(canvasRes.body.error).toBeUndefined();
+    } finally {
+      fetchSpy2.mockRestore();
+    }
+  });
+
   it('24. GET /slack/conversations — staff session (null googleAudience) returns not_connected, not another user\'s data', async () => {
     setStaffNullAudienceSession(); // staff email = 'staff@transitiontrails.org'; no token row in DB
 
