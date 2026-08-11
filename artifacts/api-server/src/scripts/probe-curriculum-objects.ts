@@ -46,7 +46,7 @@ async function main() {
         results.push({ api, label, status: "EXISTS", detail: `${body["totalSize"] ?? 0} records` });
       } else {
         // Salesforce error response — likely INVALID_TYPE (object doesn't exist)
-        const errs  = (body as { errorCode?: string; message?: string }[]);
+        const errs  = (body as unknown as { errorCode?: string; message?: string }[]);
         const code  = Array.isArray(errs) ? (errs[0]?.errorCode ?? "") : "";
         const msg   = Array.isArray(errs) ? (errs[0]?.message  ?? "") : JSON.stringify(body).slice(0, 120);
         results.push({ api, label, status: `NOT_FOUND (${res.status})`, detail: `${code}: ${msg}`.slice(0, 120) });

@@ -65,13 +65,14 @@ vi.mock('@workspace/db', () => ({
   pool: { query: vi.fn().mockResolvedValue({ rows: [] }) },
   db: {
     select: vi.fn(() => ({ from: vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue([]), where: mockWhere })) })),
-    insert: vi.fn(() => ({ values: vi.fn(() => ({ onConflictDoNothing: mockOnConflictDoNothing })) })),
+    insert: vi.fn(() => ({ values: vi.fn(() => ({ onConflictDoNothing: mockOnConflictDoNothing, catch: vi.fn() })) })),
     update: vi.fn(() => ({ set: vi.fn(() => ({ where: mockUpdateWhere })) })),
   },
 }));
 
 vi.mock('@workspace/db/schema', () => ({
   promptTemplatesTable: { id: 'id', data: 'data', createdAt: 'created_at', updatedAt: 'updated_at' },
+  trailOsAuditLogTable: { _: { name: 'trail_os_audit_log' } },
 }));
 
 vi.mock('drizzle-orm', () => ({ eq: vi.fn().mockReturnValue('eq-expr') }));

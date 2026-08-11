@@ -107,7 +107,7 @@ vi.mock('../lib/salesforceOAuth.js', () => ({
 
           return makeResponse(true, 200, {
             name:   objectName,
-            fields: override.map(f => ({ name: f, custom: true })),
+            fields: (override as string[]).map(f => ({ name: f, custom: true })),
           });
         }
 
@@ -220,9 +220,10 @@ describe('getAutomations() — unit tests', () => {
           records:   records as T[],
         };
       },
-      async createRecord() { return { id: 'mock-id' }; },
+      async createRecord() { return { id: 'mock-id', success: true }; },
       async updateRecord() { return undefined; },
       async deleteRecord() { return undefined; },
+      async getRecord<T>() { return {} as T; },
     };
   }
 

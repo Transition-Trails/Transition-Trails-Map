@@ -22,6 +22,7 @@ import {
   type RetrievedChunk,
   type MemoryExchange,
 } from "../lib/pennyPromptAssembler.js";
+import { callLLM, LLM_PROVIDER_MAP } from "../lib/llm/index.js";
 import { DEFAULT_TRAIL_CONFIG } from "../lib/defaultTrailConfig.js";
 import type { SalesforceClient } from "../lib/salesforceClient.js";
 import { logger } from "../lib/logger.js";
@@ -153,8 +154,6 @@ router.post("/penny/ask", async (req, res) => {
   }
 
   // ── Validate inputs ────────────────────────────────────────────────────────
-  // Note: GEMINI_API_KEY is checked inside the Gemini/learner branch below so
-  // that a missing Gemini key never blocks staff (Claude) requests.
   const roleStr = typeof role === 'string' ? role : undefined;
   const validChunks: RetrievedChunk[] = Array.isArray(retrievedChunks)
     ? (retrievedChunks as unknown[]).filter((c): c is RetrievedChunk =>
@@ -166,13 +165,6 @@ router.post("/penny/ask", async (req, res) => {
 
   // ── Fetch Salesforce context (layers 2 + 3) ────────────────────────────────
   let sfClient: SalesforceClient | null = null;
-  try {
-    sfClient = getSalesforceClient(req);
-  } catch {
-    res.json({ records: [], sfConnected: false, error: "Salesforce not connected" });
-    return;
-  }
-
   let sfContactId: string | null = null;
   // isLearnerContact tracks whether sfContactId refers to a learner's Contact
   // (for SF logging decisions) — it is SEPARATE from audience identity, which
@@ -399,215 +391,53 @@ router.post("/penny/ask", async (req, res) => {
     };
   }
 
-  // ─── Branch: Claude for internal/staff ───────────────────────────────────
-  if (audience === 'internal') {
-    const anthropicKey = process.env["ANTHROPIC_API_KEY"];
-    if (!anthropicKey) {
-      logger.error({ audience }, 'ANTHROPIC_API_KEY not configured — staff Penny unavailable');
-      return res.status(503).json({
-        error: "Penny is not available for staff right now — the AI provider is not configured. Contact your system administrator.",
-      });
-    }
-
-    // Anthropic messages API uses 'assistant' role, not 'model'
-    const anthropicMessages = [
-      ...validHistory.map(h => ({
-        role:    h.role === 'model' ? 'assistant' as const : 'user' as const,
-        content: h.text,
-      })),
-      { role: 'user' as const, content: userText },
-    ];
-
-    const claudeModel = "claude-sonnet-4-5";
-
-    try {
-      const claudeResp = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type":    "application/json",
-          "x-api-key":       anthropicKey,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model:      claudeModel,
-          max_tokens: 4096,
-          system:     systemPrompt,
-          messages:   anthropicMessages,
-        }),
-        signal: AbortSignal.timeout(30_000),
-      });
-
-      if (!claudeResp.ok) {
-        // Explicit failure — log with full detail so the issue is visible in
-        // logs immediately. Do NOT fall back to Gemini.
-        const errBody = await claudeResp.json().catch(() => ({})) as { error?: { type?: string; message?: string } };
-        const errType = errBody.error?.type ?? 'unknown';
-        const errMsg  = errBody.error?.message ?? `Anthropic API returned HTTP ${claudeResp.status}`;
-        logger.error(
-          {
-            status:    claudeResp.status,
-            errType,
-            errMsg,
-            audience,
-            userEmail: req.session.sfEmail ?? null,
-          },
-          'Claude API returned non-2xx — returning 503 to staff (no Gemini fallback)'
-        );
-        return res.status(503).json({
-          error:     "Penny is temporarily unavailable for staff. Please try again in a moment.",
-          retryable: true,
-        });
-      }
-
-      const claudeData = await claudeResp.json() as {
-        content?: Array<{ type: string; text?: string }>;
-      };
-      const claudeText = (claudeData.content ?? [])
-        .filter(b => b.type === 'text')
-        .map(b => b.text ?? '')
-        .join('')
-        .trim();
-
-      if (!claudeText) {
-        logger.warn({ audience, userEmail: req.session.sfEmail ?? null }, 'Claude returned empty content — 503 to staff (no Gemini fallback)');
-        return res.status(503).json({
-          error:     "Penny returned an empty response. Please try again.",
-          retryable: true,
-        });
-      }
-
-      const durationMs = Date.now() - start;
-      const { shouldWriteToSf } = persistInteraction(claudeText, claudeModel, durationMs);
-
-      return res.json({
-        reply: claudeText,
-        model: claudeModel,
-        durationMs,
-        layersPresent,
-        contextMeta: buildContextMeta(shouldWriteToSf),
-      });
-    } catch (e: unknown) {
-      const isTimeout = e instanceof Error && e.name === "TimeoutError";
-      // Log with ERROR severity so Anthropic outages appear in log searches.
-      // Do NOT fall back to Gemini.
-      logger.error(
-        {
-          err:       e instanceof Error ? e.message : String(e),
-          isTimeout,
-          audience,
-          userEmail: req.session.sfEmail ?? null,
-        },
-        isTimeout
-          ? 'Claude request timed out after 30s — 503 to staff (no Gemini fallback)'
-          : 'Claude request threw unexpected error — 503 to staff (no Gemini fallback)'
-      );
-      return res.status(503).json({
-        error: isTimeout
-          ? "Penny took too long to respond (30s timeout). Please try again."
-          : "Penny is temporarily unavailable for staff. Please try again in a moment.",
-        retryable: true,
-      });
-    }
-  }
-
-  // ─── Branch: Gemini for learner audience (unchanged) ─────────────────────
-  // Build Gemini-format contents array and call with overload retry logic.
-  // Nothing below this point has been modified from the original implementation.
-  const contents = [
-    ...validHistory.map(h => ({ role: h.role, parts: [{ text: h.text }] })),
-    { role: 'user' as const, parts: [{ text: userText }] },
-  ];
-
-  // ── Call Gemini 2.5 Flash via REST (with overload retries) ──────────────
-  // Verify the Gemini key here — after audience dispatch — so a missing key
-  // never blocks the staff/Claude branch above.
-  const apiKey = process.env["GEMINI_API_KEY"];
-  if (!apiKey) {
-    return res.status(503).json({ error: "Gemini API key not configured. Set GEMINI_API_KEY in Replit Secrets." });
-  }
-
-  const model = "gemini-2.5-flash";
-  const url   = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-
-  const geminiBody = JSON.stringify({
-    system_instruction: { parts: [{ text: systemPrompt }] },
-    contents,
-    generationConfig: {
-      maxOutputTokens: 4096,
-      temperature: 0.7,
-    },
-  });
-
-  /** True when the Gemini response signals a transient overload. */
-  function isOverloaded(status: number, msg: string): boolean {
-    return status === 503 || status === 429 ||
-      /high demand|overload|resource.has.been.exhausted|quota/i.test(msg);
-  }
-
-  const MAX_ATTEMPTS = 3;
-  let lastStatus = 502;
-  let lastErrMsg  = '';
+  // ── Route to correct LLM provider based on audience ─────────────────────
+  const provider = LLM_PROVIDER_MAP[audience];
 
   try {
-    let resp: Response | null = null;
+    const llmResp = await callLLM(provider, {
+      systemPrompt,
+      history: validHistory,
+      userMessage: userText,
+      maxOutputTokens: 4096,
+      temperature: 0.7,
+    });
 
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      if (attempt > 1) {
-        // exponential back-off: 1s → 2s
-        await new Promise(r => setTimeout(r, (attempt - 1) * 1000));
-      }
-      resp = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: geminiBody,
-        signal: AbortSignal.timeout(30_000),
-      });
-
-      if (resp.ok) break;
-
-      const errBody = await resp.json().catch(() => ({})) as { error?: { message?: string } };
-      lastStatus  = resp.status;
-      lastErrMsg  = errBody.error?.message ?? `Gemini API returned HTTP ${resp.status}`;
-
-      if (!isOverloaded(resp.status, lastErrMsg)) break; // non-retryable error
-      // else loop and retry
-      resp = null;
-    }
-
-    if (!resp) {
-      // All attempts hit an overload — return a friendly message
-      return res.status(503).json({
-        error: "Penny is temporarily busy due to high demand. Please try again in a moment.",
-        retryable: true,
-      });
-    }
-
-    if (!resp.ok) {
-      return res.status(502).json({ error: lastErrMsg });
-    }
-
-    const body = await resp.json() as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
-    };
-
-    const text = body.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-    if (!text) {
-      return res.status(502).json({ error: "Penny returned an empty response. Try rephrasing your question." });
-    }
-
-    const durationMs  = Date.now() - start;
+    const { text, model, provider: llmProvider } = llmResp;
+    const durationMs = Date.now() - start;
     const { shouldWriteToSf } = persistInteraction(text, model, durationMs);
 
     return res.json({
       reply: text,
       model,
+      provider: llmProvider,
       durationMs,
       layersPresent,
       contextMeta: buildContextMeta(shouldWriteToSf),
     });
   } catch (e: unknown) {
-    const isTimeout = e instanceof Error && e.name === "TimeoutError";
-    const msg = e instanceof Error ? e.message : String(e);
+    const isNotConfigured = (e as { code?: string }).code === 'NOT_CONFIGURED';
+    const isRetryable     = (e as { retryable?: boolean }).retryable === true;
+    const isTimedOut      = (e as { timedOut?: boolean }).timedOut === true;
+
+    if (isNotConfigured) {
+      return res.status(503).json({
+        error: e instanceof Error ? e.message : "Penny is not available right now.",
+      });
+    }
+    if (isTimedOut) {
+      return res.status(503).json({
+        error: "Penny took too long to respond (30s timeout). Please try again.",
+        retryable: true,
+      });
+    }
+    if (isRetryable) {
+      return res.status(503).json({
+        error: "Penny is temporarily unavailable. Please try again in a moment.",
+        retryable: true,
+      });
+    }
+    const msg = `Penny could not generate a response: ${e instanceof Error ? e.message : String(e)}`;
     return res.status(502).json({ error: msg });
   }
 });

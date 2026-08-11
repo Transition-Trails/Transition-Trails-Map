@@ -177,6 +177,7 @@ interface PreflightReq {
   kind: string;
   status: string;
   detail: string;
+  label?: string;
 }
 
 interface PreflightBody {

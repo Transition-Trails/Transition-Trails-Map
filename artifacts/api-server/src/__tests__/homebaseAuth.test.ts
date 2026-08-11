@@ -68,7 +68,7 @@ vi.mock('@workspace/db', () => ({
   pool: { query: vi.fn().mockResolvedValue({ rows: [] }) },
   db: {
     insert: vi.fn(() => ({
-      values: vi.fn(() => ({ returning: mockInsertReturning })),
+      values: vi.fn(() => ({ returning: mockInsertReturning, catch: vi.fn() })),
     })),
     select: vi.fn(() => ({
       from: vi.fn(() => ({
@@ -87,6 +87,7 @@ vi.mock('@workspace/db/schema', () => ({
     hours:         'hours',
     loggedAt:      'logged_at',
   },
+  trailOsAuditLogTable: { _: { name: 'trail_os_audit_log' } },
 }));
 
 vi.mock('drizzle-orm', () => ({

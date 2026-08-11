@@ -67,7 +67,7 @@ vi.mock("connect-pg-simple", () => ({
 vi.mock("@workspace/db", () => ({
   pool: { query: vi.fn().mockResolvedValue({ rows: [] }) },
   db: {
-    insert: vi.fn(() => ({ values: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([]) })) })),
+    insert: vi.fn(() => ({ values: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([]), catch: vi.fn() })) })),
     select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn(() => ({ orderBy: vi.fn().mockResolvedValue([]) })) })) })),
   },
 }));
@@ -75,6 +75,7 @@ vi.mock("@workspace/db", () => ({
 vi.mock("@workspace/db/schema", () => ({
   timeLogsTable: { id: "id", userEmail: "user_email", audience: "audience", activityLabel: "activity_label", hours: "hours", loggedAt: "logged_at" },
   coachProfilesTable: { userEmail: "user_email", coachLevel: "coach_level", updatedAt: "updated_at" },
+  trailOsAuditLogTable: { _: { name: 'trail_os_audit_log' } },
 }));
 
 vi.mock("drizzle-orm", () => ({

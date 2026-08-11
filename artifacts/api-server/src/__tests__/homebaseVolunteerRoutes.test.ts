@@ -96,7 +96,7 @@ mockWhere.limit.mockReturnValue(mockLimit);
 vi.mock("@workspace/db", () => ({
   pool: { query: vi.fn().mockResolvedValue({ rows: [] }) },
   db: {
-    insert: vi.fn(() => ({ values: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([]) })) })),
+    insert: vi.fn(() => ({ values: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([]), catch: vi.fn() })) })),
     select: vi.fn(() => mockSelectChain),
   },
 }));
@@ -112,6 +112,7 @@ vi.mock("@workspace/db/schema", () => ({
     coordinatorSlackId: "coordinator_slack_id", coordinatorName: "coordinator_name",
     volunteerSlackChannel: "volunteer_slack_channel", updatedAt: "updated_at",
   },
+  trailOsAuditLogTable: { _: { name: 'trail_os_audit_log' } },
 }));
 
 vi.mock("drizzle-orm", () => ({

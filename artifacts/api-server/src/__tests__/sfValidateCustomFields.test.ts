@@ -103,7 +103,7 @@ vi.mock('../lib/salesforceOAuth.js', () => ({
           // Return only the supplied custom fields
           return makeResponse(true, 200, {
             name:   objectName,
-            fields: override.map(f => ({ name: f, custom: true })),
+            fields: (override as string[]).map(f => ({ name: f, custom: true })),
           });
         }
 
