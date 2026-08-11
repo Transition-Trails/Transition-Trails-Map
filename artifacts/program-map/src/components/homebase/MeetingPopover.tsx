@@ -9,7 +9,7 @@
  * border-2 border-primary/25, w-80, side="bottom", align="start".
  */
 
-import { ReactNode } from "react";
+import { ReactNode, Fragment } from "react";
 import {
   Popover,
   PopoverContent,
@@ -71,6 +71,40 @@ function stripMarkdown(md: string): string {
     .trim();
 }
 
+/**
+ * Split text on URLs and return an array of strings + <a> elements so raw
+ * URLs in AI-generated summaries and action items render as clickable links.
+ */
+const URL_RE = /https?:\/\/[^\s)\]'"]+/g;
+
+function linkifyText(text: string): ReactNode[] {
+  const parts: ReactNode[] = [];
+  let last = 0;
+  let match: RegExpExecArray | null;
+  URL_RE.lastIndex = 0;
+  while ((match = URL_RE.exec(text)) !== null) {
+    if (match.index > last) {
+      parts.push(text.slice(last, match.index));
+    }
+    const url = match[0];
+    parts.push(
+      <a
+        key={match.index}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={e => e.stopPropagation()}
+        className="text-primary underline underline-offset-2 hover:text-primary/75 transition-colors break-all"
+      >
+        {url}
+      </a>
+    );
+    last = match.index + url.length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
 function formatDate(iso: string): string {
   if (!iso) return "";
   return new Date(iso).toLocaleDateString("en-US", {
@@ -128,7 +162,9 @@ export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
                   className="text-[12px] text-foreground/80 leading-relaxed break-words"
                   style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
                 >
-                  {para}
+                  {linkifyText(para).map((node, j) => (
+                    <Fragment key={j}>{node}</Fragment>
+                  ))}
                 </p>
               ))}
             </div>
@@ -157,7 +193,9 @@ export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
                     className={`text-[12px] leading-snug break-words ${item.completed ? "line-through text-muted-foreground/60" : "text-foreground/80"}`}
                     style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
                   >
-                    {item.description}
+                    {linkifyText(item.description).map((node, j) => (
+                      <Fragment key={j}>{node}</Fragment>
+                    ))}
                     {item.assigneeName && (
                       <span className="text-muted-foreground ml-1 not-line-through">
                         — {item.assigneeName}
