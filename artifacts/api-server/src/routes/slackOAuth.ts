@@ -214,6 +214,21 @@ export function sanitizeReturnPath(raw: string | undefined): string {
   return "/";
 }
 
+// Slack API error codes that indicate the stored token is no longer valid.
+// When detected, the API returns 401 + { error: "token_expired" } so the
+// frontend can show a targeted "reconnect" prompt instead of a generic error.
+const SLACK_TOKEN_ERRORS = new Set([
+  "token_revoked",
+  "token_expired",
+  "invalid_auth",
+  "account_inactive",
+  "not_authed",
+]);
+
+function isTokenExpiredError(slackError: unknown): boolean {
+  return typeof slackError === "string" && SLACK_TOKEN_ERRORS.has(slackError);
+}
+
 /** Call Slack Web API with a user or bot token (GET methods). */
 async function slackUserGet(
   token:  string,
@@ -528,8 +543,13 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
     });
 
     if (r["ok"] !== true) {
-      req.log.warn({ error: r["error"] }, "slack conversations.list failed");
-      res.status(502).json({ error: String(r["error"] ?? "slack_api_error") });
+      const slackErr = r["error"];
+      req.log.warn({ error: slackErr }, "slack conversations.list failed");
+      if (isTokenExpiredError(slackErr)) {
+        res.status(401).json({ error: "token_expired", message: "Slack token is no longer valid. Please reconnect." });
+        return;
+      }
+      res.status(502).json({ error: String(slackErr ?? "slack_api_error") });
       return;
     }
 
@@ -612,8 +632,13 @@ router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res
     });
 
     if (r["ok"] !== true) {
-      req.log.warn({ error: r["error"], channelId }, "slack conversations.history failed");
-      res.status(502).json({ error: String(r["error"] ?? "slack_api_error") });
+      const slackErr = r["error"];
+      req.log.warn({ error: slackErr, channelId }, "slack conversations.history failed");
+      if (isTokenExpiredError(slackErr)) {
+        res.status(401).json({ error: "token_expired", message: "Slack token is no longer valid. Please reconnect." });
+        return;
+      }
+      res.status(502).json({ error: String(slackErr ?? "slack_api_error") });
       return;
     }
 
@@ -698,6 +723,10 @@ router.post("/slack/conversations/:id/messages", requireSlackAuth, async (req, r
 
     if (!result.ok) {
       req.log.warn({ error: result.error, channelId }, "slack chat.postMessage failed");
+      if (isTokenExpiredError(result.error)) {
+        res.status(401).json({ ok: false, error: "token_expired", message: "Slack token is no longer valid. Please reconnect." });
+        return;
+      }
       res.status(502).json({ ok: false, error: result.error ?? "slack_api_error" });
       return;
     }

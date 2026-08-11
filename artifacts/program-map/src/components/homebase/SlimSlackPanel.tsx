@@ -88,9 +88,28 @@ function SlackIcon({ size = 20, muted = false }: { size?: number; muted?: boolea
 // BASE is the Vite base URL (e.g. /program-map) with trailing slash stripped.
 const BASE = (import.meta.env.BASE_URL as string).replace(/\/$/, "");
 
+/**
+ * Typed fetch error that carries the HTTP status and the server-side error
+ * code parsed from the JSON body (when available).  Callers can inspect
+ * `err.code === "token_expired"` to show targeted reconnect prompts instead
+ * of generic error strings.
+ */
+class ApiError extends Error {
+  constructor(public readonly status: number, public readonly code: string | null) {
+    super(`HTTP ${status}${code ? ` (${code})` : ""}`);
+  }
+}
+
 async function apiGet<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, { credentials: "include" });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    let code: string | null = null;
+    try {
+      const body = await res.clone().json() as { error?: string };
+      code = body.error ?? null;
+    } catch { /* ignore parse failure */ }
+    throw new ApiError(res.status, code);
+  }
   return res.json() as Promise<T>;
 }
 
@@ -99,7 +118,7 @@ async function apiDelete(path: string): Promise<void> {
     method:      "DELETE",
     credentials: "include",
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) throw new ApiError(res.status, null);
 }
 
 async function apiPost<T>(path: string, body: unknown): Promise<T> {
@@ -109,7 +128,14 @@ async function apiPost<T>(path: string, body: unknown): Promise<T> {
     headers:     { "Content-Type": "application/json" },
     body:        JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    let code: string | null = null;
+    try {
+      const b = await res.clone().json() as { error?: string };
+      code = b.error ?? null;
+    } catch { /* ignore */ }
+    throw new ApiError(res.status, code);
+  }
   return res.json() as Promise<T>;
 }
 
@@ -168,6 +194,66 @@ function ConvItem({
       {icon}
       <span className="truncate text-[12px]">{conv.name}</span>
     </button>
+  );
+}
+
+// ── Token-expired state ───────────────────────────────────────────────────────
+
+/**
+ * Shown when the panel has a stored connection but the Slack API rejects the
+ * token (revoked, expired, or account deactivated).  Distinct from the first-
+ * time "Connect Slack" screen so staff understand they need to RE-connect, not
+ * connect for the first time.
+ */
+function TokenExpiredView({
+  returnPath,
+  onReconnected,
+}: {
+  returnPath:   string;
+  onReconnected: () => void;
+}) {
+  const authorizeUrl = `${BASE}/api/slack/oauth/authorize?return=${encodeURIComponent(returnPath)}`;
+
+  const handleReconnect = useCallback(() => {
+    const popup = window.open(
+      authorizeUrl,
+      "slack-oauth",
+      "width=620,height=720,scrollbars=yes,resizable=yes",
+    );
+
+    if (!popup) {
+      window.open(authorizeUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    const timer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(timer);
+        onReconnected();
+      }
+    }, 600);
+  }, [authorizeUrl, onReconnected]);
+
+  return (
+    <div className="flex flex-col items-center gap-4 px-4 py-6 text-center">
+      <SlackIcon size={40} />
+      <div>
+        <p className="text-sm font-semibold text-foreground">Reconnect your Slack account</p>
+        <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+          Your Slack session has expired or been revoked. Sign in again to restore access.
+        </p>
+      </div>
+      <button
+        onClick={handleReconnect}
+        className="flex items-center gap-2 rounded-lg bg-[#4A154B] px-4 py-2 text-white text-sm font-medium hover:bg-[#611f69] transition-colors"
+      >
+        <SlackIcon size={16} />
+        Reconnect Slack
+      </button>
+      <p className="text-[10px] text-muted-foreground leading-relaxed px-2">
+        Your previous Slack connection is no longer active.
+      </p>
+    </div>
   );
 }
 
@@ -235,11 +321,13 @@ function UnconnectedView({
 function ConnectedView({
   teamName,
   onDisconnect,
+  onTokenExpired,
   expanded,
 }: {
-  teamName:     string | null;
-  onDisconnect: () => void;
-  expanded:     boolean;
+  teamName:       string | null;
+  onDisconnect:   () => void;
+  onTokenExpired: () => void;
+  expanded:       boolean;
 }) {
   const [conversations,     setConversations]     = useState<Conversation[]>([]);
   const [convLoading,       setConvLoading]       = useState(true);
@@ -270,8 +358,13 @@ function ConnectedView({
           }
         }
       })
-      .catch(() => {
-        if (!cancelled) setConvError("Could not load conversations.");
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.code === "token_expired") {
+          onTokenExpired();
+          return;
+        }
+        setConvError("Could not load conversations.");
       })
       .finally(() => {
         if (!cancelled) setConvLoading(false);
@@ -290,12 +383,16 @@ function ConnectedView({
       );
       // API returns newest-first; reverse for chronological display
       setMessages([...data.messages].reverse());
-    } catch {
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.code === "token_expired") {
+        onTokenExpired();
+        return;
+      }
       setMsgError("Could not load messages.");
     } finally {
       setMsgLoading(false);
     }
-  }, []);
+  }, [onTokenExpired]);
 
   useEffect(() => {
     if (!selectedConv || !expanded) return;
@@ -326,13 +423,19 @@ function ConnectedView({
       await apiPost(`/slack/conversations/${selectedConv.id}/messages`, { text });
       // Optimistically refresh messages
       await fetchMessages(selectedConv.id, true);
-    } catch {
-      // Put the text back if send failed
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.code === "token_expired") {
+        // Preserve draft so user doesn't lose their message, then show reconnect.
+        setComposeText(text);
+        onTokenExpired();
+        return;
+      }
+      // Put the text back for any other send failure
       setComposeText(text);
     } finally {
       setSending(false);
     }
-  }, [composeText, selectedConv, sending, fetchMessages]);
+  }, [composeText, selectedConv, sending, fetchMessages, onTokenExpired]);
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -476,7 +579,8 @@ interface SlimSlackPanelProps {
 type ConnectionStatus =
   | { state: "loading" }
   | { state: "unconnected" }
-  | { state: "connected"; teamName: string | null; slackUserId: string };
+  | { state: "connected"; teamName: string | null; slackUserId: string }
+  | { state: "token_expired" };
 
 export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelProps) {
   const [status, setStatus] = useState<ConnectionStatus>({ state: "loading" });
@@ -513,10 +617,15 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
     }
   }, [checkStatus]);
 
-  // Collapsed icon
+  // Collapsed icon — show muted icon for expired token too (needs re-auth)
   const collapsedIcon = status.state === "connected"
     ? <SlackIcon size={18} />
     : <SlackIcon size={18} muted />;
+
+  const collapsedTitle =
+    status.state === "connected" ? "Slack (connected)" :
+    status.state === "token_expired" ? "Slack (reconnect required)" :
+    "Connect Slack";
 
   return (
     <>
@@ -526,7 +635,7 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
           onClick={onToggle}
           className="w-full flex flex-col items-center gap-2 pt-3 pb-2 hover:bg-muted/20 transition-colors cursor-pointer"
           aria-label="Expand Slack panel"
-          title={status.state === "connected" ? "Slack (connected)" : "Connect Slack"}
+          title={collapsedTitle}
         >
           {collapsedIcon}
           <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-muted-foreground" />
@@ -560,10 +669,13 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
               </div>
             ) : status.state === "unconnected" ? (
               <UnconnectedView returnPath={returnPath} onConnected={checkStatus} />
+            ) : status.state === "token_expired" ? (
+              <TokenExpiredView returnPath={returnPath} onReconnected={checkStatus} />
             ) : (
               <ConnectedView
                 teamName={status.teamName}
                 onDisconnect={() => setStatus({ state: "unconnected" })}
+                onTokenExpired={() => setStatus({ state: "token_expired" })}
                 expanded={open}
               />
             )}
