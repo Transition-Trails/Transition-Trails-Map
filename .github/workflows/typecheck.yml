@@ -38,7 +38,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Restore lib dist cache
+        id: lib-dist-cache
+        uses: actions/cache@v4
+        with:
+          path: lib/*/dist
+          key: ${{ runner.os }}-lib-dist-${{ hashFiles('lib/**/src/**', 'lib/**/tsconfig*.json', 'lib/**/package.json', 'pnpm-lock.yaml') }}
+
       - name: Build lib packages
+        if: steps.lib-dist-cache.outputs.cache-hit != 'true'
         run: pnpm run typecheck:libs
 
       - name: Check lib package dists are up to date
