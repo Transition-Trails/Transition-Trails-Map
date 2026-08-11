@@ -98,10 +98,18 @@ const staffAuthGate: RequestHandler = (req, res, next) => {
   if (path.startsWith('/homebase')) return next();
 
   // Slack homebase routes — OAuth flow and user data endpoints.
-  // requireHomebaseAuth on each individual route is the effective access control.
+  // requireSlackAuth on each individual route is the effective access control;
+  // the staff gate must not pre-empt it for Homebase audiences.
   // Existing bot-only routes (/slack/validate, /slack/events) are NOT under these
   // prefixes and remain subject to the staff gate and PUBLIC_PATHS.
-  if (path.startsWith('/slack/oauth') || path.startsWith('/slack/conversations')) return next();
+  if (
+    path.startsWith('/slack/oauth') ||
+    path.startsWith('/slack/conversations') ||
+    path.startsWith('/slack/users') ||
+    path.startsWith('/slack/search') ||
+    path.startsWith('/slack/unreads') ||
+    path.startsWith('/slack/threads')
+  ) return next();
 
   // Check against the public allowlist (exact match or path prefix).
   const isPublic = PUBLIC_PATHS.some(

@@ -435,6 +435,74 @@ describe('Slack OAuth routes', () => {
     expect(emailArgs).not.toContain('coach@example.com');
   });
 
+  // ── Unreads endpoint ────────────────────────────────────────────────────────
+
+  it('25. GET /slack/unreads — 401 with no session', async () => {
+    const res = await request(app).get('/api/slack/unreads');
+    expect(res.status).toBe(401);
+  });
+
+  it('26. GET /slack/unreads — 403 when staff session has no homebase audience', async () => {
+    setStaffOnlySession();
+    const res = await request(app).get('/api/slack/unreads');
+    expect(res.status).toBe(403);
+  });
+
+  it('27. GET /slack/unreads — 403 not_connected for learner with no token', async () => {
+    setLearnerSession();
+    const res = await request(app).get('/api/slack/unreads');
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({ error: 'not_connected' });
+  });
+
+  it('28. GET /slack/unreads — 403 not_connected for coach with no token', async () => {
+    setCoachSession();
+    const res = await request(app).get('/api/slack/unreads');
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({ error: 'not_connected' });
+  });
+
+  it('29. GET /slack/unreads — 403 not_connected for staff null-audience session with no token', async () => {
+    setStaffNullAudienceSession();
+    const res = await request(app).get('/api/slack/unreads');
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({ error: 'not_connected' });
+  });
+
+  // ── Threads endpoint ────────────────────────────────────────────────────────
+
+  it('30. GET /slack/threads — 401 with no session', async () => {
+    const res = await request(app).get('/api/slack/threads');
+    expect(res.status).toBe(401);
+  });
+
+  it('31. GET /slack/threads — 403 when staff session has no homebase audience', async () => {
+    setStaffOnlySession();
+    const res = await request(app).get('/api/slack/threads');
+    expect(res.status).toBe(403);
+  });
+
+  it('32. GET /slack/threads — 403 not_connected for learner with no token', async () => {
+    setLearnerSession();
+    const res = await request(app).get('/api/slack/threads');
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({ error: 'not_connected' });
+  });
+
+  it('33. GET /slack/threads — 403 not_connected for coach with no token', async () => {
+    setCoachSession();
+    const res = await request(app).get('/api/slack/threads');
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({ error: 'not_connected' });
+  });
+
+  it('34. GET /slack/threads — 403 not_connected for staff null-audience session with no token', async () => {
+    setStaffNullAudienceSession();
+    const res = await request(app).get('/api/slack/threads');
+    expect(res.status).toBe(403);
+    expect(res.body).toMatchObject({ error: 'not_connected' });
+  });
+
   it('24. GET /slack/conversations — staff session (null googleAudience) returns not_connected, not another user\'s data', async () => {
     setStaffNullAudienceSession(); // staff email = 'staff@transitiontrails.org'; no token row in DB
 

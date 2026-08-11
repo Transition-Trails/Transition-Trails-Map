@@ -35,6 +35,8 @@ import {
   Search,
   Smile,
   X,
+  Bell,
+  MessageCircle,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -70,6 +72,33 @@ interface SearchResult {
   channelId?:  string;
   channelName?: string;
   permalink?:  string;
+}
+
+interface UnreadItem {
+  id:          string;
+  name:        string;
+  type:        string;  // "channel" | "im" | "mpim"
+  unreadCount: number;
+}
+
+interface ThreadItem {
+  channelId:   string;
+  channelName: string;
+  threadTs:    string;
+  text:        string;
+  replyCount:  number;
+  latestReply: string;  // Slack timestamp string ("1234567890.123456")
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function relativeTime(slackTs: string): string {
+  const ms   = parseFloat(slackTs) * 1000;
+  const diff = Date.now() - ms;
+  if (diff < 60_000)     return "just now";
+  if (diff < 3_600_000)  return `${Math.floor(diff / 60_000)}m ago`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+  return `${Math.floor(diff / 86_400_000)}d ago`;
 }
 
 // Common emojis available in the reaction picker
@@ -320,6 +349,111 @@ function ConvItem({
         {conv.name}
       </span>
     </button>
+  );
+}
+
+// ── Unreads section ───────────────────────────────────────────────────────────
+
+function UnreadsSection({ items, loading }: { items: UnreadItem[]; loading: boolean }) {
+  const [open, setOpen] = useState(true);
+
+  if (!loading && items.length === 0) return null;
+
+  return (
+    <div className="mb-0.5">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-muted/20 transition-colors"
+      >
+        <ChevronDown className={`w-3 h-3 text-muted-foreground/50 flex-shrink-0 transition-transform duration-150 ${open ? "" : "-rotate-90"}`} />
+        <span className="flex items-center gap-1 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase flex-1 text-left">
+          <Bell className="w-3 h-3" />Unreads
+        </span>
+        {loading
+          ? <Loader2 className="w-2.5 h-2.5 animate-spin text-muted-foreground/40 flex-shrink-0" />
+          : <span className="text-[10px] text-muted-foreground/40">{items.length}</span>
+        }
+      </button>
+      {open && !loading && (
+        <div className="pl-1 pr-1 pb-0.5 flex flex-col gap-0.5">
+          {items.map(item => (
+            <a
+              key={item.id}
+              href={`https://slack.com/app_redirect?channel=${item.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+            >
+              {item.type === "channel"
+                ? <Hash className="w-3 h-3 flex-shrink-0 text-muted-foreground/60" />
+                : <span className="w-3 h-3 rounded-full border-2 border-muted-foreground/40 flex-shrink-0" />
+              }
+              <span className="truncate text-[12px] leading-tight flex-1">{item.name}</span>
+              <span className="flex-shrink-0 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-amber-500 text-white text-[10px] font-semibold px-1 leading-none">
+                {item.unreadCount > 99 ? "99+" : item.unreadCount}
+              </span>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Threads section ───────────────────────────────────────────────────────────
+
+function ThreadsSection({ items, loading }: { items: ThreadItem[]; loading: boolean }) {
+  const [open, setOpen] = useState(true);
+
+  if (!loading && items.length === 0) return null;
+
+  return (
+    <div className="mb-0.5">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-muted/20 transition-colors"
+      >
+        <ChevronDown className={`w-3 h-3 text-muted-foreground/50 flex-shrink-0 transition-transform duration-150 ${open ? "" : "-rotate-90"}`} />
+        <span className="flex items-center gap-1 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase flex-1 text-left">
+          <MessageCircle className="w-3 h-3" />Threads
+        </span>
+        {loading
+          ? <Loader2 className="w-2.5 h-2.5 animate-spin text-muted-foreground/40 flex-shrink-0" />
+          : <span className="text-[10px] text-muted-foreground/40">{items.length}</span>
+        }
+      </button>
+      {open && !loading && (
+        <div className="pl-1 pr-1 pb-0.5 flex flex-col gap-0.5">
+          {items.map(item => (
+            <a
+              key={`${item.channelId}-${item.threadTs}`}
+              href={`https://slack.com/app_redirect?channel=${item.channelId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex flex-col gap-0.5 px-2 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+            >
+              <div className="flex items-center gap-1.5">
+                <Hash className="w-2.5 h-2.5 flex-shrink-0 text-muted-foreground/50" />
+                <span className="text-[10px] font-semibold text-muted-foreground truncate flex-1">
+                  {item.channelName}
+                </span>
+                <span className="flex-shrink-0 text-[10px] text-muted-foreground/50">
+                  {relativeTime(item.latestReply)}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 pl-4">
+                <p className="text-[11px] text-foreground/80 leading-snug line-clamp-1 flex-1">
+                  {item.text || "(no text)"}
+                </p>
+                <span className="flex-shrink-0 flex items-center gap-0.5 text-[10px] text-muted-foreground/60 whitespace-nowrap">
+                  <MessageCircle className="w-2.5 h-2.5" />{item.replyCount}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -623,6 +757,14 @@ function ConnectedView({
   // ── Presence ──────────────────────────────────────────────────────────────
   const [presenceMap,    setPresenceMap]    = useState<Map<string, "active" | "away">>(new Map());
 
+  // ── Unreads ───────────────────────────────────────────────────────────────
+  const [unreads,        setUnreads]        = useState<UnreadItem[]>([]);
+  const [unreadsLoading, setUnreadsLoading] = useState(true);
+
+  // ── Threads ───────────────────────────────────────────────────────────────
+  const [threads,        setThreads]        = useState<ThreadItem[]>([]);
+  const [threadsLoading, setThreadsLoading] = useState(true);
+
   // ── Search ────────────────────────────────────────────────────────────────
   const [searchActive,   setSearchActive]   = useState(false);
   const [searchQuery,    setSearchQuery]    = useState("");
@@ -734,6 +876,36 @@ function ConnectedView({
       }
     };
   }, [conversations, expanded, fetchPresence]);
+
+  // Fetch unreads and threads in parallel on mount; silently degrade on error
+  useEffect(() => {
+    if (!expanded) return;
+    let cancelled = false;
+
+    setUnreadsLoading(true);
+    apiGet<{ unreads: UnreadItem[] }>("/api/slack/unreads")
+      .then(data => { if (!cancelled) setUnreads(data.unreads); })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.code === "token_expired") { onTokenExpired(); return; }
+        if (err instanceof ApiError && err.code === "missing_scope") { handleMissingScope(); return; }
+        // silently discard — unreads are non-critical
+      })
+      .finally(() => { if (!cancelled) setUnreadsLoading(false); });
+
+    setThreadsLoading(true);
+    apiGet<{ threads: ThreadItem[] }>("/api/slack/threads")
+      .then(data => { if (!cancelled) setThreads(data.threads); })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.code === "token_expired") { onTokenExpired(); return; }
+        if (err instanceof ApiError && err.code === "missing_scope") { handleMissingScope(); return; }
+        // silently discard — threads are non-critical
+      })
+      .finally(() => { if (!cancelled) setThreadsLoading(false); });
+
+    return () => { cancelled = true; };
+  }, [expanded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Search — debounced 400 ms
   useEffect(() => {
@@ -939,8 +1111,13 @@ function ConnectedView({
           {/* ── Conversation list ── */}
           <div
             className="flex-shrink-0 border-b border-border bg-white overflow-y-auto py-1.5 px-1.5"
-            style={{ maxHeight: "45%" }}
+            style={{ maxHeight: "55%" }}
           >
+            {/* Unreads + Threads render independently — non-blocking */}
+            <UnreadsSection items={unreads} loading={unreadsLoading} />
+            <ThreadsSection items={threads} loading={threadsLoading} />
+
+            {/* Channels & DMs */}
             {convLoading ? (
               <div className="flex items-center justify-center py-3">
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
