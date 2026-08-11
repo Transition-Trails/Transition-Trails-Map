@@ -3,6 +3,7 @@ type ModuleMap = Record<string, () => Promise<Record<string, unknown>>>;
 export const modules: ModuleMap = {
   "./components/mockups/gmail-page/OptionA.tsx": () => import("../components/mockups/gmail-page/OptionA.tsx"),
   "./components/mockups/gmail-page/OptionB.tsx": () => import("../components/mockups/gmail-page/OptionB.tsx"),
+  "./components/mockups/collab-overview/CommandCenter.tsx": () => import("../components/mockups/collab-overview/CommandCenter.tsx"),
   "./components/mockups/gmail-panel/InboxHybrid.tsx": () => import("../components/mockups/gmail-panel/InboxHybrid.tsx"),
   "./components/mockups/gmail-panel/InboxSummary.tsx": () => import("../components/mockups/gmail-panel/InboxSummary.tsx"),
   "./components/mockups/gmail-panel/QuickCompose.tsx": () => import("../components/mockups/gmail-panel/QuickCompose.tsx"),
@@ -15,7 +16,6 @@ export const modules: ModuleMap = {
   "./components/mockups/penny-assets-v1/StatePicker.tsx": () => import("../components/mockups/penny-assets-v1/StatePicker.tsx"),
   "./components/mockups/penny-assets-v2/TwoPanel.tsx": () => import("../components/mockups/penny-assets-v2/TwoPanel.tsx"),
   "./components/mockups/penny-config-a/GuidedMissionTrail.tsx": () => import("../components/mockups/penny-config-a/GuidedMissionTrail.tsx"),
-  "./components/mockups/collab-overview/CommandCenter.tsx": () => import("../components/mockups/collab-overview/CommandCenter.tsx"),
   "./components/mockups/penny-config-b/InlineCopilotWorkshop.tsx": () => import("../components/mockups/penny-config-b/InlineCopilotWorkshop.tsx"),
   "./components/mockups/penny-config-b/SetupProcessWorkshop.tsx": () => import("../components/mockups/penny-config-b/SetupProcessWorkshop.tsx"),
   "./components/mockups/penny-config-c/ProgressiveSkillTree.tsx": () => import("../components/mockups/penny-config-c/ProgressiveSkillTree.tsx"),
