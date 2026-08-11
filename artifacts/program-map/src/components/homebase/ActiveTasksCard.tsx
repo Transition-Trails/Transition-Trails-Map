@@ -3,7 +3,8 @@
  *
  * Inline homebase card: all active tasks sorted by due date (soonest first,
  * undated tasks at the end). Completing a task optimistically removes it from
- * the list and PATCHes the SF record.
+ * the list and PATCHes the SF record. Hovering a task opens a detail card
+ * with full description + a direct Salesforce link.
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -14,6 +15,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { CreateTaskDrawer } from "./CreateTaskDrawer";
+import { TaskHoverCard } from "./TaskHoverCard";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -84,10 +86,11 @@ function PriorityBadge({ priority }: { priority: string | null }) {
 interface TaskRowProps {
   task: SfTask;
   isCompleting: boolean;
+  orgBaseUrl: string;
   onComplete: (task: SfTask) => void;
 }
 
-function TaskRow({ task, isCompleting, onComplete }: TaskRowProps) {
+function TaskRow({ task, isCompleting, orgBaseUrl, onComplete }: TaskRowProps) {
   const overdue = isOverdue(task.ActivityDate);
   return (
     <li className="flex items-start gap-3 py-3 border-b border-border/50 last:border-0">
@@ -103,19 +106,21 @@ function TaskRow({ task, isCompleting, onComplete }: TaskRowProps) {
         }
       </button>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-sm font-medium text-foreground leading-snug">
-            {task.Subject ?? "Untitled task"}
-          </p>
-          <PriorityBadge priority={task.Priority} />
+      <TaskHoverCard task={task} orgBaseUrl={orgBaseUrl}>
+        <div className="flex-1 min-w-0 cursor-default">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm font-medium text-foreground leading-snug">
+              {task.Subject ?? "Untitled task"}
+            </p>
+            <PriorityBadge priority={task.Priority} />
+          </div>
+          {task.Description && (
+            <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-1">
+              {task.Description}
+            </p>
+          )}
         </div>
-        {task.Description && (
-          <p className="text-[12px] text-muted-foreground mt-0.5 line-clamp-1">
-            {task.Description}
-          </p>
-        )}
-      </div>
+      </TaskHoverCard>
 
       {/* Due date — right-aligned */}
       <div className={`flex-shrink-0 flex items-center gap-1 text-[12px] ${overdue ? "text-rose-600" : "text-muted-foreground"}`}>
@@ -145,6 +150,7 @@ export function ActiveTasksCard({ onCreated }: ActiveTasksCardProps) {
   const { toast } = useToast();
   const [, nav]   = useLocation();
   const [tasks,         setTasks]         = useState<SfTask[]>([]);
+  const [orgBaseUrl,    setOrgBaseUrl]    = useState("");
   const [loading,       setLoading]       = useState(true);
   const [sfUnavailable, setSfUnavailable] = useState(false);
   const [drawerOpen,    setDrawerOpen]    = useState(false);
@@ -158,8 +164,9 @@ export function ActiveTasksCard({ onCreated }: ActiveTasksCardProps) {
       const res = await fetch("/api/sf/tasks?status=active");
       if (res.status === 401) { setSfUnavailable(true); setLoading(false); return; }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json() as { tasks: SfTask[] };
+      const data = await res.json() as { tasks: SfTask[]; orgBaseUrl?: string };
       setTasks(sortByDueDate(data.tasks ?? []));
+      setOrgBaseUrl(data.orgBaseUrl ?? "");
       setCompleted(new Set());
     } catch {
       setSfUnavailable(true);
@@ -254,6 +261,7 @@ export function ActiveTasksCard({ onCreated }: ActiveTasksCardProps) {
                   key={task.Id}
                   task={task}
                   isCompleting={completing.has(task.Id)}
+                  orgBaseUrl={orgBaseUrl}
                   onComplete={handleComplete}
                 />
               ))}

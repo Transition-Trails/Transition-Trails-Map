@@ -4,6 +4,7 @@
  * Shows tasks due today for the current staff member. Renders in TeamHomebase's
  * middle grid. Each task has a checkbox to mark complete; completing optimistically
  * updates the UI then PATCHes the SF record, rolling back on failure.
+ * Hovering a task opens a detail card with full description + a direct SF link.
  *
  * States: loading | sf-unavailable | empty | list
  */
@@ -12,6 +13,7 @@ import { useState, useEffect, useCallback } from "react";
 import { CheckSquare, Square, Loader2, Plus, ArrowRight, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CreateTaskDrawer } from "./CreateTaskDrawer";
+import { TaskHoverCard } from "./TaskHoverCard";
 import { useLocation } from "wouter";
 
 interface SfTask {
@@ -44,6 +46,7 @@ export function TodayTasksCard() {
   const { toast }   = useToast();
   const [, nav]     = useLocation();
   const [tasks, setTasks]           = useState<SfTask[]>([]);
+  const [orgBaseUrl, setOrgBaseUrl] = useState("");
   const [loading, setLoading]       = useState(true);
   const [sfUnavailable, setSfUnavailable] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -58,8 +61,9 @@ export function TodayTasksCard() {
       const res = await fetch("/api/sf/tasks?status=active&date=today");
       if (res.status === 401) { setSfUnavailable(true); setLoading(false); return; }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json() as { tasks: SfTask[] };
+      const data = await res.json() as { tasks: SfTask[]; orgBaseUrl?: string };
       setTasks(data.tasks ?? []);
+      setOrgBaseUrl(data.orgBaseUrl ?? "");
     } catch {
       setSfUnavailable(true);
     } finally {
@@ -170,19 +174,22 @@ export function TodayTasksCard() {
                         : <Square  className="w-4 h-4" />
                       }
                     </button>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-sm text-foreground leading-snug truncate">
-                          {task.Subject ?? "Untitled task"}
-                        </p>
-                        <PriorityBadge priority={task.Priority} />
+
+                    <TaskHoverCard task={task} orgBaseUrl={orgBaseUrl}>
+                      <div className="flex-1 min-w-0 cursor-default">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm text-foreground leading-snug truncate">
+                            {task.Subject ?? "Untitled task"}
+                          </p>
+                          <PriorityBadge priority={task.Priority} />
+                        </div>
+                        {task.Description && (
+                          <p className="text-[12px] text-muted-foreground mt-0.5 truncate">
+                            {task.Description}
+                          </p>
+                        )}
                       </div>
-                      {task.Description && (
-                        <p className="text-[12px] text-muted-foreground mt-0.5 truncate">
-                          {task.Description}
-                        </p>
-                      )}
-                    </div>
+                    </TaskHoverCard>
                   </li>
                 );
               })}

@@ -1514,14 +1514,19 @@ router.get("/sf/tasks", async (req, res) => {
   // Single authoritative SOQL — always scoped to the authenticated user's ID.
   const taskSoql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE IsDeleted = false AND OwnerId = '${sfUserId}' AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
 
-  try {
-    const result = await client.query<{
-      Id: string; Subject: string | null; Description: string | null;
-      ActivityDate: string | null; Priority: string | null; Status: string | null;
-      CreatedDate: string | null;
-    }>(taskSoql);
+  const proxyFetch = getEffectiveSfFetch(req);
 
-    return res.json({ tasks: result.records, total: result.totalSize });
+  try {
+    const [result, orgBaseUrl] = await Promise.all([
+      client.query<{
+        Id: string; Subject: string | null; Description: string | null;
+        ActivityDate: string | null; Priority: string | null; Status: string | null;
+        CreatedDate: string | null;
+      }>(taskSoql),
+      proxyFetch ? getOrgBaseUrl(proxyFetch).catch(() => "") : Promise.resolve(""),
+    ]);
+
+    return res.json({ tasks: result.records, total: result.totalSize, orgBaseUrl });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     return res.status(500).json({ error: msg });
