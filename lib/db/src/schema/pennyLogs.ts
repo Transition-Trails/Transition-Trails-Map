@@ -20,6 +20,12 @@ export const pennyLogsTable = pgTable("penny_logs", {
    * Null for rows written before this column was added.
    */
   audience:      text("audience"),
+  /**
+   * LLM provider that handled this exchange — 'gemini', 'claude', etc.
+   * Derived from the model name by the route handler.
+   * Null for rows written before this column was added.
+   */
+  provider:      text("provider"),
   createdAt:     timestamp("created_at").defaultNow().notNull(),
 });
 

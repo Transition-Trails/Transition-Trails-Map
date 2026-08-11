@@ -46,7 +46,22 @@ function derivePromptMode(hasLearnerCtx: boolean, hasMemory: boolean): string {
   return 'ask';
 }
 
-// ─── In-memory rate limiter (10 req / 60 s per IP) ────────────────────────────
+/**
+ * Map a model name to its LLM provider slug.
+ *
+ * Rules:
+ *  - Any model starting with "gemini"  → 'gemini'
+ *  - Any model starting with "claude"  → 'claude'
+ *  - Unknown models                    → 'unknown'
+ *
+ * This is intentionally a simple prefix match so it stays correct as model
+ * version strings evolve (e.g. "gemini-2.5-flash", "claude-3-5-sonnet-20241022").
+ */
+function deriveProvider(modelName: string): string {
+  if (modelName.startsWith('gemini')) return 'gemini';
+  if (modelName.startsWith('claude')) return 'claude';
+  return 'unknown';
+}
 const RATE_WINDOW_MS  = 60_000;
 const RATE_MAX_REQ    = 10;
 const rateBuckets = new Map<string, { count: number; resetAt: number }>();
@@ -151,7 +166,14 @@ router.post("/penny/ask", async (req, res) => {
 
   // ── Fetch Salesforce context (layers 2 + 3) ────────────────────────────────
   let sfClient: SalesforceClient | null = null;
+  try {
+    sfClient = getSalesforceClient(req);
+  } catch {
+    res.json({ records: [], sfConnected: false, error: "Salesforce not connected" });
+    return;
+  }
 
+  try {
     const soql =
       "SELECT Id, Source__c, Prompt_Mode__c, CreatedDate " +
       "FROM Penny_Interaction_Log__c " +
@@ -423,11 +445,9 @@ router.post("/penny/ask", async (req, res) => {
       if (!claudeResp.ok) {
         // Explicit failure — log with full detail so the issue is visible in
         // logs immediately.  Do NOT fall back to Gemini.
-        const errBody = await claudeResp.json().catch(() => ({})) as {
-          error?: { type?: string; message?: string };
-        };
+      const errBody = await resp.json().catch(() => ({})) as { error?: { message?: string } };
         const errType = errBody.error?.type ?? 'unknown';
-        const errMsg  = errBody.error?.message ?? `HTTP ${claudeResp.status}`;
+          const errMsg = e instanceof Error ? e.message : String(e);
         logger.error(
           {
             status:    claudeResp.status,
@@ -461,19 +481,18 @@ router.post("/penny/ask", async (req, res) => {
         });
       }
 
-      const durationMs = Date.now() - start;
-      const { shouldWriteToSf } = persistInteraction(claudeText, claudeModel, durationMs);
+    const durationMs  = Date.now() - start;
+    const { shouldWriteToSf } = persistInteraction(text, model, durationMs);
 
-      return res.json({
-        reply:      claudeText,
-        model:      claudeModel,
-        durationMs,
-        layersPresent,
-        contextMeta: buildContextMeta(shouldWriteToSf),
-      });
-
-    } catch (e: unknown) {
-      const isTimeout = e instanceof Error && e.name === 'TimeoutError';
+    return res.json({
+      reply: text,
+      model,
+      durationMs,
+      layersPresent,
+      contextMeta: buildContextMeta(shouldWriteToSf),
+    });
+  } catch (e: unknown) {
+    const isTimeout = e instanceof Error && e.name === "TimeoutError";
       // Log with ERROR severity so Anthropic outages appear in log searches.
       // Do NOT fall back to Gemini.
       logger.error(
@@ -593,9 +612,7 @@ router.post("/penny/ask", async (req, res) => {
     });
   } catch (e: unknown) {
     const isTimeout = e instanceof Error && e.name === "TimeoutError";
-    const msg = isTimeout
-      ? "Penny took too long to respond (30s timeout). Try a shorter question."
-      : `Could not reach Gemini: ${e instanceof Error ? e.message : String(e)}`;
+    const msg = err instanceof Error ? err.message : String(err);
     return res.status(502).json({ error: msg });
   }
 });
@@ -854,7 +871,7 @@ router.get("/penny/capabilities/:id/preflight", async (req, res): Promise<void> 
 
 router.get("/penny/stats", async (_req, res): Promise<void> => {
   try {
-    const todayStart = new Date();
+      const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
     // Today's rows (all of them — low volume, aggregate in JS)
@@ -890,6 +907,7 @@ router.get("/penny/stats", async (_req, res): Promise<void> => {
         userEmail:    pennyLogsTable.userEmail,
         promptMode:   pennyLogsTable.promptMode,
         model:        pennyLogsTable.model,
+        provider:     pennyLogsTable.provider,
         durationMs:   pennyLogsTable.durationMs,
         createdAt:    pennyLogsTable.createdAt,
       })
@@ -1017,3 +1035,5 @@ router.get("/penny/sf-recent-logs", async (req, res): Promise<void> => {
 });
 
 export default router;
+
+    const provider    = deriveProvider(model);

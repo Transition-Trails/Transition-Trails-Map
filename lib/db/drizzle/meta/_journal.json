@@ -43,6 +43,13 @@
       "when": 1754784000000,
       "tag": "0005_create_slack_user_tokens",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786462852413,
+      "tag": "0006_add_penny_logs_provider",
+      "breakpoints": true
     }
   ]
 }

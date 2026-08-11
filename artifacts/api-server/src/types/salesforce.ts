@@ -97,6 +97,12 @@ export interface LogInteractionPayload {
    * Also captured by the local DB (pennyLogsTable).
    */
   audience?: string | null;
+  /**
+   * LLM provider that handled this exchange — 'gemini', 'claude', etc.
+   * Captured by the local DB.  Written to Provider__c on Penny_Interaction_Log__c
+   * once that field is added to the SF schema (pending — see logInteraction).
+   */
+  provider?: string | null;
 }
 
 export interface InteractionLogRecord {

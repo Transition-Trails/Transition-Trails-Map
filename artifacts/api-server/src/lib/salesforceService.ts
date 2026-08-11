@@ -299,6 +299,21 @@ export async function logInteraction(
     // Everything else is already in place: the payload carries audience, the
     // memory-window SOQL filters by Audience__c, and the test suite covers it.
     // Audience__c: payload.audience ?? null,
+    //
+    // ── Provider__c — PENDING SF SCHEMA CHANGE ────────────────────────────
+    // This field does not yet exist on Penny_Interaction_Log__c in production.
+    // Writing a non-existent field causes Salesforce to reject the ENTIRE
+    // insert, so it must stay commented out until the field is confirmed present.
+    //
+    // To enable:
+    //   1. Create Provider__c as a Text(50) field on Penny_Interaction_Log__c
+    //      in SF Setup → Object Manager → Penny Interaction Log → Fields.
+    //   2. Confirm the field exists:
+    //        SELECT COUNT() FROM Penny_Interaction_Log__c WHERE Provider__c != null
+    //      (0 rows returned without an error = field exists).
+    //   3. Uncomment the line below and redeploy.
+    //
+    // Provider__c: payload.provider ?? null,
   };
 
   if (payload.contactId !== null) {
