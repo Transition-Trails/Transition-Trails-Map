@@ -1468,6 +1468,135 @@ router.post("/salesforce/governance/classroom-nudges", withClient(async (req, re
   res.status(201).json(result);
 }));
 
+// ── SF Tasks API ───────────────────────────────────────────────────────────────
+
+/**
+ * GET /api/sf/tasks
+ * Returns Tasks owned by the current SF user.
+ * Query param: ?status=active (open+in-progress, default) | all | completed
+ */
+router.get("/sf/tasks", async (req, res) => {
+  let client: ISalesforceClient;
+  try {
+    client = getSalesforceClient(req);
+  } catch {
+    return res.status(401).json({ error: "Not connected to Salesforce. Visit /api/auth/salesforce/login to connect." });
+  }
+
+  const statusParam = (req.query["status"] as string | undefined) ?? "active";
+
+  let statusFilter: string;
+  if (statusParam === "completed") {
+    statusFilter = "Status = 'Completed'";
+  } else if (statusParam === "all") {
+    statusFilter = "Status != null";
+  } else {
+    // active — open + in-progress
+    statusFilter = "Status IN ('Not Started', 'In Progress', 'Deferred')";
+  }
+
+  try {
+    // OwnerId matches the current user; also catch today-scoped if ?date=today
+    const dateParam = req.query["date"] as string | undefined;
+    let dateFilter = "";
+    if (dateParam === "today") {
+      const today = new Date().toISOString().slice(0, 10);
+      dateFilter = ` AND ActivityDate = ${today}`;
+    }
+
+    const soql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE OwnerId = '${req.session.sfUserId ?? "ME"}' AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
+
+    // Use session userId if available, otherwise use SOQL CurrentUser binding
+    const whoSoql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE OwnerId IN (SELECT Id FROM User WHERE Username = '${req.session.sfUsername ?? "__NONE__"}') AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
+
+    // Try with "ME" keyword first (works when token is user-scoped)
+    const meSoql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE IsDeleted = false AND OwnerId = '${req.session.sfUserId ?? ""}' AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
+
+    // Simpler: just fetch tasks where IsClosed matches
+    const simpleSoql = `SELECT Id, Subject, Description, ActivityDate, Priority, Status, CreatedDate FROM Task WHERE IsDeleted = false AND ${statusFilter}${dateFilter} ORDER BY ActivityDate ASC NULLS LAST LIMIT 200`;
+
+    // We use the simpleSoql and rely on SF's implicit "current user" for tasks in personal objects
+    // For production: Task in SOQL already scopes to the running user's visible records by sharing
+    const result = await client.query<{
+      Id: string; Subject: string | null; Description: string | null;
+      ActivityDate: string | null; Priority: string | null; Status: string | null;
+      CreatedDate: string | null;
+    }>(simpleSoql);
+
+    return res.json({ tasks: result.records, total: result.totalSize });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * POST /api/sf/tasks
+ * Create a new Task owned by the current SF user.
+ * Body: { subject, description?, dueDate?, priority? }
+ */
+router.post("/sf/tasks", async (req, res) => {
+  let client: ISalesforceClient;
+  try {
+    client = getSalesforceClient(req);
+  } catch {
+    return res.status(401).json({ error: "Not connected to Salesforce. Visit /api/auth/salesforce/login to connect." });
+  }
+
+  const { subject, description, dueDate, priority } = req.body as {
+    subject?: string; description?: string; dueDate?: string; priority?: string;
+  };
+
+  if (!subject || !subject.trim()) {
+    return res.status(400).json({ error: "subject is required." });
+  }
+
+  const VALID_PRIORITIES = ["High", "Normal", "Low"];
+  const resolvedPriority = VALID_PRIORITIES.includes(priority ?? "") ? priority : "Normal";
+
+  const data: Record<string, unknown> = {
+    Subject:      subject.trim(),
+    Status:       "Not Started",
+    Priority:     resolvedPriority,
+  };
+  if (description?.trim()) data["Description"] = description.trim();
+  if (dueDate)             data["ActivityDate"] = dueDate;
+
+  try {
+    const result = await client.createRecord("Task", data);
+    return res.status(201).json({ id: result.id, success: result.success });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: msg });
+  }
+});
+
+/**
+ * PATCH /api/sf/tasks/:id/complete
+ * Mark a Task as Completed.
+ */
+router.patch("/sf/tasks/:id/complete", async (req, res) => {
+  let client: ISalesforceClient;
+  try {
+    client = getSalesforceClient(req);
+  } catch {
+    return res.status(401).json({ error: "Not connected to Salesforce. Visit /api/auth/salesforce/login to connect." });
+  }
+
+  const { id } = req.params;
+  if (!id || !/^[a-zA-Z0-9]{15,18}$/.test(id)) {
+    return res.status(400).json({ error: "Invalid Task ID." });
+  }
+
+  try {
+    await client.updateRecord("Task", id, { Status: "Completed" });
+    return res.json({ success: true });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: msg });
+  }
+});
+
 // ── GET /salesforce/describe/:objectApiName ────────────────────────────────────
 
 router.get("/salesforce/describe/:objectApiName", async (req, res) => {

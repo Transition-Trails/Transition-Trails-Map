@@ -107,6 +107,7 @@ import LearnerQuest       from "@/pages/learner/LearnerQuest";
 import LearnerProgress    from "@/pages/learner/LearnerProgress";
 import HomebaseLanding    from "@/pages/homebase/HomebaseLanding";
 import TeamHomebase       from "@/pages/homebase/TeamHomebase";
+import TasksPage          from "@/pages/homebase/TasksPage";
 
 // ── TeamRoute — path-aware shell for team@ staff ──────────────────────────────
 // At '/' they see TeamHomebase; any admin path shows Mission Control (AppShell).
@@ -345,6 +346,9 @@ function Router() {
       {/* Standalone platform pages */}
       <Route path="/trail-os-overview"       component={TrailOSOverview} />
       <Route path="/release-notes"           component={ReleaseNotes} />
+
+      {/* Tasks */}
+      <Route path="/tasks" component={TasksPage} />
 
       {/* Administration */}
       <Route path="/admin/setup">             <Redirect to="/admin/integrations" /></Route>

@@ -3,7 +3,7 @@ import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import {
   Home, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
-  ChevronDown, Search,
+  ChevronDown, Search, CheckSquare,
 } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { type AccessTier, canAccess, TIER_CONFIG } from '@/config/accessTiers';
@@ -24,6 +24,15 @@ type NavGroup = {
 };
 
 const navGroups: NavGroup[] = [
+  {
+    id: 'tasks',
+    label: 'Tasks',
+    icon: CheckSquare,
+    pathPrefix: '/tasks',
+    items: [
+      { id: 'tasks-all', path: '/tasks', label: 'My Tasks' },
+    ],
+  },
   {
     id: 'operations',
     label: 'Operations',

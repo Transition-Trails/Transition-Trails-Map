@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { HomebaseShell } from "@/components/layout/HomebaseShell";
 import { useTierFlags }  from "@/hooks/useTierFlags";
+import { TodayTasksCard } from "@/components/homebase/TodayTasksCard";
 
 interface TeamHomebaseProps {
   displayName: string;
@@ -117,6 +118,14 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
               </a>
             ))}
           </div>
+        </div>
+
+        {/* Today's Tasks */}
+        <div>
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            Today's tasks
+          </p>
+          <TodayTasksCard />
         </div>
 
       </div>
