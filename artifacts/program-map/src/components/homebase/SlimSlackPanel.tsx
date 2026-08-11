@@ -24,7 +24,6 @@ import React, {
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronDown,
-  ChevronUp,
   ExternalLink,
   LogOut,
   MessageSquare,
@@ -32,6 +31,7 @@ import {
   Send,
   Loader2,
   AlertCircle,
+  User,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -175,25 +175,74 @@ function ConvItem({
   selected: boolean;
   onSelect: () => void;
 }) {
-  const icon =
-    conv.type === "channel" ? (
-      <Hash className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
-    ) : (
-      <MessageSquare className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
-    );
-
   return (
     <button
       onClick={onSelect}
-      className={`w-full flex items-center gap-2 px-3 py-1.5 text-left rounded-md transition-colors text-sm ${
+      className={`w-full flex items-center gap-2 px-2 py-1.5 text-left rounded-md transition-colors ${
         selected
-          ? "bg-primary/10 text-primary font-medium"
+          ? "bg-primary/10 text-primary"
           : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
       }`}
     >
-      {icon}
-      <span className="truncate text-[12px]">{conv.name}</span>
+      {conv.type === "channel"
+        ? <Hash className={`w-3 h-3 flex-shrink-0 ${selected ? "text-primary" : "text-muted-foreground/60"}`} />
+        : <span className={`w-3 h-3 flex-shrink-0 rounded-full border-2 ${selected ? "border-primary bg-primary/20" : "border-muted-foreground/40"}`} />
+      }
+      <span className={`truncate text-[12px] leading-tight ${selected ? "font-semibold" : "font-normal"}`}>
+        {conv.name}
+      </span>
     </button>
+  );
+}
+
+// ── Collapsible section ────────────────────────────────────────────────────────
+
+function ConvSection({
+  label,
+  icon,
+  items,
+  selectedId,
+  onSelect,
+  defaultOpen = true,
+}: {
+  label:       string;
+  icon:        React.ReactNode;
+  items:       Conversation[];
+  selectedId:  string | null;
+  onSelect:    (conv: Conversation) => void;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="mb-0.5">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-muted/20 transition-colors group"
+      >
+        <ChevronDown
+          className={`w-3 h-3 text-muted-foreground/50 flex-shrink-0 transition-transform duration-150 ${open ? "" : "-rotate-90"}`}
+        />
+        <span className="flex items-center gap-1 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase flex-1 text-left">
+          {icon}{label}
+        </span>
+        <span className="text-[10px] text-muted-foreground/40">{items.length}</span>
+      </button>
+      {open && (
+        <div className="pl-1 pr-1 pb-0.5 flex flex-col gap-0.5">
+          {items.map(conv => (
+            <ConvItem
+              key={conv.id}
+              conv={conv}
+              selected={selectedId === conv.id}
+              onSelect={() => onSelect(conv)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -491,25 +540,35 @@ function ConnectedView({
         </div>
       </div>
 
-      {/* Conversation list */}
-      <div className="flex-shrink-0 border-b border-border bg-white max-h-[140px] overflow-y-auto py-1 px-1">
+      {/* Conversation list — collapsible Channels + DMs */}
+      <div className="flex-shrink-0 border-b border-border bg-white overflow-y-auto py-1.5 px-1.5" style={{ maxHeight: "45%" }}>
         {convLoading ? (
           <div className="flex items-center justify-center py-3">
             <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
           </div>
         ) : convError ? (
-          <p className="text-[11px] text-destructive px-3 py-2">{convError}</p>
+          <p className="text-[11px] text-destructive px-2 py-2">{convError}</p>
         ) : conversations.length === 0 ? (
-          <p className="text-[11px] text-muted-foreground px-3 py-2">No conversations found.</p>
+          <p className="text-[11px] text-muted-foreground px-2 py-2">No conversations found.</p>
         ) : (
-          conversations.map(conv => (
-            <ConvItem
-              key={conv.id}
-              conv={conv}
-              selected={selectedConv?.id === conv.id}
-              onSelect={() => setSelectedConv(conv)}
+          <>
+            <ConvSection
+              label="Channels"
+              icon={<Hash className="w-3 h-3" />}
+              items={conversations.filter(c => c.type === "channel")}
+              selectedId={selectedConv?.id ?? null}
+              onSelect={setSelectedConv}
+              defaultOpen={true}
             />
-          ))
+            <ConvSection
+              label="Direct Messages"
+              icon={<User className="w-3 h-3" />}
+              items={conversations.filter(c => c.type === "im" || c.type === "mpim")}
+              selectedId={selectedConv?.id ?? null}
+              onSelect={setSelectedConv}
+              defaultOpen={true}
+            />
+          </>
         )}
       </div>
 
