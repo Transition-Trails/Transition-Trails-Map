@@ -203,15 +203,16 @@ router.get("/connected", (_req, res): void => {
   </div>
   <script>
     (function () {
-      try {
-        if (window.opener && !window.opener.closed) {
-          window.opener.location.reload();
-          window.close();
-          return;
-        }
-      } catch (_) { /* cross-origin guard — shouldn't happen */ }
-      // Fallback: not a popup, just navigate home.
-      window.location.replace('/');
+      if (window.opener && !window.opener.closed) {
+        // postMessage is cross-origin safe and works inside Replit preview iframes.
+        // The SPA listens for this event and calls window.location.reload() itself.
+        window.opener.postMessage({ type: 'sf-auth-complete' }, '*');
+        // Give the message a moment to land before closing.
+        setTimeout(function () { window.close(); }, 800);
+      } else {
+        // Not in a popup — just navigate home.
+        window.location.replace('/');
+      }
     })();
   </script>
 </body>

@@ -74,6 +74,9 @@ router.get("/sf/cases", async (req, res) => {
     [false, false],
   ];
 
+  // Work through all fallback combinations. Always try every variant —
+  // never bail early on a mid-chain error, because the real cause might be
+  // an optional field that the next variant drops.
   let lastError = "";
   for (const [withFollowUp, withModifiedBy] of attempts) {
     try {
@@ -84,12 +87,8 @@ router.get("/sf/cases", async (req, res) => {
       lastError = "";
       break;
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      lastError = msg;
-      // Only continue if the failure is a missing-field error
-      if (!/FollowUpDate|LastModifiedBy|No such column|INVALID_FIELD/i.test(msg)) {
-        return res.status(500).json({ error: msg });
-      }
+      lastError = e instanceof Error ? e.message : String(e);
+      // Always continue to the next fallback variant.
     }
   }
 

@@ -582,6 +582,19 @@ function InnerApp() {
 }
 
 function App() {
+  // Listen for the postMessage that the Salesforce OAuth popup sends after
+  // auth completes. The popup can't reliably reload window.opener across
+  // Replit's preview iframe boundaries, so we do the reload here instead.
+  useEffect(() => {
+    function onMessage(e: MessageEvent) {
+      if (e.data?.type === "sf-auth-complete") {
+        window.location.reload();
+      }
+    }
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, []);
+
   return (
     <WouterRouter base={basePath}>
       <QueryClientProvider client={queryClient}>
