@@ -617,6 +617,30 @@ router.get("/slack/conversations", requireSlackAuth, async (req, res) => {
   }
 });
 
+// ── POST /slack/conversations/:id/viewed ─────────────────────────────────────
+// Optimistic read-state update: zeroes out the cached unreadCount for one
+// conversation so that a page reload within the 60 s cache TTL also returns 0
+// instead of the stale count that was present before the user opened the DM.
+// This is a best-effort call — a missing cache entry is silently ignored.
+
+router.post("/slack/conversations/:id/viewed", requireSlackAuth, (req, res) => {
+  const email = req.session.googleEmail;
+  if (!email) { res.status(401).json({ error: "unauthenticated" }); return; }
+
+  const channelId = String(req.params["id"]);
+  const cached    = convCache.get(email);
+  if (cached) {
+    convCache.set(email, {
+      ...cached,
+      data: cached.data.map(c =>
+        c.id === channelId ? { ...c, unreadCount: 0 } : c,
+      ),
+    });
+  }
+
+  res.json({ ok: true });
+});
+
 // ── GET /slack/conversations/:id/history ─────────────────────────────────────
 
 router.get("/slack/conversations/:id/history", requireSlackAuth, async (req, res) => {

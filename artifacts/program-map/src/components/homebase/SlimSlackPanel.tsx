@@ -882,6 +882,15 @@ function ConnectedView({
     setSelectedConv(conv);
     if (conv && (conv.type === "im" || conv.type === "mpim")) {
       setViewedDmIds(prev => new Set(prev).add(conv.id));
+      // Optimistic update: zero out the unread count in local state immediately
+      // so the amber badge / grey dot disappears without waiting for cache expiry.
+      setConversations(prev =>
+        prev.map(c => c.id === conv.id ? { ...c, unreadCount: 0 } : c),
+      );
+      // Patch the server-side cache too so a page refresh within the 60 s TTL
+      // also returns 0 for this conversation.  Fire-and-forget — a failure here
+      // only means the badge may briefly reappear on reload, which is acceptable.
+      void apiPost(`/api/slack/conversations/${conv.id}/viewed`, {}).catch(() => undefined);
     }
   }, []);
 
