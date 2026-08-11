@@ -880,29 +880,38 @@ router.get("/slack/unreads", requireSlackAuth, async (req, res) => {
     }
 
     const rawChannels = (r["channels"] as Record<string, unknown>[]) ?? [];
+    const cutoff30d   = Date.now() / 1000 - 30 * 24 * 60 * 60;
+
     const withUnreads = rawChannels.filter(ch => {
-      const count = ch["unread_count"] as number | undefined;
-      return typeof count === "number" && count > 0;
+      const count   = ch["unread_count"] as number | undefined;
+      const latestTs = parseFloat(
+        ((ch["latest"] as Record<string, unknown> | undefined)?.["ts"] as string | undefined) ?? "0",
+      );
+      return typeof count === "number" && count > 0 && latestTs >= cutoff30d;
     });
 
     const items = await Promise.all(
-      withUnreads.map(async (ch): Promise<{ id: string; name: string; type: string; unreadCount: number }> => {
+      withUnreads.map(async (ch): Promise<{ id: string; name: string; type: string; unreadCount: number; latestTs: number }> => {
         const id          = ch["id"] as string;
         const unreadCount = (ch["unread_count"] as number) ?? 0;
+        const latestTs    = parseFloat(
+          ((ch["latest"] as Record<string, unknown> | undefined)?.["ts"] as string | undefined) ?? "0",
+        );
         if (ch["is_im"] === true) {
           const dmUserId = ch["user"] as string | undefined;
           const name     = dmUserId ? await resolveDisplayName(token!, dmUserId) : "Direct Message";
-          return { id, name, type: "im", unreadCount };
+          return { id, name, type: "im", unreadCount, latestTs };
         }
         if (ch["is_mpim"] === true) {
-          return { id, name: (ch["name"] as string | undefined) ?? "Group DM", type: "mpim", unreadCount };
+          return { id, name: (ch["name"] as string | undefined) ?? "Group DM", type: "mpim", unreadCount, latestTs };
         }
-        return { id, name: (ch["name"] as string | undefined) ?? id, type: "channel", unreadCount };
+        return { id, name: (ch["name"] as string | undefined) ?? id, type: "channel", unreadCount, latestTs };
       }),
     );
 
-    items.sort((a, b) => b.unreadCount - a.unreadCount);
-    res.json({ unreads: items });
+    // Sort by most recently active first (mirrors Slack sidebar order)
+    items.sort((a, b) => b.latestTs - a.latestTs);
+    res.json({ unreads: items.map(({ latestTs: _ts, ...rest }) => rest) });
   } catch (err) {
     req.log.error({ err }, "slack unreads fetch error");
     res.status(502).json({ error: "fetch_error" });
@@ -971,17 +980,19 @@ router.get("/slack/threads", requireSlackAuth, async (req, res) => {
         });
         if (histR["ok"] !== true) return;
 
+        const cutoff30d   = Date.now() / 1000 - 30 * 24 * 60 * 60;
         const messages = (histR["messages"] as Record<string, unknown>[]) ?? [];
         for (const msg of messages) {
-          const replyCount = (msg["reply_count"] as number | undefined) ?? 0;
-          if (replyCount > 0) {
+          const replyCount  = (msg["reply_count"] as number | undefined) ?? 0;
+          const latestReply = (msg["latest_reply"] as string | undefined) ?? (msg["ts"] as string);
+          if (replyCount > 0 && parseFloat(latestReply) >= cutoff30d) {
             allThreads.push({
               channelId,
               channelName,
               threadTs:    msg["ts"] as string,
               text:        ((msg["text"] as string | undefined) ?? "").slice(0, 120),
               replyCount,
-              latestReply: (msg["latest_reply"] as string | undefined) ?? (msg["ts"] as string),
+              latestReply,
             });
           }
         }
