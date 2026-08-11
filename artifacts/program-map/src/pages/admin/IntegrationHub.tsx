@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { TERMS } from '@/config/terminology';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -7,7 +7,7 @@ import {
   MessageCircle, Mail, Layout as LayoutIcon, GraduationCap,
   ChevronRight, ChevronDown, ChevronUp, AlertTriangle, CheckCircle2,
   Clock, Plug, Key, Bot, Activity, BookOpen, Shield,
-  Network, LogIn, LogOut, User, Loader2,
+  Network, LogIn, LogOut, User, Loader2, Video,
 } from 'lucide-react';
 import { useSalesforceAuth } from '@/hooks/useSalesforceAuth';
 
@@ -105,6 +105,12 @@ const CONNECTIONS: Connection[] = [
     id: 'mural', name: 'Mural', tagline: 'Visual Collaboration',
     status: 'phase-3', icon: LayoutIcon, iconCls: 'bg-zinc-50 text-zinc-400', owner: '—',
     detail: 'Whiteboard integration for sprint planning and retrospectives. Phase 3 — after Drive and collaboration foundations are complete.', action: '', href: '',
+  },
+  {
+    id: 'fathom', name: 'Fathom', tagline: 'Meeting Notes & Recordings',
+    status: 'configured', icon: Video, iconCls: 'bg-[#EDF5F8] text-[#2F6F7E]', owner: 'Per-user',
+    detail: 'Personal meeting recordings and AI-generated notes. Each staff member connects their own Fathom API key.',
+    action: '', href: '',
   },
   {
     id: 'lms', name: 'LMS', tagline: 'Learning Delivery Platform',
@@ -234,6 +240,157 @@ function SalesforceConnectionCard({ conn: c, navigate }: { conn: Connection; nav
   );
 }
 
+// ── Fathom connection card (per-user API key) ─────────────────────────────────
+
+type FathomView = 'checking' | 'connect' | 'connecting' | 'connected';
+
+function FathomConnectionCard({ conn: c }: { conn: Connection }) {
+  const cfg = CONN_STATUS[c.status];
+  const Icon = c.icon;
+
+  const [view,        setView]        = useState<FathomView>('checking');
+  const [apiKeyInput, setApiKeyInput] = useState('');
+  const [connectErr,  setConnectErr]  = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const checkStatus = useCallback(async () => {
+    setView('checking');
+    try {
+      const res  = await fetch('/api/fathom/status');
+      const data = await res.json() as { connected: boolean };
+      setView(data.connected ? 'connected' : 'connect');
+    } catch {
+      setView('connect');
+    }
+  }, []);
+
+  useEffect(() => { void checkStatus(); }, [checkStatus]);
+  useEffect(() => { if (view === 'connect') inputRef.current?.focus(); }, [view]);
+
+  async function handleConnect(e: React.FormEvent) {
+    e.preventDefault();
+    const key = apiKeyInput.trim();
+    if (!key) return;
+    setConnectErr(null);
+    setView('connecting');
+    try {
+      const res  = await fetch('/api/fathom/key', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: key }),
+      });
+      const data = await res.json() as { connected?: boolean; error?: string };
+      if (res.ok && data.connected) {
+        setApiKeyInput('');
+        setView('connected');
+      } else {
+        setConnectErr(data.error ?? 'Could not verify key. Please try again.');
+        setView('connect');
+      }
+    } catch {
+      setConnectErr('Network error. Please try again.');
+      setView('connect');
+    }
+  }
+
+  async function handleDisconnect() {
+    try { await fetch('/api/fathom/key', { method: 'DELETE' }); } catch { /* best-effort */ }
+    setApiKeyInput('');
+    setConnectErr(null);
+    setView('connect');
+  }
+
+  return (
+    <div className="rounded-lg border border-border p-3.5 bg-white flex flex-col gap-2">
+      {/* Header row */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 ${c.iconCls}`}>
+            <Icon className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[14px] font-bold text-foreground leading-tight">{c.name}</p>
+            <p className="text-[14px] text-muted-foreground">{c.tagline}</p>
+          </div>
+        </div>
+        <div className={`flex items-center gap-1 border rounded-full px-1.5 py-0.5 flex-shrink-0 ${cfg.cls}`}>
+          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${cfg.dot}`} />
+          <span className={`text-[14px] font-bold whitespace-nowrap ${cfg.badge}`}>{cfg.label}</span>
+        </div>
+      </div>
+
+      <p className="text-[14px] text-muted-foreground leading-relaxed">{c.detail}</p>
+
+      {/* Dynamic connection area */}
+      {view === 'checking' && (
+        <div className="flex items-center gap-1.5 rounded-md px-2 py-1.5 bg-slate-50 border border-slate-100">
+          <Loader2 className="w-3 h-3 text-slate-400 animate-spin flex-shrink-0" />
+          <p className="text-[14px] text-slate-500">Checking your Fathom connection…</p>
+        </div>
+      )}
+
+      {view === 'connected' && (
+        <div className="flex items-center justify-between gap-2 rounded-md px-2 py-1.5 bg-[#E6F0EA] border border-[#9FC3AE]">
+          <div className="flex items-center gap-1.5">
+            <CheckCircle2 className="w-3 h-3 text-[#2F6B3F] flex-shrink-0" />
+            <p className="text-[14px] font-semibold text-[#245531]">Connected</p>
+          </div>
+          <button
+            onClick={() => void handleDisconnect()}
+            className="flex items-center gap-1 text-[14px] font-semibold text-[#A93F2F] hover:text-[#A93F2F]/80 transition-colors flex-shrink-0"
+          >
+            <LogOut className="w-3 h-3" />
+            Disconnect
+          </button>
+        </div>
+      )}
+
+      {(view === 'connect' || view === 'connecting') && (
+        <form onSubmit={handleConnect} className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              type="password"
+              value={apiKeyInput}
+              onChange={e => setApiKeyInput(e.target.value)}
+              placeholder="Paste your Fathom API key…"
+              className="flex-1 min-w-0 text-[12px] border border-border rounded-md px-3 py-1.5 bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50 disabled:opacity-50"
+              disabled={view === 'connecting'}
+              autoComplete="off"
+            />
+            <button
+              type="submit"
+              disabled={!apiKeyInput.trim() || view === 'connecting'}
+              className="flex-shrink-0 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {view === 'connecting' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Connect'}
+            </button>
+          </div>
+          {connectErr && (
+            <div className="flex items-start gap-1.5 text-[11px] text-rose-600">
+              <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+              <span>{connectErr}</span>
+            </div>
+          )}
+        </form>
+      )}
+
+      {/* Footer */}
+      <div className="flex items-center justify-between mt-auto pt-0.5">
+        <span className="text-[14px] text-muted-foreground/50">{c.owner}</span>
+        <a
+          href="https://app.fathom.video/settings/api-access"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 text-[14px] font-semibold text-primary hover:text-primary/70 transition-colors"
+        >
+          Get API key <ChevronRight className="w-3 h-3" />
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
   const live    = CONNECTIONS.filter(c => ['live', 'live-partial', 'configured'].includes(c.status));
   const needsSet = CONNECTIONS.filter(c => c.status === 'needs-setup');
@@ -253,7 +410,9 @@ function ConnectionsTab({ navigate }: { navigate: (href: string) => void }) {
             {live.map(c =>
               c.id === 'salesforce'
                 ? <SalesforceConnectionCard key={c.id} conn={c} navigate={navigate} />
-                : <ConnectionCard key={c.id} conn={c} navigate={navigate} />
+                : c.id === 'fathom'
+                  ? <FathomConnectionCard key={c.id} conn={c} />
+                  : <ConnectionCard key={c.id} conn={c} navigate={navigate} />
             )}
           </div>
         </div>
