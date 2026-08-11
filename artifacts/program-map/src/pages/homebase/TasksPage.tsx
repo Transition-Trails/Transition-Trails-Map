@@ -151,6 +151,9 @@ export default function TasksPage() {
   const [completing, setCompleting] = useState<Set<string>>(new Set());
   const [completed, setCompleted]   = useState<Set<string>>(new Set());
   const [orgBaseUrl, setOrgBaseUrl] = useState<string>("");
+  const [counts, setCounts]         = useState<{ active: number | null; all: number | null; completed: number | null }>({
+    active: null, all: null, completed: null,
+  });
 
   const load = useCallback(async (tab: FilterTab) => {
     setLoading(true);
@@ -172,6 +175,20 @@ export default function TasksPage() {
   }, []);
 
   useEffect(() => { void load(filter); }, [filter, load]);
+
+  // Fetch counts for all tabs on mount (non-blocking — runs independently of task list)
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch("/api/sf/tasks/counts");
+        if (!res.ok) return;
+        const data = await res.json() as { active: number; all: number; completed: number };
+        setCounts({ active: data.active, all: data.all, completed: data.completed });
+      } catch {
+        // counts are best-effort; failing silently is fine
+      }
+    })();
+  }, []);
 
   async function handleComplete(task: SfTask) {
     setCompleted(prev => new Set([...prev, task.Id]));
@@ -215,19 +232,35 @@ export default function TasksPage() {
 
         {/* Filter tabs */}
         <div className="flex gap-0.5 border-b border-border">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setFilter(tab.id)}
-              className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                filter === tab.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {TABS.map(tab => {
+            const count = counts[tab.id];
+            const isActive = filter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setFilter(tab.id)}
+                className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                  isActive
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.label}
+                {/* Count badge — shown once counts have loaded; "—" while loading */}
+                <span
+                  className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none tabular-nums ${
+                    tab.id === "active" && count !== null && count > 0
+                      ? isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {count === null ? "—" : count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Content */}

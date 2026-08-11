@@ -96,7 +96,7 @@ import app from '../app.js';
 
 // ── Session helpers ───────────────────────────────────────────────────────────
 
-function setStaffSession(sfUserId = 'U_CURRENT_005XXXX') {
+function setStaffSession(sfUserId = '005CURRENT0001ABC') {
   Object.assign(mockSession, {
     googleEmail:      'staff@transitiontrails.org',
     googleGroups:     ['trailosmembers'],
@@ -146,7 +146,7 @@ describe('SF task ownership enforcement', () => {
   });
 
   it('2. GET /sf/tasks — SOQL contains OwnerId scoped to session sfUserId', async () => {
-    setStaffSession('U_ALICE_005XXXALICE');
+    setStaffSession('005ALICE0001AAAAAA');
 
     mockQuery.mockResolvedValue({
       totalSize: 1,
@@ -160,7 +160,7 @@ describe('SF task ownership enforcement', () => {
 
     // The executed SOQL must be scoped to Alice's ID — never a cross-org query
     const [capturedSoql] = mockQuery.mock.calls[0] as [string];
-    expect(capturedSoql).toContain("OwnerId = 'U_ALICE_005XXXALICE'");
+    expect(capturedSoql).toContain("OwnerId = '005ALICE0001AAAAAA'");
     // Confirm IsDeleted = false is also applied so soft-deleted tasks are excluded
     expect(capturedSoql).toContain('IsDeleted = false');
   });
@@ -185,7 +185,7 @@ describe('SF task ownership enforcement', () => {
   });
 
   it('4. PATCH /sf/tasks/:id/complete — 404 when Task is not owned by current user (cross-owner IDOR attempt)', async () => {
-    setStaffSession('U_BOB_005XXXBOB');
+    setStaffSession('005BOB00001BBBBBB');
 
     // Ownership query returns no records — the task belongs to someone else
     mockQuery.mockResolvedValue({ totalSize: 0, done: true, records: [] });
@@ -199,12 +199,12 @@ describe('SF task ownership enforcement', () => {
 
     // Ownership SOQL must scope to Bob's ID
     const [ownershipSoql] = mockQuery.mock.calls[0] as [string];
-    expect(ownershipSoql).toContain("OwnerId = 'U_BOB_005XXXBOB'");
+    expect(ownershipSoql).toContain("OwnerId = '005BOB00001BBBBBB'");
     expect(ownershipSoql).toContain("Id = '00T000000000002AAA'");
   });
 
   it('5. PATCH /sf/tasks/:id/complete — 200 when task is owned by current user', async () => {
-    setStaffSession('U_ALICE_005XXXALICE');
+    setStaffSession('005ALICE0001AAAAAA');
 
     // Ownership query returns the task — it belongs to Alice
     mockQuery.mockResolvedValue({

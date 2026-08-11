@@ -50,6 +50,8 @@ const {
   lastCreateRecordData,
   mockSfUserId,
   lastQuerySoql,
+  mockAggregateRows,
+  mockQueryError,
 } = vi.hoisted(() => ({
   /** When non-null, createRecord returns this result. */
   mockCreateRecordResult: { value: { id: 'fake-task-id-001', success: true } as { id: string; success: boolean } },
@@ -67,6 +69,13 @@ const {
   mockSfUserId: { value: '005SF000001TestABC' as string | null },
   /** Captures the SOQL string passed to client.query() for GET /sf/tasks assertions. */
   lastQuerySoql: { value: null as string | null },
+  /**
+   * When non-null, GROUP BY aggregate queries (counts endpoint) return these rows.
+   * Each row models one AggregateResult: { Status, expr0 (COUNT) }.
+   */
+  mockAggregateRows: { value: null as Array<{ Status: string; expr0: number }> | null },
+  /** When non-null, query() throws this error instead of returning data. */
+  mockQueryError: { value: null as Error | null },
 }));
 
 // ── Mock salesforceOAuth (not exercised by this suite) ─────────────────────────
@@ -97,6 +106,13 @@ vi.mock('../lib/getSalesforceClient.js', () => ({
     return {
       query: async <T>(soql: string) => {
         lastQuerySoql.value = soql;
+        if (mockQueryError.value) throw mockQueryError.value;
+        // Counts endpoint — single GROUP BY aggregate query.
+        // Return mockAggregateRows if set; otherwise empty result.
+        if (soql.includes('GROUP BY Status')) {
+          const rows = mockAggregateRows.value ?? [];
+          return { totalSize: rows.length, done: true, records: rows as unknown as T[] };
+        }
         // The PATCH /:id/complete route runs an ownership check:
         //   SELECT Id FROM Task WHERE Id = '<taskId>' AND OwnerId = '<userId>' ...
         // The mock returns empty records by default, which causes the route to
@@ -126,6 +142,12 @@ vi.mock('../lib/getSalesforceClient.js', () => ({
 vi.mock('../lib/connectorSalesforceClient.js', () => ({
   ConnectorSalesforceClient: class {
     async query<T>(soql: string) {
+      if (mockQueryError.value) throw mockQueryError.value;
+      // Counts endpoint — GROUP BY aggregate query.
+      if (soql.includes('GROUP BY Status')) {
+        const rows = mockAggregateRows.value ?? [];
+        return { totalSize: rows.length, done: true, records: rows as unknown as T[] };
+      }
       // Mirror the ownership-check fix applied to getSalesforceClient above.
       const ownershipMatch = /FROM Task WHERE Id = '([^']+)'/.exec(soql);
       if (ownershipMatch) {
@@ -154,9 +176,11 @@ beforeEach(() => {
   mockCreateRecordResult.value = { id: 'fake-task-id-001', success: true };
   mockCreateRecordError.value  = null;
   mockUpdateRecordError.value  = null;
+  mockQueryError.value         = null;
   lastCreateRecordData.value   = null;
   mockSfUserId.value           = '005SF000001TestABC';
   lastQuerySoql.value          = null;
+  mockAggregateRows.value      = null;
 });
 
 // ── V. POST route: subject validation ─────────────────────────────────────────
@@ -676,6 +700,107 @@ describe('GET /api/sf/tasks — status filter', () => {
 
     expect(res.status).toBe(200);
     expect(lastQuerySoql.value).toContain("Status IN ('Not Started', 'In Progress', 'Deferred')");
+  });
+});
+
+// ── C. GET /sf/tasks/counts ───────────────────────────────────────────────────
+//
+// The endpoint runs a single GROUP BY aggregate SOQL query and maps the
+// AggregateResult rows (Status + expr0 count) to { active, completed, all }.
+
+describe('GET /api/sf/tasks/counts', () => {
+
+  // ── C1: authentication guards ──────────────────────────────────────────────
+
+  test('C1: returns 401 when not connected to Salesforce', async () => {
+    mockSfUserId.value = null; // causes getSalesforceClient to throw
+
+    const res = await request(app).get('/api/sf/tasks/counts');
+
+    expect(res.status).toBe(401);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error.length).toBeGreaterThan(0);
+  });
+
+  // ── C2: single GROUP BY query ──────────────────────────────────────────────
+
+  test('C2: issues a single GROUP BY aggregate query (one SF API call)', async () => {
+    mockAggregateRows.value = [];
+
+    await request(app).get('/api/sf/tasks/counts');
+
+    expect(lastQuerySoql.value).toContain('GROUP BY Status');
+    expect(lastQuerySoql.value).toContain('COUNT(Id)');
+  });
+
+  test('C2: the GROUP BY query is scoped to the authenticated user', async () => {
+    mockAggregateRows.value = [];
+
+    await request(app).get('/api/sf/tasks/counts');
+
+    expect(lastQuerySoql.value).toContain("OwnerId = '005SF000001TestABC'");
+    expect(lastQuerySoql.value).toContain('IsDeleted = false');
+  });
+
+  // ── C3: correct count derivation from aggregate rows ──────────────────────
+
+  test('C3: correctly tallies active, completed and all from aggregate rows', async () => {
+    mockAggregateRows.value = [
+      { Status: 'Not Started', expr0: 5 },
+      { Status: 'In Progress', expr0: 2 },
+      { Status: 'Deferred',    expr0: 1 },
+      { Status: 'Completed',   expr0: 10 },
+      { Status: 'Waiting',     expr0: 3 },  // other status — counts only toward "all"
+    ];
+
+    const res = await request(app).get('/api/sf/tasks/counts');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ active: 8, completed: 10, all: 21 });
+  });
+
+  test('C3: active count is 0 when all tasks are completed', async () => {
+    mockAggregateRows.value = [
+      { Status: 'Completed', expr0: 7 },
+    ];
+
+    const res = await request(app).get('/api/sf/tasks/counts');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ active: 0, completed: 7, all: 7 });
+  });
+
+  test('C3: returns zeros for all counts when no tasks exist', async () => {
+    mockAggregateRows.value = [];
+
+    const res = await request(app).get('/api/sf/tasks/counts');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ active: 0, completed: 0, all: 0 });
+  });
+
+  // ── C4: SF query failure → 500 ─────────────────────────────────────────────
+
+  test('C4: returns 500 when the Salesforce query throws', async () => {
+    mockQueryError.value = new Error('QUERY_TIMEOUT: Execution time limit exceeded');
+
+    const res = await request(app).get('/api/sf/tasks/counts');
+
+    expect(res.status).toBe(500);
+    expect(typeof res.body.error).toBe('string');
+    expect(res.body.error).toContain('QUERY_TIMEOUT');
+  });
+
+  test('C4: 500 body does not contain a stack trace', async () => {
+    mockQueryError.value = new Error('REQUEST_LIMIT_EXCEEDED: Daily API limit reached');
+
+    const res = await request(app).get('/api/sf/tasks/counts');
+
+    expect(res.status).toBe(500);
+    const body = JSON.stringify(res.body);
+    expect(body).not.toMatch(/\bat\s+\w/);
+    expect(body).not.toMatch(/\.ts:\d+/);
+    expect(body).not.toMatch(/\.js:\d+/);
   });
 });
 

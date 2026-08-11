@@ -1471,6 +1471,54 @@ router.post("/salesforce/governance/classroom-nudges", withClient(async (req, re
 // ── SF Tasks API ───────────────────────────────────────────────────────────────
 
 /**
+ * GET /api/sf/tasks/counts
+ * Returns task counts for each filter tab (active, completed, all).
+ *
+ * Uses a single GROUP BY aggregate query so only one Salesforce API call is
+ * made per page load. Salesforce returns the COUNT(Id) value as the `expr0`
+ * field on each AggregateResult row (SOQL does not support column aliases on
+ * aggregate functions). Active = Not Started | In Progress | Deferred.
+ */
+router.get("/sf/tasks/counts", async (req, res) => {
+  let client: ISalesforceClient;
+  try {
+    client = getSalesforceClient(req);
+  } catch {
+    return res.status(401).json({ error: "Not connected to Salesforce." });
+  }
+
+  const sfUserId = req.session.sfUserId;
+  if (!sfUserId || !/^[a-zA-Z0-9]{15,18}$/.test(sfUserId)) {
+    return res.status(401).json({ error: "Salesforce user identity unavailable." });
+  }
+
+  type AggregateRow = { Status: string; expr0: number };
+  const ACTIVE_STATUSES = new Set(["Not Started", "In Progress", "Deferred"]);
+
+  try {
+    const result = await client.query<AggregateRow>(
+      `SELECT Status, COUNT(Id) FROM Task WHERE IsDeleted = false AND OwnerId = '${sfUserId}' GROUP BY Status`,
+    );
+
+    let active = 0;
+    let completed = 0;
+    let all = 0;
+
+    for (const row of result.records) {
+      const n = Number(row.expr0) || 0;
+      all += n;
+      if (row.Status === "Completed")             completed += n;
+      else if (ACTIVE_STATUSES.has(row.Status))   active    += n;
+    }
+
+    return res.json({ active, completed, all });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(500).json({ error: msg });
+  }
+});
+
+/**
  * GET /api/sf/tasks
  * Returns Tasks owned by the current SF user.
  * Query param: ?status=active (open+in-progress, default) | all | completed
