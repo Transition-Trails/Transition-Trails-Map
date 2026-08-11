@@ -18,7 +18,7 @@ const router = Router();
 // ── POST /api/time-logs ────────────────────────────────────────────────────────
 
 router.post("/time-logs", async (req, res) => {
-  const userEmail = req.session.userEmail ?? req.session.email;
+  const userEmail = req.session.googleEmail ?? req.session.sfEmail;
   if (!userEmail) return res.status(401).json({ error: "Not authenticated." });
 
   const { sfObjectType, sfObjectId, sfObjectName, minutes, notes, workDate } = req.body as {
@@ -63,7 +63,7 @@ router.post("/time-logs", async (req, res) => {
 // ── GET /api/time-logs ─────────────────────────────────────────────────────────
 
 router.get("/time-logs", async (req, res) => {
-  const userEmail = req.session.userEmail ?? req.session.email;
+  const userEmail = req.session.googleEmail ?? req.session.sfEmail;
   if (!userEmail) return res.status(401).json({ error: "Not authenticated." });
 
   // Optional filter: ?objectId=xxx returns entries for a specific SF record
@@ -93,7 +93,7 @@ router.get("/time-logs", async (req, res) => {
 // Pass ?objectIds=id1,id2,id3 to query multiple objects at once.
 
 router.get("/time-logs/summary", async (req, res) => {
-  const userEmail = req.session.userEmail ?? req.session.email;
+  const userEmail = req.session.googleEmail ?? req.session.sfEmail;
   if (!userEmail) return res.status(401).json({ error: "Not authenticated." });
 
   const objectIds = ((req.query["objectIds"] as string) ?? "")
@@ -133,7 +133,7 @@ router.get("/time-logs/summary", async (req, res) => {
 // ── DELETE /api/time-logs/:id ──────────────────────────────────────────────────
 
 router.delete("/time-logs/:id", async (req, res) => {
-  const userEmail = req.session.userEmail ?? req.session.email;
+  const userEmail = req.session.googleEmail ?? req.session.sfEmail;
   if (!userEmail) return res.status(401).json({ error: "Not authenticated." });
 
   const id = parseInt(req.params["id"] ?? "", 10);

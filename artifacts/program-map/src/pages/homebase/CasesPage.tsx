@@ -61,8 +61,13 @@ const PRIORITY_CHIPS: Record<PriorityFilter, string> = {
   Low:    "bg-sky-100 text-sky-700 ring-1 ring-sky-300",
 };
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
+function formatMinutes(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
 function ageLabel(dateStr: string | null): string {
   if (!dateStr) return "—";
   const ms   = Date.now() - new Date(dateStr).getTime();
@@ -109,6 +114,7 @@ export default function CasesPage() {
   const [followUpDateSupported, setFollowUpDateSupported] = useState(true);
   const [loading,            setLoading]            = useState(true);
   const [sfUnavailable,      setSfUnavailable]      = useState(false);
+  const [timeSummary,        setTimeSummary]        = useState<Record<string, number>>({});
 
   // UI state
   const [filter,         setFilter]         = useState<FilterTab>("open");
@@ -131,10 +137,21 @@ export default function CasesPage() {
         orgBaseUrl?: string;
         followUpDateSupported?: boolean;
       };
-      setCases(data.cases ?? []);
+      const loaded = data.cases ?? [];
+      setCases(loaded);
       if (data.orgBaseUrl) setOrgBaseUrl(data.orgBaseUrl);
       if (typeof data.followUpDateSupported === "boolean") {
         setFollowUpDateSupported(data.followUpDateSupported);
+      }
+      // Batch-fetch time totals for all loaded cases
+      if (loaded.length > 0) {
+        const ids = loaded.map(c => c.Id).join(",");
+        fetch(`/api/time-logs/summary?objectIds=${ids}`)
+          .then(r => r.ok ? r.json() : null)
+          .then((d: { summary?: Record<string, number> } | null) => {
+            if (d?.summary) setTimeSummary(d.summary);
+          })
+          .catch(() => { /* non-critical — badge just won't show */ });
       }
     } catch {
       setSfUnavailable(true);
@@ -451,6 +468,25 @@ export default function CasesPage() {
                       ) : (
                         <span className="text-muted-foreground/40 text-[12px]">—</span>
                       )}
+                    </td>
+
+                    {/* Last Activity + time badge */}
+                    <td className="px-3 py-3.5 w-40 align-top">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[12px] text-muted-foreground whitespace-nowrap">
+                          {activityLabel(c.LastActivityDate ?? c.LastModifiedDate)}
+                        </span>
+                        {timeSummary[c.Id] > 0 && (
+                          <span className={`inline-flex items-center gap-0.5 self-start rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                            timeSummary[c.Id] >= 60
+                              ? "bg-slate-100 text-slate-600"
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            <Clock className="w-2.5 h-2.5" />
+                            {formatMinutes(timeSummary[c.Id])}
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     {/* Age */}

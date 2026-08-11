@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   Briefcase, Loader2, RefreshCw,
-  ChevronDown, ChevronRight,
+  ChevronDown, ChevronRight, Clock,
 } from "lucide-react";
 import { useLocation }     from "wouter";
 import { useCollapsible }  from "@/hooks/useCollapsible";
@@ -22,6 +22,14 @@ import { CaseHoverCard }  from "./CaseHoverCard";
 import type { SfCase }    from "./CaseHoverCard";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+function formatMinutes(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}
 
 function activityLabel(dateStr: string | null): string {
   if (!dateStr) return "—";
@@ -63,6 +71,7 @@ export function CasesCard() {
   const [followUpDateSupported, setFollowUpDateSupported] = useState(true);
   const [loading,               setLoading]               = useState(true);
   const [sfUnavailable,         setSfUnavailable]         = useState(false);
+  const [timeSummary,           setTimeSummary]           = useState<Record<string, number>>({});
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -77,10 +86,21 @@ export function CasesCard() {
         followUpDateSupported?: boolean;
       };
       // Cap at 5 for the dashboard widget; full list lives on /cases.
-      setCases((data.cases ?? []).slice(0, 5));
+      const loaded = (data.cases ?? []).slice(0, 5);
+      setCases(loaded);
       if (data.orgBaseUrl) setOrgBaseUrl(data.orgBaseUrl);
       if (typeof data.followUpDateSupported === "boolean") {
         setFollowUpDateSupported(data.followUpDateSupported);
+      }
+      // Batch-fetch time totals for all visible cases
+      if (loaded.length > 0) {
+        const ids = loaded.map(c => c.Id).join(",");
+        fetch(`/api/time-logs/summary?objectIds=${ids}`)
+          .then(r => r.ok ? r.json() : null)
+          .then((d: { summary?: Record<string, number> } | null) => {
+            if (d?.summary) setTimeSummary(d.summary);
+          })
+          .catch(() => { /* non-critical — badge just won't show */ });
       }
     } catch {
       setSfUnavailable(true);
@@ -214,6 +234,16 @@ export function CasesCard() {
 
                           {/* Badges */}
                           <div className="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
+                            {timeSummary[c.Id] > 0 && (
+                              <span className={`inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                                timeSummary[c.Id] >= 60
+                                  ? "bg-slate-100 text-slate-600"
+                                  : "bg-muted text-muted-foreground"
+                              }`}>
+                                <Clock className="w-2.5 h-2.5" />
+                                {formatMinutes(timeSummary[c.Id])}
+                              </span>
+                            )}
                             {c.Priority && priCls && (
                               <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${priCls}`}>
                                 {c.Priority}
