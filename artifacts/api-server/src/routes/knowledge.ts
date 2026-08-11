@@ -851,6 +851,8 @@ interface SfArticleDetail extends SfArticle {
   body: string | null;
   urlName: string | null;
   sections: ArticleSection[];
+  sfUrl: string | null;
+  sfEditUrl: string | null;
 }
 
 // ── Data-category helpers ──────────────────────────────────────────────────────
@@ -1430,6 +1432,7 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
     // Fetch ALL content fields from the article-type __kav object.
     const sections: ArticleSection[] = [];
     let body: string | null = null;
+    let orgBaseUrl: string | null = null;
     const allBodyInfo = await getKavAllBodyFields(client, {
       warn: (m) => req.log.warn(m),
       info: (m) => req.log.info(m),
@@ -1446,7 +1449,6 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
         const row = bodyResult.records[0];
         if (row) {
           // Fetch org base URL once for image rewriting across all sections.
-          let orgBaseUrl: string | null = null;
           try { orgBaseUrl = await client.getOrgBaseUrl(); } catch { /* ok — images will load without rewrite */ }
 
           for (const field of allBodyInfo.fields) {
@@ -1465,6 +1467,14 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
       }
     }
 
+    // Ensure we have the org base URL for building Salesforce record links
+    if (!orgBaseUrl) {
+      try { orgBaseUrl = await client.getOrgBaseUrl(); } catch { /* ok */ }
+    }
+    const sfType    = meta.ArticleType ?? 'Knowledge__kav';
+    const sfUrl     = orgBaseUrl ? `${orgBaseUrl}/lightning/r/${sfType}/${meta.Id}/view` : null;
+    const sfEditUrl = orgBaseUrl ? `${orgBaseUrl}/lightning/r/${sfType}/${meta.Id}/edit` : null;
+
     const article: SfArticleDetail = {
       id:                 meta.Id,
       knowledgeArticleId: meta.KnowledgeArticleId,
@@ -1481,6 +1491,8 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
       urlName:            meta.UrlName ?? null,
       body,
       sections,
+      sfUrl,
+      sfEditUrl,
     };
 
     res.json({ article });

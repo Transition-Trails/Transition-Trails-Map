@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Search, FileText, ChevronRight, Loader2, AlertCircle,
   RefreshCw, Calendar, Globe, Eye, EyeOff, BookOpen, CheckCircle, Clock,
+  Pencil, ExternalLink,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -45,6 +46,8 @@ interface SfArticleDetail extends SfArticle {
   body: string | null;
   urlName: string | null;
   sections?: ArticleSection[];
+  sfUrl?: string | null;
+  sfEditUrl?: string | null;
 }
 
 interface ArticlesResponse {
@@ -276,6 +279,18 @@ function DetailPanel({ articleId }: { articleId: string }) {
               <p className="text-[13px] text-muted-foreground mt-1.5 leading-relaxed">{a.summary}</p>
             )}
           </div>
+          {a.sfEditUrl && (
+            <a
+              href={a.sfEditUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-[12px] font-medium text-foreground hover:border-primary/40 hover:bg-muted/40 transition-colors shrink-0 shadow-sm"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              Edit in Salesforce
+              <ExternalLink className="w-3 h-3 text-muted-foreground/60" />
+            </a>
+          )}
         </div>
 
         {/* Metadata strip */}
