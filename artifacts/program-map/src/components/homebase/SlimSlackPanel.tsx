@@ -173,8 +173,39 @@ function ConvItem({
 
 // ── Unconnected state ─────────────────────────────────────────────────────────
 
-function UnconnectedView({ returnPath }: { returnPath: string }) {
+function UnconnectedView({
+  returnPath,
+  onConnected,
+}: {
+  returnPath:  string;
+  onConnected: () => void;
+}) {
+  // Use the homebase page itself as the OAuth return destination so the
+  // callback lands somewhere the panel can detect ?slackOAuth=connected.
   const authorizeUrl = `${BASE}/api/slack/oauth/authorize?return=${encodeURIComponent(returnPath)}`;
+
+  const handleConnect = useCallback(() => {
+    // Open in a popup so the original tab's panel auto-refreshes on completion.
+    const popup = window.open(
+      authorizeUrl,
+      "slack-oauth",
+      "width=620,height=720,scrollbars=yes,resizable=yes",
+    );
+
+    if (!popup) {
+      // Popup blocked (e.g. strict browser settings) — open in a new tab.
+      window.open(authorizeUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // Poll until the popup closes, then re-check connection status.
+    const timer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(timer);
+        onConnected();
+      }
+    }, 600);
+  }, [authorizeUrl, onConnected]);
 
   return (
     <div className="flex flex-col items-center gap-4 px-4 py-6 text-center">
@@ -185,13 +216,13 @@ function UnconnectedView({ returnPath }: { returnPath: string }) {
           Sign in with Slack to read your channels and DMs without leaving Trail OS.
         </p>
       </div>
-      <a
-        href={authorizeUrl}
+      <button
+        onClick={handleConnect}
         className="flex items-center gap-2 rounded-lg bg-[#4A154B] px-4 py-2 text-white text-sm font-medium hover:bg-[#611f69] transition-colors"
       >
         <SlackIcon size={16} />
         Connect Slack
-      </a>
+      </button>
       <p className="text-[10px] text-muted-foreground leading-relaxed px-2">
         Messages you send here post as you — not as a bot.
       </p>
@@ -528,7 +559,7 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
                 <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
               </div>
             ) : status.state === "unconnected" ? (
-              <UnconnectedView returnPath={returnPath} />
+              <UnconnectedView returnPath={returnPath} onConnected={checkStatus} />
             ) : (
               <ConnectedView
                 teamName={status.teamName}
