@@ -104,12 +104,14 @@ const requireSlackAuth: RequestHandler = (req, res, next) => {
     return;
   }
 
-  // 3. Homebase audience — must be a personal homebase user, not staff-only
+  // 3. Audience guard — allow homebase audiences (learner/coach/volunteer) and
+  //    staff sessions.  Staff sessions have googleAudience = null/undefined so
+  //    we only block if the value is explicitly set to something unrecognised.
   const audience = req.session.googleAudience;
-  if (!audience || !SLACK_HOMEBASE_AUDIENCES.includes(audience as typeof SLACK_HOMEBASE_AUDIENCES[number])) {
+  if (audience != null && !SLACK_HOMEBASE_AUDIENCES.includes(audience as typeof SLACK_HOMEBASE_AUDIENCES[number])) {
     res.status(403).json({
       error:   "not_authorized",
-      message: "This resource is only available to Homebase users (learner, coach, volunteer, or team).",
+      message: "This resource is not available for your account type.",
     });
     return;
   }
