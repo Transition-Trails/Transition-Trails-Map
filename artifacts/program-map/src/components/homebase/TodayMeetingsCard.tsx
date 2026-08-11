@@ -10,12 +10,21 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { CalendarDays, Loader2, Video, Clock, ExternalLink, RefreshCw } from "lucide-react";
+import { CalendarHoverCard } from "./CalendarHoverCard";
 
 // ── Types (mirrors CalendarEventOut from the API) ──────────────────────────────
 
 interface GCalDateTime {
   dateTime?: string;
   date?: string;
+}
+
+interface GCalAttendee {
+  email:          string;
+  displayName?:   string;
+  responseStatus?: "accepted" | "needsAction" | "declined" | "tentative";
+  self?:          boolean;
+  organizer?:     boolean;
 }
 
 interface CalEvent {
@@ -25,6 +34,7 @@ interface CalEvent {
   location: string;
   start: GCalDateTime;
   end: GCalDateTime;
+  attendees: GCalAttendee[];
   htmlLink: string;
   /** Resolved server-side from conferenceData / hangoutLink. */
   meetLink: string | null;
@@ -94,57 +104,62 @@ function MeetingRow({ ev }: { ev: CalEvent }) {
 
   return (
     <li className={`py-3 border-b border-border/50 last:border-0 ${now ? "opacity-100" : ""}`}>
-      {/* Time row */}
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <div className={`flex items-center gap-1.5 text-[11px] font-medium ${now ? "text-emerald-600" : "text-muted-foreground"}`}>
-          <Clock className="w-3 h-3 flex-shrink-0" />
-          <span>{startTime} – {endTime}</span>
-          {now && (
-            <span className="ml-1 inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
-              Now
-            </span>
-          )}
-        </div>
+      <CalendarHoverCard event={ev}>
+        {/* Clickable trigger area: time row + title + description */}
+        <button className="w-full text-left space-y-1 focus:outline-none">
+          {/* Time row */}
+          <div className="flex items-center justify-between gap-2">
+            <div className={`flex items-center gap-1.5 text-[11px] font-medium ${now ? "text-emerald-600" : "text-muted-foreground"}`}>
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              <span>{startTime} – {endTime}</span>
+              {now && (
+                <span className="ml-1 inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+                  Now
+                </span>
+              )}
+            </div>
+          </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center gap-1 flex-shrink-0">
-          {meetLink && (
-            <a
-              href={meetLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
-                now
-                  ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                  : "bg-primary/10 text-primary hover:bg-primary/20"
-              }`}
-              title="Join Google Meet"
-            >
-              <Video className="w-3 h-3" />
-              Join
-            </a>
+          {/* Title */}
+          <p className="text-sm font-medium text-foreground leading-snug">{ev.summary}</p>
+
+          {/* Description */}
+          {shortDesc && (
+            <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+              {shortDesc}
+            </p>
           )}
+        </button>
+      </CalendarHoverCard>
+
+      {/* Action buttons — outside the popover trigger so they don't open the popover */}
+      <div className="flex items-center gap-1 mt-1.5">
+        {meetLink && (
           <a
-            href={ev.htmlLink}
+            href={meetLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
-            title="Open in Google Calendar"
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold transition-colors ${
+              now
+                ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                : "bg-primary/10 text-primary hover:bg-primary/20"
+            }`}
+            title="Join Google Meet"
           >
-            <ExternalLink className="w-3 h-3" />
+            <Video className="w-3 h-3" />
+            Join
           </a>
-        </div>
+        )}
+        <a
+          href={ev.htmlLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
+          title="Open in Google Calendar"
+        >
+          <ExternalLink className="w-3 h-3" />
+        </a>
       </div>
-
-      {/* Title */}
-      <p className="text-sm font-medium text-foreground leading-snug">{ev.summary}</p>
-
-      {/* Description */}
-      {shortDesc && (
-        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">
-          {shortDesc}
-        </p>
-      )}
     </li>
   );
 }

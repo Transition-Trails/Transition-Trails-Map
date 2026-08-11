@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
+import { CalendarHoverCard } from '@/components/homebase/CalendarHoverCard';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -21,7 +22,7 @@ interface GCalDateTime { dateTime?: string; date?: string; }
 interface GCalAttendee {
   email: string;
   displayName?: string;
-  responseStatus?: string;
+  responseStatus?: "accepted" | "needsAction" | "declined" | "tentative";
   self?: boolean;
   organizer?: boolean;
 }
@@ -34,6 +35,8 @@ interface CalEvent {
   end:   GCalDateTime;
   attendees: GCalAttendee[];
   htmlLink: string;
+  meetLink: string | null;
+  status: string;
   isTrailTalk: boolean;
   isPendingResponse: boolean;
   attendeeCount: number;
@@ -107,10 +110,24 @@ async function fetchPennyPrep(ev: CalEvent): Promise<string> {
 
 // ── Compact Event Card ────────────────────────────────────────────────────────
 
-function EventCard({ ev }: { ev: CalEvent }) {
+interface EventCardProps {
+  ev:      CalEvent;
+  onRsvp?: (eventId: string, newStatus: string) => void;
+}
+
+function EventCard({ ev, onRsvp }: EventCardProps) {
   const start = parseStart(ev);
   const soon  = isStartingSoon(start);
   const [prep, setPrep] = useState<PrepState>({ loading: false, reply: null, error: null });
+  const [pendingResponse, setPendingResponse] = useState(ev.isPendingResponse);
+
+  function handleRsvp(eventId: string, newStatus: string) {
+    // If the user accepted or declined, the event no longer needs a response
+    if (newStatus === 'accepted' || newStatus === 'declined') {
+      setPendingResponse(false);
+    }
+    onRsvp?.(eventId, newStatus);
+  }
 
   async function requestPrep() {
     setPrep({ loading: true, reply: null, error: null });
@@ -124,10 +141,10 @@ function EventCard({ ev }: { ev: CalEvent }) {
 
   return (
     <div className={`rounded-lg border bg-card overflow-hidden ${
-      ev.isTrailTalk       ? 'border-[#7FAFC6]' :
-      ev.isPendingResponse ? 'border-[#FFD08A]'  :
-      soon                 ? 'border-[#9FC3AE]' :
-                             'border-border'
+      ev.isTrailTalk   ? 'border-[#7FAFC6]' :
+      pendingResponse  ? 'border-[#FFD08A]'  :
+      soon             ? 'border-[#9FC3AE]' :
+                         'border-border'
     }`}>
 
       {/* Trail Talk header */}
@@ -139,116 +156,103 @@ function EventCard({ ev }: { ev: CalEvent }) {
       )}
 
       {/* Pending response header */}
-      {ev.isPendingResponse && !ev.isTrailTalk && (
+      {pendingResponse && !ev.isTrailTalk && (
         <div className="flex items-center justify-between px-3 py-1 bg-[#FFF3E0] border-b border-[#FFD08A]">
           <div className="flex items-center gap-1.5">
             <AlertCircle className="w-2.5 h-2.5 text-[#CC8400]" />
             <span className="text-[14px] font-bold  text-[#CC8400]">Response needed</span>
           </div>
-          <a
-            href={ev.htmlLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[14px] font-semibold text-[#CC8400] hover:underline flex items-center gap-0.5"
-          >
-            Open <ExternalLink className="w-2 h-2" />
-          </a>
+          <span className="text-[14px] text-[#CC8400]/70 italic">click to respond</span>
         </div>
       )}
 
       {/* Starting soon banner */}
-      {soon && !ev.isPendingResponse && !ev.isTrailTalk && (
+      {soon && !pendingResponse && !ev.isTrailTalk && (
         <div className="flex items-center gap-1.5 px-3 py-1 bg-[#E6F0EA] border-b border-[#9FC3AE]">
           <Zap className="w-2.5 h-2.5 text-[#2F6B3F]" />
           <span className="text-[14px] font-bold  text-[#2F6B3F]">Starting soon</span>
         </div>
       )}
 
-      <div className="p-3 space-y-1.5">
+      <CalendarHoverCard event={ev} onRsvp={handleRsvp}>
+        <button className="w-full text-left p-3 space-y-1.5 focus:outline-none hover:bg-muted/30 transition-colors">
 
-        {/* Title + open link */}
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-[14px] font-semibold text-foreground leading-snug">{ev.summary}</p>
-          <a
-            href={ev.htmlLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground shrink-0 mt-0.5"
-            aria-label="Open in Google Calendar"
+          {/* Title + open link */}
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-[14px] font-semibold text-foreground leading-snug">{ev.summary}</p>
+            <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0 mt-0.5" />
+          </div>
+
+          {/* Date + countdown */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
+              <CalendarDays className="w-2.5 h-2.5" />
+              <span>{formatDate(start)}{ev.start.dateTime ? ` · ${formatTime(start)}` : ''}</span>
+            </div>
+            <div className={`flex items-center gap-1 text-[14px] font-semibold ${soon ? 'text-[#2F6B3F]' : 'text-primary'}`}>
+              <Clock className="w-2.5 h-2.5" />
+              <span>{timeToStart(start)}</span>
+            </div>
+          </div>
+
+          {/* Attendees (compact) */}
+          {ev.attendeeCount > 0 && (
+            <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
+              <Users className="w-2.5 h-2.5" />
+              <span>{ev.attendeeCount}</span>
+              {ev.attendees.slice(0, 2).map(a => (
+                <span key={a.email} className="bg-muted rounded-full px-1.5 py-0.5 text-[14px] truncate max-w-[70px]">
+                  {a.displayName ?? a.email.split('@')[0]}
+                </span>
+              ))}
+              {ev.attendeeCount > 2 && (
+                <span className="text-[14px] text-muted-foreground">+{ev.attendeeCount - 2}</span>
+              )}
+            </div>
+          )}
+        </button>
+      </CalendarHoverCard>
+
+      {/* Penny prep — outside the popover trigger */}
+      <div className="px-3 pb-3 pt-0">
+        {!prep.reply && !prep.loading && !prep.error && (
+          <button
+            onClick={() => void requestPrep()}
+            className="flex items-center gap-1 text-[14px] text-primary border border-primary/20 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
           >
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        </div>
+            <Brain className="w-2.5 h-2.5" /> {TERMS.aiAssistant} prep brief
+          </button>
+        )}
 
-        {/* Date + countdown */}
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
-            <CalendarDays className="w-2.5 h-2.5" />
-            <span>{formatDate(start)}{ev.start.dateTime ? ` · ${formatTime(start)}` : ''}</span>
-          </div>
-          <div className={`flex items-center gap-1 text-[14px] font-semibold ${soon ? 'text-[#2F6B3F]' : 'text-primary'}`}>
-            <Clock className="w-2.5 h-2.5" />
-            <span>{timeToStart(start)}</span>
-          </div>
-        </div>
-
-        {/* Attendees (compact) */}
-        {ev.attendeeCount > 0 && (
-          <div className="flex items-center gap-1 text-[14px] text-muted-foreground">
-            <Users className="w-2.5 h-2.5" />
-            <span>{ev.attendeeCount}</span>
-            {ev.attendees.slice(0, 2).map(a => (
-              <span key={a.email} className="bg-muted rounded-full px-1.5 py-0.5 text-[14px] truncate max-w-[70px]">
-                {a.displayName ?? a.email.split('@')[0]}
-              </span>
-            ))}
-            {ev.attendeeCount > 2 && (
-              <span className="text-[14px] text-muted-foreground">+{ev.attendeeCount - 2}</span>
-            )}
+        {prep.loading && (
+          <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
+            <Brain className="w-2.5 h-2.5 text-primary animate-pulse" />
+            <span>Generating brief…</span>
           </div>
         )}
 
-        {/* Penny prep */}
-        <div className="pt-0.5">
-          {!prep.reply && !prep.loading && !prep.error && (
+        {prep.reply && (
+          <div className="rounded-md border border-primary/20 bg-primary/5 p-2 space-y-1">
+            <div className="flex items-center gap-1 mb-0.5">
+              <Brain className="w-2.5 h-2.5 text-primary" />
+              <span className="text-[14px] font-bold  text-primary">{TERMS.aiAssistant} Prep Brief</span>
+            </div>
+            <p className="text-[14px] text-foreground leading-relaxed whitespace-pre-wrap">{prep.reply}</p>
             <button
-              onClick={() => void requestPrep()}
-              className="flex items-center gap-1 text-[14px] text-primary border border-primary/20 rounded-md px-2 py-1 hover:bg-primary/5 transition-colors"
+              onClick={() => setPrep({ loading: false, reply: null, error: null })}
+              className="text-[14px] text-muted-foreground hover:text-foreground transition-colors mt-0.5"
             >
-              <Brain className="w-2.5 h-2.5" /> {TERMS.aiAssistant} prep brief
+              Dismiss
             </button>
-          )}
+          </div>
+        )}
 
-          {prep.loading && (
-            <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
-              <Brain className="w-2.5 h-2.5 text-primary animate-pulse" />
-              <span>Generating brief…</span>
-            </div>
-          )}
-
-          {prep.reply && (
-            <div className="rounded-md border border-primary/20 bg-primary/5 p-2 space-y-1">
-              <div className="flex items-center gap-1 mb-0.5">
-                <Brain className="w-2.5 h-2.5 text-primary" />
-                <span className="text-[14px] font-bold  text-primary">{TERMS.aiAssistant} Prep Brief</span>
-              </div>
-              <p className="text-[14px] text-foreground leading-relaxed whitespace-pre-wrap">{prep.reply}</p>
-              <button
-                onClick={() => setPrep({ loading: false, reply: null, error: null })}
-                className="text-[14px] text-muted-foreground hover:text-foreground transition-colors mt-0.5"
-              >
-                Dismiss
-              </button>
-            </div>
-          )}
-
-          {prep.error && (
-            <div className="flex items-center gap-1 text-[14px] text-[#A93F2F]">
-              <AlertCircle className="w-2.5 h-2.5" />
-              <span>{prep.error}</span>
-            </div>
-          )}
-        </div>
+        {prep.error && (
+          <div className="flex items-center gap-1 text-[14px] text-[#A93F2F]">
+            <AlertCircle className="w-2.5 h-2.5" />
+            <span>{prep.error}</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -293,6 +297,16 @@ export function CalendarActionPanel() {
     const id = setInterval(() => setTick(n => n + 1), 30_000);
     return () => clearInterval(id);
   }, [calendarPanelOpen]);
+
+  // When RSVP is confirmed, mark the event as no longer pending so the
+  // section header count updates without a full reload.
+  const handleRsvp = useCallback((eventId: string, newStatus: string) => {
+    if (newStatus === 'accepted' || newStatus === 'declined') {
+      setEvents(prev =>
+        prev.map(e => e.id === eventId ? { ...e, isPendingResponse: false } : e)
+      );
+    }
+  }, []);
 
   const pending  = events.filter(e => e.isPendingResponse);
   const upcoming = events.filter(e => !e.isPendingResponse);
@@ -423,7 +437,7 @@ export function CalendarActionPanel() {
                       </p>
                     </div>
                     <div className="space-y-2">
-                      {pending.map(ev => <EventCard key={ev.id} ev={ev} />)}
+                      {pending.map(ev => <EventCard key={ev.id} ev={ev} onRsvp={handleRsvp} />)}
                     </div>
                   </div>
                 )}
@@ -438,7 +452,7 @@ export function CalendarActionPanel() {
                       </p>
                     </div>
                     <div className="space-y-2">
-                      {upcoming.map(ev => <EventCard key={ev.id} ev={ev} />)}
+                      {upcoming.map(ev => <EventCard key={ev.id} ev={ev} onRsvp={handleRsvp} />)}
                     </div>
                   </div>
                 )}

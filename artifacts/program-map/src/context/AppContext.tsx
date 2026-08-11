@@ -18,9 +18,14 @@ export type RecOverride = {
 };
 
 export type LogTimePrefill = {
-  sfObjectType: "case" | "account" | "task" | "opportunity";
-  sfObjectId:   string;
-  sfObjectName: string;
+  /** When provided, pre-selects a Salesforce record in the modal. */
+  sfObjectType?:   "case" | "account" | "task" | "opportunity";
+  sfObjectId?:     string;
+  sfObjectName?:   string;
+  /** Pre-select a duration (minutes, rounded to nearest 15). Optional. */
+  initialMinutes?: number;
+  /** Pre-fill the notes field. Optional. */
+  initialNotes?:   string;
 } | null;
 
 export type SelectedItemType =

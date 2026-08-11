@@ -86,12 +86,22 @@ export function LogTimeModal({ open, prefill, onClose, onSaved }: LogTimeModalPr
   useEffect(() => {
     if (open) {
       setQuery(""); setResults([]);
-      setMinutes(null); setNotes(""); setWorkDate(todayIso());
+      setWorkDate(todayIso());
       setError(""); setSaving(false);
       if (prefill) {
-        setSelected({ id: prefill.sfObjectId, type: prefill.sfObjectType, name: prefill.sfObjectName, subtitle: "" });
+        // Pre-select SF record only when all three fields are present and non-empty
+        if (prefill.sfObjectType && prefill.sfObjectId && prefill.sfObjectName) {
+          setSelected({ id: prefill.sfObjectId, type: prefill.sfObjectType, name: prefill.sfObjectName, subtitle: "" });
+        } else {
+          setSelected(null);
+          setTimeout(() => inputRef.current?.focus(), 100);
+        }
+        setMinutes(prefill.initialMinutes ?? null);
+        setNotes(prefill.initialNotes ?? "");
       } else {
         setSelected(null);
+        setMinutes(null);
+        setNotes("");
         setTimeout(() => inputRef.current?.focus(), 100);
       }
     }

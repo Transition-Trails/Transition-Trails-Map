@@ -170,4 +170,89 @@ router.get("/calendar/events", async (_req, res) => {
   }
 });
 
+// ─── PATCH /api/calendar/events/:eventId/rsvp ─────────────────────────────────
+// Updates the current user's response status for a calendar event.
+// Body: { status: "accepted" | "declined" | "tentative" }
+// Uses the same shared refresh token (acts as calendar owner).
+
+router.patch("/calendar/events/:eventId/rsvp", async (req, res) => {
+  const userEmail = req.session?.googleEmail;
+  if (!userEmail) {
+    return res.status(401).json({ error: "not_authenticated" });
+  }
+
+  const { eventId } = req.params;
+  const { status } = req.body as { status?: string };
+
+  const VALID = ["accepted", "declined", "tentative"] as const;
+  type RsvpStatus = typeof VALID[number];
+  if (!status || !VALID.includes(status as RsvpStatus)) {
+    return res.status(400).json({ error: "status must be 'accepted', 'declined', or 'tentative'" });
+  }
+
+  try {
+    const token = await getAccessToken();
+
+    // 1. Fetch the current event to get the attendees array
+    const getResp = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(eventId)}?fields=id,attendees`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(10_000),
+      }
+    );
+
+    if (!getResp.ok) {
+      const body = await getResp.json().catch(() => ({})) as { error?: { message?: string } };
+      return res.status(502).json({ error: body.error?.message ?? `Google Calendar API returned HTTP ${getResp.status}` });
+    }
+
+    const evData = await getResp.json() as { id: string; attendees?: GCalAttendee[] };
+    const attendees: GCalAttendee[] = evData.attendees ?? [];
+
+    // 2. Find the attendee entry for the current user and update responseStatus
+    const userLower = userEmail.toLowerCase();
+    let matched = false;
+    const updatedAttendees = attendees.map(a => {
+      if (a.email.toLowerCase() === userLower || a.self) {
+        matched = true;
+        return { ...a, responseStatus: status as RsvpStatus };
+      }
+      return a;
+    });
+
+    if (!matched) {
+      // User is not in the attendees list — still attempt the patch so the
+      // calendar API can handle it gracefully.
+      updatedAttendees.push({ email: userEmail, responseStatus: status as RsvpStatus });
+    }
+
+    // 3. PATCH the event with the updated attendees
+    const patchResp = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(eventId)}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ attendees: updatedAttendees }),
+        signal: AbortSignal.timeout(10_000),
+      }
+    );
+
+    if (!patchResp.ok) {
+      const body = await patchResp.json().catch(() => ({})) as { error?: { message?: string } };
+      return res.status(502).json({ error: body.error?.message ?? `Google Calendar API returned HTTP ${patchResp.status}` });
+    }
+
+    const updated = await patchResp.json() as GCalEvent;
+    const selfEntry = (updated.attendees ?? []).find(a => a.self || a.email.toLowerCase() === userLower);
+    return res.json({ ok: true, responseStatus: selfEntry?.responseStatus ?? status });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return res.status(502).json({ error: msg });
+  }
+});
+
 export default router;
