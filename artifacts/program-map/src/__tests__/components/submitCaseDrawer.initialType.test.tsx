@@ -26,7 +26,7 @@
 
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ── Mock heavy child components that use browser APIs not in jsdom ────────────
@@ -238,6 +238,72 @@ describe('SubmitCaseDrawer — initialType routing', () => {
       });
 
       expect(screen.getByText(FORM_SUBJECT_LABEL)).toBeInTheDocument();
+    },
+  );
+
+  // ── T4: close after initialType pre-select → reopen without initialType → type-picker ──
+
+  test(
+    'T4: opened with initialType → closed (reset) → reopened without initialType → type-picker shown',
+    async () => {
+      global.fetch = makeFetch([
+        makeRecordType('General',   'rt-001', true),
+        makeRecordType('Technical', 'rt-002'),
+      ]);
+
+      const onClose = vi.fn();
+
+      const { rerender } = render(
+        <SubmitCaseDrawer
+          open={true}
+          onClose={onClose}
+          initialType="General"
+        />,
+      );
+
+      // Wait for the form step to appear (initialType matched → skip type-picker)
+      await waitFor(() => {
+        expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+      });
+      expect(screen.getByText(FORM_SUBJECT_LABEL)).toBeInTheDocument();
+
+      // Click the close button — this calls handleClose() → reset() → onClose()
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      fireEvent.click(closeButton);
+      expect(onClose).toHaveBeenCalledTimes(1);
+
+      // Simulate the parent closing the drawer
+      rerender(
+        <SubmitCaseDrawer
+          open={false}
+          onClose={onClose}
+          // no initialType
+        />,
+      );
+
+      // Drawer is hidden — neither step should be visible
+      expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+      expect(screen.queryByText(FORM_SUBJECT_LABEL)).not.toBeInTheDocument();
+
+      // Reset fetch call count so we can track the reopen fetch cleanly
+      (global.fetch as ReturnType<typeof vi.fn>).mockClear();
+
+      // Reopen without initialType
+      rerender(
+        <SubmitCaseDrawer
+          open={true}
+          onClose={onClose}
+          // no initialType
+        />,
+      );
+
+      // With multiple types and no initialType, the type-picker must appear
+      await waitFor(() => {
+        expect(screen.getByText(TYPE_PICKER_TEXT)).toBeInTheDocument();
+      });
+
+      // The form step must NOT be visible — no Subject field
+      expect(screen.queryByText(FORM_SUBJECT_LABEL)).not.toBeInTheDocument();
     },
   );
 });
