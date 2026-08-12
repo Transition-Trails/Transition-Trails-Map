@@ -5,7 +5,9 @@ import { useSeenVersion } from "@/hooks/useSeenVersion";
 import { APP_VERSION } from "@/config/version";
 import { SubmitCaseDrawer } from "@/components/homebase/SubmitCaseDrawer";
 import { useHomebaseTour } from "@/hooks/useHomebaseTour";
+import { useMissionControlTour } from "@/hooks/useMissionControlTour";
 import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
+import { useLocation } from "wouter";
 import { RELEASES, type ChangeKind, type ReleaseEntry, type Release } from "@/data/releaseData";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -84,6 +86,8 @@ export default function ReleaseNotes() {
   const [selectedVersion,  setSelectedVersion]  = useState<string>(RELEASES[0].version);
   const [showSubmitCase,   setShowSubmitCase]   = useState(false);
   const { startTour } = useHomebaseTour();
+  const { startTour: startMCTour } = useMissionControlTour();
+  const [, navigate] = useLocation();
   const { audience } = useHomebaseAuth();
   const isHombaseAudience = audience !== null;
   const release = RELEASES.find((r) => r.version === selectedVersion) ?? RELEASES[0];
@@ -269,7 +273,30 @@ export default function ReleaseNotes() {
                         <li key={i} className="flex items-baseline gap-2.5 text-[12px] text-foreground/80 leading-relaxed">
                           <span className="mt-2 w-1 h-1 rounded-full bg-muted-foreground/40 shrink-0" />
                           {showNewBadges && <NewBadge />}
-                          {entry.text}
+                          <span>
+                            {entry.text}
+                            {entry.action && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (entry.action!.tourKey === 'missionControl') {
+                                    startMCTour();
+                                    navigate('/mission-control');
+                                  } else {
+                                    startTour();
+                                    if (!isHombaseAudience) {
+                                      window.history.pushState({}, '', '/homebase');
+                                      window.dispatchEvent(new PopStateEvent('popstate'));
+                                    }
+                                  }
+                                }}
+                                className="ml-1.5 inline-flex items-center gap-1 text-primary hover:underline font-medium"
+                              >
+                                <PlayCircle className="w-3 h-3 inline" />
+                                {entry.action.label}
+                              </button>
+                            )}
+                          </span>
                         </li>
                       ))}
                     </ul>

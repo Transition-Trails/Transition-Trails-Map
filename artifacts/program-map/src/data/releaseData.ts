@@ -5,6 +5,12 @@ export type ChangeKind = "major" | "minor" | "fix";
 export interface ReleaseEntry {
   kind: ChangeKind;
   text: string;
+  /** Optional interactive action rendered as a small link alongside the entry. */
+  action?: {
+    label:   string;
+    /** Which tour to launch when clicked. */
+    tourKey: 'homebase' | 'missionControl';
+  };
 }
 
 export interface Release {
@@ -18,9 +24,20 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
-    version: "1.6",
+    version: "1.7",
     date: "August 12, 2026",
     label: "Current",
+    entries: [
+      { kind: "major", text: "Mission Control role-aware walkthrough tour — fires automatically on first visit; 4–8 steps tailored to Everyday, Power, Admin, and Super Admin tiers; shared steps auto-skipped on replay.", action: { label: "Take the Mission Control tour", tourKey: "missionControl" } },
+      { kind: "major", text: "Onboarding audit & dead-link fixes — broken /knowledge/procedures link corrected; GovernanceHub article link corrected; stale placeholder comments cleaned up; Intake demand queue and Standards Studio both start empty instead of showing prototype seed data." },
+      { kind: "minor", text: "Standards Studio Gap Report now derives all counts and gap records from live standards — static seed gaps never surface for user-created standards; proper empty state shown at each level." },
+      { kind: "minor", text: "Communication Channels Phase 2 provider card replaced with a polished coming-soon card consistent with admin UX standards." },
+      { kind: "fix",   text: "Auto-case creation from build error logs — API server error classifier raises a Salesforce case with AI-generated resolution plan whenever a build-breaking error is detected; 60-minute dedup window prevents duplicate cases." },
+    ],
+  },
+  {
+    version: "1.6",
+    date: "August 12, 2026",
     entries: [
       { kind: "major", text: "Homebase first-visit tour launched — animated 7-step walkthrough fires automatically on first visit for every audience; audience-aware steps tailored to staff, coach, learner, and volunteer layouts." },
       { kind: "major", text: "Tour auto-skips shared steps already seen on a previous visit; 'Show all steps' button lets users replay the full tour any time." },

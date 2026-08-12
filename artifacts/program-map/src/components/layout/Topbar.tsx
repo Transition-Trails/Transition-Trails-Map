@@ -12,7 +12,7 @@ import { type AccessTier, TIER_CONFIG, TIER_ORDER } from '@/config/accessTiers';
 // ── Page info lookup ──────────────────────────────────────────────────────────
 
 const PAGE_INFO: Array<[string, string, string]> = [
-  ['/',                                  'Trail OS',               'Mission Control'],
+  ['/mission-control',                   'Trail OS',               'Mission Control'],
   ['/trail-os-overview',                 'Trail OS',               'Overview'],
   ['/digital-twin',                      'Digital Twin',           'Explore'],
   ['/digital-twin/governance',           'Digital Twin',           'Governance'],

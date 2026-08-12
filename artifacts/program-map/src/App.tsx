@@ -167,7 +167,9 @@ function Redirect({ to }: { to: string }) {
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      {/* Mission Control — dedicated route; '/' is intercepted by StaffRoute/TeamRoute before Router renders */}
+      <Route path="/mission-control" component={Home} />
+      <Route path="/"><Redirect to="/homebase" /></Route>
 
       {/* ── Redirects (must precede hub wildcard routes) ── */}
 

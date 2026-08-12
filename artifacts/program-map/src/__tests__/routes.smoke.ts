@@ -18,7 +18,8 @@ interface RouteEntry {
 
 export const ROUTE_MANIFEST: RouteEntry[] = [
   // ── Home / Homebase ───────────────────────────────────────────────────────
-  { path: '/',                    kind: 'active', note: 'HomebaseLanding (learner/coach/volunteer) or Home (staff) — audience-dispatched' },
+  { path: '/',                    kind: 'active', note: 'HomebaseLanding (learner/coach/volunteer); staff intercepted by StaffRoute/TeamRoute before Router renders' },
+  { path: '/mission-control',     kind: 'active', note: 'Mission Control dashboard (staff only — rendered via AppShell + Router when path is not / or /homebase)' },
   { path: '/access-not-granted',  kind: 'active', note: 'Authenticated but no recognized Trail OS group' },
 
   // ── Navigator (sidebar links use /navigator/* prefix; these are the App.tsx redirects) ─

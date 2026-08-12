@@ -38,9 +38,9 @@ vi.mock('sonner', () => ({
   }),
 }));
 
-// APP_VERSION is "1.5" (from src/config/version.ts).
+// APP_VERSION is "1.7" (from src/config/version.ts).
 // We import it dynamically after vi.resetModules() to pick up the fresh module.
-const APP_VERSION = '1.5';
+const APP_VERSION = '1.7';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

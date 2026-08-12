@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import { TERMS } from '@/config/terminology';
 import { useAppContext } from '@/context/AppContext';
 import { useTierFlags } from '@/hooks/useTierFlags';
@@ -9,8 +10,10 @@ import {
   ArrowRight, CheckCircle2, Circle,
   BarChart3, FileText, Bot,
   AlertTriangle, Calendar,
-  RefreshCw, WifiOff, ChevronRight,
+  RefreshCw, WifiOff, ChevronRight, PlayCircle,
 } from 'lucide-react';
+import { useMissionControlTour } from '@/hooks/useMissionControlTour';
+import { MissionControlTour } from '@/components/homebase/MissionControlTour';
 import { useSfOpsSummary, formatSyncAge, type SfCount } from '@/hooks/useSfOpsSummary';
 import {
   HEALTH_LEVEL_CONFIG, REC_PRIORITY_CONFIG,
@@ -82,7 +85,7 @@ const PROGRAM_COLORS: Record<string, string> = {
 
 export default function Home() {
   const { programs } = useAppContext();
-  const { isEveryday, isPowerOrAbove, isAdminOrAbove } = useTierFlags();
+  const { isEveryday, isPowerOrAbove, isAdminOrAbove, tier } = useTierFlags();
   const [, navigate] = useLocation();
   const { user } = useGoogleAuth();
   // Superadmins always get audience=null (isKnownStaff short-circuits before
@@ -93,6 +96,12 @@ export default function Home() {
   const { domainHealthData, overallHealthScore, overallHealthLevel } = useHealthScores();
 
   const { data: sfData, isLoading: sfLoading, isError: sfError, refetch, isFetching } = useSfOpsSummary();
+
+  // ── Mission Control tour ──────────────────────────────────────────────────
+  const mcTour = useMissionControlTour();
+  useEffect(() => {
+    if (mcTour.shouldAutoStart) mcTour.startTour();
+  }, [mcTour.shouldAutoStart]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const cfg = HEALTH_LEVEL_CONFIG[overallHealthLevel];
   const n = (v: SfCount | number | null | undefined): string => {
@@ -120,10 +129,20 @@ export default function Home() {
     <div className="h-full w-full flex flex-col overflow-hidden">
 
       {/* ── Header ── */}
-      <div className="flex-shrink-0 px-3 pt-3 pb-0">
+      <div className="flex-shrink-0 px-3 pt-3 pb-0 flex items-center justify-between gap-2">
         <h1 className="text-sm font-semibold text-foreground leading-none">
           {isEveryday ? 'My Dashboard' : 'Mission Control'}
         </h1>
+        {mcTour.isReady && !mcTour.tourActive && (
+          <button
+            type="button"
+            onClick={mcTour.startTour}
+            className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <PlayCircle className="w-3 h-3" />
+            Take a tour
+          </button>
+        )}
       </div>
 
       {/* ── Scrollable body ── */}
@@ -406,6 +425,16 @@ export default function Home() {
         </div>
 
       </div>
+
+      {/* ── Mission Control Tour ── */}
+      <MissionControlTour
+        open={mcTour.tourActive}
+        onComplete={mcTour.completeTour}
+        tier={tier}
+        seenStepKeysAtOpen={mcTour.seenStepKeysAtOpen}
+        onMarkStepSeen={mcTour.markStepSeen}
+        onShowAllSteps={mcTour.showAllSteps}
+      />
     </div>
   );
 }

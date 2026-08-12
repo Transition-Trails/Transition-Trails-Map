@@ -207,9 +207,9 @@ export function Sidebar() {
       `}>
         <div className="flex-1 overflow-y-auto py-2 px-1 xl:px-2 space-y-0.5">
 
-          {/* Home */}
-          <button title="Home" onClick={() => nav('/')} className={topBtnCls(location === '/')}>
-            <Home className={`w-4 h-4 flex-shrink-0 ${location === '/' ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+          {/* Mission Control */}
+          <button title="Home" onClick={() => nav('/mission-control')} className={topBtnCls(location === '/mission-control')}>
+            <Home className={`w-4 h-4 flex-shrink-0 ${location === '/mission-control' ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
             <span className="hidden xl:inline">Home</span>
           </button>
 
