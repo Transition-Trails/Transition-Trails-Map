@@ -134,7 +134,7 @@ export function CaseAttachments({
     setErrors([]);
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { displaySurface: "browser" } as MediaTrackConstraints,
+        preferCurrentTab: true,
         audio: false,
       } as DisplayMediaStreamOptions);
 
