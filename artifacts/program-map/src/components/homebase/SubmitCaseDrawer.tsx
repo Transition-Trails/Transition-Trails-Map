@@ -24,7 +24,7 @@ import {
 import { useToast }             from "@/hooks/use-toast";
 import { CaseRichTextEditor, htmlToPlainText } from "./CaseRichTextEditor";
 import { CaseAttachments }                      from "./CaseAttachments";
-import { fileToBase64 }                         from "@/lib/fileUtils";
+import { uploadAttachments }                    from "@/lib/uploadAttachments";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -36,10 +36,11 @@ interface SubmitResult {
   synced:        boolean;
   sfCaseId?:     string;
   sfCaseNumber?: string;
+  sfCaseUrl?:    string;
   message?:      string;
 }
 
-interface AttachProgress {
+export interface AttachProgress {
   total:    number;
   uploaded: number;
   failed:   number;
@@ -157,7 +158,7 @@ function LookupField({
 
 // ── Attachment progress row ────────────────────────────────────────────────────
 
-function AttachProgressRow({ progress }: { progress: AttachProgress }) {
+export function AttachProgressRow({ progress }: { progress: AttachProgress }) {
   if (progress.total === 0) return null;
 
   if (!progress.done) {
@@ -318,34 +319,12 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawe
   }
 
   // ── Upload attachments after case creation ───────────────────────────────────
+  // Delegated to lib/uploadAttachments for testability.
+  // Parses JSON response body for per-file success — the endpoint always returns
+  // HTTP 200, so r.ok alone cannot distinguish a Salesforce rejection.
 
-  async function uploadAttachments(sfCaseId: string, files: File[]) {
-    if (files.length === 0) return;
-
-    const progress: AttachProgress = { total: files.length, uploaded: 0, failed: 0, done: false };
-    setAttachProgress({ ...progress });
-
-    for (const file of files) {
-      try {
-        const base64 = await fileToBase64(file);
-        const r = await fetch(`/api/sf/cases/${sfCaseId}/attachments`, {
-          method:  "POST",
-          headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ files: [{ name: file.name, base64, mimeType: file.type || "application/octet-stream" }] }),
-        });
-        if (r.ok) {
-          progress.uploaded++;
-        } else {
-          progress.failed++;
-        }
-      } catch {
-        progress.failed++;
-      }
-      setAttachProgress({ ...progress });
-    }
-
-    progress.done = true;
-    setAttachProgress({ ...progress });
+  async function doUploadAttachments(sfCaseId: string, files: File[]) {
+    await uploadAttachments(sfCaseId, files, p => setAttachProgress(p));
   }
 
   // ── Submit ───────────────────────────────────────────────────────────────────
@@ -418,7 +397,7 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawe
         });
         // Upload attachments after showing the result screen
         if (res.sfCaseId && attachments.length > 0) {
-          void uploadAttachments(res.sfCaseId, attachments);
+          void doUploadAttachments(res.sfCaseId, attachments);
         }
       } else {
         toast({ title: "Case saved locally", description: res.message ?? "Sync pending" });

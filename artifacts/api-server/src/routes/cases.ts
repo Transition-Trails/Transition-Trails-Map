@@ -62,26 +62,29 @@ router.get("/sf/cases", async (req, res) => {
   const orgBaseUrl = proxyFetch ? await getOrgBaseUrl(proxyFetch) : "";
 
   let records: Record<string, unknown>[] = [];
+  let followUpDateSupported    = false;
   let lastModifiedBySupported  = false;
 
-  const buildSoql = (withModifiedBy: boolean) =>
+  const buildSoql = (withModifiedBy: boolean, withFollowUp: boolean) =>
     `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, LastModifiedDate` +
     (withModifiedBy ? `, LastModifiedBy.Name` : ``) +
+    (withFollowUp   ? `, FollowUpDate`        : ``) +
     `, Owner.Name, Contact.Name, Account.Name ` +
     `FROM Case WHERE OwnerId = '${sfUserId}' ${statusClause} ` +
     `ORDER BY CreatedDate DESC LIMIT 50`;
 
-  const attempts: Array<[boolean]> = [
-    [true ],
-    [false],
+  const attempts: Array<[boolean, boolean]> = [
+    [true,  true ],
+    [false, false],
   ];
 
   let lastError = "";
-  for (const [withModifiedBy] of attempts) {
+  for (const [withModifiedBy, withFollowUp] of attempts) {
     try {
-      const result = await client.query<Record<string, unknown>>(buildSoql(withModifiedBy));
+      const result = await client.query<Record<string, unknown>>(buildSoql(withModifiedBy, withFollowUp));
       records = result.records;
       lastModifiedBySupported = withModifiedBy;
+      followUpDateSupported   = withFollowUp;
       lastError = "";
       break;
     } catch (e: unknown) {
@@ -104,12 +107,13 @@ router.get("/sf/cases", async (req, res) => {
     CreatedDate:        r["CreatedDate"]       as string | null,
     LastModifiedDate:   r["LastModifiedDate"] as string | null,
     LastModifiedByName: lastModifiedBySupported ? (((r["LastModifiedBy"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null) : null,
+    FollowUpDate:       followUpDateSupported   ? (r["FollowUpDate"] as string | null) : null,
     OwnerName:          ((r["Owner"]   as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
     ContactName:        ((r["Contact"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
     AccountName:        ((r["Account"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
   }));
 
-  return res.json({ cases, orgBaseUrl });
+  return res.json({ cases, orgBaseUrl, followUpDateSupported });
 });
 
 // ── PATCH /sf/cases/:id/status ─────────────────────────────────────────────────
@@ -258,32 +262,26 @@ router.post("/sf/cases/:id/comments", async (req, res) => {
 });
 
 // ── GET /sf/cases/statuses ────────────────────────────────────────────────────
-// Returns the active Status picklist values from the SF Case object describe.
-// Includes a `closed` flag so the frontend knows which transitions remove the
-// case from the open-cases list.
+// Returns active Case Status values with their closure state.
+//
+// Source: CaseStatus sobject via SOQL — the ONLY place SF exposes IsClosed for
+// each status value. The Case object describe's picklistValues do NOT carry a
+// `closed` property, so using describe for this flag silently returns false for
+// every custom terminal status (e.g. "Resolved").
 
 router.get("/sf/cases/statuses", async (req, res) => {
-  const proxyFetch = getEffectiveSfFetch(req);
-  if (!proxyFetch) return res.status(401).json({ error: "Not connected to Salesforce." });
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
+  try { client = getSalesforceClient(req); } catch { /* no SF session */ }
+  if (!client) return res.status(401).json({ error: "Not connected to Salesforce." });
 
   try {
-    const r = await proxyFetch(`/services/data/${SF_API_VERSION}/sobjects/Case/describe`, {
-      headers: { Accept: "application/json" },
-    });
-    if (!r.ok) {
-      const text = await r.text().catch(() => "");
-      return res.status(502).json({ error: `SF describe failed: ${text.slice(0, 200)}` });
-    }
-    const data = await r.json() as {
-      fields?: Array<{
-        name: string;
-        picklistValues?: Array<{ value: string; active: boolean; closed?: boolean }>;
-      }>;
-    };
-    const statusField = (data.fields ?? []).find(f => f.name === "Status");
-    const statuses = (statusField?.picklistValues ?? [])
-      .filter(v => v.active)
-      .map(v => ({ value: v.value, closed: v.closed ?? false }));
+    const result = await client.query<{ MasterLabel: string; IsClosed: boolean }>(
+      `SELECT MasterLabel, IsClosed FROM CaseStatus WHERE IsActive = true ORDER BY SortOrder`
+    );
+    const statuses = result.records.map(r => ({
+      value:  r.MasterLabel,
+      closed: r.IsClosed,
+    }));
     return res.json({ statuses });
   } catch (e: unknown) {
     return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
