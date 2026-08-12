@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useState, useCallback } from "react";
+import { toast } from "sonner";
 import { APP_VERSION } from "@/config/version";
 
 const PREF_KEY  = "lastSeenVersion";
@@ -107,7 +108,15 @@ export function useSeenVersion(): SeenVersionResult {
       credentials: "include",
       headers:     { "Content-Type": "application/json" },
       body:        JSON.stringify({ prefs: { [PREF_KEY]: APP_VERSION } }),
-    }).catch(() => undefined);
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error(`PATCH ${r.status}`);
+      })
+      .catch(() => {
+        // Roll back — reinstate the dot so the user can try again.
+        _setLastSeen(null);
+        toast.error("Couldn't save your preference — try again");
+      });
   }, []);
 
   return {

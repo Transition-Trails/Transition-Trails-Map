@@ -28,6 +28,16 @@ import '@testing-library/jest-dom';
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
+// Prevent the sonner toast() call inside markSeen from erroring in jsdom.
+vi.mock('sonner', () => ({
+  toast: Object.assign(vi.fn(), {
+    error:   vi.fn(),
+    success: vi.fn(),
+    info:    vi.fn(),
+    warning: vi.fn(),
+  }),
+}));
+
 // APP_VERSION is "1.5" (from src/config/version.ts).
 // We import it dynamically after vi.resetModules() to pick up the fresh module.
 const APP_VERSION = '1.5';
@@ -178,9 +188,12 @@ describe('useSeenVersion', () => {
     expect(result.current.hasUnseenRelease).toBe(true);
   });
 
-  // ── S6: graceful degradation — failed PATCH, fresh load re-shows dot ─────────
+  // ── S6: failed PATCH → optimistic state rolls back in the same session ────────
 
-  it('S6: when PATCH fails (network error), a fresh module load re-fetches and re-shows dot if server has no pref', async () => {
+  it('S6: when PATCH fails (network error), hasUnseenRelease is reinstated immediately and a fresh load also re-shows the dot', async () => {
+    const { toast } = await import('sonner');
+    const toastError = vi.mocked((toast as unknown as { error: ReturnType<typeof vi.fn> }).error);
+
     // === First "session": PATCH fails ===
     let patchCalled = false;
     fetchSpy = vi.spyOn(global, 'fetch').mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
@@ -198,15 +211,19 @@ describe('useSeenVersion', () => {
     await act(async () => { await Promise.resolve(); });
     expect(r1.current.hasUnseenRelease).toBe(true);
 
-    // markSeen clears the dot optimistically but the PATCH fires immediately (fire-and-forget)
+    // markSeen clears the dot optimistically
     act(() => { r1.current.markSeen(); });
     expect(r1.current.hasUnseenRelease).toBe(false); // optimistic
 
-    // Let the failed PATCH settle (the rejection is swallowed by .catch(() => undefined))
+    // Let the failed PATCH settle — rollback should fire
     await act(async () => {
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
     });
     expect(patchCalled).toBe(true); // PATCH was attempted
+
+    // ── Key rollback assertions (same session) ────────────────────────────────
+    expect(r1.current.hasUnseenRelease).toBe(true);  // dot reinstated
+    expect(toastError).toHaveBeenCalledWith("Couldn't save your preference — try again");
 
     // === Second "session": fresh module load, server still has no pref ===
     vi.resetModules();
@@ -221,7 +238,7 @@ describe('useSeenVersion', () => {
 
     await act(async () => { await Promise.resolve(); });
 
-    // Dot must re-appear — the failed PATCH means the server has no record
+    // Dot must also re-appear on next load — server has no record
     expect(r2.current.isReady).toBe(true);
     expect(r2.current.hasUnseenRelease).toBe(true);
   });
