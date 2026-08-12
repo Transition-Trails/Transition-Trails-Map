@@ -48,9 +48,12 @@ export interface AttachProgress {
 }
 
 export interface SubmitCaseDrawerProps {
-  open:         boolean;
-  onClose:      () => void;
-  onSubmitted?: () => void;
+  open:          boolean;
+  onClose:       () => void;
+  onSubmitted?:  () => void;
+  /** Pre-select a record type by name (case-insensitive). Falls back to the
+   *  type-picker screen if the name doesn't match any type in the org. */
+  initialType?:  string;
 }
 
 type Step      = "type" | "form" | "result";
@@ -208,7 +211,7 @@ export function AttachProgressRow({ progress }: { progress: AttachProgress }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawerProps) {
+export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType }: SubmitCaseDrawerProps) {
   const { toast } = useToast();
 
   // ── Steps
@@ -264,7 +267,17 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawe
           setStep("form");
           void loadQueues();
         } else {
-          setStep("type");
+          // Pre-select by name if caller provided an initialType hint.
+          const preselect = initialType
+            ? rt.find(t => t.name.toLowerCase() === initialType.toLowerCase()) ?? null
+            : null;
+          if (preselect) {
+            setSelectedType(preselect);
+            setStep("form");
+            void loadQueues();
+          } else {
+            setStep("type");
+          }
         }
       })
       .catch(() => {

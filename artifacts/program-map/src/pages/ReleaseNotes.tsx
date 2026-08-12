@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tag, Wrench, Sparkles, ArrowUpCircle, ChevronRight } from "lucide-react";
+import { Tag, Wrench, Sparkles, ArrowUpCircle, ChevronRight, MessageSquarePlus } from "lucide-react";
 import { useSeenVersion } from "@/hooks/useSeenVersion";
 import { APP_VERSION } from "@/config/version";
+import { SubmitCaseDrawer } from "@/components/homebase/SubmitCaseDrawer";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -187,7 +188,8 @@ function isNewerVersion(a: string, b: string): boolean {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function ReleaseNotes() {
-  const [selectedVersion, setSelectedVersion] = useState<string>(RELEASES[0].version);
+  const [selectedVersion,  setSelectedVersion]  = useState<string>(RELEASES[0].version);
+  const [showSubmitCase,   setShowSubmitCase]   = useState(false);
   const release = RELEASES.find((r) => r.version === selectedVersion) ?? RELEASES[0];
 
   const { lastSeenVersion, markSeen, isReady } = useSeenVersion();
@@ -220,16 +222,28 @@ export default function ReleaseNotes() {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 border-b border-border shrink-0">
-        <div className="flex items-center gap-2 mb-1">
-          <Tag className="w-4 h-4 text-muted-foreground" />
-          <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">
-            Trail OS
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Tag className="w-4 h-4 text-muted-foreground" />
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">
+                Trail OS
+              </p>
+            </div>
+            <h1 className="text-lg font-semibold font-serif text-foreground">Release Notes</h1>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              A history of major features, improvements, and bug fixes.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowSubmitCase(true)}
+            className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted/60 text-[12px] font-medium text-foreground transition-colors mt-0.5"
+          >
+            <MessageSquarePlus className="w-3.5 h-3.5 text-muted-foreground" />
+            Report an issue
+          </button>
         </div>
-        <h1 className="text-lg font-semibold font-serif text-foreground">Release Notes</h1>
-        <p className="text-[12px] text-muted-foreground mt-0.5">
-          A history of major features, improvements, and bug fixes.
-        </p>
       </div>
 
       {/* Body: selector + content */}
@@ -385,6 +399,12 @@ export default function ReleaseNotes() {
           </div>
         </ScrollArea>
       </div>
+
+      <SubmitCaseDrawer
+        open={showSubmitCase}
+        onClose={() => setShowSubmitCase(false)}
+        initialType="General"
+      />
     </div>
   );
 }
