@@ -62,10 +62,11 @@ function LookupField({
   label: string; types: string; placeholder: string;
   value: SearchHit | null; onChange: (hit: SearchHit | null) => void;
 }) {
-  const [query,   setQuery]   = useState("");
-  const [results, setResults] = useState<SearchHit[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [open,    setOpen]    = useState(false);
+  const [query,      setQuery]      = useState("");
+  const [results,    setResults]    = useState<SearchHit[]>([]);
+  const [loading,    setLoading]    = useState(false);
+  const [open,       setOpen]       = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
   const wrapRef  = useRef<HTMLDivElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -90,6 +91,11 @@ function LookupField({
         if (r.ok) {
           const d = await r.json() as { results: SearchHit[] };
           setResults(d.results ?? []);
+          // Flip upward if less than 220px remain below the input
+          if (wrapRef.current) {
+            const rect = wrapRef.current.getBoundingClientRect();
+            setOpenUpward(window.innerHeight - rect.bottom < 220);
+          }
           setOpen(true);
         }
       } finally { setLoading(false); }
@@ -130,7 +136,7 @@ function LookupField({
           className="w-full rounded-lg border border-border bg-background pl-8 pr-8 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
         {open && results.length > 0 && (
-          <div className="absolute z-10 top-full mt-1 left-0 right-0 rounded-lg border border-border bg-white shadow-lg overflow-hidden">
+          <div className={`absolute z-10 left-0 right-0 rounded-lg border border-border bg-white shadow-lg overflow-hidden ${openUpward ? "bottom-full mb-1" : "top-full mt-1"}`}>
             {results.map(r => (
               <button key={r.id} type="button"
                 onClick={() => { onChange(r); setQuery(""); setOpen(false); }}
