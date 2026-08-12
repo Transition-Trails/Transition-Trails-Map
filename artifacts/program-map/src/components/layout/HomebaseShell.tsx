@@ -464,7 +464,7 @@ export function HomebaseShell({
       </motion.div>
 
       {/* Homebase tour overlay */}
-      <HomebaseTour open={tourActive} onComplete={completeTour} />
+      <HomebaseTour open={tourActive} onComplete={completeTour} audience={audience} />
     </div>
   );
 }
