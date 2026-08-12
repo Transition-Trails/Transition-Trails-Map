@@ -241,6 +241,72 @@ describe('SubmitCaseDrawer — initialType routing', () => {
     },
   );
 
+  // ── T5: close after initialType pre-select → reopen with same initialType → form step ──
+
+  test(
+    'T5: opened with initialType → closed (reset) → reopened with same initialType → form step shown',
+    async () => {
+      global.fetch = makeFetch([
+        makeRecordType('General',   'rt-001', true),
+        makeRecordType('Technical', 'rt-002'),
+      ]);
+
+      const onClose = vi.fn();
+
+      const { rerender } = render(
+        <SubmitCaseDrawer
+          open={true}
+          onClose={onClose}
+          initialType="General"
+        />,
+      );
+
+      // Wait for the form step to appear on first open
+      await waitFor(() => {
+        expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+      });
+      expect(screen.getByText(FORM_SUBJECT_LABEL)).toBeInTheDocument();
+
+      // Click the close button — this calls handleClose() → reset() → onClose()
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      fireEvent.click(closeButton);
+      expect(onClose).toHaveBeenCalledTimes(1);
+
+      // Simulate the parent closing the drawer
+      rerender(
+        <SubmitCaseDrawer
+          open={false}
+          onClose={onClose}
+          initialType="General"
+        />,
+      );
+
+      // Drawer is hidden — neither step should be visible
+      expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+      expect(screen.queryByText(FORM_SUBJECT_LABEL)).not.toBeInTheDocument();
+
+      // Reset fetch call count so we can track the reopen fetch cleanly
+      (global.fetch as ReturnType<typeof vi.fn>).mockClear();
+
+      // Reopen with the same initialType="General"
+      rerender(
+        <SubmitCaseDrawer
+          open={true}
+          onClose={onClose}
+          initialType="General"
+        />,
+      );
+
+      // initialType still matches — the form step must appear on the second open too
+      await waitFor(() => {
+        expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+      });
+
+      // Subject field must be visible — confirming we are on the form step, not the type-picker
+      expect(screen.getByText(FORM_SUBJECT_LABEL)).toBeInTheDocument();
+    },
+  );
+
   // ── T4: close after initialType pre-select → reopen without initialType → type-picker ──
 
   test(
