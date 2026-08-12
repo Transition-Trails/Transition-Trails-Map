@@ -135,7 +135,7 @@ const LIVE_INTEGRATIONS: SetupCard[] = [
   {
     id: 'agentforce',
     name: 'Agentforce',
-    tagline: 'Penny–Transition Trails Assistant',
+    tagline: 'Penny – Trail OS Assistant',
     status: 'live-partial',
     icon: Bot,
     iconCls: 'bg-cyan-50 text-cyan-700',

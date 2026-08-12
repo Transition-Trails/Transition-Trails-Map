@@ -84,7 +84,7 @@ const CONNECTIONS: Connection[] = [
     needs: 'channels:read scope not yet approved — bot cannot list channels or members',
   },
   {
-    id: 'agentforce', name: 'Agentforce', tagline: `${TERMS.aiAssistant}–Transition Trails Assistant`,
+    id: 'agentforce', name: 'Agentforce', tagline: `${TERMS.aiAssistant} – Trail OS Assistant`,
     status: 'live-partial', icon: Bot, iconCls: 'bg-cyan-50 text-cyan-700', owner: 'Salesforce Admin',
     detail: 'Sessions API wired. Dual-AI coaching active on Assessment page.',
     action: 'Agentforce', href: '/penny/agentforce',

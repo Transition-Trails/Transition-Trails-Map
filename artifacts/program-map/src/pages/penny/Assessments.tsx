@@ -294,7 +294,7 @@ export default function Assessments() {
                   {activeCoaching.status === 'loading' && (
                     <div className="flex items-center gap-1.5 text-[14px] text-muted-foreground">
                       <RefreshCw className="w-3 h-3 animate-spin text-cyan-500" />
-                      <span>Connecting to Penny–Transition Trails Assistant…</span>
+                      <span>Connecting to Penny – Trail OS Assistant…</span>
                     </div>
                   )}
 

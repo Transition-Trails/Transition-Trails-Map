@@ -210,7 +210,7 @@ function friendlyModelName(modelId: string): string {
 function makeSeed(): Message[] {
   return [{
     role: 'penny',
-    content: `Hi! I'm ${TERMS.aiAssistant}, your Transition Trails AI guide. Ask me anything about programs, learners, Salesforce data, operations, or how Trail OS works.`,
+    content: `Hi! I'm ${TERMS.aiAssistant}, your Trail OS AI guide. Ask me anything about programs, learners, Salesforce data, operations, or how Trail OS works.`,
     time: '—',
   }];
 }
