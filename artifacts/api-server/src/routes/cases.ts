@@ -1,10 +1,16 @@
 /**
- * Cases routes — /api/sf/cases
+ * Cases routes — /api/sf/cases  &  /api/cases
  *
- * GET    /sf/cases                — list cases owned by the current SF user
- * PATCH  /sf/cases/:id/status     — update Status field
- * PATCH  /sf/cases/:id            — update FollowUpDate
- * POST   /sf/cases/:id/comments   — create a CaseComment (internal note)
+ * GET    /sf/cases                    — list cases owned by the current SF user
+ * PATCH  /sf/cases/:id/status         — update Status field
+ * PATCH  /sf/cases/:id                — update FollowUpDate
+ * POST   /sf/cases/:id/comments       — create a CaseComment (internal note)
+ * GET    /sf/cases/record-types       — active record types for Case
+ * GET    /sf/cases/queues             — SF queues that support Case
+ * POST   /sf/cases/:caseId/attachments — upload files to a SF Case
+ * POST   /cases/submit               — local-first case creation
+ * GET    /cases/submitted             — list locally submitted cases
+ * POST   /cases/:id/retry            — retry a failed/pending SF sync
  */
 
 import { Router } from "express";
@@ -13,7 +19,7 @@ import { getEffectiveSfFetch }  from "../lib/salesforceOAuth.js";
 import { SF_API_VERSION }       from "../lib/sfConstants.js";
 import { logger }               from "../lib/logger.js";
 import { db, submittedCasesTable } from "@workspace/db";
-import { eq, desc }             from "drizzle-orm";
+import { eq, desc, and, inArray } from "drizzle-orm";
 
 const router = Router();
 
@@ -56,10 +62,6 @@ router.get("/sf/cases", async (req, res) => {
   const proxyFetch = getEffectiveSfFetch(req);
   const orgBaseUrl = proxyFetch ? await getOrgBaseUrl(proxyFetch) : "";
 
-  // Try with optional fields; fall back gracefully if any are unsupported.
-  // LastModifiedDate is a standard Case field and is always included in the
-  // base query.  LastModifiedBy.Name and FollowUpDate are optional — they are
-  // dropped in the fallback attempt if the org does not support them.
   let records: Record<string, unknown>[] = [];
   let followUpDateSupported    = false;
   let lastModifiedBySupported  = false;
@@ -72,11 +74,9 @@ router.get("/sf/cases", async (req, res) => {
     `FROM Case WHERE OwnerId = '${sfUserId}' ${statusClause} ` +
     `ORDER BY CreatedDate DESC LIMIT 50`;
 
-  // Progressive fallback: richest → stripped.  Each attempt drops one layer
-  // of optional fields so we always land on a query the org can handle.
   const attempts: Array<[boolean, boolean]> = [
-    [true,  true ],  // all optional fields
-    [false, false],  // minimal (base query — guaranteed safe)
+    [true,  true ],
+    [false, false],
   ];
 
   let lastError = "";
@@ -147,8 +147,6 @@ router.patch("/sf/cases/:id/status", async (req, res) => {
   }
 
   try {
-    // Ownership check — return 404 regardless of whether the Case exists but
-    // belongs to someone else, to avoid leaking existence of other users' cases.
     const owned = await client.query<{ Id: string }>(
       `SELECT Id FROM Case WHERE Id = '${id}' AND OwnerId = '${sfUserId}' AND IsDeleted = false LIMIT 1`,
     );
@@ -193,7 +191,6 @@ router.patch("/sf/cases/:id", async (req, res) => {
   }
 
   try {
-    // Ownership check — return 404 regardless of whether the Case belongs to another user.
     const owned = await client.query<{ Id: string }>(
       `SELECT Id FROM Case WHERE Id = '${id}' AND OwnerId = '${sfUserId}' AND IsDeleted = false LIMIT 1`,
     );
@@ -214,7 +211,6 @@ router.patch("/sf/cases/:id", async (req, res) => {
 // ── POST /sf/cases/:id/comments ───────────────────────────────────────────────
 
 router.post("/sf/cases/:id/comments", async (req, res) => {
-  // Need both client (ownership check) and proxyFetch (CaseComment creation).
   let client: ReturnType<typeof getSalesforceClient>;
   try {
     client = getSalesforceClient(req);
@@ -243,7 +239,6 @@ router.post("/sf/cases/:id/comments", async (req, res) => {
   }
 
   try {
-    // Ownership check — do not disclose whether a foreign Case exists.
     const owned = await client.query<{ Id: string }>(
       `SELECT Id FROM Case WHERE Id = '${id}' AND OwnerId = '${sfUserId}' AND IsDeleted = false LIMIT 1`,
     );
@@ -272,7 +267,6 @@ router.post("/sf/cases/:id/comments", async (req, res) => {
 });
 
 // ── GET /sf/cases/record-types ────────────────────────────────────────────────
-// Returns the active, non-master record types for the Case object.
 
 router.get("/sf/cases/record-types", async (req, res) => {
   const proxyFetch = getEffectiveSfFetch(req);
@@ -302,7 +296,6 @@ router.get("/sf/cases/record-types", async (req, res) => {
 });
 
 // ── GET /sf/cases/queues ──────────────────────────────────────────────────────
-// Returns Salesforce queues that support the Case object.
 
 router.get("/sf/cases/queues", async (req, res) => {
   let client: ReturnType<typeof getSalesforceClient>;
@@ -319,6 +312,64 @@ router.get("/sf/cases/queues", async (req, res) => {
   } catch (e: unknown) {
     return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }
+});
+
+// ── POST /sf/cases/:caseId/attachments ────────────────────────────────────────
+// Upload one or more files to a Salesforce Case as ContentVersion records.
+
+router.post("/sf/cases/:caseId/attachments", async (req, res) => {
+  const { caseId } = req.params;
+  if (!caseId || !/^[a-zA-Z0-9]{15,18}$/.test(caseId)) {
+    return res.status(400).json({ error: "Invalid caseId." });
+  }
+
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) return res.status(401).json({ error: "Not connected to Salesforce." });
+
+  const { files } = req.body as {
+    files?: Array<{ name: string; base64: string; mimeType: string }>;
+  };
+  if (!Array.isArray(files) || files.length === 0) {
+    return res.status(400).json({ error: "files array is required." });
+  }
+  if (files.length > 10) {
+    return res.status(400).json({ error: "Maximum 10 files per request." });
+  }
+
+  const results: Array<{ name: string; success: boolean; error?: string }> = [];
+
+  for (const file of files) {
+    if (!file.name || !file.base64) {
+      results.push({ name: file.name ?? "(unnamed)", success: false, error: "Missing name or base64." });
+      continue;
+    }
+    try {
+      const r = await proxyFetch(`/services/data/${SF_API_VERSION}/sobjects/ContentVersion`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          Title:                  file.name,
+          PathOnClient:           file.name,
+          VersionData:            file.base64,
+          FirstPublishLocationId: caseId,
+        }),
+      });
+      if (!r.ok) {
+        const text = await r.text().catch(() => "");
+        logger.warn({ caseId, file: file.name }, `ContentVersion upload failed: ${text.slice(0, 200)}`);
+        results.push({ name: file.name, success: false, error: text.slice(0, 200) });
+      } else {
+        results.push({ name: file.name, success: true });
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      results.push({ name: file.name, success: false, error: msg });
+    }
+  }
+
+  const uploaded = results.filter(r => r.success).length;
+  const failed   = results.filter(r => !r.success).length;
+  return res.json({ uploaded, failed, results });
 });
 
 // ── POST /api/cases/submit ────────────────────────────────────────────────────
@@ -392,19 +443,16 @@ router.post("/cases/submit", async (req, res) => {
     if (recordTypeId)         sfData["RecordTypeId"]  = recordTypeId;
     if (contactId)            sfData["ContactId"]     = contactId;
     if (accountId)            sfData["AccountId"]     = accountId;
-    // Owner: explicit ID (queue or user) beats the session user
     sfData["OwnerId"] = ownerId || sfUserId || undefined;
     if (customFields) {
       for (const [k, v] of Object.entries(customFields)) sfData[k] = v;
     }
-    // Remove undefined keys so SF doesn't reject them
     for (const k of Object.keys(sfData)) {
       if (sfData[k] === undefined) delete sfData[k];
     }
 
     const result = await client.createRecord("Case", sfData);
 
-    // Fetch case number (best-effort)
     let sfCaseNumber: string | null = null;
     try {
       const cq = await client.query<{ CaseNumber: string }>(
@@ -440,68 +488,6 @@ router.post("/cases/submit", async (req, res) => {
   }
 });
 
-// ── POST /api/sf/cases/:caseId/attachments ────────────────────────────────────
-// Upload one or more files to a Salesforce Case as ContentVersion records.
-// Setting FirstPublishLocationId = caseId automatically creates the
-// ContentDocumentLink — no separate link step required.
-//
-// Body: { files: [{ name: string; base64: string; mimeType: string }] }
-
-router.post("/sf/cases/:caseId/attachments", async (req, res) => {
-  const { caseId } = req.params;
-  if (!caseId || !/^[a-zA-Z0-9]{15,18}$/.test(caseId)) {
-    return res.status(400).json({ error: "Invalid caseId." });
-  }
-
-  const proxyFetch = getEffectiveSfFetch(req);
-  if (!proxyFetch) return res.status(401).json({ error: "Not connected to Salesforce." });
-
-  const { files } = req.body as {
-    files?: Array<{ name: string; base64: string; mimeType: string }>;
-  };
-  if (!Array.isArray(files) || files.length === 0) {
-    return res.status(400).json({ error: "files array is required." });
-  }
-  if (files.length > 10) {
-    return res.status(400).json({ error: "Maximum 10 files per request." });
-  }
-
-  const results: Array<{ name: string; success: boolean; error?: string }> = [];
-
-  for (const file of files) {
-    if (!file.name || !file.base64) {
-      results.push({ name: file.name ?? "(unnamed)", success: false, error: "Missing name or base64." });
-      continue;
-    }
-    try {
-      const r = await proxyFetch(`/services/data/${SF_API_VERSION}/sobjects/ContentVersion`, {
-        method:  "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          Title:                  file.name,
-          PathOnClient:           file.name,
-          VersionData:            file.base64,
-          FirstPublishLocationId: caseId,
-        }),
-      });
-      if (!r.ok) {
-        const text = await r.text().catch(() => "");
-        logger.warn({ caseId, file: file.name }, `ContentVersion upload failed: ${text.slice(0, 200)}`);
-        results.push({ name: file.name, success: false, error: text.slice(0, 200) });
-      } else {
-        results.push({ name: file.name, success: true });
-      }
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      results.push({ name: file.name, success: false, error: msg });
-    }
-  }
-
-  const uploaded = results.filter(r => r.success).length;
-  const failed   = results.filter(r => !r.success).length;
-  return res.json({ uploaded, failed, results });
-});
-
 // ── GET /api/cases/submitted ──────────────────────────────────────────────────
 // Returns cases the current user has submitted via Trail OS (local + SF sync status).
 
@@ -517,6 +503,139 @@ router.get("/cases/submitted", async (req, res) => {
     .limit(50);
 
   return res.json({ cases });
+});
+
+// ── POST /api/cases/:id/retry ─────────────────────────────────────────────────
+// Re-attempts a Salesforce sync for a locally-saved case that previously failed
+// or is still pending.  Only the original submitter may retry their own case.
+//
+// Concurrency safety: we use a single atomic UPDATE that claims the row by
+// transitioning it from an eligible status ('failed' | 'pending') to 'retrying'.
+// If no row is returned, either another request claimed it first or the case is
+// already synced — either way we return 409 and make no Salesforce call.  This
+// prevents duplicate SF Case creation even when two tabs or requests race.
+
+router.post("/cases/:id/retry", async (req, res) => {
+  const userEmail = (req.session.googleEmail ?? req.session.sfEmail) || null;
+  if (!userEmail) return res.status(401).json({ error: "Not signed in." });
+
+  const localId = parseInt(req.params["id"] ?? "", 10);
+  if (!Number.isFinite(localId)) {
+    return res.status(400).json({ error: "Invalid case ID." });
+  }
+
+  // Need a live SF connection before we claim the row — no point locking it
+  // only to immediately release because there is no session.
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
+  try { client = getSalesforceClient(req); } catch { /* no SF session */ }
+  if (!client) {
+    return res.status(401).json({ error: "Not connected to Salesforce. Connect your account and try again." });
+  }
+
+  const sfUserId = req.session.sfUserId ?? null;
+
+  // ── Atomic claim ──────────────────────────────────────────────────────────
+  // Transition the row from an eligible status to 'retrying' in a single
+  // UPDATE statement.  Postgres executes this atomically per row, so exactly
+  // one concurrent caller will receive a returned row; all others get nothing.
+  const [claimed] = await db
+    .update(submittedCasesTable)
+    .set({ syncStatus: "retrying", syncError: null, updatedAt: new Date() })
+    .where(
+      and(
+        eq(submittedCasesTable.id, localId),
+        eq(submittedCasesTable.createdByEmail, userEmail),
+        inArray(submittedCasesTable.syncStatus, ["failed", "pending"]),
+      )
+    )
+    .returning();
+
+  if (!claimed) {
+    // Either no such record, wrong owner, already synced, or another retry is
+    // already in flight ('retrying').  All cases are safe to reject.
+    const [existing] = await db
+      .select({
+        syncStatus:   submittedCasesTable.syncStatus,
+        sfCaseId:     submittedCasesTable.sfCaseId,
+        sfCaseNumber: submittedCasesTable.sfCaseNumber,
+      })
+      .from(submittedCasesTable)
+      .where(and(
+        eq(submittedCasesTable.id, localId),
+        eq(submittedCasesTable.createdByEmail, userEmail),
+      ))
+      .limit(1);
+
+    if (!existing) return res.status(404).json({ error: "Case not found." });
+    if (existing.syncStatus === "synced") {
+      return res.status(409).json({
+        error: "Case is already synced.",
+        sfCaseId:     existing.sfCaseId,
+        sfCaseNumber: existing.sfCaseNumber,
+      });
+    }
+    return res.status(409).json({ error: "A retry is already in progress for this case." });
+  }
+
+  // ── Salesforce write ──────────────────────────────────────────────────────
+  try {
+    const sfData: Record<string, unknown> = {
+      Subject:  claimed.subject,
+      Status:   claimed.status ?? "New",
+      Priority: claimed.priority ?? "Medium",
+      Origin:   "Web",
+    };
+    if (claimed.description)  sfData["Description"]  = claimed.description;
+    if (claimed.recordTypeId) sfData["RecordTypeId"]  = claimed.recordTypeId;
+    if (claimed.contactId)    sfData["ContactId"]     = claimed.contactId;
+    if (claimed.accountId)    sfData["AccountId"]     = claimed.accountId;
+    sfData["OwnerId"] = claimed.ownerId || sfUserId || undefined;
+    if (claimed.customFields && typeof claimed.customFields === "object") {
+      for (const [k, v] of Object.entries(claimed.customFields as Record<string, unknown>)) {
+        sfData[k] = v;
+      }
+    }
+    for (const k of Object.keys(sfData)) {
+      if (sfData[k] === undefined) delete sfData[k];
+    }
+
+    const result = await client.createRecord("Case", sfData);
+
+    // Fetch case number (best-effort).
+    let sfCaseNumber: string | null = null;
+    try {
+      const cq = await client.query<{ CaseNumber: string }>(
+        `SELECT CaseNumber FROM Case WHERE Id = '${result.id}' LIMIT 1`
+      );
+      sfCaseNumber = cq.records[0]?.CaseNumber ?? null;
+    } catch { /* non-fatal */ }
+
+    const [updated] = await db
+      .update(submittedCasesTable)
+      .set({
+        sfCaseId:     result.id,
+        sfCaseNumber,
+        syncStatus:   "synced",
+        syncedAt:     new Date(),
+        syncError:    null,
+        updatedAt:    new Date(),
+      })
+      .where(eq(submittedCasesTable.id, localId))
+      .returning();
+
+    return res.json({ case: updated ?? claimed, synced: true, sfCaseId: result.id, sfCaseNumber });
+  } catch (e: unknown) {
+    const syncError = e instanceof Error ? e.message : String(e);
+    logger.error({ err: syncError, localId }, "Retry: failed to sync case to Salesforce");
+
+    const [updated] = await db
+      .update(submittedCasesTable)
+      .set({ syncStatus: "failed", syncError, updatedAt: new Date() })
+      .where(eq(submittedCasesTable.id, localId))
+      .returning();
+
+    return res.status(502).json({ case: updated ?? claimed, synced: false, error: syncError });
+  }
 });
 
 export default router;

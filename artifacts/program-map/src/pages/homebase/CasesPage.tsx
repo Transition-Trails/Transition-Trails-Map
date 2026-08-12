@@ -11,6 +11,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Loader2, RefreshCw, Briefcase, Clock,
   ChevronsUpDown, ChevronUp, ChevronDown, Plus,
+  AlertCircle, CheckCircle2, RotateCw,
 } from "lucide-react";
 import { useToast }        from "@/hooks/use-toast";
 import { openSfAuthPopup } from "@/utils/openSfAuthPopup";
@@ -20,6 +21,23 @@ import type { SfCase }     from "@/components/homebase/CaseHoverCard";
 import { SubmitCaseDrawer } from "@/components/homebase/SubmitCaseDrawer";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
+
+interface SubmittedCase {
+  id:             number;
+  subject:        string;
+  description:    string | null;
+  priority:       string | null;
+  status:         string | null;
+  recordTypeName: string | null;
+  ownerName:      string | null;
+  contactName:    string | null;
+  accountName:    string | null;
+  sfCaseId:       string | null;
+  sfCaseNumber:   string | null;
+  syncStatus:     string;  // "pending" | "synced" | "failed"
+  syncError:      string | null;
+  createdAt:      string;
+}
 
 type FilterTab      = "open" | "all" | "closed";
 type SortField      = "CaseNumber" | "Subject" | "Status" | "OwnerName" | "Priority" | "CreatedDate" | "LastModifiedDate";
@@ -117,6 +135,12 @@ export default function CasesPage() {
   const [sfUnavailable,      setSfUnavailable]      = useState(false);
   const [timeSummary,        setTimeSummary]        = useState<Record<string, number>>({});
 
+  // Submitted cases (local-first: pending / failed / synced)
+  const [submittedCases,     setSubmittedCases]     = useState<SubmittedCase[]>([]);
+  const [submittedLoading,   setSubmittedLoading]   = useState(true);
+  const [retryingIds,        setRetryingIds]        = useState<Set<number>>(new Set());
+  const [submittedExpanded,  setSubmittedExpanded]  = useState(true);
+
   // UI state
   const [filter,         setFilter]         = useState<FilterTab>("open");
   const [showSubmit,     setShowSubmit]     = useState(false);
@@ -163,6 +187,59 @@ export default function CasesPage() {
   }, []);
 
   useEffect(() => { void load(filter); }, [filter, load]);
+
+  // ── Submitted cases (local-first) ─────────────────────────────────────────
+
+  const loadSubmitted = useCallback(async () => {
+    setSubmittedLoading(true);
+    try {
+      const res = await fetch("/api/cases/submitted");
+      if (!res.ok) return;
+      const data = await res.json() as { cases: SubmittedCase[] };
+      setSubmittedCases(data.cases ?? []);
+    } finally {
+      setSubmittedLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void loadSubmitted(); }, [loadSubmitted]);
+
+  const handleRetry = useCallback(async (localId: number) => {
+    setRetryingIds(prev => new Set(prev).add(localId));
+    try {
+      const res  = await fetch(`/api/cases/${localId}/retry`, { method: "POST" });
+      const data = await res.json() as {
+        synced?: boolean; sfCaseNumber?: string; sfCaseId?: string;
+        case?: SubmittedCase; error?: string;
+      };
+      if (data.synced) {
+        toast({ title: "Sync successful", description: data.sfCaseNumber ? `Case #${data.sfCaseNumber} created in Salesforce` : "Case synced to Salesforce" });
+        setSubmittedCases(prev => prev.map(c =>
+          c.id === localId
+            ? { ...c, syncStatus: "synced", sfCaseId: data.sfCaseId ?? c.sfCaseId, sfCaseNumber: data.sfCaseNumber ?? c.sfCaseNumber, syncError: null }
+            : c
+        ));
+      } else if (res.status === 401) {
+        toast({ title: "Connect Salesforce first", description: data.error ?? "Sign in to Salesforce then retry.", variant: "destructive" });
+        openSfAuthPopup();
+      } else {
+        toast({ title: "Sync failed", description: data.error ?? "Salesforce returned an error. Try again later.", variant: "destructive" });
+        setSubmittedCases(prev => prev.map(c =>
+          c.id === localId ? { ...c, syncStatus: "failed", syncError: data.error ?? c.syncError } : c
+        ));
+      }
+    } catch {
+      toast({ title: "Network error", description: "Could not reach the server. Try again.", variant: "destructive" });
+    } finally {
+      setRetryingIds(prev => { const s = new Set(prev); s.delete(localId); return s; });
+    }
+  }, [toast]);
+
+  // Pending/failed cases that need attention
+  const actionableSubmitted = useMemo(
+    () => submittedCases.filter(c => c.syncStatus === "pending" || c.syncStatus === "failed"),
+    [submittedCases]
+  );
 
   // ── Derived list ─────────────────────────────────────────────────────────────
 
@@ -298,6 +375,125 @@ export default function CasesPage() {
           </button>
         </div>
       </div>
+
+      {/* ── My Submitted Cases (pending / failed) ──────────────────────────── */}
+      {(submittedLoading || submittedCases.length > 0) && (
+        <div className="rounded-xl border border-border bg-white overflow-hidden">
+          {/* Section header */}
+          <button
+            type="button"
+            onClick={() => setSubmittedExpanded(e => !e)}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+                My Submitted Cases
+              </span>
+              {actionableSubmitted.length > 0 && (
+                <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-700 text-[10px] font-semibold px-2 py-0.5 gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {actionableSubmitted.length} need{actionableSubmitted.length === 1 ? "s" : ""} attention
+                </span>
+              )}
+            </div>
+            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${submittedExpanded ? "rotate-180" : ""}`} />
+          </button>
+
+          {submittedExpanded && (
+            <>
+              {submittedLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                </div>
+              ) : submittedCases.length === 0 ? (
+                <div className="px-4 py-5 text-center">
+                  <p className="text-[12px] text-muted-foreground">No cases submitted yet.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-border/50 border-t border-border/50">
+                  {submittedCases.map(c => {
+                    const isFailed        = c.syncStatus === "failed";
+                    const isPending       = c.syncStatus === "pending";
+                    const isSynced        = c.syncStatus === "synced";
+                    const isRetryingStatus = c.syncStatus === "retrying";
+                    const isRetrying      = retryingIds.has(c.id);
+
+                    return (
+                      <div key={c.id} className={`flex items-start gap-3 px-4 py-3 ${isFailed ? "bg-rose-50/40" : isPending ? "bg-amber-50/40" : ""}`}>
+                        {/* Status icon */}
+                        <div className="mt-0.5 shrink-0">
+                          {isSynced    && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
+                          {isFailed    && <AlertCircle  className="w-4 h-4 text-rose-500" />}
+                          {(isPending || isRetryingStatus) && <Loader2 className="w-4 h-4 text-amber-500 animate-spin" />}
+                        </div>
+
+                        {/* Details */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline gap-2 flex-wrap">
+                            <p className="text-[13px] font-medium text-foreground truncate">
+                              {c.subject}
+                            </p>
+                            {c.sfCaseNumber && (
+                              <span className="text-[11px] font-mono text-muted-foreground shrink-0">
+                                #{c.sfCaseNumber}
+                              </span>
+                            )}
+                            {c.priority && (
+                              <span className={`text-[10px] font-semibold rounded px-1.5 py-0.5 shrink-0 ${
+                                c.priority === "High"   ? "bg-rose-50 text-rose-700"
+                                : c.priority === "Medium" ? "bg-amber-50 text-amber-700"
+                                : "bg-sky-50 text-sky-700"
+                              }`}>
+                                {c.priority}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            <span className={`text-[11px] font-medium ${
+                              isSynced        ? "text-emerald-600"
+                              : isFailed        ? "text-rose-600"
+                              : isRetryingStatus ? "text-sky-600"
+                              : "text-amber-600"
+                            }`}>
+                              {isSynced        ? "Synced to Salesforce"
+                               : isFailed        ? "Sync failed"
+                               : isRetryingStatus ? "Retrying…"
+                               : "Pending sync"}
+                            </span>
+                            {isFailed && c.syncError && (
+                              <span className="text-[11px] text-muted-foreground truncate max-w-[260px]" title={c.syncError}>
+                                — {c.syncError.slice(0, 80)}{c.syncError.length > 80 ? "…" : ""}
+                              </span>
+                            )}
+                            <span className="text-[10px] text-muted-foreground/60">
+                              {ageLabel(c.createdAt)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Retry button — only for failed/pending; hidden while a retry is in-flight */}
+                        {(isFailed || isPending) && !isRetryingStatus && (
+                          <button
+                            type="button"
+                            disabled={isRetrying}
+                            onClick={() => void handleRetry(c.id)}
+                            className="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[12px] font-medium border border-border text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-colors disabled:opacity-50"
+                          >
+                            {isRetrying
+                              ? <><Loader2 className="w-3 h-3 animate-spin" /> Retrying…</>
+                              : <><RotateCw className="w-3 h-3" /> Retry sync</>
+                            }
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-0.5 border-b border-border">
@@ -526,7 +722,7 @@ export default function CasesPage() {
       <SubmitCaseDrawer
         open={showSubmit}
         onClose={() => setShowSubmit(false)}
-        onSubmitted={() => void load(filter)}
+        onSubmitted={() => { void load(filter); void loadSubmitted(); }}
       />
     </div>
   );
