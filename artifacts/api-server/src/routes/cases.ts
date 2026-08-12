@@ -440,6 +440,68 @@ router.post("/cases/submit", async (req, res) => {
   }
 });
 
+// ── POST /api/sf/cases/:caseId/attachments ────────────────────────────────────
+// Upload one or more files to a Salesforce Case as ContentVersion records.
+// Setting FirstPublishLocationId = caseId automatically creates the
+// ContentDocumentLink — no separate link step required.
+//
+// Body: { files: [{ name: string; base64: string; mimeType: string }] }
+
+router.post("/sf/cases/:caseId/attachments", async (req, res) => {
+  const { caseId } = req.params;
+  if (!caseId || !/^[a-zA-Z0-9]{15,18}$/.test(caseId)) {
+    return res.status(400).json({ error: "Invalid caseId." });
+  }
+
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) return res.status(401).json({ error: "Not connected to Salesforce." });
+
+  const { files } = req.body as {
+    files?: Array<{ name: string; base64: string; mimeType: string }>;
+  };
+  if (!Array.isArray(files) || files.length === 0) {
+    return res.status(400).json({ error: "files array is required." });
+  }
+  if (files.length > 10) {
+    return res.status(400).json({ error: "Maximum 10 files per request." });
+  }
+
+  const results: Array<{ name: string; success: boolean; error?: string }> = [];
+
+  for (const file of files) {
+    if (!file.name || !file.base64) {
+      results.push({ name: file.name ?? "(unnamed)", success: false, error: "Missing name or base64." });
+      continue;
+    }
+    try {
+      const r = await proxyFetch(`/services/data/${SF_API_VERSION}/sobjects/ContentVersion`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          Title:                  file.name,
+          PathOnClient:           file.name,
+          VersionData:            file.base64,
+          FirstPublishLocationId: caseId,
+        }),
+      });
+      if (!r.ok) {
+        const text = await r.text().catch(() => "");
+        logger.warn({ caseId, file: file.name }, `ContentVersion upload failed: ${text.slice(0, 200)}`);
+        results.push({ name: file.name, success: false, error: text.slice(0, 200) });
+      } else {
+        results.push({ name: file.name, success: true });
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      results.push({ name: file.name, success: false, error: msg });
+    }
+  }
+
+  const uploaded = results.filter(r => r.success).length;
+  const failed   = results.filter(r => !r.success).length;
+  return res.json({ uploaded, failed, results });
+});
+
 // ── GET /api/cases/submitted ──────────────────────────────────────────────────
 // Returns cases the current user has submitted via Trail OS (local + SF sync status).
 
