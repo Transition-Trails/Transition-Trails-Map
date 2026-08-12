@@ -202,11 +202,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [actionPanel, setActionPanel]   = useState<ActionPanelConfig | null>(null);
   const [slackPanel,  setSlackPanel]    = useState<SlackPanelConfig | null>(null);
   const [pennyPanelTab, setPennyPanelTab] = useState<'penny' | 'signals' | 'ask'>('penny');
-  const [rightPanelOpen, setRightPanelOpen]       = useState(false);
-  const [askPennyOpen, setAskPennyOpen]             = useState(false);
-  const [calendarPanelOpen, setCalendarPanelOpen]   = useState(false);
-  const [gmailPanelOpen,    setGmailPanelOpen]      = useState(false);
-  const [helpPanelOpen,     setHelpPanelOpen]       = useState(false);
+  const [rightPanelOpen, setRightPanelOpen]          = useState(false);
+  const [askPennyOpen,      _setAskPennyOpen]        = useState(false);
+  const [calendarPanelOpen, _setCalendarPanelOpen]   = useState(false);
+  const [gmailPanelOpen,    _setGmailPanelOpen]      = useState(false);
+  const [helpPanelOpen,     _setHelpPanelOpen]       = useState(false);
+
+  // Smart setters — opening any slide-over panel closes all others.
+  // Centralising here means every call site (ContextPanel, RailActionPanel, etc.)
+  // benefits without needing individual updates.
+  function setAskPennyOpen(v: boolean) {
+    _setAskPennyOpen(v);
+    if (v) { _setCalendarPanelOpen(false); _setGmailPanelOpen(false); _setHelpPanelOpen(false); }
+  }
+  function setCalendarPanelOpen(v: boolean) {
+    _setCalendarPanelOpen(v);
+    if (v) { _setAskPennyOpen(false); _setGmailPanelOpen(false); _setHelpPanelOpen(false); }
+  }
+  function setGmailPanelOpen(v: boolean) {
+    _setGmailPanelOpen(v);
+    if (v) { _setAskPennyOpen(false); _setCalendarPanelOpen(false); _setHelpPanelOpen(false); }
+  }
+  function setHelpPanelOpen(v: boolean) {
+    _setHelpPanelOpen(v);
+    if (v) { _setAskPennyOpen(false); _setCalendarPanelOpen(false); _setGmailPanelOpen(false); }
+  }
   const [pendingPennyQuery, setPendingPennyQuery]   = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [logTimeOpen,    setLogTimeOpen]    = useState(false);

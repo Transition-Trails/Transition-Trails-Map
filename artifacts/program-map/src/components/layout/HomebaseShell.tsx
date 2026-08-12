@@ -327,7 +327,7 @@ function WorkspaceDrawer({
 
 // ── PennyBar ───────────────────────────────────────────────────────────────────
 
-function PennyBar({ displayName }: { displayName: string }) {
+function PennyBar({ displayName, isTeam }: { displayName: string; isTeam: boolean }) {
   const [query, setQuery]     = useState("");
   const [sending, setSending] = useState(false);
   const { hasUnseenRelease, markSeen } = useSeenVersion();
@@ -370,19 +370,21 @@ function PennyBar({ displayName }: { displayName: string }) {
         <Send className="w-3.5 h-3.5" />
       </button>
 
-      {/* Help guide toggle */}
-      <button
-        onClick={() => setHelpPanelOpen(!helpPanelOpen)}
-        title="Help guide — Salesforce Knowledge articles"
-        className={`flex-shrink-0 flex items-center gap-1.5 pl-3 border-l border-border text-[11px] font-medium transition-colors ${
-          helpPanelOpen
-            ? 'text-[#CC8400]'
-            : 'text-muted-foreground hover:text-foreground'
-        }`}
-      >
-        <BookOpen className="w-3.5 h-3.5" />
-        <span className="hidden sm:inline">Help</span>
-      </button>
+      {/* Help guide toggle — staff (team) only; coach/learner/volunteer lack SF article access */}
+      {isTeam && (
+        <button
+          onClick={() => setHelpPanelOpen(!helpPanelOpen)}
+          title="Help guide — Salesforce Knowledge articles"
+          className={`flex-shrink-0 flex items-center gap-1.5 pl-3 border-l border-border text-[11px] font-medium transition-colors ${
+            helpPanelOpen
+              ? 'text-[#CC8400]'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Help</span>
+        </button>
+      )}
 
       {/* Release Notes — always visible; pulsing dot when there's an unseen release */}
       <a
@@ -469,7 +471,7 @@ export function HomebaseShell({
 
       {/* Centre: Penny bar + scrollable content */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <PennyBar displayName={displayName} />
+        <PennyBar displayName={displayName} isTeam={audience === 'team'} />
         <main className="flex-1 overflow-y-auto">
           {children}
         </main>
@@ -498,8 +500,8 @@ export function HomebaseShell({
         onShowAllSteps={showAllSteps}
       />
 
-      {/* Help panel — same component as AppShell; state lives in AppContext */}
-      <HelpPanel />
+      {/* Help panel — staff only; coach/learner/volunteer lack SF article access */}
+      {audience === 'team' && <HelpPanel />}
     </div>
   );
 }
