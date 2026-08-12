@@ -42,14 +42,13 @@ async function getOrgBaseUrl(proxyFetch: (url: string, init?: RequestInit) => Pr
 // ── GET /sf/cases ──────────────────────────────────────────────────────────────
 
 router.get("/sf/cases", async (req, res) => {
-  let client: ReturnType<typeof getSalesforceClient>;
-  try {
-    client = getSalesforceClient(req);
-  } catch {
-    return res.status(401).json({ error: "Not connected to Salesforce." });
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
+  try { client = getSalesforceClient(req); } catch { /* no SF session */ }
+  if (!client) {
+    return res.status(401).json({ error: "Not connected to Salesforce. Connect your account and try again." });
   }
 
-  const sfUserId = req.session.sfUserId;
+  const sfUserId = req.session.sfUserId ?? null;
   if (!sfUserId || !/^[a-zA-Z0-9]{15,18}$/.test(sfUserId)) {
     return res.status(401).json({ error: "Salesforce user not found in session." });
   }
@@ -82,9 +81,7 @@ router.get("/sf/cases", async (req, res) => {
   let lastError = "";
   for (const [withModifiedBy, withFollowUp] of attempts) {
     try {
-      const result = await client.query<Record<string, unknown>>(
-        buildSoql(withModifiedBy, withFollowUp)
-      );
+      const result = await client.query<Record<string, unknown>>(buildSoql(withModifiedBy, withFollowUp));
       records = result.records;
       lastModifiedBySupported = withModifiedBy;
       followUpDateSupported   = withFollowUp;
@@ -102,18 +99,18 @@ router.get("/sf/cases", async (req, res) => {
   }
 
   const cases = records.map(r => ({
-    Id:                   r["Id"]               as string,
-    CaseNumber:           r["CaseNumber"]        as string | null,
-    Subject:              r["Subject"]           as string | null,
-    Priority:             r["Priority"]          as string | null,
-    Status:               r["Status"]            as string | null,
-    CreatedDate:          r["CreatedDate"]        as string | null,
-    LastModifiedDate:     r["LastModifiedDate"]  as string | null,
-    LastModifiedByName:   lastModifiedBySupported ? (((r["LastModifiedBy"] as Record<string, unknown> | null)?.["Name"] as string | null) ?? null) : null,
-    FollowUpDate:         followUpDateSupported   ? (r["FollowUpDate"] as string | null) : null,
-    OwnerName:            ((r["Owner"]   as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
-    ContactName:          ((r["Contact"] as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
-    AccountName:          ((r["Account"] as Record<string, unknown> | null)?.["Name"]  as string | null) ?? null,
+    Id:                 r["Id"]              as string,
+    CaseNumber:         r["CaseNumber"]       as string | null,
+    Subject:            r["Subject"]          as string | null,
+    Priority:           r["Priority"]         as string | null,
+    Status:             r["Status"]           as string | null,
+    CreatedDate:        r["CreatedDate"]       as string | null,
+    LastModifiedDate:   r["LastModifiedDate"] as string | null,
+    LastModifiedByName: lastModifiedBySupported ? (((r["LastModifiedBy"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null) : null,
+    FollowUpDate:       followUpDateSupported   ? (r["FollowUpDate"] as string | null) : null,
+    OwnerName:          ((r["Owner"]   as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
+    ContactName:        ((r["Contact"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
+    AccountName:        ((r["Account"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
   }));
 
   return res.json({ cases, orgBaseUrl, followUpDateSupported });
@@ -122,7 +119,7 @@ router.get("/sf/cases", async (req, res) => {
 // ── PATCH /sf/cases/:id/status ─────────────────────────────────────────────────
 
 router.patch("/sf/cases/:id/status", async (req, res) => {
-  let client: ReturnType<typeof getSalesforceClient>;
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
   try {
     client = getSalesforceClient(req);
   } catch {
@@ -141,7 +138,7 @@ router.patch("/sf/cases/:id/status", async (req, res) => {
     });
   }
 
-  const sfUserId = req.session.sfUserId ?? "";
+  const sfUserId = req.session.sfUserId ?? null;
   if (!sfUserId) {
     return res.status(401).json({ error: "Salesforce user not found in session." });
   }
@@ -163,7 +160,7 @@ router.patch("/sf/cases/:id/status", async (req, res) => {
 // ── PATCH /sf/cases/:id ────────────────────────────────────────────────────────
 
 router.patch("/sf/cases/:id", async (req, res) => {
-  let client: ReturnType<typeof getSalesforceClient>;
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
   try {
     client = getSalesforceClient(req);
   } catch {
@@ -185,7 +182,7 @@ router.patch("/sf/cases/:id", async (req, res) => {
     return res.status(400).json({ error: "followUpDate must be YYYY-MM-DD or null." });
   }
 
-  const sfUserId = req.session.sfUserId ?? "";
+  const sfUserId = req.session.sfUserId ?? null;
   if (!sfUserId) {
     return res.status(401).json({ error: "Salesforce user not found in session." });
   }
@@ -200,7 +197,7 @@ router.patch("/sf/cases/:id", async (req, res) => {
     await client.updateRecord("Case", id, { FollowUpDate: dateVal });
     return res.json({ success: true, FollowUpDate: dateVal });
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
+      const msg = e instanceof Error ? e.message : String(e);
     if (/FollowUpDate|No such column/i.test(msg)) {
       return res.json({ success: false, fieldUnsupported: true });
     }
@@ -228,7 +225,7 @@ router.post("/sf/cases/:id/comments", async (req, res) => {
     return res.status(400).json({ error: "Invalid Case ID." });
   }
 
-  const sfUserId = req.session.sfUserId ?? "";
+  const sfUserId = req.session.sfUserId ?? null;
   if (!sfUserId) {
     return res.status(401).json({ error: "Salesforce user not found in session." });
   }
@@ -298,7 +295,7 @@ router.get("/sf/cases/record-types", async (req, res) => {
 // ── GET /sf/cases/queues ──────────────────────────────────────────────────────
 
 router.get("/sf/cases/queues", async (req, res) => {
-  let client: ReturnType<typeof getSalesforceClient>;
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
   try { client = getSalesforceClient(req); }
   catch { return res.status(401).json({ error: "Not connected to Salesforce." }); }
 
@@ -432,6 +429,9 @@ router.post("/cases/submit", async (req, res) => {
     });
   }
 
+  const proxyFetch = getEffectiveSfFetch(req);
+  const orgBaseUrl = proxyFetch ? await getOrgBaseUrl(proxyFetch) : "";
+
   try {
     const sfData: Record<string, unknown> = {
       Subject:  subject.trim(),
@@ -453,6 +453,7 @@ router.post("/cases/submit", async (req, res) => {
 
     const result = await client.createRecord("Case", sfData);
 
+    // Fetch case number (best-effort).
     let sfCaseNumber: string | null = null;
     try {
       const cq = await client.query<{ CaseNumber: string }>(
@@ -467,9 +468,13 @@ router.post("/cases/submit", async (req, res) => {
       .where(eq(submittedCasesTable.id, local.id))
       .returning();
 
+    const sfCaseUrl = orgBaseUrl && result.id
+      ? `${orgBaseUrl}/lightning/r/Case/${result.id}/view`
+      : undefined;
+
     return res.status(201).json({
       case: updated ?? local, synced: true,
-      sfCaseId: result.id, sfCaseNumber,
+      sfCaseId: result.id, sfCaseNumber, sfCaseUrl,
     });
   } catch (e: unknown) {
     const syncError = e instanceof Error ? e.message : String(e);
@@ -578,6 +583,9 @@ router.post("/cases/:id/retry", async (req, res) => {
   }
 
   // ── Salesforce write ──────────────────────────────────────────────────────
+  const proxyFetch = getEffectiveSfFetch(req);
+  const orgBaseUrl = proxyFetch ? await getOrgBaseUrl(proxyFetch) : "";
+
   try {
     const sfData: Record<string, unknown> = {
       Subject:  claimed.subject,
@@ -612,18 +620,15 @@ router.post("/cases/:id/retry", async (req, res) => {
 
     const [updated] = await db
       .update(submittedCasesTable)
-      .set({
-        sfCaseId:     result.id,
-        sfCaseNumber,
-        syncStatus:   "synced",
-        syncedAt:     new Date(),
-        syncError:    null,
-        updatedAt:    new Date(),
-      })
+      .set({ sfCaseId: result.id, sfCaseNumber, syncStatus: "synced", syncedAt: new Date(), updatedAt: new Date() })
       .where(eq(submittedCasesTable.id, localId))
       .returning();
 
-    return res.json({ case: updated ?? claimed, synced: true, sfCaseId: result.id, sfCaseNumber });
+    const sfCaseUrl = orgBaseUrl && result.id
+      ? `${orgBaseUrl}/lightning/r/Case/${result.id}/view`
+      : undefined;
+
+    return res.json({ case: updated ?? claimed, synced: true, sfCaseId: result.id, sfCaseNumber, sfCaseUrl });
   } catch (e: unknown) {
     const syncError = e instanceof Error ? e.message : String(e);
     logger.error({ err: syncError, localId }, "Retry: failed to sync case to Salesforce");

@@ -384,7 +384,7 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawe
 
       const data = await r.json() as {
         synced?: boolean; sfCaseNumber?: string; sfCaseId?: string;
-        message?: string; error?: string;
+        sfCaseUrl?: string; message?: string; error?: string;
       };
 
       if (!r.ok && r.status !== 201) {
@@ -395,6 +395,7 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawe
         synced:       data.synced ?? false,
         sfCaseId:     data.sfCaseId,
         sfCaseNumber: data.sfCaseNumber,
+        sfCaseUrl:    data.sfCaseUrl,
         message:      data.message,
       };
 
@@ -746,9 +747,9 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawe
         {step === "result" && (
           <div className="flex items-center justify-between gap-3 px-5 py-4 border-t border-border shrink-0">
             {/* Show SF link when synced */}
-            {result?.synced && result.sfCaseId ? (
+            {result?.sfCaseUrl ? (
               <a
-                href="https://login.salesforce.com"
+                href={result.sfCaseUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground hover:text-primary transition-colors"
