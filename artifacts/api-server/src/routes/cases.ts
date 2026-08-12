@@ -23,7 +23,7 @@ import { eq, desc, and, inArray } from "drizzle-orm";
 
 const router = Router();
 
-const ALLOWED_CASE_STATUSES = ["New", "Working", "Escalated", "Closed"] as const;
+// Status values are validated by Salesforce on update; no hardcoded allowlist needed.
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -128,10 +128,8 @@ router.patch("/sf/cases/:id/status", async (req, res) => {
   }
 
   const { status } = (req.body ?? {}) as { status?: string };
-  if (!status || !(ALLOWED_CASE_STATUSES as readonly string[]).includes(status)) {
-    return res.status(400).json({
-      error: `status must be one of: ${ALLOWED_CASE_STATUSES.join(", ")}`,
-    });
+  if (!status || typeof status !== "string" || status.trim().length === 0 || status.length > 100) {
+    return res.status(400).json({ error: "status is required." });
   }
 
   const sfUserId = req.session.sfUserId ?? null;
@@ -254,6 +252,39 @@ router.post("/sf/cases/:id/comments", async (req, res) => {
     }
     const data = await sfRes.json() as { id?: string; success?: boolean };
     return res.status(201).json({ success: true, id: data.id });
+  } catch (e: unknown) {
+    return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+  }
+});
+
+// ── GET /sf/cases/statuses ────────────────────────────────────────────────────
+// Returns the active Status picklist values from the SF Case object describe.
+// Includes a `closed` flag so the frontend knows which transitions remove the
+// case from the open-cases list.
+
+router.get("/sf/cases/statuses", async (req, res) => {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) return res.status(401).json({ error: "Not connected to Salesforce." });
+
+  try {
+    const r = await proxyFetch(`/services/data/${SF_API_VERSION}/sobjects/Case/describe`, {
+      headers: { Accept: "application/json" },
+    });
+    if (!r.ok) {
+      const text = await r.text().catch(() => "");
+      return res.status(502).json({ error: `SF describe failed: ${text.slice(0, 200)}` });
+    }
+    const data = await r.json() as {
+      fields?: Array<{
+        name: string;
+        picklistValues?: Array<{ value: string; active: boolean; closed?: boolean }>;
+      }>;
+    };
+    const statusField = (data.fields ?? []).find(f => f.name === "Status");
+    const statuses = (statusField?.picklistValues ?? [])
+      .filter(v => v.active)
+      .map(v => ({ value: v.value, closed: v.closed ?? false }));
+    return res.json({ statuses });
   } catch (e: unknown) {
     return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }

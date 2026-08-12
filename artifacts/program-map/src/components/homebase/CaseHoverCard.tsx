@@ -40,19 +40,41 @@ interface CaseHoverCardProps {
   case_:               SfCase;
   orgBaseUrl:          string;
   followUpDateSupported: boolean;
+  caseStatuses?:       Array<{ value: string; closed: boolean }>;
   onStatusChange?: (caseId: string, newStatus: string) => void;
   onCaseUpdate?:   (caseId: string, updates: { FollowUpDate?: string | null }) => void;
   children: ReactNode;
 }
 
-// ── Status config ─────────────────────────────────────────────────────────────
+// ── Status colour map ─────────────────────────────────────────────────────────
+// Keys are common SF Case Status values. Unknown values fall back to primary.
 
-const STATUSES = [
-  { value: "New",       active: "bg-slate-600 text-white",    idle: "bg-slate-100 text-slate-600 hover:bg-slate-200"     },
-  { value: "Working",   active: "bg-sky-600 text-white",      idle: "bg-sky-50 text-sky-700 hover:bg-sky-100"            },
-  { value: "Escalated", active: "bg-rose-600 text-white",     idle: "bg-rose-50 text-rose-700 hover:bg-rose-100"         },
-  { value: "Closed",    active: "bg-emerald-600 text-white",  idle: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"},
-] as const;
+const STATUS_COLORS: Record<string, { active: string; idle: string }> = {
+  "New":                    { active: "bg-slate-600 text-white",   idle: "bg-slate-100 text-slate-600 hover:bg-slate-200"    },
+  "Open":                   { active: "bg-slate-600 text-white",   idle: "bg-slate-100 text-slate-600 hover:bg-slate-200"    },
+  "Working":                { active: "bg-sky-600 text-white",     idle: "bg-sky-50 text-sky-700 hover:bg-sky-100"           },
+  "In Progress":            { active: "bg-sky-600 text-white",     idle: "bg-sky-50 text-sky-700 hover:bg-sky-100"           },
+  "Escalated":              { active: "bg-rose-600 text-white",    idle: "bg-rose-50 text-rose-700 hover:bg-rose-100"        },
+  "Closed":                 { active: "bg-emerald-600 text-white", idle: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" },
+  "Resolved":               { active: "bg-emerald-600 text-white", idle: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100" },
+  "On Hold":                { active: "bg-amber-600 text-white",   idle: "bg-amber-50 text-amber-700 hover:bg-amber-100"     },
+  "Pending":                { active: "bg-amber-600 text-white",   idle: "bg-amber-50 text-amber-700 hover:bg-amber-100"     },
+  "Waiting on Customer":    { active: "bg-amber-600 text-white",   idle: "bg-amber-50 text-amber-700 hover:bg-amber-100"     },
+  "Waiting on Development": { active: "bg-amber-600 text-white",   idle: "bg-amber-50 text-amber-700 hover:bg-amber-100"     },
+};
+const STATUS_COLORS_DEFAULT = { active: "bg-primary text-white", idle: "bg-primary/10 text-primary hover:bg-primary/20" };
+
+function statusColors(value: string) {
+  return STATUS_COLORS[value] ?? STATUS_COLORS_DEFAULT;
+}
+
+// Fallback list used when the org's real statuses haven't loaded yet.
+const FALLBACK_STATUSES: Array<{ value: string; closed: boolean }> = [
+  { value: "New",       closed: false },
+  { value: "Working",   closed: false },
+  { value: "Escalated", closed: false },
+  { value: "Closed",    closed: true  },
+];
 
 const PRIORITY_STYLES: Record<string, string> = {
   High:   "bg-rose-100 text-rose-700 border border-rose-200",
@@ -86,10 +108,14 @@ export function CaseHoverCard({
   case_: c,
   orgBaseUrl,
   followUpDateSupported,
+  caseStatuses,
   onStatusChange,
   onCaseUpdate,
   children,
 }: CaseHoverCardProps) {
+  const resolvedStatuses = (caseStatuses && caseStatuses.length > 0)
+    ? caseStatuses
+    : FALLBACK_STATUSES;
   const { toast } = useToast();
   const { openLogTime } = useAppContext();
   const [open, setOpen] = useState(false);
@@ -290,8 +316,9 @@ export function CaseHoverCard({
             Status
           </p>
           <div className="grid grid-cols-2 gap-1.5">
-            {STATUSES.map(s => {
+            {resolvedStatuses.map(s => {
               const isActive = currentStatus === s.value;
+              const colors   = statusColors(s.value);
               return (
                 <button
                   key={s.value}
@@ -300,7 +327,7 @@ export function CaseHoverCard({
                   className={`
                     flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md
                     text-[11px] font-semibold transition-all disabled:opacity-60
-                    ${isActive ? s.active + " ring-2 ring-offset-1 ring-current/30" : s.idle}
+                    ${isActive ? colors.active + " ring-2 ring-offset-1 ring-current/30" : colors.idle}
                   `}
                 >
                   {savingStatus && isActive && <Loader2 className="w-3 h-3 animate-spin" />}

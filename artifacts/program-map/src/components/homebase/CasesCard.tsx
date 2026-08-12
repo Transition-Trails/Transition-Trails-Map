@@ -72,12 +72,16 @@ export function CasesCard() {
   const [loading,               setLoading]               = useState(true);
   const [sfUnavailable,         setSfUnavailable]         = useState(false);
   const [timeSummary,           setTimeSummary]           = useState<Record<string, number>>({});
+  const [caseStatuses,          setCaseStatuses]          = useState<Array<{ value: string; closed: boolean }>>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
     setSfUnavailable(false);
     try {
-      const res  = await fetch("/api/sf/cases?status=open");
+      const [res, statusesRes] = await Promise.all([
+        fetch("/api/sf/cases?status=open"),
+        fetch("/api/sf/cases/statuses"),
+      ]);
       if (res.status === 401) { setSfUnavailable(true); setLoading(false); return; }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json() as {
@@ -91,6 +95,10 @@ export function CasesCard() {
       if (data.orgBaseUrl) setOrgBaseUrl(data.orgBaseUrl);
       if (typeof data.followUpDateSupported === "boolean") {
         setFollowUpDateSupported(data.followUpDateSupported);
+      }
+      if (statusesRes.ok) {
+        const sd = await statusesRes.json() as { statuses?: Array<{ value: string; closed: boolean }> };
+        if (sd.statuses && sd.statuses.length > 0) setCaseStatuses(sd.statuses);
       }
       // Batch-fetch time totals for all visible cases
       if (loaded.length > 0) {
@@ -114,8 +122,10 @@ export function CasesCard() {
   // ── Optimistic handlers ────────────────────────────────────────────────────
 
   function handleStatusChange(id: string, status: string) {
-    // Closing a case removes it from the open list immediately.
-    if (status === "Closed") {
+    // Use the `closed` flag from the real SF picklist; fall back to name-match.
+    const isClosed = caseStatuses.find(s => s.value === status)?.closed
+      ?? status.toLowerCase() === "closed";
+    if (isClosed) {
       setCases(prev => prev.filter(c => c.Id !== id));
     } else {
       setCases(prev => prev.map(c => c.Id === id ? { ...c, Status: status } : c));
@@ -203,6 +213,7 @@ export function CasesCard() {
                         case_={c}
                         orgBaseUrl={orgBaseUrl}
                         followUpDateSupported={followUpDateSupported}
+                        caseStatuses={caseStatuses}
                         onStatusChange={handleStatusChange}
                         onCaseUpdate={handleCaseUpdate}
                       >
