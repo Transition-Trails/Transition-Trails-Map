@@ -15,9 +15,11 @@
  * Right rail: SlimSlackPanel (wired in HomebaseShell)
  */
 
+import { useState } from "react";
 import { Link } from "wouter";
-import { BookOpen, Video, Sparkles, MessageSquare, Users, CalendarClock, Hash } from "lucide-react";
+import { BookOpen, Video, Sparkles, MessageSquare, Users, CalendarClock, Hash, Plus } from "lucide-react";
 import { HomebaseShell }       from "@/components/layout/HomebaseShell";
+import { SubmitCaseDrawer }    from "@/components/homebase/SubmitCaseDrawer";
 import { LogTimeRow }          from "@/components/homebase/LogTimeRow";
 import { CairnBand }           from "@/components/homebase/CairnBand";
 import { LearnerCasesCard }    from "@/components/homebase/LearnerCasesCard";
@@ -170,6 +172,7 @@ interface LearnerHomebaseProps {
 }
 
 export default function LearnerHomebase({ audience, displayName }: LearnerHomebaseProps) {
+  const [showSubmitCase, setShowSubmitCase] = useState(false);
   const questResult = useHomebaseLearnerQuest();
   const casesResult = useHomebaseLearnerCases();
   const weekResult  = useHomebaseLearnerWeek();
@@ -183,6 +186,21 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
       displayName={displayName}
     >
       <div className="flex flex-col gap-4 px-5 py-5">
+        {/* 0 — Header strip */}
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[12px] text-muted-foreground font-medium">
+            {displayName ? `${displayName.split(" ")[0]}'s homebase` : "Your homebase"}
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowSubmitCase(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Submit a Case
+          </button>
+        </div>
+
         {/* 1 — Today's Trail Quest */}
         <CairnBand
           isLoading={questResult.isLoading}
@@ -219,6 +237,11 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
         {/* 4 — Team card (coach or Penny fallback) */}
         <TeamCard coachState={coachResult.data} />
       </div>
+
+      <SubmitCaseDrawer
+        open={showSubmitCase}
+        onClose={() => setShowSubmitCase(false)}
+      />
     </HomebaseShell>
   );
 }

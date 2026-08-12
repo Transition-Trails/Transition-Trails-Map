@@ -16,6 +16,7 @@
  * Right rail: SlimSlackPanel (wired in HomebaseShell)
  */
 
+import { useState } from "react";
 import { HomebaseShell }      from "@/components/layout/HomebaseShell";
 import { LogTimeRow }         from "@/components/homebase/LogTimeRow";
 import { PennyPreparedBand }  from "@/components/homebase/PennyPreparedBand";
@@ -24,7 +25,8 @@ import { SquadGrid }          from "@/components/homebase/SquadGrid";
 import { CoachCasesCard }     from "@/components/homebase/CoachCasesCard";
 import { CoachWeekCard }      from "@/components/homebase/CoachWeekCard";
 import { TodayTasksCard }     from "@/components/homebase/TodayTasksCard";
-import { Shield, MessageSquare, Hash, Users } from "lucide-react";
+import { SubmitCaseDrawer }   from "@/components/homebase/SubmitCaseDrawer";
+import { Shield, MessageSquare, Hash, Users, Plus } from "lucide-react";
 import {
   useCoachPennyPrepared,
   useCoachArtefacts,
@@ -151,6 +153,7 @@ export default function CoachHomebase({
   coachLevel: coachLevelProp,
 }: CoachHomebaseProps) {
   const coachLevel: CoachLevel = coachLevelProp ?? "associate";
+  const [showSubmitCase, setShowSubmitCase] = useState(false);
   const levelLabel = COACH_LEVEL_LABELS[coachLevel];
 
   const pennyResult    = useCoachPennyPrepared();
@@ -169,15 +172,25 @@ export default function CoachHomebase({
       <div className="flex flex-col gap-4 px-5 py-5">
 
         {/* 1 — Level header strip */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
           <p className="text-[12px] text-muted-foreground font-medium">
             {displayName
               ? `${displayName.split(" ")[0]}'s homebase`
               : "Your homebase"}
           </p>
-          <span className="inline-flex items-center rounded-full border border-border bg-white px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-            {levelLabel}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-full border border-border bg-white px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+              {levelLabel}
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowSubmitCase(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors shadow-sm"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Submit a Case
+            </button>
+          </div>
         </div>
 
         {/* 2 — Penny has prepared */}
@@ -226,6 +239,11 @@ export default function CoachHomebase({
         {/* 8 — Lead team card */}
         <LeadTeamCard leadState={leadResult.data} coachLevel={coachLevel} />
       </div>
+
+      <SubmitCaseDrawer
+        open={showSubmitCase}
+        onClose={() => setShowSubmitCase(false)}
+      />
     </HomebaseShell>
   );
 }

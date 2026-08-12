@@ -15,9 +15,11 @@
  * Right rail: SlimSlackPanel (wired in HomebaseShell)
  */
 
+import { useState } from "react";
 import { Link } from "wouter";
-import { FileText, MessageSquare, Hash, Heart } from "lucide-react";
+import { FileText, MessageSquare, Hash, Heart, Plus } from "lucide-react";
 import { HomebaseShell }        from "@/components/layout/HomebaseShell";
+import { SubmitCaseDrawer }     from "@/components/homebase/SubmitCaseDrawer";
 import { LogTimeRow }           from "@/components/homebase/LogTimeRow";
 import { ThisMonthBand }        from "@/components/homebase/ThisMonthBand";
 import { VolunteerCasesCard }   from "@/components/homebase/VolunteerCasesCard";
@@ -171,6 +173,7 @@ interface VolunteerHomebaseProps {
 }
 
 export default function VolunteerHomebase({ audience, displayName }: VolunteerHomebaseProps) {
+  const [showSubmitCase, setShowSubmitCase] = useState(false);
   const monthResult       = useVolunteerMonth();
   const casesResult       = useVolunteerCases();
   const queueResult       = useVolunteerQueue();
@@ -192,6 +195,21 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
       displayName={displayName}
     >
       <div className="flex flex-col gap-4 px-5 py-5">
+
+        {/* 0 — Header strip */}
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[12px] text-muted-foreground font-medium">
+            {displayName ? `${displayName.split(" ")[0]}'s homebase` : "Your homebase"}
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowSubmitCase(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Submit a Case
+          </button>
+        </div>
 
         {/* 1 — This month band */}
         <ThisMonthBand
@@ -249,6 +267,11 @@ export default function VolunteerHomebase({ audience, displayName }: VolunteerHo
         {/* 6 — Coordinator card */}
         <CoordinatorCard coordinatorState={coordinatorResult.data} />
       </div>
+
+      <SubmitCaseDrawer
+        open={showSubmitCase}
+        onClose={() => setShowSubmitCase(false)}
+      />
     </HomebaseShell>
   );
 }
