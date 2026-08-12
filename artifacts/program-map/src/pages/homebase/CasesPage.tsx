@@ -10,13 +10,14 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Loader2, RefreshCw, Briefcase, Clock,
-  ChevronsUpDown, ChevronUp, ChevronDown,
+  ChevronsUpDown, ChevronUp, ChevronDown, Plus,
 } from "lucide-react";
 import { useToast }        from "@/hooks/use-toast";
 import { openSfAuthPopup } from "@/utils/openSfAuthPopup";
 import { useAppContext }   from "@/context/AppContext";
 import { CaseHoverCard }   from "@/components/homebase/CaseHoverCard";
 import type { SfCase }     from "@/components/homebase/CaseHoverCard";
+import { SubmitCaseDrawer } from "@/components/homebase/SubmitCaseDrawer";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -118,6 +119,7 @@ export default function CasesPage() {
 
   // UI state
   const [filter,         setFilter]         = useState<FilterTab>("open");
+  const [showSubmit,     setShowSubmit]     = useState(false);
   const [sortField,      setSortField]      = useState<SortField>("CreatedDate");
   const [sortDir,        setSortDir]        = useState<SortDir>("desc");
   const [statusFilter,   setStatusFilter]   = useState<StatusFilter>("All");
@@ -279,13 +281,22 @@ export default function CasesPage() {
             )}
           </h1>
         </div>
-        <button
-          onClick={() => void load(filter)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => void load(filter)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
+          <button
+            onClick={() => setShowSubmit(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Submit a Case
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -511,6 +522,12 @@ export default function CasesPage() {
           </table>
         )}
       </div>
+
+      <SubmitCaseDrawer
+        open={showSubmit}
+        onClose={() => setShowSubmit(false)}
+        onSubmitted={() => void load(filter)}
+      />
     </div>
   );
 }

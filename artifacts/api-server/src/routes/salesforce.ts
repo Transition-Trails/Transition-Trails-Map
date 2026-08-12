@@ -1485,11 +1485,29 @@ router.get("/sf/records/search", async (req, res) => {
   // Escape SOSL reserved characters: ? & | ! { } [ ] ( ) ^ ~ * : \ " ' + -
   const escaped = q.replace(/[?&|!{}[\]()^~*:\\"'+\-]/g, "\\$&");
 
-  const sosl = `FIND {${escaped}*} IN NAME FIELDS RETURNING ` +
-    `Account(Id, Name LIMIT 5), ` +
-    `Case(Id, Subject, CaseNumber LIMIT 5), ` +
-    `Opportunity(Id, Name LIMIT 5), ` +
-    `Task(Id, Subject LIMIT 5)`;
+  // Accept a comma-separated list of SF object types to narrow the search.
+  // Defaults to the standard set used by the task related-record picker.
+  const rawTypes = (req.query["types"] as string | undefined) ?? "Account,Case,Opportunity,Task";
+  const ALLOWED = new Set(["Account", "Case", "Opportunity", "Task", "Contact", "Lead"]);
+  const requestedTypes = rawTypes
+    .split(",")
+    .map(t => t.trim())
+    .filter(t => ALLOWED.has(t));
+
+  if (requestedTypes.length === 0) return res.json({ results: [] });
+
+  // Build the RETURNING clause per type
+  const RETURNING_MAP: Record<string, string> = {
+    Account:     "Account(Id, Name LIMIT 5)",
+    Case:        "Case(Id, Subject, CaseNumber LIMIT 5)",
+    Opportunity: "Opportunity(Id, Name LIMIT 5)",
+    Task:        "Task(Id, Subject LIMIT 5)",
+    Contact:     "Contact(Id, FirstName, LastName LIMIT 5)",
+    Lead:        "Lead(Id, FirstName, LastName, Company LIMIT 5)",
+  };
+  const returning = requestedTypes.map(t => RETURNING_MAP[t]).filter(Boolean).join(", ");
+
+  const sosl = `FIND {${escaped}*} IN NAME FIELDS RETURNING ${returning}`;
 
   try {
     const res2 = await proxyFetch(
@@ -1507,10 +1525,24 @@ router.get("/sf/records/search", async (req, res) => {
     type SearchResult = { id: string; type: string; label: string; subtitle?: string };
     const results: SearchResult[] = (data.searchRecords ?? []).map(r => {
       const type = r.attributes?.type ?? "Record";
-      const label = type === "Case"
-        ? (r.Subject ?? "(no subject)")
-        : (r.Name ?? r.Subject ?? "(unnamed)");
-      const subtitle = type === "Case" && r.CaseNumber ? `Case #${r.CaseNumber}` : type;
+      let label: string;
+      let subtitle: string | undefined;
+
+      if (type === "Case") {
+        label    = r.Subject ?? "(no subject)";
+        subtitle = r.CaseNumber ? `Case #${r.CaseNumber}` : "Case";
+      } else if (type === "Contact" || type === "Lead") {
+        const fn = (r as Record<string, unknown>)["FirstName"] as string | undefined;
+        const ln = (r as Record<string, unknown>)["LastName"]  as string | undefined;
+        label    = [fn, ln].filter(Boolean).join(" ") || "(unnamed)";
+        subtitle = type === "Lead"
+          ? ((r as Record<string, unknown>)["Company"] as string | undefined) ?? type
+          : type;
+      } else {
+        label    = r.Name ?? r.Subject ?? "(unnamed)";
+        subtitle = type;
+      }
+
       return { id: r.Id, type, label, subtitle };
     });
 

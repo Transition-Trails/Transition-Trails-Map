@@ -6,6 +6,7 @@
  * left drawer or the prominent card below.
  */
 
+import { useState } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -24,6 +25,7 @@ import { Link } from "wouter";
 import { HomebaseShell }    from "@/components/layout/HomebaseShell";
 import { useTierFlags }     from "@/hooks/useTierFlags";
 import { useAppContext }    from "@/context/AppContext";
+import { SubmitCaseDrawer } from "@/components/homebase/SubmitCaseDrawer";
 import { TodayTasksCard }   from "@/components/homebase/TodayTasksCard";
 import { TodayMeetingsCard } from "@/components/homebase/TodayMeetingsCard";
 import { ActiveTasksCard }  from "@/components/homebase/ActiveTasksCard";
@@ -68,6 +70,7 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
   const firstName = displayName.split(" ")[0] || "there";
   const { isAdminOrAbove, isPower, isEveryday } = useTierFlags();
   const { openLogTime, logTimeSavedAt } = useAppContext();
+  const [showSubmitCase, setShowSubmitCase] = useState(false);
 
   let quickLinks = TEAM_QUICK_LINKS;
   if (isStaff) {
@@ -105,15 +108,14 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
             </button>
 
             {/* Submit a Case */}
-            <a
-              href="https://transitiontrails.my.salesforce.com/500/e"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => setShowSubmitCase(true)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
               Submit a Case
-            </a>
+            </button>
           </div>
         </div>
 
@@ -168,6 +170,10 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
 
       </div>
 
+      <SubmitCaseDrawer
+        open={showSubmitCase}
+        onClose={() => setShowSubmitCase(false)}
+      />
     </HomebaseShell>
   );
 }

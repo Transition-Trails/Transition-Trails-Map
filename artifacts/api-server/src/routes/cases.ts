@@ -12,6 +12,8 @@ import { getSalesforceClient }  from "../lib/getSalesforceClient.js";
 import { getEffectiveSfFetch }  from "../lib/salesforceOAuth.js";
 import { SF_API_VERSION }       from "../lib/sfConstants.js";
 import { logger }               from "../lib/logger.js";
+import { db, submittedCasesTable } from "@workspace/db";
+import { eq, desc }             from "drizzle-orm";
 
 const router = Router();
 
@@ -267,6 +269,192 @@ router.post("/sf/cases/:id/comments", async (req, res) => {
   } catch (e: unknown) {
     return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
   }
+});
+
+// ── GET /sf/cases/record-types ────────────────────────────────────────────────
+// Returns the active, non-master record types for the Case object.
+
+router.get("/sf/cases/record-types", async (req, res) => {
+  const proxyFetch = getEffectiveSfFetch(req);
+  if (!proxyFetch) return res.status(401).json({ error: "Not connected to Salesforce." });
+
+  try {
+    const r = await proxyFetch(`/services/data/${SF_API_VERSION}/sobjects/Case/describe`, {
+      headers: { Accept: "application/json" },
+    });
+    if (!r.ok) {
+      const text = await r.text().catch(() => "");
+      return res.status(502).json({ error: `SF describe failed: ${text.slice(0, 200)}` });
+    }
+    const data = await r.json() as {
+      recordTypeInfos?: Array<{
+        active: boolean; master: boolean; available: boolean;
+        name: string; recordTypeId: string; defaultRecordTypeMapping: boolean;
+      }>;
+    };
+    const recordTypes = (data.recordTypeInfos ?? [])
+      .filter(rt => rt.active && !rt.master && rt.available)
+      .map(rt => ({ id: rt.recordTypeId, name: rt.name, isDefault: rt.defaultRecordTypeMapping }));
+    return res.json({ recordTypes });
+  } catch (e: unknown) {
+    return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+  }
+});
+
+// ── GET /sf/cases/queues ──────────────────────────────────────────────────────
+// Returns Salesforce queues that support the Case object.
+
+router.get("/sf/cases/queues", async (req, res) => {
+  let client: ReturnType<typeof getSalesforceClient>;
+  try { client = getSalesforceClient(req); }
+  catch { return res.status(401).json({ error: "Not connected to Salesforce." }); }
+
+  try {
+    const result = await client.query<{ Id: string; Name: string }>(
+      `SELECT Id, Name FROM Group WHERE Type = 'Queue' AND Id IN ` +
+      `(SELECT QueueId FROM QueueSobject WHERE SobjectType = 'Case') ` +
+      `ORDER BY Name LIMIT 50`
+    );
+    return res.json({ queues: result.records.map(q => ({ id: q.Id, name: q.Name })) });
+  } catch (e: unknown) {
+    return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+  }
+});
+
+// ── POST /api/cases/submit ────────────────────────────────────────────────────
+// Local-first case creation: writes to DB first, then syncs to Salesforce.
+
+router.post("/cases/submit", async (req, res) => {
+  const userEmail = (req.session.googleEmail ?? req.session.sfEmail) || null;
+  if (!userEmail) return res.status(401).json({ error: "Not signed in." });
+
+  const sfUserId = req.session.sfUserId ?? null;
+
+  const {
+    recordTypeId, recordTypeName, subject, description, priority,
+    ownerId, ownerName, ownerType,
+    contactId, contactName, accountId, accountName, customFields,
+  } = req.body as {
+    recordTypeId?:  string; recordTypeName?: string;
+    subject?:       string; description?:    string; priority?: string;
+    ownerId?:       string; ownerName?:      string; ownerType?: string;
+    contactId?:     string; contactName?:    string;
+    accountId?:     string; accountName?:    string;
+    customFields?:  Record<string, unknown>;
+  };
+
+  if (!subject?.trim()) return res.status(400).json({ error: "subject is required." });
+
+  // 1. Insert local record (pending sync)
+  const [local] = await db
+    .insert(submittedCasesTable)
+    .values({
+      subject:        subject.trim(),
+      description:    description?.trim() || null,
+      priority:       priority ?? "Medium",
+      status:         "New",
+      recordTypeId:   recordTypeId   || null,
+      recordTypeName: recordTypeName || null,
+      ownerId:        ownerId        || null,
+      ownerName:      ownerName      || null,
+      ownerType:      ownerType      || null,
+      contactId:      contactId      || null,
+      contactName:    contactName    || null,
+      accountId:      accountId      || null,
+      accountName:    accountName    || null,
+      customFields:   customFields   ?? null,
+      createdByEmail: userEmail,
+      syncStatus:     "pending",
+    })
+    .returning();
+
+  if (!local) return res.status(500).json({ error: "Failed to create local case record." });
+
+  // 2. Attempt Salesforce sync
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
+  try { client = getSalesforceClient(req); } catch { /* no SF session */ }
+
+  if (!client) {
+    return res.status(201).json({
+      case: local, synced: false,
+      message: "Case saved locally. Connect to Salesforce to sync.",
+    });
+  }
+
+  try {
+    const sfData: Record<string, unknown> = {
+      Subject:  subject.trim(),
+      Status:   "New",
+      Priority: priority ?? "Medium",
+      Origin:   "Web",
+    };
+    if (description?.trim())  sfData["Description"]  = description.trim();
+    if (recordTypeId)         sfData["RecordTypeId"]  = recordTypeId;
+    if (contactId)            sfData["ContactId"]     = contactId;
+    if (accountId)            sfData["AccountId"]     = accountId;
+    // Owner: explicit ID (queue or user) beats the session user
+    sfData["OwnerId"] = ownerId || sfUserId || undefined;
+    if (customFields) {
+      for (const [k, v] of Object.entries(customFields)) sfData[k] = v;
+    }
+    // Remove undefined keys so SF doesn't reject them
+    for (const k of Object.keys(sfData)) {
+      if (sfData[k] === undefined) delete sfData[k];
+    }
+
+    const result = await client.createRecord("Case", sfData);
+
+    // Fetch case number (best-effort)
+    let sfCaseNumber: string | null = null;
+    try {
+      const cq = await client.query<{ CaseNumber: string }>(
+        `SELECT CaseNumber FROM Case WHERE Id = '${result.id}' LIMIT 1`
+      );
+      sfCaseNumber = cq.records[0]?.CaseNumber ?? null;
+    } catch { /* non-fatal */ }
+
+    const [updated] = await db
+      .update(submittedCasesTable)
+      .set({ sfCaseId: result.id, sfCaseNumber, syncStatus: "synced", syncedAt: new Date(), updatedAt: new Date() })
+      .where(eq(submittedCasesTable.id, local.id))
+      .returning();
+
+    return res.status(201).json({
+      case: updated ?? local, synced: true,
+      sfCaseId: result.id, sfCaseNumber,
+    });
+  } catch (e: unknown) {
+    const syncError = e instanceof Error ? e.message : String(e);
+    logger.error({ err: syncError, localId: local.id }, "Failed to sync case to Salesforce");
+
+    await db
+      .update(submittedCasesTable)
+      .set({ syncStatus: "failed", syncError, updatedAt: new Date() })
+      .where(eq(submittedCasesTable.id, local.id));
+
+    return res.status(201).json({
+      case: { ...local, syncStatus: "failed", syncError },
+      synced: false,
+      message: "Saved locally — Salesforce sync failed. You can retry from the Cases page.",
+    });
+  }
+});
+
+// ── GET /api/cases/submitted ──────────────────────────────────────────────────
+// Returns cases the current user has submitted via Trail OS (local + SF sync status).
+
+router.get("/cases/submitted", async (req, res) => {
+  const userEmail = (req.session.googleEmail ?? req.session.sfEmail) || null;
+  if (!userEmail) return res.status(401).json({ error: "Not signed in." });
+
+  const cases = await db
+    .select()
+    .from(submittedCasesTable)
+    .where(eq(submittedCasesTable.createdByEmail, userEmail))
+    .orderBy(desc(submittedCasesTable.createdAt))
+    .limit(50);
+
+  return res.json({ cases });
 });
 
 export default router;
