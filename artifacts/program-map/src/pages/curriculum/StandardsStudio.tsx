@@ -845,20 +845,25 @@ function OverviewView({
               <p className="text-[12px] text-muted-foreground">{reqChecks} required checks · run against any content object</p>
             </div>
           </button>
-          <button
-            onClick={() => onNavigate('gap-report')}
-            className="rounded-xl border border-[#E8B9B4] bg-[#FBEAE6]/60 px-4 py-3 text-left hover:bg-[#FBEAE6] transition-colors flex items-center gap-3"
-          >
-            <AlertTriangle className="w-4 h-4 text-[#A93F2F] shrink-0" />
-            <div>
-              <p className="text-[13px] font-bold text-foreground">Gap Report</p>
-              <p className="text-[12px] text-muted-foreground">
-                {standards.length === 0
-                  ? 'Add standards to enable gap analysis'
-                  : `${GAP_SUMMARY.bySeverity.high} high-severity gaps need attention`}
-              </p>
-            </div>
-          </button>
+          {(() => {
+            const resolvedHigh = gapReportItems.filter(g => g.severity === 'high' && standards.some(s => s.id === g.standardId)).length;
+            return (
+              <button
+                onClick={() => onNavigate('gap-report')}
+                className="rounded-xl border border-[#E8B9B4] bg-[#FBEAE6]/60 px-4 py-3 text-left hover:bg-[#FBEAE6] transition-colors flex items-center gap-3"
+              >
+                <AlertTriangle className="w-4 h-4 text-[#A93F2F] shrink-0" />
+                <div>
+                  <p className="text-[13px] font-bold text-foreground">Gap Report</p>
+                  <p className="text-[12px] text-muted-foreground">
+                    {resolvedHigh > 0
+                      ? `${resolvedHigh} high-severity gaps need attention`
+                      : 'No gaps for your current standards'}
+                  </p>
+                </div>
+              </button>
+            );
+          })()}
         </div>
 
         {standards.length === 0 ? (
@@ -1194,11 +1199,22 @@ function GapReportView({
   const [filterSev, setFilterSev]   = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [focusedId, setFocusedId]   = useState<string | null>(null);
 
+  // Only surface gap records whose standardId resolves to an existing live standard.
+  // Static seed gaps reference seed IDs that will never match user-created standards.
+  const resolvedItems = useMemo(
+    () => gapReportItems.filter(g => standards.some(s => s.id === g.standardId)),
+    [standards],
+  );
+
+  const resolvedHigh   = resolvedItems.filter(g => g.severity === 'high').length;
+  const resolvedMedium = resolvedItems.filter(g => g.severity === 'medium').length;
+  const resolvedLow    = resolvedItems.filter(g => g.severity === 'low').length;
+
   const filtered = useMemo(() =>
-    gapReportItems.filter(g =>
+    resolvedItems.filter(g =>
       (filterType === 'all' || g.gapType === filterType) &&
       (filterSev  === 'all' || g.severity === filterSev)
-    ), [filterType, filterSev]);
+    ), [resolvedItems, filterType, filterSev]);
 
   const sevCls: Record<string, string> = {
     high:   'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]',
@@ -1223,17 +1239,21 @@ function GapReportView({
     }
   }
 
-  // When there are no standards, the static gap records have no parent to resolve against —
-  // show an empty state rather than a list with broken "fix" navigation.
-  if (standards.length === 0) {
+  // Show empty state when no gap records resolve to a live standard —
+  // this covers both the initial empty state and any user-created standards
+  // whose IDs don't appear in the gap dataset.
+  if (resolvedItems.length === 0) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center max-w-[260px]">
           <AlertTriangle className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
-          <p className="text-[13px] font-semibold text-foreground mb-1">No standards configured</p>
+          <p className="text-[13px] font-semibold text-foreground mb-1" data-testid="gap-empty-state">
+            {standards.length === 0 ? 'No standards configured' : 'No gaps for your standards'}
+          </p>
           <p className="text-[12px] text-muted-foreground leading-relaxed">
-            The gap report analyses your content against active standards.
-            Add at least one standard to begin gap analysis.
+            {standards.length === 0
+              ? 'The gap report analyses your content against active standards. Add at least one standard to begin gap analysis.'
+              : 'No gap records exist for your current standards. Gaps are generated automatically as content is reviewed.'}
           </p>
         </div>
       </div>
@@ -1245,9 +1265,9 @@ function GapReportView({
       <div className="px-5 py-3 border-b border-border flex items-center gap-4 flex-shrink-0 bg-background">
         <div className="flex items-center gap-2 flex-wrap">
           {[
-            { label: `${GAP_SUMMARY.bySeverity.high} High`,   cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
-            { label: `${GAP_SUMMARY.bySeverity.medium} Medium`, cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
-            { label: `${GAP_SUMMARY.bySeverity.low} Low`,      cls: 'text-slate-600 bg-slate-50 border-slate-200' },
+            { label: `${resolvedHigh} High`,   cls: 'text-[#A93F2F] bg-[#FBEAE6] border-[#E8B9B4]' },
+            { label: `${resolvedMedium} Medium`, cls: 'text-[#CC8400] bg-[#FFF3E0] border-[#FFD08A]' },
+            { label: `${resolvedLow} Low`,      cls: 'text-slate-600 bg-slate-50 border-slate-200' },
           ].map(s => (
             <span key={s.label} className={`text-[14px] font-bold border rounded-full px-2 py-0.5 ${s.cls}`}>{s.label}</span>
           ))}
@@ -1366,6 +1386,11 @@ export default function StandardsStudio() {
   const totalChecks = standards.reduce((n, s) => n + s.pennyChecks.length, 0);
   const reqChecks   = standards.reduce((n, s) => n + s.pennyChecks.filter(c => c.required).length, 0);
 
+  // Resolve gap records against the live standards list for tab counts + header alert.
+  // Must mirror the same filter used inside GapReportView.
+  const resolvedGapTotal = gapReportItems.filter(g => standards.some(s => s.id === g.standardId)).length;
+  const resolvedGapHigh  = gapReportItems.filter(g => g.severity === 'high' && standards.some(s => s.id === g.standardId)).length;
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Compact page header */}
@@ -1391,11 +1416,11 @@ export default function StandardsStudio() {
             </span>
           </div>
 
-          {/* Gap alert — only when on gap-report tab and standards exist */}
-          {view === 'gap-report' && standards.length > 0 && (
+          {/* Gap alert — only when on gap-report tab and resolved gaps exist */}
+          {view === 'gap-report' && resolvedGapHigh > 0 && (
             <span className="flex items-center gap-1 text-[11px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-2 py-0.5">
               <AlertTriangle className="w-3 h-3" />
-              {GAP_SUMMARY.bySeverity.high} high-severity
+              {resolvedGapHigh} high-severity
             </span>
           )}
 
@@ -1414,7 +1439,7 @@ export default function StandardsStudio() {
           <ViewTab id="overview"   label="Overview"   icon={BookCheck}     active={view === 'overview'}   onClick={() => navigateTo('overview')} />
           <ViewTab id="standards"  label="Standards"  icon={ShieldCheck}   active={view === 'standards'}  count={standards.length} onClick={() => navigateTo('standards')} />
           <ViewTab id="checklist"  label="Checklist"  icon={ClipboardList} active={view === 'checklist'}  count={reqChecks} onClick={() => navigateTo('checklist')} />
-          <ViewTab id="gap-report" label="Gap Report" icon={AlertTriangle} active={view === 'gap-report'} count={standards.length > 0 ? GAP_SUMMARY.total : 0} onClick={() => navigateTo('gap-report')} />
+          <ViewTab id="gap-report" label="Gap Report" icon={AlertTriangle} active={view === 'gap-report'} count={resolvedGapTotal} onClick={() => navigateTo('gap-report')} />
         </div>
       </div>
 
@@ -1455,6 +1480,7 @@ function ViewTab({
 }) {
   return (
     <button
+      data-testid={`view-tab-${id}`}
       onClick={onClick}
       className={`flex items-center gap-1.5 text-[12px] font-semibold px-3 py-2.5 border-b-2 transition-colors whitespace-nowrap ${
         active
