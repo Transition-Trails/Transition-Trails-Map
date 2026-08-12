@@ -452,6 +452,23 @@ function GlobalLogTimeModal() {
   );
 }
 
+// ── /release-notes route body — exported so routing tests can exercise the real
+//    dispatch logic without mounting the full app.
+// Audience-aware: homebase audiences (learner/coach/volunteer/team) get the page
+// inside HomebaseShell so the tour overlay mounts correctly; staff get AppShell.
+export function ReleaseNotesRouteBody() {
+  const auth = useGoogleAuth();
+  if (!auth.isSignedIn) return <SignInPage />;
+  if (auth.user?.audience) {
+    return (
+      <HomebaseShell audience={auth.user.audience} displayName={auth.user?.name ?? ""}>
+        <ReleaseNotes />
+      </HomebaseShell>
+    );
+  }
+  return <AppShell><ReleaseNotes /></AppShell>;
+}
+
 // ── Inner app — inside WouterRouter and QueryClientProvider ──────────────────
 function InnerApp() {
   const auth = useGoogleAuth();
@@ -584,24 +601,8 @@ function InnerApp() {
         )}
       </Route>
 
-      {/* /release-notes — audience-aware.
-           Homebase audiences (learner / coach / volunteer / team) see the page
-           inside their HomebaseShell so the tour overlay mounts correctly and
-           the "Take the tour" replay button uses the right audience-specific steps.
-           Staff (no audience) see the page inside AppShell as before. */}
-      <Route path="/release-notes">
-        {auth.isSignedIn ? (
-          auth.user?.audience ? (
-            <HomebaseShell audience={auth.user.audience} displayName={auth.user?.name ?? ""}>
-              <ReleaseNotes />
-            </HomebaseShell>
-          ) : (
-            <AppShell><ReleaseNotes /></AppShell>
-          )
-        ) : (
-          <SignInPage />
-        )}
-      </Route>
+      {/* /release-notes — audience-aware (dispatch handled by ReleaseNotesRouteBody). */}
+      <Route path="/release-notes" component={ReleaseNotesRouteBody} />
 
       {/* /homebase — entry point for team audience, staff, and superadmins.
            All signed-in staff (audience or no audience) land here instead of

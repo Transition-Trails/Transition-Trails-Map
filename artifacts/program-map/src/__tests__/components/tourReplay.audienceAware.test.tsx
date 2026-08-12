@@ -229,16 +229,14 @@ describe('ReleaseNotes — tour replay button (staff / non-homebase)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     navigatedPaths.length = 0;
-    _mockAudience = null; // staff: no homebase audience
+    _mockAudience = null; // staff — no homebase audience
 
     origPushState = window.history.pushState.bind(window.history);
     origDispatch  = window.dispatchEvent.bind(window);
 
-    // Capture pushState calls so we can assert on navigation target
     window.history.pushState = vi.fn((_state, _title, url) => {
       if (typeof url === 'string') navigatedPaths.push(url);
     });
-    // dispatchEvent is called for the PopStateEvent after pushState
     window.dispatchEvent = vi.fn();
   });
 
@@ -267,8 +265,8 @@ describe('ReleaseNotes — tour replay button (staff / non-homebase)', () => {
     const btn = screen.getByRole('button', { name: /take the tour/i });
     fireEvent.click(btn);
 
-    // The button pushes "/homebase" so HomebaseShell becomes the active shell
-    // and the already-mounted HomebaseTour (with the correct audience) can open.
+    // Staff have no HomebaseShell in the tree; the button navigates to /homebase
+    // so the shell mounts and the already-wired HomebaseTour overlay can open.
     expect(navigatedPaths).toContain('/homebase');
   });
 });

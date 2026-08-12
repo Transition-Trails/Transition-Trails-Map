@@ -178,9 +178,10 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/governance/:tab', kind: 'active' },
 
   // ── Utility ────────────────────────────────────────────────────────────────
-  { path: '/search',       kind: 'active' },
-  { path: '/context',      kind: 'active' },
-  { path: '/context/:tab', kind: 'active' },
+  { path: '/search',         kind: 'active' },
+  { path: '/context',        kind: 'active' },
+  { path: '/context/:tab',   kind: 'active' },
+  { path: '/release-notes',  kind: 'active', note: 'Audience-dispatched: HomebaseShell (learner/coach/volunteer/team) or AppShell (staff)' },
 
   // ── Administration ──────────────────────────────────────────────────────────
   { path: '/admin',                       kind: 'redirect', target: '/admin/integrations' },
