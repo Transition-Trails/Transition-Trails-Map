@@ -373,6 +373,99 @@ describe('SubmitCaseDrawer — initialType routing', () => {
     },
   );
 
+  // ── T6: first open errors (catch path) → close → reopen with matching initialType → form step ──
+
+  test(
+    'T6: first open errors (catch path → form step) → close → reopen with initialType matching → form step shown',
+    async () => {
+      // Track how many times the record-types endpoint has been called so we
+      // can return different responses on the first vs subsequent opens.
+      let recordTypesCalls = 0;
+
+      global.fetch = vi.fn(async (url: string | URL | Request) => {
+        const path = typeof url === 'string' ? url : url.toString();
+
+        if (path.includes('record-types')) {
+          recordTypesCalls += 1;
+          if (recordTypesCalls === 1) {
+            // First open: simulate a server error so the catch branch fires.
+            return new Response('Internal Server Error', { status: 500 });
+          }
+          // Second open: success — returns two types, one of which matches initialType.
+          return new Response(
+            JSON.stringify({
+              recordTypes: [
+                { id: 'rt-001', name: 'General',   isDefault: true },
+                { id: 'rt-002', name: 'Technical', isDefault: false },
+              ],
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        }
+
+        if (path.includes('queues')) {
+          return new Response(
+            JSON.stringify({ queues: [] }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        }
+
+        return new Response('{}', { status: 200 });
+      }) as unknown as typeof fetch;
+
+      const onClose = vi.fn();
+
+      const { rerender } = render(
+        <SubmitCaseDrawer
+          open={true}
+          onClose={onClose}
+          initialType="General"
+        />,
+      );
+
+      // First open: fetch fails → catch branch sets step to "form"
+      await waitFor(() => {
+        expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+      });
+      expect(screen.getByText(FORM_SUBJECT_LABEL)).toBeInTheDocument();
+
+      // Click the close button → reset() → onClose()
+      const closeButton = screen.getByRole('button', { name: /close/i });
+      fireEvent.click(closeButton);
+      expect(onClose).toHaveBeenCalledTimes(1);
+
+      // Simulate the parent honouring the onClose callback
+      rerender(
+        <SubmitCaseDrawer
+          open={false}
+          onClose={onClose}
+          initialType="General"
+        />,
+      );
+
+      // Drawer is hidden — neither step should be visible
+      expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+      expect(screen.queryByText(FORM_SUBJECT_LABEL)).not.toBeInTheDocument();
+
+      // Reopen with the same initialType="General" — fetch now succeeds
+      rerender(
+        <SubmitCaseDrawer
+          open={true}
+          onClose={onClose}
+          initialType="General"
+        />,
+      );
+
+      // initialType matches "General" in the successful response → form step (not type-picker)
+      await waitFor(() => {
+        expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+      });
+
+      // Subject field must be visible — confirming we are on the form step
+      expect(screen.getByText(FORM_SUBJECT_LABEL)).toBeInTheDocument();
+    },
+  );
+
   // ── T4: never-resolving fetch → spinner visible, no type-picker, no form ──────
 
   test(
