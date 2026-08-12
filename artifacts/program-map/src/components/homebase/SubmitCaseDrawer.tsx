@@ -297,7 +297,9 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawe
     setAttachProgress(null);
     setTypes([]);
     setQueues([]);
-    submittingRef.current = false;
+    // Do NOT clear submittingRef here — if a POST is still in flight when the
+    // drawer is closed and reopened, the guard must stay active until the
+    // finally block in handleSubmit clears it.
   }
 
   function handleClose() { reset(); onClose(); }
@@ -419,6 +421,7 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted }: SubmitCaseDrawe
       setFormError(err instanceof Error ? err.message : "Failed to submit case.");
       submittingRef.current = false;           // allow retry on error
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
