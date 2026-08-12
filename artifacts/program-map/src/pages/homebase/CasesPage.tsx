@@ -130,7 +130,7 @@ export default function CasesPage() {
   // Remote state
   const [cases,              setCases]              = useState<SfCase[]>([]);
   const [orgBaseUrl,         setOrgBaseUrl]         = useState("");
-  const [followUpDateSupported, setFollowUpDateSupported] = useState(true);
+  const [followUpDateSupported, setFollowUpDateSupported] = useState(false);
   const [loading,            setLoading]            = useState(true);
   const [sfUnavailable,      setSfUnavailable]      = useState(false);
   const [timeSummary,        setTimeSummary]        = useState<Record<string, number>>({});

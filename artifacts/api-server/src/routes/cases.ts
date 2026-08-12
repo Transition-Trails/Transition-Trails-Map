@@ -62,29 +62,26 @@ router.get("/sf/cases", async (req, res) => {
   const orgBaseUrl = proxyFetch ? await getOrgBaseUrl(proxyFetch) : "";
 
   let records: Record<string, unknown>[] = [];
-  let followUpDateSupported    = false;
   let lastModifiedBySupported  = false;
 
-  const buildSoql = (withModifiedBy: boolean, withFollowUp: boolean) =>
+  const buildSoql = (withModifiedBy: boolean) =>
     `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, LastModifiedDate` +
     (withModifiedBy ? `, LastModifiedBy.Name` : ``) +
-    (withFollowUp   ? `, FollowUpDate`        : ``) +
     `, Owner.Name, Contact.Name, Account.Name ` +
     `FROM Case WHERE OwnerId = '${sfUserId}' ${statusClause} ` +
     `ORDER BY CreatedDate DESC LIMIT 50`;
 
-  const attempts: Array<[boolean, boolean]> = [
-    [true,  true ],
-    [false, false],
+  const attempts: Array<[boolean]> = [
+    [true ],
+    [false],
   ];
 
   let lastError = "";
-  for (const [withModifiedBy, withFollowUp] of attempts) {
+  for (const [withModifiedBy] of attempts) {
     try {
-      const result = await client.query<Record<string, unknown>>(buildSoql(withModifiedBy, withFollowUp));
+      const result = await client.query<Record<string, unknown>>(buildSoql(withModifiedBy));
       records = result.records;
       lastModifiedBySupported = withModifiedBy;
-      followUpDateSupported   = withFollowUp;
       lastError = "";
       break;
     } catch (e: unknown) {
@@ -107,13 +104,12 @@ router.get("/sf/cases", async (req, res) => {
     CreatedDate:        r["CreatedDate"]       as string | null,
     LastModifiedDate:   r["LastModifiedDate"] as string | null,
     LastModifiedByName: lastModifiedBySupported ? (((r["LastModifiedBy"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null) : null,
-    FollowUpDate:       followUpDateSupported   ? (r["FollowUpDate"] as string | null) : null,
     OwnerName:          ((r["Owner"]   as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
     ContactName:        ((r["Contact"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
     AccountName:        ((r["Account"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
   }));
 
-  return res.json({ cases, orgBaseUrl, followUpDateSupported });
+  return res.json({ cases, orgBaseUrl });
 });
 
 // ── PATCH /sf/cases/:id/status ─────────────────────────────────────────────────
