@@ -93,15 +93,17 @@ export default function CommunicationChannels() {
           </button>
         ))}
 
-        {/* Future provider placeholder */}
-        <div className="rounded-xl border-2 border-dashed border-border bg-muted/20 flex flex-col items-center justify-center p-6 text-center min-h-[200px]">
-          <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center mb-3">
-            <Plus className="w-4 h-4 text-muted-foreground" />
+        {/* Phase 2 provider — coming soon */}
+        <div className="rounded-xl border-2 border-dashed border-border bg-muted/10 flex flex-col items-center justify-center p-6 text-center min-h-[200px] gap-2">
+          <div className="w-9 h-9 rounded-full bg-muted/60 flex items-center justify-center">
+            <Plus className="w-4 h-4 text-muted-foreground/50" />
           </div>
-          <p className="text-sm font-medium text-muted-foreground mb-1">Future Provider</p>
-          <p className="text-sm text-muted-foreground/60 max-w-[140px] leading-relaxed">
-            Teams, Email, SMS — add via provider adapter with no routing changes
-          </p>
+          <div>
+            <p className="text-[12px] font-semibold text-muted-foreground/70">More providers in Phase 2</p>
+            <p className="text-[11px] text-muted-foreground/50 mt-0.5 leading-relaxed max-w-[160px] mx-auto">
+              Teams, Email, and SMS support are on the Phase 2 roadmap.
+            </p>
+          </div>
         </div>
       </div>
 

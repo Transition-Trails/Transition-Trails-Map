@@ -335,6 +335,8 @@ function Router() {
       <Route path="/knowledge/governance" component={KnowledgeHub} />
       <Route path="/knowledge/article-studio"> <Redirect to="/knowledge" /></Route>
       <Route path="/knowledge/sources">        <Redirect to="/knowledge/governance" /></Route>
+      {/* /knowledge/sf-articles is a live redirect alias — kept intentionally so external
+          bookmarks and old links continue to work. Destination: /knowledge/governance. */}
       <Route path="/knowledge/sf-articles">    <Redirect to="/knowledge/governance" /></Route>
       <Route path="/knowledge/review-queue">   <Redirect to="/knowledge/governance" /></Route>
       <Route path="/knowledge/library"  component={LibraryDocuments} />

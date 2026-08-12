@@ -595,7 +595,7 @@ function ReviewCyclesTab() {
                                   Since {fmtReviewDate(a.overdueSince)}
                                 </span>
                                 <a
-                                  href="/knowledge/sf-articles"
+                                  href="/knowledge/governance"
                                   onClick={e => e.stopPropagation()}
                                   className="inline-flex items-center gap-0.5 text-[12px] text-primary hover:underline"
                                 >

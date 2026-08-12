@@ -857,41 +857,51 @@ function OverviewView({
           </button>
         </div>
 
-        {byCategory.map(({ cat, stds }) => {
-          if (stds.length === 0) return null;
-          const Icon   = CATEGORY_ICONS[cat];
-          const catCfg = STANDARD_CATEGORY_CONFIG[cat];
-          return (
-            <div key={cat}>
-              <div className="flex items-center gap-2 mb-2">
-                <Icon className="w-4 h-4 text-muted-foreground" />
-                <h3 className="text-[14px] font-bold text-foreground">{cat}</h3>
-                <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{stds.length}</span>
+        {standards.length === 0 ? (
+          <div className="rounded-lg border border-border bg-muted/10 px-4 py-8 text-center">
+            <BookCheck className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+            <p className="text-[13px] font-semibold text-foreground mb-1">No content standards yet</p>
+            <p className="text-[12px] text-muted-foreground max-w-[240px] mx-auto leading-relaxed">
+              Add your first standard using the button in the top-right corner. Standards guide how {TERMS.aiAssistant} generates and validates content.
+            </p>
+          </div>
+        ) : (
+          byCategory.map(({ cat, stds }) => {
+            if (stds.length === 0) return null;
+            const Icon   = CATEGORY_ICONS[cat];
+            const catCfg = STANDARD_CATEGORY_CONFIG[cat];
+            return (
+              <div key={cat}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Icon className="w-4 h-4 text-muted-foreground" />
+                  <h3 className="text-[14px] font-bold text-foreground">{cat}</h3>
+                  <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 ${catCfg.cls}`}>{stds.length}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {stds.map(std => {
+                    const statusCfg = STANDARD_STATUS_CONFIG[std.status];
+                    return (
+                      <button
+                        key={std.id}
+                        onClick={() => onNavigate('standards', std.id)}
+                        className="text-left rounded-lg border border-border bg-background hover:border-foreground/20 hover:bg-muted/20 p-3 transition-all"
+                      >
+                        <div className="flex items-start justify-between mb-1">
+                          <p className="text-[14px] font-bold text-foreground">{std.name}</p>
+                          <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ml-1 ${statusCfg.cls}`}>{statusCfg.label}</span>
+                        </div>
+                        <p className="text-[14px] text-muted-foreground leading-snug line-clamp-2">{std.purpose}</p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <span className="text-[14px] text-muted-foreground/70">{std.pennyChecks.length} checks · Owner: {std.owner || '—'}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {stds.map(std => {
-                  const statusCfg = STANDARD_STATUS_CONFIG[std.status];
-                  return (
-                    <button
-                      key={std.id}
-                      onClick={() => onNavigate('standards', std.id)}
-                      className="text-left rounded-lg border border-border bg-background hover:border-foreground/20 hover:bg-muted/20 p-3 transition-all"
-                    >
-                      <div className="flex items-start justify-between mb-1">
-                        <p className="text-[14px] font-bold text-foreground">{std.name}</p>
-                        <span className={`text-[14px] font-bold border rounded-full px-1.5 py-0.5 shrink-0 ml-1 ${statusCfg.cls}`}>{statusCfg.label}</span>
-                      </div>
-                      <p className="text-[14px] text-muted-foreground leading-snug line-clamp-2">{std.purpose}</p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <span className="text-[14px] text-muted-foreground/70">{std.pennyChecks.length} checks · Owner: {std.owner || '—'}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
 
       </div>
     </ScrollArea>
@@ -1290,8 +1300,9 @@ type DrawerState =
 export default function StandardsStudio() {
   const { setSelectedItem } = useAppContext();
 
-  // Live standards state — starts from seed data, mutations are in-session
-  const [standards, setStandards] = useState<ContentStandard[]>(SEED_STANDARDS);
+  // Standards state — starts empty; populated via the "New Standard" drawer.
+  // SEED_STANDARDS (imported above) is kept for local development reference only.
+  const [standards, setStandards] = useState<ContentStandard[]>([]);
 
   const [view, setView]                   = useState<StudioView>('overview');
   const [initialStdId, setInitialStdId]   = useState<string | undefined>(undefined);

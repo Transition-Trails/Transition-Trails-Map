@@ -1102,7 +1102,9 @@ export default function Intake() {
   const { setAskPennyOpen, setCalendarPanelOpen, setPendingPennyQuery, setSelectedItem, selectedItem } = useAppContext();
   const { isEveryday } = useTierFlags();
 
-  const [requests,    setRequests   ] = useState<DemandRequest[]>([...SEED_REQUESTS]);
+  // Start empty — SEED_REQUESTS is kept above for local development reference only.
+  // In production this list is populated via the "New Request" form and SF sync.
+  const [requests,    setRequests   ] = useState<DemandRequest[]>([]);
   const [filter,      setFilter     ] = useState<FilterKey>('all');
   const [expandedId,  setExpandedId ] = useState<string | null>(null);
   const [collapsed,   setCollapsed  ] = useState<Set<string>>(new Set(['done']));

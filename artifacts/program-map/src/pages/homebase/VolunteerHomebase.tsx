@@ -80,10 +80,10 @@ function RecordProcessCard() {
         </div>
       </div>
       <Link
-        href="/knowledge/procedures"
+        href="/knowledge"
         className="mt-3 flex items-center justify-center rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted/30 transition-colors"
       >
-        Open Procedure Builder
+        Open Knowledge Hub
       </Link>
     </div>
   );

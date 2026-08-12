@@ -11,9 +11,10 @@ import TeamHomebase       from "@/pages/homebase/TeamHomebase";
  * Audience dispatcher.  Reads googleAudience from the homebase session and
  * renders the correct audience-specific homebase page inside HomebaseShell.
  *
- *   learner   → LearnerHomebase  (task #250 — complete)
- *   coach     → CoachHomebase    (task #251 — complete)
- *   volunteer → HomebaseShell + LogTimeRow placeholder (task #252 pending)
+ *   learner   → LearnerHomebase
+ *   coach     → CoachHomebase
+ *   volunteer → VolunteerHomebase
+ *   team      → TeamHomebase     (staff; priority path)
  */
 export default function HomebaseLanding() {
   const { audience, displayName, coachLevel, isLoading } = useHomebaseAuth();
