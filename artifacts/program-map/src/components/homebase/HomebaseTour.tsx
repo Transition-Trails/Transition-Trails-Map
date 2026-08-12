@@ -8,9 +8,16 @@
  * learners, and volunteers each see steps matched to their own layout and cards.
  * Shared steps (Penny bar, workspace drawer, Slack panel, release notes) are
  * reused across all variants to avoid duplication.
+ *
+ * Auto-skip behaviour:
+ *   Shared steps whose title appears in `seenStepKeysAtOpen` are filtered out
+ *   before the tour opens.  `seenStepKeysAtOpen` is a snapshot taken at tour-
+ *   start by the hook, so the step list is completely stable for the whole
+ *   session — navigating or marking steps does not shift the list or reset
+ *   the index.  Pass an empty set (via showAllSteps) to show every step.
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Sparkles,
@@ -32,43 +39,93 @@ import {
   Heart,
   Award,
   TrendingUp,
+  RefreshCw,
 } from "lucide-react";
 import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
 
 // ── Step definitions ──────────────────────────────────────────────────────────
 
 interface TourStep {
-  icon:  React.FC<{ className?: string }>;
-  color: string;        // Tailwind bg color class for the icon bubble
-  title: string;
-  body:  string;
+  icon:      React.FC<{ className?: string }>;
+  color:     string;   // Tailwind bg color class for the icon bubble
+  title:     string;
+  body:      string;
+  /** When true this step is eligible for auto-skip on replay. */
+  isShared?: boolean;
 }
 
 const SHARED_PENNY: TourStep = {
-  icon:  Sparkles,
-  color: "bg-violet-100 text-violet-600",
-  title: "Ask Penny anything",
-  body:  "The bar at the top connects you to Penny, your Trail OS AI guide. Ask her about your progress, open cases, or anything else on your plate.",
+  icon:     Sparkles,
+  color:    "bg-violet-100 text-violet-600",
+  title:    "Ask Penny anything",
+  body:     "The bar at the top connects you to Penny, your Trail OS AI guide. Ask her about your progress, open cases, or anything else on your plate.",
+  isShared: true,
 };
 interface HomebaseTourProps {
-  open:       boolean;
-  onComplete: () => void;
-  audience:   HomebaseAudience;
+  open:              boolean;
+  onComplete:        () => void;
+  audience:          HomebaseAudience;
+  /**
+   * Snapshot of seen step titles taken when the tour opened.
+   * Stable for the session — shared steps whose title appears here are
+   * filtered out before rendering.  Pass an empty set to show all steps.
+   */
+  seenStepKeysAtOpen: Set<string>;
+  /** Called each time a new step becomes visible (for persistence only — no re-render). */
+  onMarkStepSeen:    (title: string) => void;
+  /**
+   * Called when the user clicks "Show all steps".
+   * The parent should clear seenStepKeys and re-open in show-all mode.
+   */
+  onShowAllSteps:    () => void;
 }
 
-export function HomebaseTour({ open, onComplete, audience }: HomebaseTourProps) {
+export function HomebaseTour({
+  open,
+  onComplete,
+  audience,
+  seenStepKeysAtOpen,
+  onMarkStepSeen,
+  onShowAllSteps,
+}: HomebaseTourProps) {
   const [step, setStep] = useState(0);
 
-  const steps = STEPS_BY_AUDIENCE[audience] ?? STEPS_BY_AUDIENCE.team;
+  const allSteps = STEPS_BY_AUDIENCE[audience] ?? STEPS_BY_AUDIENCE.team;
 
-  // Reset to step 0 every time the tour opens or the audience changes.
+  /**
+   * Filter shared steps that were already seen before this session.
+   * `seenStepKeysAtOpen` is a snapshot — it never changes during the tour,
+   * so this memo is stable and will not shift the step list mid-navigation.
+   */
+  const steps = useMemo<TourStep[]>(() => {
+    return allSteps.filter(s => !(s.isShared && seenStepKeysAtOpen.has(s.title)));
+  }, [allSteps, seenStepKeysAtOpen]);
+
+  /** True when at least one shared step was skipped this session. */
+  const hasSkippedSteps = allSteps.some(
+    s => s.isShared && seenStepKeysAtOpen.has(s.title),
+  );
+
+  // Reset to step 0 only when the tour opens or the audience changes.
+  // Deliberately NOT including `steps` — the filtered list is stable for the
+  // session so there is no need to reset on filtering changes.
   useEffect(() => {
     if (open) setStep(0);
-  }, [open]);
+  }, [open, audience]);
+
+  // Mark the current step as seen whenever it becomes active (persistence only).
+  useEffect(() => {
+    if (!open || steps.length === 0) return;
+    const current = steps[step];
+    if (current) onMarkStepSeen(current.title);
+  }, [open, step]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isLast  = step === steps.length - 1;
   const current = steps[step];
-  const Icon    = current.icon;
+
+  if (!current) return null;
+
+  const Icon = current.icon;
 
   function next() {
     if (isLast) { onComplete(); } else { setStep(s => s + 1); }
@@ -132,6 +189,11 @@ export function HomebaseTour({ open, onComplete, audience }: HomebaseTourProps) 
                 {/* Step counter */}
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
                   Step {step + 1} of {steps.length}
+                  {hasSkippedSteps && (
+                    <span className="ml-1 normal-case tracking-normal font-normal">
+                      · some steps skipped
+                    </span>
+                  )}
                 </p>
 
                 {/* Title + body */}
@@ -151,6 +213,18 @@ export function HomebaseTour({ open, onComplete, audience }: HomebaseTourProps) 
                     </p>
                   </motion.div>
                 </AnimatePresence>
+
+                {/* "Show all steps" link — only when some steps were auto-skipped */}
+                {hasSkippedSteps && (
+                  <button
+                    type="button"
+                    onClick={onShowAllSteps}
+                    className="mt-3 flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    Show all steps
+                  </button>
+                )}
               </div>
 
               {/* Dot indicators */}
@@ -211,29 +285,32 @@ export function HomebaseTour({ open, onComplete, audience }: HomebaseTourProps) 
 // ── Shared steps (declared before STEPS_BY_AUDIENCE to avoid TDZ errors) ─────
 
 const SHARED_WORKSPACE: TourStep = {
-  icon:  LayoutGrid,
-  color: "bg-sky-100 text-sky-600",
-  title: "Your workspace drawer",
-  body:  "The left panel gives you quick access to Google Workspace apps, collaboration tools, and your program links — all in one click.",
+  icon:     LayoutGrid,
+  color:    "bg-sky-100 text-sky-600",
+  title:    "Your workspace drawer",
+  body:     "The left panel gives you quick access to Google Workspace apps, collaboration tools, and your program links — all in one click.",
+  isShared: true,
 };
 
 const SHARED_SLACK: TourStep = {
-  icon:  MessageSquare,
-  color: "bg-rose-100 text-rose-600",
-  title: "Team channels",
-  body:  "The Slack panel on the right keeps you connected to your team channels. Click the arrow icon to expand it at any time.",
+  icon:     MessageSquare,
+  color:    "bg-rose-100 text-rose-600",
+  title:    "Team channels",
+  body:     "The Slack panel on the right keeps you connected to your team channels. Click the arrow icon to expand it at any time.",
+  isShared: true,
 };
 
 const SHARED_RELEASE_NOTES: TourStep = {
-  icon:  Tag,
-  color: "bg-indigo-100 text-indigo-600",
-  title: "Stay up to date",
-  body:  "Whenever Trail OS is updated, a pulsing dot appears next to the version number in the top bar. Click it to read the release notes — and replay this tour any time from that page.",
+  icon:     Tag,
+  color:    "bg-indigo-100 text-indigo-600",
+  title:    "Stay up to date",
+  body:     "Whenever Trail OS is updated, a pulsing dot appears next to the version number in the top bar. Click it to read the release notes — and replay this tour any time from that page.",
+  isShared: true,
 };
 
 const STEPS_BY_AUDIENCE: Record<HomebaseAudience, TourStep[]> = {
 
-  // Staff / team — the full operational tour (original 7 steps, unchanged).
+  // Staff / team — the full operational tour.
   team: [
     {
       icon:  Home,
@@ -283,7 +360,7 @@ const STEPS_BY_AUDIENCE: Record<HomebaseAudience, TourStep[]> = {
     {
       icon:  FolderOpen,
       color: "bg-amber-100 text-amber-600",
-      title: "Artefacts",
+      title: "Artifacts",
       body:  "Learner artifacts — submitted work, documents, and evidence — are surfaced here so you can review and give feedback without leaving your homebase.",
     },
     {

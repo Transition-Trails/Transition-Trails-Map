@@ -428,7 +428,15 @@ export function HomebaseShell({
   }, []);
 
   // Tour — auto-start once on first homebase visit.
-  const { shouldAutoStart, tourActive, startTour, completeTour } = useHomebaseTour();
+  const {
+    shouldAutoStart,
+    tourActive,
+    seenStepKeysAtOpen,
+    startTour,
+    showAllSteps,
+    markStepSeen,
+    completeTour,
+  } = useHomebaseTour();
   useEffect(() => {
     if (shouldAutoStart) startTour();
   }, [shouldAutoStart, startTour]);
@@ -464,7 +472,14 @@ export function HomebaseShell({
       </motion.div>
 
       {/* Homebase tour overlay */}
-      <HomebaseTour open={tourActive} onComplete={completeTour} audience={audience} />
+      <HomebaseTour
+        open={tourActive}
+        onComplete={completeTour}
+        audience={audience}
+        seenStepKeysAtOpen={seenStepKeysAtOpen}
+        onMarkStepSeen={markStepSeen}
+        onShowAllSteps={showAllSteps}
+      />
     </div>
   );
 }
