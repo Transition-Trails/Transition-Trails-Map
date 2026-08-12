@@ -72,6 +72,11 @@ export interface SeenVersionResult {
   markSeen: () => void;
   /** False until the prefs fetch resolves (avoids a flash of the dot). */
   isReady: boolean;
+  /**
+   * The version string the user last acknowledged, or null if never set / not
+   * yet loaded. Useful for highlighting entries newer than their last seen version.
+   */
+  lastSeenVersion: string | null;
 }
 
 export function useSeenVersion(): SeenVersionResult {
@@ -109,5 +114,6 @@ export function useSeenVersion(): SeenVersionResult {
     hasUnseenRelease: _isReady && _lastSeen !== APP_VERSION,
     markSeen,
     isReady: _isReady,
+    lastSeenVersion: _lastSeen,
   };
 }

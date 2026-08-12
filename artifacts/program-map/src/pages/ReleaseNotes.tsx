@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tag, Wrench, Sparkles, ArrowUpCircle, ChevronRight } from "lucide-react";
+import { useSeenVersion } from "@/hooks/useSeenVersion";
+import { APP_VERSION } from "@/config/version";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -165,9 +167,54 @@ function ReleaseSummaryChips({ entries }: { entries: ReleaseEntry[] }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+function NewBadge() {
+  return (
+    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-primary/10 text-primary border border-primary/25 shrink-0">
+      New
+    </span>
+  );
+}
+
+// ── Version comparison ────────────────────────────────────────────────────────
+
+/** Returns true when `a` is strictly newer than `b` (major.minor format). */
+function isNewerVersion(a: string, b: string): boolean {
+  const [aMaj, aMin] = a.split(".").map(Number);
+  const [bMaj, bMin] = b.split(".").map(Number);
+  return aMaj > bMaj || (aMaj === bMaj && aMin > bMin);
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
 export default function ReleaseNotes() {
   const [selectedVersion, setSelectedVersion] = useState<string>(RELEASES[0].version);
   const release = RELEASES.find((r) => r.version === selectedVersion) ?? RELEASES[0];
+
+  const { lastSeenVersion, markSeen, isReady } = useSeenVersion();
+
+  // Latch the lastSeenVersion at page-open time *before* markSeen() updates it,
+  // so badges stay visible for the whole session even after the dot is cleared.
+  // undefined = not yet latched; null = user has never recorded a seen version.
+  const lastSeenAtOpenRef = useRef<string | null | undefined>(undefined);
+  if (isReady && lastSeenAtOpenRef.current === undefined) {
+    lastSeenAtOpenRef.current = lastSeenVersion;
+  }
+
+  // Mark seen once prefs are loaded (clears the sidebar dot).
+  useEffect(() => {
+    if (isReady) markSeen();
+  }, [isReady, markSeen]);
+
+  // Show "New" badges on every release that is newer than the version the user
+  // last acknowledged. null means the user has no recorded seen-version (first
+  // visit or anonymous) — show no badges to avoid overwhelming them.
+  const isReleaseNew = (releaseVersion: string): boolean => {
+    const baseline = lastSeenAtOpenRef.current;
+    if (!baseline) return false;
+    return isNewerVersion(releaseVersion, baseline);
+  };
+
+  const showNewBadges = isReleaseNew(release.version);
 
   return (
     <div className="flex flex-col h-full">
@@ -213,6 +260,9 @@ export default function ReleaseNotes() {
                         <span className={`text-[13px] font-semibold ${isActive ? "text-primary" : "text-foreground"}`}>
                           v{r.version}
                         </span>
+                        {isReleaseNew(r.version) && !r.label && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                        )}
                         {r.label && (
                           <span className="text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/15 text-primary border border-primary/25">
                             {r.label}
@@ -275,8 +325,9 @@ export default function ReleaseNotes() {
                     </div>
                     <ul className="space-y-2.5 pl-1">
                       {items.map((entry, i) => (
-                        <li key={i} className="flex gap-2.5 text-[12px] text-foreground/80 leading-relaxed">
+                        <li key={i} className="flex items-baseline gap-2.5 text-[12px] text-foreground/80 leading-relaxed">
                           <span className="mt-2 w-1 h-1 rounded-full bg-muted-foreground/40 shrink-0" />
+                          {showNewBadges && <NewBadge />}
                           {entry.text}
                         </li>
                       ))}
