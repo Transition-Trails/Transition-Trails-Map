@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TERMS } from '@/config/terminology';
+import { APP_VERSION } from '@/config/version';
+import { useSeenVersion } from '@/hooks/useSeenVersion';
 import { useLocation } from 'wouter';
 import {
   Home, Activity, GraduationCap, Brain, BookOpen, MessageSquare, Settings,
@@ -135,6 +137,7 @@ function calcMaxHeight(items: NavItem[]): number {
 export function Sidebar() {
   const [location, setLocation] = useLocation();
   const { userTier, mobileSidebarOpen, setMobileSidebarOpen } = useAppContext();
+  const { hasUnseenRelease, markSeen } = useSeenVersion();
 
   const visibleGroups = navGroups
     .filter(g => canAccess(g.minTier, userTier))
@@ -292,16 +295,48 @@ export function Sidebar() {
             <Home className="w-4 h-4 flex-shrink-0" />
             <span className="hidden xl:block text-[12px] whitespace-nowrap">Homebase</span>
           </button>
-          {/* Version link */}
+          {/* Version link — expanded sidebar */}
           <a
             href="/release-notes"
-            onClick={(e) => { e.preventDefault(); window.history.pushState({}, "", "/release-notes"); window.dispatchEvent(new PopStateEvent("popstate")); }}
-            className="hidden xl:block text-[12px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors xl:px-2"
+            onClick={(e) => {
+              e.preventDefault();
+              markSeen();
+              window.history.pushState({}, "", "/release-notes");
+              window.dispatchEvent(new PopStateEvent("popstate"));
+            }}
+            className="hidden xl:flex items-center gap-1.5 text-[12px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors xl:px-2"
           >
-            Trail OS v1.4 · Internal
+            Trail OS v{APP_VERSION} · Internal
+            {hasUnseenRelease && (
+              <span
+                className="relative flex h-2 w-2 flex-shrink-0"
+                title={`What's new in v${APP_VERSION}`}
+              >
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+              </span>
+            )}
           </a>
+          {/* Version dot — collapsed sidebar (clickable) */}
           <div className="xl:hidden flex justify-center py-0.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
+            <button
+              onClick={() => {
+                markSeen();
+                window.history.pushState({}, "", "/release-notes");
+                window.dispatchEvent(new PopStateEvent("popstate"));
+              }}
+              title={`Trail OS v${APP_VERSION} — Release notes`}
+              className="p-0.5 rounded-full"
+            >
+              {hasUnseenRelease ? (
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                </span>
+              ) : (
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20 block" />
+              )}
+            </button>
           </div>
         </div>
       </div>

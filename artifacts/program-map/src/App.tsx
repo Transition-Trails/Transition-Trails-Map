@@ -1,5 +1,5 @@
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +8,8 @@ import { AppProvider, useAppContext } from "@/context/AppContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { LogTimeModal } from "@/components/homebase/LogTimeModal";
 import { useGoogleAuth } from "@/hooks/useGoogleAuth";
+import { useSeenVersion } from "@/hooks/useSeenVersion";
+import { APP_VERSION } from "@/config/version";
 import SignInPage from "@/pages/SignIn";
 import { Map, ShieldOff } from "lucide-react";
 
@@ -455,6 +457,8 @@ function InnerApp() {
   const auth = useGoogleAuth();
   const { setUserTier } = useAppContext();
   const { toast } = useToast();
+  const { hasUnseenRelease, markSeen, isReady } = useSeenVersion();
+  const toastFiredRef = useRef(false);
 
   const { isImpersonating, impersonatedUser, realEmail, realName } = auth;
 
@@ -478,6 +482,36 @@ function InnerApp() {
     window.addEventListener('trail-os-forbidden', handleForbidden);
     return () => window.removeEventListener('trail-os-forbidden', handleForbidden);
   }, [toast]);
+
+  // "What's New" toast — fires once per session when the user signs in and
+  // has not yet acknowledged the current release. A ref guard prevents it from
+  // re-firing if auth state updates (e.g. tier load) causes a re-render.
+  useEffect(() => {
+    if (
+      toastFiredRef.current ||
+      auth.isLoading ||
+      !auth.isSignedIn ||
+      !isReady ||
+      !hasUnseenRelease
+    ) return;
+    toastFiredRef.current = true;
+    toast({
+      title:       `What's New — Trail OS v${APP_VERSION}`,
+      description: 'A new release is available. See what changed in this update.',
+      action: (
+        <button
+          onClick={() => {
+            markSeen();
+            window.history.pushState({}, "", "/release-notes");
+            window.dispatchEvent(new PopStateEvent("popstate"));
+          }}
+          className="text-xs font-medium text-primary underline-offset-2 hover:underline whitespace-nowrap"
+        >
+          See what&apos;s new →
+        </button>
+      ),
+    } as Parameters<typeof toast>[0]);
+  }, [auth.isLoading, auth.isSignedIn, isReady, hasUnseenRelease, toast, markSeen]);
 
   // Full-page loading state while session check is in flight
   if (auth.isLoading) {
