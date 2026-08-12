@@ -30,12 +30,14 @@ const { mockRequireAdmin, mockWhere, mockOnConflictDoNothing, mockUpdateWhere, m
 vi.mock('../middlewares/requireAuth.js', () => ({
   requireStaff:        (_req: unknown, _res: unknown, next: () => void) => next(),
   requireAdmin:        (...args: unknown[]) => (mockRequireAdmin as (...a: unknown[]) => void)(...args),
+  requireSuperAdmin: (_req: unknown, _res: unknown, next: () => void) => next(),
   requireHomebaseAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
   isStaff:               () => true,
   isAdmin:               () => true,
   isSuperAdmin:          () => false,
   TRAIL_OS_STAFF_GROUPS: [],
   TRAIL_OS_ADMIN_GROUPS: [],
+  effectiveIdentityMiddleware: (_req: unknown, _res: unknown, next: () => void) => next(),
 }));
 
 vi.mock('express-session', () => ({

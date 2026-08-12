@@ -14,12 +14,14 @@ const { mockOrderBy, mockWhere, mockOnConflictDoNothing, mockUpdateWhere } = vi.
 vi.mock('../middlewares/requireAuth.js', () => ({
   requireStaff: (_req: unknown, _res: unknown, next: () => void) => next(),
   requireAdmin: (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireSuperAdmin: (_req: unknown, _res: unknown, next: () => void) => next(),
   requireHomebaseAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
   isStaff:        () => true,
   isAdmin:        () => true,
   isSuperAdmin:   () => false,
   TRAIL_OS_STAFF_GROUPS: [],
   TRAIL_OS_ADMIN_GROUPS: [],
+  effectiveIdentityMiddleware: (_req: unknown, _res: unknown, next: () => void) => next(),
 }));
 
 vi.mock('connect-pg-simple', () => ({

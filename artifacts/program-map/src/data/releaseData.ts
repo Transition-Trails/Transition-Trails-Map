@@ -18,9 +18,24 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: "1.6",
+    date: "August 12, 2026",
+    label: "Current",
+    entries: [
+      { kind: "major", text: "Homebase first-visit tour launched — animated 7-step walkthrough fires automatically on first visit for every audience; audience-aware steps tailored to staff, coach, learner, and volunteer layouts." },
+      { kind: "major", text: "Tour auto-skips shared steps already seen on a previous visit; 'Show all steps' button lets users replay the full tour any time." },
+      { kind: "major", text: "Submit a Case drawer added to Coach, Learner, and Volunteer homepages — pre-filtered to the General case type; already present on Team Homebase." },
+      { kind: "minor", text: "'What's New' link in PennyBar — always visible on all homebase layouts; shows a pulsing dot and 'What's new' label when unseen, a version tag otherwise." },
+      { kind: "minor", text: "Tour replay from Release Notes — 'Take the tour' button navigates to homebase and opens the audience-specific tour in-place without redirecting away." },
+      { kind: "minor", text: "Release Notes route serves the correct shell per sign-in type — homebase audiences stay in HomebaseShell; staff stay in AppShell." },
+      { kind: "fix",   text: "American English spelling enforced across the full codebase — programme→program, artefact→artifact, colour→color, -ise→-ize and all other British variants replaced." },
+      { kind: "fix",   text: "ArtefactsCard renamed to ArtifactsCard on disk — was causing a Vite import resolution error after the spelling sweep." },
+      { kind: "fix",   text: "16 API server test suites and 7 frontend tests updated to export requireSuperAdmin and effectiveIdentityMiddleware from the requireAuth mock — previously silently never running." },
+    ],
+  },
+  {
     version: "1.5",
     date: "August 6, 2026",
-    label: "Current",
     entries: [
       { kind: "major", text: "Homebase system launched — audience-dispatched landing pages for learners, coaches, volunteers, and team staff, each with a dedicated shell and personalised content." },
       { kind: "major", text: "Google SSO + Google Group routing live — sign-in derives each user's audience from DWD group membership; 5-minute cache auto-refreshes on /me." },

@@ -34,6 +34,10 @@ vi.mock('@/components/homebase/TaskHoverCard', () => ({
   TaskHoverCard: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+vi.mock('@/context/AppContext', () => ({
+  useAppContext: () => ({ openLogTime: vi.fn() }),
+}));
+
 // ── Component under test (imported after mocks are registered) ────────────────
 
 import TasksPage from '../../pages/homebase/TasksPage';
