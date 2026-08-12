@@ -41,34 +41,68 @@ interface MeetingPopoverProps {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/**
- * Strip common markdown syntax so AI summaries render as plain readable text.
- * Handles: headings, bold, italic, inline code, bullets, horizontal rules.
- */
-function stripMarkdown(md: string): string {
-  return md
-    // ATX headings → plain line
-    .replace(/^#{1,6}\s+/gm, "")
-    // Bold + italic combined (***text*** / ___text___)
+/** Strip inline markdown (bold, italic, code) — leaves text readable. */
+function stripInline(text: string): string {
+  return text
     .replace(/\*{3}(.+?)\*{3}/g, "$1")
     .replace(/_{3}(.+?)_{3}/g, "$1")
-    // Bold (**text** / __text__)
     .replace(/\*{2}(.+?)\*{2}/g, "$1")
     .replace(/_{2}(.+?)_{2}/g, "$1")
-    // Italic (*text* / _text_) — only when surrounded by word boundary or space
     .replace(/(^|[\s(])\*([^\s*][^*]*)\*([\s,.!?)]|$)/gm, "$1$2$3")
     .replace(/(^|[\s(])_([^\s_][^_]*)_([\s,.!?)]|$)/gm, "$1$2$3")
-    // Inline code
     .replace(/`([^`]+)`/g, "$1")
-    // Unordered bullets (- / * / +)
-    .replace(/^[\s]*[-*+]\s+/gm, "• ")
-    // Ordered list numbers
-    .replace(/^[\s]*\d+\.\s+/gm, "")
-    // Horizontal rules
-    .replace(/^[-*_]{3,}\s*$/gm, "")
-    // Collapse 3+ blank lines to 2
-    .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+type SummaryBlock =
+  | { kind: "heading"; text: string }
+  | { kind: "bullet";  text: string }
+  | { kind: "para";    text: string };
+
+/**
+ * Parse an AI summary string into structured blocks:
+ *  - ATX headings (## Meeting Purpose) → heading
+ *  - Bullet lines (- / * / • / 1.) → bullet
+ *  - Everything else → paragraph
+ * Blank lines are ignored (they just separate blocks).
+ */
+function parseSummary(md: string): SummaryBlock[] {
+  const lines  = md.split("\n");
+  const blocks: SummaryBlock[] = [];
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+
+    // ATX heading
+    const headingMatch = /^#{1,6}\s+(.+)$/.exec(line);
+    if (headingMatch) {
+      blocks.push({ kind: "heading", text: stripInline(headingMatch[1]!) });
+      continue;
+    }
+
+    // Bullet (-, *, +, •, or numbered list)
+    const bulletMatch = /^(?:[-*+•]|\d+\.)\s+(.+)$/.exec(line);
+    if (bulletMatch) {
+      blocks.push({ kind: "bullet", text: stripInline(bulletMatch[1]!) });
+      continue;
+    }
+
+    // Horizontal rule — skip
+    if (/^[-*_]{3,}\s*$/.test(line)) continue;
+
+    // Plain paragraph text — treat bare "Meeting Purpose" / "Key Takeaways" /
+    // "Next Steps" lines as headings since Fathom sometimes omits the #.
+    const KNOWN_HEADINGS = /^(Meeting Purpose|Key Takeaways?|Next Steps?|Summary|Overview|Action Items?)$/i;
+    if (KNOWN_HEADINGS.test(line)) {
+      blocks.push({ kind: "heading", text: stripInline(line) });
+      continue;
+    }
+
+    blocks.push({ kind: "para", text: stripInline(line) });
+  }
+
+  return blocks;
 }
 
 /**
@@ -117,8 +151,8 @@ function formatDate(iso: string): string {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
-  const summaryText     = meeting.summary ? stripMarkdown(meeting.summary) : null;
-  const hasActionItems  = meeting.action_items.length > 0;
+  const summaryBlocks  = meeting.summary ? parseSummary(meeting.summary) : null;
+  const hasActionItems = meeting.action_items.length > 0;
 
   return (
     <Popover>
@@ -151,22 +185,50 @@ export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
 
         {/* AI Summary */}
         <div className="px-4 py-3 border-b border-border/40">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1.5">
+          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
             AI Summary
           </p>
-          {summaryText ? (
-            <div className="space-y-1.5 max-h-48 overflow-y-auto overflow-x-hidden pr-0.5">
-              {summaryText.split("\n\n").map((para, i) => (
-                <p
-                  key={i}
-                  className="text-[12px] text-foreground/80 leading-relaxed break-words"
-                  style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
-                >
-                  {linkifyText(para).map((node, j) => (
-                    <Fragment key={j}>{node}</Fragment>
-                  ))}
-                </p>
-              ))}
+          {summaryBlocks && summaryBlocks.length > 0 ? (
+            <div className="max-h-56 overflow-y-auto overflow-x-hidden pr-0.5 space-y-0">
+              {summaryBlocks.map((block, i) => {
+                if (block.kind === "heading") {
+                  return (
+                    <p
+                      key={i}
+                      className="text-[11px] font-semibold text-foreground uppercase tracking-wide mt-3 mb-1 first:mt-0"
+                    >
+                      {block.text}
+                    </p>
+                  );
+                }
+                if (block.kind === "bullet") {
+                  return (
+                    <div key={i} className="flex items-start gap-1.5 mb-1">
+                      <span className="text-primary/70 text-[11px] leading-relaxed mt-[1px] flex-shrink-0">•</span>
+                      <span
+                        className="text-[12px] text-foreground/80 leading-relaxed break-words flex-1"
+                        style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
+                      >
+                        {linkifyText(block.text).map((node, j) => (
+                          <Fragment key={j}>{node}</Fragment>
+                        ))}
+                      </span>
+                    </div>
+                  );
+                }
+                // para
+                return (
+                  <p
+                    key={i}
+                    className="text-[12px] text-foreground/80 leading-relaxed break-words mb-1.5"
+                    style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
+                  >
+                    {linkifyText(block.text).map((node, j) => (
+                      <Fragment key={j}>{node}</Fragment>
+                    ))}
+                  </p>
+                );
+              })}
             </div>
           ) : (
             <p className="text-[12px] text-muted-foreground/60 italic">
