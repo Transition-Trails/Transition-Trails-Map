@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tag, Wrench, Sparkles, ArrowUpCircle, ChevronRight, MessageSquarePlus } from "lucide-react";
+import { Tag, Wrench, Sparkles, ArrowUpCircle, ChevronRight, MessageSquarePlus, PlayCircle } from "lucide-react";
 import { useSeenVersion } from "@/hooks/useSeenVersion";
 import { APP_VERSION } from "@/config/version";
 import { SubmitCaseDrawer } from "@/components/homebase/SubmitCaseDrawer";
+import { useHomebaseTour } from "@/hooks/useHomebaseTour";
 import { RELEASES, type ChangeKind, type ReleaseEntry, type Release } from "@/data/releaseData";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -81,6 +82,7 @@ function isNewerVersion(a: string, b: string): boolean {
 export default function ReleaseNotes() {
   const [selectedVersion,  setSelectedVersion]  = useState<string>(RELEASES[0].version);
   const [showSubmitCase,   setShowSubmitCase]   = useState(false);
+  const { startTour } = useHomebaseTour();
   const release = RELEASES.find((r) => r.version === selectedVersion) ?? RELEASES[0];
 
   const { lastSeenVersion, markSeen, isReady } = useSeenVersion();
@@ -126,14 +128,28 @@ export default function ReleaseNotes() {
               A history of major features, improvements, and bug fixes.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowSubmitCase(true)}
-            className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted/60 text-[12px] font-medium text-foreground transition-colors mt-0.5"
-          >
-            <MessageSquarePlus className="w-3.5 h-3.5 text-muted-foreground" />
-            Report an issue
-          </button>
+          <div className="flex items-center gap-2 mt-0.5 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                startTour();
+                window.history.pushState({}, "", "/homebase");
+                window.dispatchEvent(new PopStateEvent("popstate"));
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted/60 text-[12px] font-medium text-foreground transition-colors"
+            >
+              <PlayCircle className="w-3.5 h-3.5 text-muted-foreground" />
+              Take the tour
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSubmitCase(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted/60 text-[12px] font-medium text-foreground transition-colors"
+            >
+              <MessageSquarePlus className="w-3.5 h-3.5 text-muted-foreground" />
+              Report an issue
+            </button>
+          </div>
         </div>
       </div>
 

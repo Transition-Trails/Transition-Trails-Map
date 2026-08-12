@@ -21,7 +21,7 @@
  *  - Collapsed Slack panel is 40px (icon strip); expanded is 320px.
  */
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronRight,
@@ -53,6 +53,8 @@ import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
 import { SlimSlackPanel } from "@/components/homebase/SlimSlackPanel";
 import { useSeenVersion } from "@/hooks/useSeenVersion";
 import { APP_VERSION } from "@/config/version";
+import { useHomebaseTour } from "@/hooks/useHomebaseTour";
+import { HomebaseTour } from "@/components/homebase/HomebaseTour";
 
 // ── Google Workspace app links ─────────────────────────────────────────────────
 
@@ -425,6 +427,12 @@ export function HomebaseShell({
     });
   }, []);
 
+  // Tour — auto-start once on first homebase visit.
+  const { shouldAutoStart, tourActive, startTour, completeTour } = useHomebaseTour();
+  useEffect(() => {
+    if (shouldAutoStart) startTour();
+  }, [shouldAutoStart, startTour]);
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[hsl(40_30%_97%)] text-foreground">
       {/* Left: Workspace drawer */}
@@ -454,6 +462,9 @@ export function HomebaseShell({
           returnPath={location ?? "/"}
         />
       </motion.div>
+
+      {/* Homebase tour overlay */}
+      <HomebaseTour open={tourActive} onComplete={completeTour} />
     </div>
   );
 }
