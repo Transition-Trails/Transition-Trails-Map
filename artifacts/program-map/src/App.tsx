@@ -38,7 +38,19 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
       // session is gone, which causes InnerApp to show the sign-in page.
       void queryClient.invalidateQueries({ queryKey: ['google-auth-me'] });
     } else if (res.status === 403) {
-      window.dispatchEvent(new CustomEvent('trail-os-forbidden'));
+      // Only fire the "Access denied" toast for auth failures (not_authorized).
+      // Feature-level 403s (e.g. Slack not connected, adapter not configured)
+      // return different error codes and must NOT trigger this toast.
+      const clone = res.clone();
+      clone.json().then((body: unknown) => {
+        if (
+          body &&
+          typeof body === 'object' &&
+          (body as Record<string, unknown>).error === 'not_authorized'
+        ) {
+          window.dispatchEvent(new CustomEvent('trail-os-forbidden'));
+        }
+      }).catch(() => { /* non-JSON body — not an auth error */ });
     }
   }
 
