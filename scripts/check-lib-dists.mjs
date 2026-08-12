@@ -24,7 +24,8 @@ import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const WORKSPACE_ROOT = resolve(__dirname, "..");
+// Allow tests to redirect the script at a temp fixture tree without touching real code.
+const WORKSPACE_ROOT = process.env.DIST_CHECK_ROOT ?? resolve(__dirname, "..");
 
 // Load TypeScript compiler API from the workspace's own typescript package.
 const require = createRequire(import.meta.url);
