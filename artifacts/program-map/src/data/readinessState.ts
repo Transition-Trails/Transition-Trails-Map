@@ -75,7 +75,7 @@ export const INTEGRATION_STATUS: Record<string, IntegrationStatus> = {
       'the AI provider footprint. The ANTHROPIC_API_KEY secret and GET /api/anthropic/validate ' +
       'endpoint are retained so Claude can be wired to future capabilities without setup overhead. ' +
       'No active API calls are made to Anthropic — omitting ANTHROPIC_API_KEY has no impact on ' +
-      'current platform behaviour.',
+      'current platform behavior.',
     lastVerified: 'August 2026',
   },
   googleDrive: {

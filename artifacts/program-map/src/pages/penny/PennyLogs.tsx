@@ -369,7 +369,7 @@ export default function PennyLogs() {
           <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
           <div>
             <p className="text-[12px] font-semibold text-primary">Ask {TERMS.aiAssistant}</p>
-            <p className="text-[11px] text-primary/60">Analyse interaction patterns</p>
+            <p className="text-[11px] text-primary/60">Analyze interaction patterns</p>
           </div>
         </button>
 

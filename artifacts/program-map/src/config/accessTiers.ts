@@ -16,8 +16,8 @@
 //   builder preview what each tier would see. No URL-level access enforcement
 //   exists yet — that ships with Google Workspace SSO (Phase 2).
 //
-// COLOUR TREATMENT:
-//   Tier chips use brand identity colours, not status colours.
+// COLOR TREATMENT:
+//   Tier chips use brand identity colors, not status colors.
 //   everyday   → Trail Green   (#2F6B3F family)
 //   power      → Deep Teal     (#2F6F7E family)
 //   admin      → Charcoal      (#2A2E2C family)
@@ -52,7 +52,7 @@ export const TIER_CONFIG = {
     description: 'Program team, coaches, and coordinators.',
     detail:      'Simplified program health, learner activity, and guided next actions. Visual indicators, counts, and page-level Trail Signals. Digital Twin runs as silent background infrastructure.',
     color:       'trail-green',
-    // Trail Green (#2F6B3F family) — brand identity colour for everyday tier
+    // Trail Green (#2F6B3F family) — brand identity color for everyday tier
     colorClass:  'text-[#2F6B3F] bg-[#E6F0EA] border-[#9FC3AE]',
     dotClass:    'bg-[#2F6B3F]',
     badgeClass:  'bg-[#E6F0EA] text-[#245531] border-[#9FC3AE]',
@@ -67,7 +67,7 @@ export const TIER_CONFIG = {
     description: 'Penny governors and AI operations.',
     detail:      'Full Penny analytics, prompt governance, quality metrics, source trust, usage analytics, learner/cohort intelligence, and deeper Trail Signals. Digital Twin as explainable context layer.',
     color:       'deep-teal',
-    // Deep Teal (#2F6F7E family) — brand identity colour for power tier
+    // Deep Teal (#2F6F7E family) — brand identity color for power tier
     colorClass:  'text-[#2F6F7E] bg-[#EDF5F8] border-[#7FAFC6]',
     dotClass:    'bg-[#2F6F7E]',
     badgeClass:  'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]',
@@ -82,7 +82,7 @@ export const TIER_CONFIG = {
     description: 'System integrators and platform operators.',
     detail:      'All integration, authentication, secrets, Salesforce, Slack, Google, Drive, Calendar, Gmail, object model, governance, Digital Twin studio, lifecycle, ownership, and configuration.',
     color:       'charcoal',
-    // Charcoal (#2A2E2C family) — brand identity colour for admin tier
+    // Charcoal (#2A2E2C family) — brand identity color for admin tier
     // Amber must not appear here — it is reserved for the single primary CTA per screen.
     colorClass:  'text-[#2A2E2C] bg-[#EAEBEA] border-[#C4C6C5]',
     dotClass:    'bg-[#2A2E2C]',

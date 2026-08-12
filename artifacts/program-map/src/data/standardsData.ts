@@ -149,7 +149,7 @@ export const contentStandards: ContentStandard[] = [
       { field: 'Review Cycle',             description: 'When each content layer is reviewed (modules: per cohort; knowledge: quarterly).',                        required: true },
       { field: 'Content Health Checks',    description: 'Open content health issues tracked and assigned.',                                                        required: true },
       // ── 11. Standards Compliance ─────────────────────────────────────────
-      { field: 'Standards Gap Report',     description: 'All open standards gaps have been reviewed and prioritised.',                                             required: false },
+      { field: 'Standards Gap Report',     description: 'All open standards gaps have been reviewed and prioritized.',                                             required: false },
     ],
     qualityCriteria: [
       'All sprints have defined themes, durations, and module breakdowns',

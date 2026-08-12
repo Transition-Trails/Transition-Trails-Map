@@ -324,7 +324,7 @@ export const SLACK_CHANNELS: SlackChannel[] = [
     id: 'exec-briefs',
     name: '#exec-briefs',
     purpose: 'executive',
-    topic: 'Executive programme briefs',
+    topic: 'Executive program briefs',
     description: 'Private channel for executive director and program leads. Penny executive summaries delivered weekly.',
     memberCount: 3,
     lifecycle: 'active',

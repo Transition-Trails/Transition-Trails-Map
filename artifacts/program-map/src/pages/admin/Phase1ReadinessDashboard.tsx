@@ -408,7 +408,7 @@ export default function Phase1ReadinessDashboard() {
             <p className="text-[14px] font-bold  text-muted-foreground/50 mb-0.5">Administration — Phase 1</p>
             <h1 className="text-base font-semibold text-foreground">Phase 1 Readiness Dashboard</h1>
             <p className="text-[14px] text-muted-foreground mt-0.5 max-w-2xl">
-              Architecture, integration, governance, knowledge, {TERMS.aiAssistant}, and operations readiness — scored, gap-analysed, and prioritised for production onboarding.
+              Architecture, integration, governance, knowledge, {TERMS.aiAssistant}, and operations readiness — scored, gap-analyzed, and prioritized for production onboarding.
             </p>
           </div>
         </div>

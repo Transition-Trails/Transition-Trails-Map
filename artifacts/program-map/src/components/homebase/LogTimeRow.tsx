@@ -25,7 +25,7 @@ const ACTIVITIES: Record<HomebaseAudience, string[]> = {
   ],
   coach: [
     "Squad coaching",
-    "Artefact review",
+    "Artifact review",
     "Verdict session",
     "Office hours",
     "Team meeting",
@@ -45,7 +45,7 @@ const ACTIVITIES: Record<HomebaseAudience, string[]> = {
   team: [
     "Team meeting",
     "Admin work",
-    "Programme support",
+    "Program support",
     "Other",
   ],
 };

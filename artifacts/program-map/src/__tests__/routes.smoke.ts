@@ -19,7 +19,7 @@ interface RouteEntry {
 export const ROUTE_MANIFEST: RouteEntry[] = [
   // ── Home / Homebase ───────────────────────────────────────────────────────
   { path: '/',                    kind: 'active', note: 'HomebaseLanding (learner/coach/volunteer) or Home (staff) — audience-dispatched' },
-  { path: '/access-not-granted',  kind: 'active', note: 'Authenticated but no recognised Trail OS group' },
+  { path: '/access-not-granted',  kind: 'active', note: 'Authenticated but no recognized Trail OS group' },
 
   // ── Navigator (sidebar links use /navigator/* prefix; these are the App.tsx redirects) ─
   { path: '/navigator/program-map',              kind: 'redirect', target: '/program' },

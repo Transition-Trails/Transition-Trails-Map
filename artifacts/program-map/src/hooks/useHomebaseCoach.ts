@@ -34,18 +34,18 @@ export interface PennyPreparedState {
   hasData: boolean;
 }
 
-/** Learner artefact awaiting a coach verdict. */
-export interface CoachArtefact {
+/** Learner artifact awaiting a coach verdict. */
+export interface CoachArtifact {
   id:              string;
   learnerName:     string;
-  artefactType:    string;
+  artifactType:    string;
   submittedAt:     string | null;
   criteriaCount:   number;
   pennyPreRead:    string | null;
 }
 
-export interface ArtefactsState {
-  items:   CoachArtefact[];
+export interface ArtifactsState {
+  items:   CoachArtifact[];
   hasData: boolean;
 }
 
@@ -123,10 +123,10 @@ export function useCoachPennyPrepared() {
   });
 }
 
-export function useCoachArtefacts() {
-  return useQuery<ArtefactsState>({
-    queryKey: ["homebase-coach-artefacts"],
-    queryFn:  () => fetchJson<ArtefactsState>("/api/homebase/coach/artefacts"),
+export function useCoachArtifacts() {
+  return useQuery<ArtifactsState>({
+    queryKey: ["homebase-coach-artifacts"],
+    queryFn:  () => fetchJson<ArtifactsState>("/api/homebase/coach/artifacts"),
     staleTime: 3 * 60 * 1000,
     retry:     1,
   });

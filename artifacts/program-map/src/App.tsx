@@ -620,7 +620,7 @@ function InnerApp() {
         ) : (
           <Switch>
             <Route path="/" component={SignInLanding} />
-            {/* Access not granted — authenticated but no recognised group */}
+            {/* Access not granted — authenticated but no recognized group */}
             <Route path="/access-not-granted" component={AccessNotGranted} />
             <Route component={SignInPage} />
           </Switch>

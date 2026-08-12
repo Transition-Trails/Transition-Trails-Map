@@ -17,7 +17,7 @@ export default function AccessNotGranted() {
       <div className="space-y-2 max-w-sm">
         <h1 className="text-xl font-semibold text-foreground">Access not granted</h1>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          Your account is not yet set up for Trail OS. Ask your programme
+          Your account is not yet set up for Trail OS. Ask your program
           coordinator to add you to the right group in Google Workspace.
         </p>
       </div>

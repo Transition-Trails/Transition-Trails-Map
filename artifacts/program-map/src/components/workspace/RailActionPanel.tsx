@@ -301,7 +301,7 @@ export function RailActionPanel({ config, onClose }: RailActionPanelProps) {
   // fires the Slack notification, and shows a confirmation screen before closing.
   function handleSendForReview() {
     onSaveDraft?.(values);
-    // onSendForReview lets callers override save behaviour (e.g. force status → Review).
+    // onSendForReview lets callers override save behavior (e.g. force status → Review).
     if (onSendForReview) {
       onSendForReview(values);
     } else {

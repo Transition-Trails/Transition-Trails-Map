@@ -114,7 +114,7 @@ const REACTION_EMOJIS: Array<{ emoji: string; name: string }> = [
   { emoji: "✅", name: "white_check_mark" },
 ];
 
-// ── Slack wordmark SVG (official brand colours) ───────────────────────────────
+// ── Slack wordmark SVG (official brand colors) ───────────────────────────────
 
 function SlackIcon({ size = 20, muted = false }: { size?: number; muted?: boolean }) {
   if (muted) {

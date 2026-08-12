@@ -189,14 +189,14 @@ export const curriculumPrograms: CurriculumItem[] = [
     confidence: 'draft',
     owner: 'Program Manager',
     program: 'First Two Weeks',
-    purpose: 'Shared onboarding that runs across all programmes — 2 weeks at the start of each cohort. Structure, content, and delivery format not yet confirmed in source materials.',
+    purpose: 'Shared onboarding that runs across all programs — 2 weeks at the start of each cohort. Structure, content, and delivery format not yet confirmed in source materials.',
     relatedSalesforceObject: 'Program__c',
     relatedLmsObject: 'Course (Salesforce LMS)',
     pennyActions: [],
     futureDemandLink: 'Submit Change Request',
     sprintCount: 0, moduleCount: 0, lessonCount: 0, assessmentCount: 0,
     duration: '2 weeks',
-    notes: 'Cross-programme onboarding from Master Program Guide. Detailed structure, modules, and facilitation approach not yet confirmed — do not populate counts until confirmed.',
+    notes: 'Cross-program onboarding from Master Program Guide. Detailed structure, modules, and facilitation approach not yet confirmed — do not populate counts until confirmed.',
   },
 ];
 

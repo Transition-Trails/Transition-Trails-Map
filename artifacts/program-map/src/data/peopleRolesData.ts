@@ -707,7 +707,7 @@ export const roleBlueprints: RoleBlueprint[] = [
     roleName: 'Active Learner',
     personaName: 'Learner',
     shortDescription: 'Defines the expected experience, responsibilities, and support structure for an enrolled Transition Trails learner.',
-    purpose: 'Ensure every learner has a clear, supported, and measurable journey from enrolment to career outcome — with Penny, their cohort, and their coach available at each stage.',
+    purpose: 'Ensure every learner has a clear, supported, and measurable journey from enrollment to career outcome — with Penny, their cohort, and their coach available at each stage.',
     responsibilities: [
       { area: 'Engagement',   description: 'Complete assigned modules and quests on schedule; attend cohort sessions.', required: true },
       { area: 'Reflection',   description: 'Submit Penny reflection prompts at module milestones.', required: true },

@@ -87,7 +87,7 @@ export function CaseRichTextEditor({
         if (!imageItem) return false;
         const file = imageItem.getAsFile();
         if (file) { onImageCapture(file); }
-        return true; // prevent default paste behaviour for images
+        return true; // prevent default paste behavior for images
       },
       // ── Drop: intercept image files ──────────────────────────────────────
       handleDrop(_view, event) {

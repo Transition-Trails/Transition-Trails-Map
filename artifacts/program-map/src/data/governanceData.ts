@@ -267,7 +267,7 @@ export const LIFECYCLE_MODELS: LifecycleModel[] = [
     objectTypeId: 'google-drive-resource', objectTypeName: 'Google Drive Resource', layer: 'Infrastructure',
     stages: [
       { id: 'created',   label: 'Created',   color: 'sky',     description: 'Resource created; structure being set up.',   entry: ['Program/cohort planned'], exit: ['Setup complete'] },
-      { id: 'organised', label: 'Organised', color: 'indigo',  description: 'Named, structured, and permissions set.',    entry: ['Created'],               exit: ['Access control review'] },
+      { id: 'organized', label: 'Organized', color: 'indigo',  description: 'Named, structured, and permissions set.',    entry: ['Created'],               exit: ['Access control review'] },
       { id: 'active',    label: 'Active',    color: 'emerald', description: 'In regular use by team and learners.',       entry: ['Access control approved'], exit: ['Archival decision'] },
       { id: 'archived',  label: 'Archived',  color: 'slate',   description: 'Read-only; historical record.',             entry: ['Parent archived'],       exit: ['N/A'] },
     ],

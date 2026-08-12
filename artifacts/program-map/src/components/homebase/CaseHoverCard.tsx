@@ -46,7 +46,7 @@ interface CaseHoverCardProps {
   children: ReactNode;
 }
 
-// ── Status colour map ─────────────────────────────────────────────────────────
+// ── Status color map ─────────────────────────────────────────────────────────
 // Keys are common SF Case Status values. Unknown values fall back to primary.
 
 const STATUS_COLORS: Record<string, { active: string; idle: string }> = {

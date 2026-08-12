@@ -2,7 +2,7 @@ export type ConfidenceStatus = 'confirmed' | 'needs-review' | 'draft' | 'depreca
 
 // ── Sub-structure types ────────────────────────────────────────────────────────
 
-/** A named role track within a programme (e.g. Trail of Mastery role specialisations) */
+/** A named role track within a program (e.g. Trail of Mastery role specialisations) */
 export interface ProgramTrack {
   id: string;
   name: string;
@@ -11,7 +11,7 @@ export interface ProgramTrack {
   certificationAnchor?: string; // deliberately left empty until all four are confirmed
 }
 
-/** A membership tier within a programme (e.g. Explorer's Trail access tiers) */
+/** A membership tier within a program (e.g. Explorer's Trail access tiers) */
 export interface ProgramMembershipTier {
   id: string;
   name: string;
@@ -28,7 +28,7 @@ export interface CoachingLadderLevel {
   name: string;
 }
 
-/** Coaching ladder configuration — record as a benefit of the membership, not a separate programme */
+/** Coaching ladder configuration — record as a benefit of the membership, not a separate program */
 export interface CoachingLadderConfig {
   levels: CoachingLadderLevel[];
   source: string;        // who the coaches are drawn from
@@ -79,7 +79,7 @@ export interface Program {
   resolvePhases: string[];
   docs: string[];
   relatedConcepts: Array<{ label: string; type: string; id: string }>;
-  // Sub-structure — populated where the Guide defines programme-internal structure
+  // Sub-structure — populated where the Guide defines program-internal structure
   tracks?: ProgramTrack[];
   trackCompositionRules?: string[];  // rules governing how tracks may be combined
   membershipTiers?: ProgramMembershipTier[];
@@ -87,7 +87,7 @@ export interface Program {
   earnedMembership?: string;         // how membership can be earned rather than bought
   cohortStructure?: CohortStructure;
   firstCohort?: FirstCohort;         // first scheduled cohort, year only
-  crossProgramme?: boolean;          // true if the programme runs across all others
+  crossProgram?: boolean;          // true if the program runs across all others
   // Live Salesforce fields (populated when data comes from pmdm__Program__c)
   status?: string | null;
   startDate?: string | null;
@@ -196,9 +196,9 @@ export const programs: Program[] = [
         "Delivery capacity for Guided Trail and the apprenticeships",
         "Founder independence",
       ],
-      membershipNote: "The alumni tier's core benefit rather than a career perk — record as a benefit of the membership, not as a separate programme",
+      membershipNote: "The alumni tier's core benefit rather than a career perk — record as a benefit of the membership, not as a separate program",
     },
-    earnedMembership: "Completing Guided Trail earns membership. Guided Trail plus an apprenticeship earns it for life. Activation should be automatic from the programme record on completion confirmation.",
+    earnedMembership: "Completing Guided Trail earns membership. Guided Trail plus an apprenticeship earns it for life. Activation should be automatic from the program record on completion confirmation.",
   },
   {
     id: "foundations-trail",
@@ -305,7 +305,7 @@ export const programs: Program[] = [
     duration: "Needs Review — duration not confirmed in source materials",
     pricing: "", // pricing not confirmed in source materials — do not display
     coreOutcome: "Needs Review — outcomes not confirmed beyond proposal stage",
-    executiveSummary: "Trail of Mastery delivers through four role tracks (Admin, Product Owner, Business Analyst, Advanced Admin), each defined by the decision it owns and the evidence type it produces. Cohort 0 is planned for 2027. Solution Consultant and Solution Architect were deliberately removed from the role set. Full programme details should be confirmed against the Trail of Mastery Proposal before being treated as authoritative.",
+    executiveSummary: "Trail of Mastery delivers through four role tracks (Admin, Product Owner, Business Analyst, Advanced Admin), each defined by the decision it owns and the evidence type it produces. Cohort 0 is planned for 2027. Solution Consultant and Solution Architect were deliberately removed from the role set. Full program details should be confirmed against the Trail of Mastery Proposal before being treated as authoritative.",
     whyItMatters: "This program closes the loop on the ecosystem by giving the most advanced learners a path toward becoming practitioners, coaches, or organizational consultants — expanding Transition Trails' alumni-to-contributor pipeline.",
     keyFacts: [
       "Status: Proposal — not yet active",
@@ -415,19 +415,19 @@ export const programs: Program[] = [
     pricingStatus: "subsidized",
     confidence: "draft",
     sourceDoc: "Master Program Guide",
-    strategicRole: "Shared onboarding — runs across all programmes at the start of each cohort",
-    audience: "All programme learners, across Foundations, Guided Trail and the apprenticeships. Cross-programme by definition.",
+    strategicRole: "Shared onboarding — runs across all programs at the start of each cohort",
+    audience: "All program learners, across Foundations, Guided Trail and the apprenticeships. Cross-program by definition.",
     prerequisite: "None — it is day one",
-    format: "Facilitator-led, running inside weeks one and two of the programme itself. Not asynchronous pre-work and not something a learner completes in a gap while waiting for a cohort to form. An apprentice with a day job will not complete a module in a gap; they will complete it when it is week one and someone is expecting it.",
+    format: "Facilitator-led, running inside weeks one and two of the program itself. Not asynchronous pre-work and not something a learner completes in a gap while waiting for a cohort to form. An apprentice with a day job will not complete a module in a gap; they will complete it when it is week one and someone is expecting it.",
     duration: "2 weeks",
-    pricing: "", // bundled into every programme — not separately charged
+    pricing: "", // bundled into every program — not separately charged
     coreOutcome: "The learner holds the shared vocabulary and has opened their Decision Log at entry number one.",
-    executiveSummary: "First Two Weeks is a shared onboarding programme that runs across Foundations, Guided Trail and the apprenticeships. It establishes the shared vocabulary, opens the Decision Log, and introduces RESOLVE — teaching Recognize directly in the week the learner is actually recognising something. It is facilitator-led, running inside weeks one and two of the programme itself, not as pre-work.",
-    whyItMatters: "Parity. Same words, same shape, different content. Without it, every programme becomes its own dialect and the cost lands in three places: a learner who has to relearn vocabulary at every transition, a coach who cannot move between programmes, and a funder who cannot compare one cohort to another.",
+    executiveSummary: "First Two Weeks is a shared onboarding program that runs across Foundations, Guided Trail and the apprenticeships. It establishes the shared vocabulary, opens the Decision Log, and introduces RESOLVE — teaching Recognize directly in the week the learner is actually recognising something. It is facilitator-led, running inside weeks one and two of the program itself, not as pre-work.",
+    whyItMatters: "Parity. Same words, same shape, different content. Without it, every program becomes its own dialect and the cost lands in three places: a learner who has to relearn vocabulary at every transition, a coach who cannot move between programs, and a funder who cannot compare one cohort to another.",
     keyFacts: [
-      "Bundled into every programme — not separately charged",
+      "Bundled into every program — not separately charged",
       "Facilitator-led: runs inside weeks one and two, not in a gap before cohort start",
-      "Shared vocabulary intended to be published as Salesforce Knowledge articles — learners and coaches read them through External Apps Login, Penny can ground on them, and a change to a definition is versioned rather than silently diverging across three programme guides",
+      "Shared vocabulary intended to be published as Salesforce Knowledge articles — learners and coaches read them through External Apps Login, Penny can ground on them, and a change to a definition is versioned rather than silently diverging across three program guides",
       "Decision Log opens at entry number one and keeps counting for years",
       "Definition of Done means the same thing in week two of Foundations as in week nine of an apprenticeship",
     ],
@@ -437,7 +437,7 @@ export const programs: Program[] = [
       "Decision Log opens at number one and keeps counting for years",
       "Definition of Done means the same thing in week two of Foundations as in week nine of an apprenticeship",
     ],
-    whatBreaksIfMissing: "Rework rate stops being comparable across cohorts, which makes the number decoration rather than evidence. And a volunteer coach at four to six hours a week cannot learn a new process for every programme.",
+    whatBreaksIfMissing: "Rework rate stops being comparable across cohorts, which makes the number decoration rather than evidence. And a volunteer coach at four to six hours a week cannot learn a new process for every program.",
     dependencies: "None — it is the true day-one start",
     pennyStatus: 'Planned',
     pennyActive: false,
@@ -446,6 +446,6 @@ export const programs: Program[] = [
     resolvePhases: ["Recognize", "Explore", "Select", "Outline", "Launch", "Verify", "Evolve"],
     docs: ["Master Program Guide"],
     relatedConcepts: [],
-    crossProgramme: true,
+    crossProgram: true,
   },
 ];

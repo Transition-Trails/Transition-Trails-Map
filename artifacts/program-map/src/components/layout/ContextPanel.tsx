@@ -2208,7 +2208,7 @@ export function ContextPanel() {
       if (isTrend) {
         const tc = TREND_TYPE_CONFIG[data.type as TrendType] ?? { label: data.type, cls: 'text-muted-foreground bg-muted border-border' };
         const uc = TREND_URGENCY_CONFIG[data.urgency as TrendUrgency] ?? { label: data.urgency, cls: 'text-muted-foreground' };
-        const q = `Trend Insight: "${data.title}"\nType: ${data.type} · Urgency: ${data.urgency}\nAffected domains: ${(data.affectedDomains ?? []).join(', ')}\nAffected programs: ${(data.affectedPrograms ?? []).join(', ')}\n\n${data.description}\n\nWhat should the Transition Trails team prioritise to address this, and what connections exist to current program delivery?`;
+        const q = `Trend Insight: "${data.title}"\nType: ${data.type} · Urgency: ${data.urgency}\nAffected domains: ${(data.affectedDomains ?? []).join(', ')}\nAffected programs: ${(data.affectedPrograms ?? []).join(', ')}\n\n${data.description}\n\nWhat should the Transition Trails team prioritize to address this, and what connections exist to current program delivery?`;
         return (
           <ScrollArea className="h-full">
             <div className="p-5 space-y-5">
@@ -2332,7 +2332,7 @@ export function ContextPanel() {
       }
       // --- Individual Health Indicator ---
       const ic = HEALTH_LEVEL_CONFIG[data.status as HealthLevel] ?? HEALTH_LEVEL_CONFIG['needs-work'];
-      const q = `Health Indicator: "${data.label}" (${data.domain})\nStatus: ${ic.label}\nSource: ${data.sourceSystem}\n\nNext action: ${data.detail}\n\nWhat specific steps should the Transition Trails team take right now to address this indicator? What blockers might they face and how should they prioritise this against other work?`;
+      const q = `Health Indicator: "${data.label}" (${data.domain})\nStatus: ${ic.label}\nSource: ${data.sourceSystem}\n\nNext action: ${data.detail}\n\nWhat specific steps should the Transition Trails team take right now to address this indicator? What blockers might they face and how should they prioritize this against other work?`;
       const indRoute = SOURCE_SYSTEM_ROUTES[data.sourceSystem as string] ?? null;
       const actionPath: string | undefined = data.actionPath;
       const actionLabel: string = data.actionLabel ?? 'Go resolve this';

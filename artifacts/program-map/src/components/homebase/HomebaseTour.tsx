@@ -27,7 +27,7 @@ import {
 
 interface TourStep {
   icon:  React.FC<{ className?: string }>;
-  color: string;        // Tailwind bg colour class for the icon bubble
+  color: string;        // Tailwind bg color class for the icon bubble
   title: string;
   body:  string;
 }
@@ -55,7 +55,7 @@ const STEPS: TourStep[] = [
     icon:  LayoutGrid,
     color: "bg-sky-100 text-sky-600",
     title: "Your workspace drawer",
-    body:  "The left panel gives you quick access to Google Workspace apps, collaboration tools, and your programme links — all in one click.",
+    body:  "The left panel gives you quick access to Google Workspace apps, collaboration tools, and your program links — all in one click.",
   },
   {
     icon:  CheckSquare,

@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// TRANSITION TRAILS — SHARED STATUS COLOUR SYSTEM
+// TRANSITION TRAILS — SHARED STATUS COLOR SYSTEM
 //
-// Single source of truth for all status, lifecycle, and category colours.
-// Import from here; never write raw colour class strings in page or component
+// Single source of truth for all status, lifecycle, and category colors.
+// Import from here; never write raw color class strings in page or component
 // files. If a brand value changes, update it here once.
 //
 // Roles:
@@ -14,11 +14,11 @@
 //
 // Amber constraint:
 //   The mid amber (#F5A623) is reserved for the single primary CTA button per
-//   screen. Status colour for "attention" uses DARK amber (#CC8400) as text on
+//   screen. Status color for "attention" uses DARK amber (#CC8400) as text on
 //   LIGHT amber tint (#FFF3E0). Never use a solid amber fill for a status badge.
 //
 // Critical note:
-//   #A93F2F (brick red) is a PROVISIONAL functional colour pending a brand book
+//   #A93F2F (brick red) is a PROVISIONAL functional color pending a brand book
 //   entry. It is defined here so it can be changed in one place when finalised.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -26,10 +26,10 @@ export type StatusRole = 'success' | 'information' | 'attention' | 'critical' | 
 
 // ── Status classes ──────────────────────────────────────────────────────────
 // badge  — tinted background + text + border  (use for pills, chips, tags)
-// dot    — solid fill                          (use for coloured dots / icons)
-// text   — text colour only                   (use for inline emphasis)
-// border — border colour only                 (use for container outlines)
-// icon   — icon / SVG fill colour             (use for status icons)
+// dot    — solid fill                          (use for colored dots / icons)
+// text   — text color only                   (use for inline emphasis)
+// border — border color only                 (use for container outlines)
+// icon   — icon / SVG fill color             (use for status icons)
 
 export const STATUS_CLASSES: Record<StatusRole, {
   badge:  string;
@@ -60,7 +60,7 @@ export const STATUS_CLASSES: Record<StatusRole, {
     icon:   'text-[#CC8400]',
   },
   critical: {
-    // Provisional: #A93F2F is a functional colour pending brand book entry.
+    // Provisional: #A93F2F is a functional color pending brand book entry.
     badge:  'bg-[#FBEAE6] text-[#A93F2F] border-[#E8B9B4]',
     dot:    'bg-[#A93F2F]',
     text:   'text-[#A93F2F]',
@@ -76,8 +76,8 @@ export const STATUS_CLASSES: Record<StatusRole, {
   },
 };
 
-// ── Legacy colour token → StatusRole ────────────────────────────────────────
-// Maps the string colour tokens used in governanceData.ts lifecycle models
+// ── Legacy color token → StatusRole ────────────────────────────────────────
+// Maps the string color tokens used in governanceData.ts lifecycle models
 // to the appropriate status role. Used by GovernanceHub's StagePill renderer.
 // "teal" in the data means "completed" which resolves to success.
 
@@ -100,12 +100,12 @@ const LIFECYCLE_COLOR_MAP: Record<string, StatusRole> = {
   stone:   'neutral',
 };
 
-/** Resolve a legacy lifecycle colour token string to a StatusRole. */
+/** Resolve a legacy lifecycle color token string to a StatusRole. */
 export function lifecycleColorToRole(color: string): StatusRole {
   return LIFECYCLE_COLOR_MAP[color] ?? 'neutral';
 }
 
-/** Resolve a legacy lifecycle colour token string directly to its class bundle. */
+/** Resolve a legacy lifecycle color token string directly to its class bundle. */
 export function lifecycleColorClasses(color: string) {
   return STATUS_CLASSES[lifecycleColorToRole(color)];
 }

@@ -8,7 +8,7 @@
  *   ─ Level header strip
  *   ─ PennyPreparedBand
  *   ─ LogTimeRow
- *   ─ ArtefactsCard
+ *   ─ ArtifactsCard
  *   ─ SquadGrid
  *   ─ 2-col grid: CoachCasesCard | CoachWeekCard
  *   ─ LeadTeamCard (lead coach contact, full width, bottom)
@@ -20,7 +20,7 @@ import { useState } from "react";
 import { HomebaseShell }      from "@/components/layout/HomebaseShell";
 import { LogTimeRow }         from "@/components/homebase/LogTimeRow";
 import { PennyPreparedBand }  from "@/components/homebase/PennyPreparedBand";
-import { ArtefactsCard }      from "@/components/homebase/ArtefactsCard";
+import { ArtifactsCard }      from "@/components/homebase/ArtifactsCard";
 import { SquadGrid }          from "@/components/homebase/SquadGrid";
 import { CoachCasesCard }     from "@/components/homebase/CoachCasesCard";
 import { CoachWeekCard }      from "@/components/homebase/CoachWeekCard";
@@ -29,7 +29,7 @@ import { SubmitCaseDrawer }   from "@/components/homebase/SubmitCaseDrawer";
 import { Shield, MessageSquare, Hash, Users, Plus } from "lucide-react";
 import {
   useCoachPennyPrepared,
-  useCoachArtefacts,
+  useCoachArtifacts,
   useCoachSquad,
   useCoachLead,
   useCoachCases,
@@ -157,7 +157,7 @@ export default function CoachHomebase({
   const levelLabel = COACH_LEVEL_LABELS[coachLevel];
 
   const pennyResult    = useCoachPennyPrepared();
-  const artefactResult = useCoachArtefacts();
+  const artifactResult = useCoachArtifacts();
   const squadResult    = useCoachSquad();
   const leadResult     = useCoachLead();
   const casesResult    = useCoachCases();
@@ -207,11 +207,11 @@ export default function CoachHomebase({
           buttonVariant={pennyHasItems ? "secondary" : "primary"}
         />
 
-        {/* 4 — Artefacts */}
-        <ArtefactsCard
-          isLoading={artefactResult.isLoading}
-          artefactsState={artefactResult.data}
-          error={artefactResult.error}
+        {/* 4 — Artifacts */}
+        <ArtifactsCard
+          isLoading={artifactResult.isLoading}
+          artifactsState={artifactResult.data}
+          error={artifactResult.error}
           coachLevel={coachLevel}
         />
 

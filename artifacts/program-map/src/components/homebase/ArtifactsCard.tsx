@@ -1,23 +1,23 @@
 /**
- * ArtefactsCard
+ * ArtifactsCard
  *
- * Collapsible "Artefacts awaiting a verdict" card on the Coach Homebase.
+ * Collapsible "Artifacts awaiting a verdict" card on the Coach Homebase.
  * Always rendered (never null) — coaches need to see when work is waiting.
  *
  * Level-aware labels:
- *   assistant  → heading "Artefacts to read"       CTA "Draft →"
- *   others     → heading "Artefacts awaiting a verdict"  CTA "Issue verdict →"
+ *   assistant  → heading "Artifacts to read"       CTA "Draft →"
+ *   others     → heading "Artifacts awaiting a verdict"  CTA "Issue verdict →"
  *
  * States:
  *   loading   — spinner
- *   empty     — "No artefacts awaiting review…"
+ *   empty     — "No artifacts awaiting review…"
  *   list      — rows with learner name, type, submission age, criteria count,
  *               Penny pre-read summary, and level-appropriate CTA
  */
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, FileCheck2, Loader2, Clock } from "lucide-react";
-import type { CoachArtefact, ArtefactsState, CoachLevel } from "@/hooks/useHomebaseCoach";
+import type { CoachArtifact, ArtifactsState, CoachLevel } from "@/hooks/useHomebaseCoach";
 
 // ── Age helper ─────────────────────────────────────────────────────────────────
 
@@ -32,13 +32,13 @@ function submissionAge(dateStr: string | null): string {
   return `${days}d ago`;
 }
 
-// ── ArtefactRow ────────────────────────────────────────────────────────────────
+// ── ArtifactRow ────────────────────────────────────────────────────────────────
 
-function ArtefactRow({
-  artefact,
+function ArtifactRow({
+  artifact,
   ctaLabel,
 }: {
-  artefact: CoachArtefact;
+  artifact: CoachArtifact;
   ctaLabel: string;
 }) {
   return (
@@ -46,31 +46,31 @@ function ArtefactRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-0.5">
           <span className="inline-flex items-center rounded border border-border px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground bg-muted/40">
-            {artefact.artefactType}
+            {artifact.artifactType}
           </span>
           <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
             <Clock className="w-3 h-3" />
-            {submissionAge(artefact.submittedAt)}
+            {submissionAge(artifact.submittedAt)}
           </span>
-          {artefact.criteriaCount > 0 && (
+          {artifact.criteriaCount > 0 && (
             <span className="text-[11px] text-muted-foreground">
-              {artefact.criteriaCount} {artefact.criteriaCount === 1 ? "criterion" : "criteria"}
+              {artifact.criteriaCount} {artifact.criteriaCount === 1 ? "criterion" : "criteria"}
             </span>
           )}
         </div>
         <p className="text-sm font-semibold text-foreground leading-snug">
-          {artefact.learnerName}
+          {artifact.learnerName}
         </p>
-        {artefact.pennyPreRead && (
+        {artifact.pennyPreRead && (
           <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed line-clamp-2">
-            {artefact.pennyPreRead}
+            {artifact.pennyPreRead}
           </p>
         )}
       </div>
-      {/* Verdict CTA — disabled until artefact detail page exists (task #259) */}
+      {/* Verdict CTA — disabled until artifact detail page exists (task #259) */}
       <button
         disabled
-        title="Artefact detail page coming soon — verdict workflow pending"
+        title="Artifact detail page coming soon — verdict workflow pending"
         className="flex-shrink-0 text-sm text-muted-foreground font-medium opacity-40 cursor-not-allowed mt-0.5"
       >
         {ctaLabel}
@@ -79,25 +79,25 @@ function ArtefactRow({
   );
 }
 
-// ── ArtefactsCard (exported) ───────────────────────────────────────────────────
+// ── ArtifactsCard (exported) ───────────────────────────────────────────────────
 
-interface ArtefactsCardProps {
+interface ArtifactsCardProps {
   isLoading:     boolean;
-  artefactsState: ArtefactsState | undefined;
+  artifactsState: ArtifactsState | undefined;
   error:         Error | null;
   coachLevel:    CoachLevel;
 }
 
-export function ArtefactsCard({
+export function ArtifactsCard({
   isLoading,
-  artefactsState,
+  artifactsState,
   error,
   coachLevel,
-}: ArtefactsCardProps) {
+}: ArtifactsCardProps) {
   const [expanded, setExpanded] = useState(true);
 
-  const items   = artefactsState?.items ?? [];
-  const heading = coachLevel === "assistant" ? "Artefacts to read" : "Artefacts awaiting a verdict";
+  const items   = artifactsState?.items ?? [];
+  const heading = coachLevel === "assistant" ? "Artifacts to read" : "Artifacts awaiting a verdict";
   const ctaLabel = coachLevel === "assistant" ? "Draft →" : "Issue verdict →";
 
   return (
@@ -132,16 +132,16 @@ export function ArtefactsCard({
             </div>
           ) : error ? (
             <p className="text-sm text-muted-foreground py-4 leading-relaxed">
-              Couldn't load artefacts right now. Try refreshing the page.
+              Couldn't load artifacts right now. Try refreshing the page.
             </p>
           ) : items.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4 leading-relaxed">
-              No artefacts awaiting review — your squad's submitted work will appear here.
+              No artifacts awaiting review — your squad's submitted work will appear here.
             </p>
           ) : (
             <div>
               {items.map(a => (
-                <ArtefactRow key={a.id} artefact={a} ctaLabel={ctaLabel} />
+                <ArtifactRow key={a.id} artifact={a} ctaLabel={ctaLabel} />
               ))}
             </div>
           )}

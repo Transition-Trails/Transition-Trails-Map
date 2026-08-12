@@ -53,7 +53,7 @@ function storageKey(key: string): string {
 
 // ── Test suite ────────────────────────────────────────────────────────────────
 
-describe('useCollapsible — race condition & server-roam behaviour', () => {
+describe('useCollapsible — race condition & server-roam behavior', () => {
   let fetchSpy: ReturnType<typeof vi.spyOn>;
 
   // We must reset the module-level `serverFetchPromise` singleton between

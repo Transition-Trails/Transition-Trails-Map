@@ -434,7 +434,7 @@ describe('SubmitCaseDrawer — initialType routing', () => {
       fireEvent.click(closeButton);
       expect(onClose).toHaveBeenCalledTimes(1);
 
-      // Simulate the parent honouring the onClose callback
+      // Simulate the parent honoring the onClose callback
       rerender(
         <SubmitCaseDrawer
           open={false}

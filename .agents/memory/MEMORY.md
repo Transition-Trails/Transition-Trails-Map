@@ -1,3 +1,4 @@
+- [American English spelling](american-english.md) — all UI text, comments, and identifiers must use American English; bulk-replaced programme→program, artefact→artifact, colour→color, -ise→-ize, etc.
 - [Google SSO auth](google-sso-auth.md) — per-user Google Sign-In; groups held as set on session; 5-min group cache; Clerk fully removed (was decoration only).
 - [API auth enforcement](api-auth-enforcement.md) — default-deny; requireStaff/requireAdmin middleware; PUBLIC_PATHS allowlist; 401=unauthenticated, 403=unauthorized; AppContext default 'everyday' not 'superadmin'.
 - [Program health merge pattern](program-health-merge.md) — HEALTH data in ProgramMap.tsx merges into program data at setSelectedItem; ContextPanel gets all fields.

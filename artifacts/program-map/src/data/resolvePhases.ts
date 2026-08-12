@@ -185,10 +185,10 @@ export const resolvePhases: ResolvePhase[] = [
     confidence: "confirmed",
     sourceNote: "Confirmed against Master RESOLVE Methodology Handbook",
     purpose: "Establish governance, triage change requests, and feed what was learned back into a new Recognize cycle.",
-    executiveSummary: "Evolve is where feedback is captured and prioritised rather than patched. A new request opens a new Recognize cycle — it does not become an immediate hotfix. The deliverable is a System Evolution and Governance Log recording feedback, system root cause, and proposed resolution. Evolve terminates in a new Recognize — the methodology is a cycle, not a line.",
+    executiveSummary: "Evolve is where feedback is captured and prioritized rather than patched. A new request opens a new Recognize cycle — it does not become an immediate hotfix. The deliverable is a System Evolution and Governance Log recording feedback, system root cause, and proposed resolution. Evolve terminates in a new Recognize — the methodology is a cycle, not a line.",
     whyItMatters: "Without Evolve, unresolved feedback accumulates into compounding technical and operational debt. This phase is what separates programs that get better over time from programs that stagnate.",
     keyFacts: [
-      "Feedback is captured and prioritised — not patched",
+      "Feedback is captured and prioritized — not patched",
       "A new request opens a new Recognize cycle — it does not become an immediate hotfix",
       "Deliverable: System Evolution and Governance Log — feedback, system root cause, proposed resolution",
       "Evolve terminates in a new Recognize — the methodology is a cycle, not a line"
