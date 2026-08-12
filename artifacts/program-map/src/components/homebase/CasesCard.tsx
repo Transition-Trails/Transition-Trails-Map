@@ -77,6 +77,9 @@ export function CasesCard() {
   const load = useCallback(async () => {
     setLoading(true);
     setSfUnavailable(false);
+    // Reset on every load so a stale true from a prior call never persists
+    // when the reconnect response omits the field.
+    setFollowUpDateSupported(false);
     try {
       const [res, statusesRes] = await Promise.all([
         fetch("/api/sf/cases?status=open"),

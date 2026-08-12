@@ -178,8 +178,20 @@ describe('CasesCard — followUpDateSupported default and post-fetch state', () 
 
   // D9 ────────────────────────────────────────────────────────────────────────
   it('D9: date picker stays hidden after SF reconnect when reconnect response omits followUpDateSupported', async () => {
-    // Track how many times the main cases endpoint has been called so we can
-    // return a 401 on the first mount and good data on the second (reconnect).
+    // This test exercises the riskier reconnect path:
+    //
+    //   Phase 1 (first page load): followUpDateSupported=true → picker shown.
+    //   Phase 2 (session expires):  401 returned → sfUnavailable state.
+    //   Phase 3 (after reconnect):  cases returned but field omitted → picker
+    //                               must stay hidden, not retain the stale true
+    //                               value from Phase 1.
+    //
+    // Each phase is simulated by unmounting and remounting CasesCard (i.e. a
+    // full page reload).  The load() reset added at the top of each call
+    // guarantees followUpDateSupported is cleared to false before evaluating
+    // whatever the API returns, so a stale true can never bleed into a later
+    // call even if the component is never unmounted.
+
     let sfCasesCallCount = 0;
 
     fetchSpy = vi.spyOn(global, 'fetch').mockImplementation((url) => {
@@ -188,11 +200,20 @@ describe('CasesCard — followUpDateSupported default and post-fetch state', () 
       if (u.includes('/api/sf/cases') && !u.includes('statuses')) {
         sfCasesCallCount++;
         if (sfCasesCallCount === 1) {
-          // First mount: SF unavailable — session has been cleared
+          // Phase 1: successful load — field present and true.
+          return Promise.resolve(
+            jsonResponse({
+              cases: [CASE_FIXTURE],
+              orgBaseUrl: 'https://ex.salesforce.com',
+              followUpDateSupported: true,
+            }),
+          );
+        }
+        if (sfCasesCallCount === 2) {
+          // Phase 2: session expired — SF unavailable.
           return Promise.resolve(new Response(null, { status: 401 }));
         }
-        // Second mount (after reconnect / page reload): returns cases but
-        // deliberately omits followUpDateSupported — picker must stay hidden.
+        // Phase 3: reconnected — field deliberately omitted.
         return Promise.resolve(
           jsonResponse({
             cases: [CASE_FIXTURE],
@@ -205,23 +226,29 @@ describe('CasesCard — followUpDateSupported default and post-fetch state', () 
       return Promise.resolve(jsonResponse({ statuses: [], summary: {} }));
     });
 
-    // ── First render: SF unavailable ─────────────────────────────────────────
-    const { unmount } = render(<CasesCard />);
+    // ── Phase 1: field present → picker allowed ───────────────────────────────
+    const { unmount: unmount1 } = render(<CasesCard />);
+    await waitFor(() =>
+      expect(screen.getByText('Test Case')).toBeInTheDocument(),
+    );
+    expect(screen.getByTestId('date-picker-allowed')).toBeInTheDocument();
+    unmount1();
+
+    // ── Phase 2: session expired → SF unavailable ─────────────────────────────
+    const { unmount: unmount2 } = render(<CasesCard />);
     await waitFor(() =>
       expect(
         screen.getByText('Connect to Salesforce to see your cases.'),
       ).toBeInTheDocument(),
     );
+    unmount2();
 
-    // ── Simulate page reload that follows a successful SF reconnect ───────────
-    unmount();
+    // ── Phase 3: reconnect but field omitted → picker must stay hidden ─────────
     render(<CasesCard />);
-
     await waitFor(() =>
       expect(screen.getByText('Test Case')).toBeInTheDocument(),
     );
 
-    // The picker must remain hidden — followUpDateSupported was never set true
     expect(screen.getByTestId('date-picker-hidden')).toBeInTheDocument();
     expect(screen.queryByTestId('date-picker-allowed')).toBeNull();
   });
