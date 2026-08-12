@@ -466,6 +466,79 @@ describe('SubmitCaseDrawer — initialType routing', () => {
     },
   );
 
+  // ── T7: error-path submit → POST body omits recordTypeId / recordTypeName ────────
+
+  test(
+    'T7: record-types fetch fails → form shown with null selectedType → submit omits recordTypeId and recordTypeName',
+    async () => {
+      // Capture the JSON body sent to the submit endpoint.
+      let capturedBody: Record<string, unknown> | null = null;
+
+      global.fetch = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+        const path = typeof url === 'string' ? url : url.toString();
+
+        if (path.includes('record-types')) {
+          // Simulate a server error so the catch branch fires.
+          return new Response('Internal Server Error', { status: 500 });
+        }
+
+        if (path.includes('queues')) {
+          return new Response(
+            JSON.stringify({ queues: [] }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        }
+
+        if (path.includes('/api/cases/submit')) {
+          // Capture the request body, then return a minimal success response.
+          capturedBody = JSON.parse((init?.body as string) ?? '{}') as Record<string, unknown>;
+          return new Response(
+            JSON.stringify({ synced: true, sfCaseId: 'case-001', sfCaseNumber: '00001' }),
+            { status: 201, headers: { 'Content-Type': 'application/json' } },
+          );
+        }
+
+        return new Response('{}', { status: 200 });
+      }) as unknown as typeof fetch;
+
+      render(
+        <SubmitCaseDrawer
+          open={true}
+          onClose={() => undefined}
+          // No initialType — the catch branch sets selectedType to null.
+        />,
+      );
+
+      // Catch branch fires: record-types fetch fails → step becomes "form"
+      // with selectedType === null. Wait for the Subject field to appear.
+      await waitFor(() => {
+        expect(screen.getByLabelText(/^subject/i)).toBeInTheDocument();
+      });
+
+      // Fill in the required Subject field.
+      const subjectInput = screen.getByLabelText(/^subject/i);
+      fireEvent.change(subjectInput, { target: { value: 'Test subject on error path' } });
+
+      // Submit the form.
+      const form = document.querySelector<HTMLFormElement>('#case-form');
+      expect(form).not.toBeNull();
+      fireEvent.submit(form!);
+
+      // Wait for the POST to be made (capturedBody will be set once fetch fires).
+      await waitFor(() => {
+        expect(capturedBody).not.toBeNull();
+      });
+
+      // The POST body must NOT include recordTypeId or recordTypeName when
+      // selectedType is null (undefined values are stripped by JSON.stringify).
+      expect(capturedBody).not.toHaveProperty('recordTypeId');
+      expect(capturedBody).not.toHaveProperty('recordTypeName');
+
+      // Subject should still be present so the case is not an empty submission.
+      expect(capturedBody).toMatchObject({ subject: 'Test subject on error path' });
+    },
+  );
+
   // ── T4: never-resolving fetch → spinner visible, no type-picker, no form ──────
 
   test(
