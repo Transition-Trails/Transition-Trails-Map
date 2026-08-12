@@ -32,6 +32,7 @@ import { ActiveTasksCard }  from "@/components/homebase/ActiveTasksCard";
 import { MeetingNotesCard } from "@/components/homebase/MeetingNotesCard";
 import { CasesCard }        from "@/components/homebase/CasesCard";
 import { MyTimeCard }       from "@/components/homebase/MyTimeCard";
+import { WhatsNewCard }     from "@/components/homebase/WhatsNewCard";
 
 interface TeamHomebaseProps {
   displayName: string;
@@ -167,6 +168,9 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
             <div className="min-w-0"><MyTimeCard refreshKey={logTimeSavedAt} /></div>
           </div>
         </div>
+
+        {/* What's New — visible for all staff members */}
+        <WhatsNewCard />
 
       </div>
 

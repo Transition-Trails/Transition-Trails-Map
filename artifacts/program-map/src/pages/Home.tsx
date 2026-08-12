@@ -17,6 +17,7 @@ import {
 } from '@/data/operationalIntelligenceData';
 import { useActionItems } from '@/hooks/useActionItems';
 import { useHealthScores } from '@/hooks/useHealthScores';
+import { WhatsNewCard } from '@/components/homebase/WhatsNewCard';
 
 // ── Route maps (mirrors OperationsHub) ───────────────────────────────────────
 const REC_ID_ROUTE: Record<string, string> = {
@@ -227,6 +228,9 @@ export default function Home() {
             </button>
           </div>
         )}
+
+        {/* ── POWER+: What's New card ── */}
+        {isPowerOrAbove && <WhatsNewCard />}
 
         {/* ── POWER+: Domain Health ── */}
         {!isEveryday && (
