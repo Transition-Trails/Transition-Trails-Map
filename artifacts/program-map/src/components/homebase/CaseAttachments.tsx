@@ -130,10 +130,6 @@ export function CaseAttachments({
   // ── Screen capture ──────────────────────────────────────────────────────────
 
   const captureScreen = useCallback(async () => {
-    if (!navigator.mediaDevices?.getDisplayMedia) {
-      setErrors(["Screen capture isn't supported in this browser. Try Chrome or Edge."]);
-      return;
-    }
     setCapturing(true);
     setErrors([]);
     try {
