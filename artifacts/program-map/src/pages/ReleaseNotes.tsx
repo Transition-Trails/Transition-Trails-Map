@@ -310,6 +310,17 @@ export default function ReleaseNotes() {
               ))}
             </div>
 
+            {/* "New since your last visit" divider — only shown for releases the user hasn't seen yet */}
+            {showNewBadges && (
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-px flex-1 bg-primary/20" />
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-primary shrink-0 px-1">
+                  New since your last visit
+                </span>
+                <div className="h-px flex-1 bg-primary/20" />
+              </div>
+            )}
+
             {/* Entries grouped by kind */}
             <div className="space-y-6">
               {(["major", "minor", "fix"] as ChangeKind[]).map((kind) => {
