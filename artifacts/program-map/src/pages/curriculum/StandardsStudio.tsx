@@ -852,7 +852,11 @@ function OverviewView({
             <AlertTriangle className="w-4 h-4 text-[#A93F2F] shrink-0" />
             <div>
               <p className="text-[13px] font-bold text-foreground">Gap Report</p>
-              <p className="text-[12px] text-muted-foreground">{GAP_SUMMARY.bySeverity.high} high-severity gaps need attention</p>
+              <p className="text-[12px] text-muted-foreground">
+                {standards.length === 0
+                  ? 'Add standards to enable gap analysis'
+                  : `${GAP_SUMMARY.bySeverity.high} high-severity gaps need attention`}
+              </p>
             </div>
           </button>
         </div>
@@ -1092,6 +1096,15 @@ function ChecklistView({
 
       <ScrollArea className="flex-1">
         <div className="p-5 space-y-5">
+          {shownStandards.length === 0 && standards.length === 0 && (
+            <div className="rounded-lg border border-border bg-muted/10 px-4 py-8 text-center">
+              <ClipboardList className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+              <p className="text-[13px] font-semibold text-foreground mb-1">No standards to check against</p>
+              <p className="text-[12px] text-muted-foreground leading-relaxed max-w-[220px] mx-auto">
+                Add a standard to generate a runnable checklist of {TERMS.aiAssistant} quality checks.
+              </p>
+            </div>
+          )}
           {shownStandards.map(std => {
             const catCfg    = STANDARD_CATEGORY_CONFIG[std.category];
             const stdPass   = std.pennyChecks.filter(c => states[c.id] === 'pass').length;
@@ -1208,6 +1221,23 @@ function GapReportView({
     } else {
       onNavigate('standards', gap.standardId);
     }
+  }
+
+  // When there are no standards, the static gap records have no parent to resolve against —
+  // show an empty state rather than a list with broken "fix" navigation.
+  if (standards.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center max-w-[260px]">
+          <AlertTriangle className="w-6 h-6 text-muted-foreground/30 mx-auto mb-2" />
+          <p className="text-[13px] font-semibold text-foreground mb-1">No standards configured</p>
+          <p className="text-[12px] text-muted-foreground leading-relaxed">
+            The gap report analyses your content against active standards.
+            Add at least one standard to begin gap analysis.
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -1361,8 +1391,8 @@ export default function StandardsStudio() {
             </span>
           </div>
 
-          {/* Gap alert — only when on gap-report tab */}
-          {view === 'gap-report' && (
+          {/* Gap alert — only when on gap-report tab and standards exist */}
+          {view === 'gap-report' && standards.length > 0 && (
             <span className="flex items-center gap-1 text-[11px] font-bold text-[#A93F2F] border border-[#E8B9B4] bg-[#FBEAE6] rounded-full px-2 py-0.5">
               <AlertTriangle className="w-3 h-3" />
               {GAP_SUMMARY.bySeverity.high} high-severity
@@ -1384,7 +1414,7 @@ export default function StandardsStudio() {
           <ViewTab id="overview"   label="Overview"   icon={BookCheck}     active={view === 'overview'}   onClick={() => navigateTo('overview')} />
           <ViewTab id="standards"  label="Standards"  icon={ShieldCheck}   active={view === 'standards'}  count={standards.length} onClick={() => navigateTo('standards')} />
           <ViewTab id="checklist"  label="Checklist"  icon={ClipboardList} active={view === 'checklist'}  count={reqChecks} onClick={() => navigateTo('checklist')} />
-          <ViewTab id="gap-report" label="Gap Report" icon={AlertTriangle} active={view === 'gap-report'} count={GAP_SUMMARY.total} onClick={() => navigateTo('gap-report')} />
+          <ViewTab id="gap-report" label="Gap Report" icon={AlertTriangle} active={view === 'gap-report'} count={standards.length > 0 ? GAP_SUMMARY.total : 0} onClick={() => navigateTo('gap-report')} />
         </div>
       </div>
 
