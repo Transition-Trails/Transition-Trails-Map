@@ -11,10 +11,10 @@
  *   maxFiles    — total file cap (default 10)
  */
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import {
   Paperclip, X, Image as ImageIcon,
-  FileText, File, UploadCloud,
+  FileText, File, UploadCloud, Monitor, Loader2,
 } from "lucide-react";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -95,8 +95,9 @@ export function CaseAttachments({
   maxFiles = DEFAULT_MAX_FILES,
 }: CaseAttachmentsProps) {
   const inputRef  = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const [errors,   setErrors]   = useState<string[]>([]);
+  const [dragOver,    setDragOver]    = useState(false);
+  const [errors,      setErrors]      = useState<string[]>([]);
+  const [capturing,   setCapturing]   = useState(false);
 
   function addFiles(incoming: File[]) {
     const errs: string[] = [];
@@ -125,6 +126,59 @@ export function CaseAttachments({
     onChange(files.filter((_, i) => i !== idx));
     setErrors([]);
   }
+
+  // ── Screen capture ──────────────────────────────────────────────────────────
+
+  const captureScreen = useCallback(async () => {
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+      setErrors(["Screen capture isn't supported in this browser. Try Chrome or Edge."]);
+      return;
+    }
+    setCapturing(true);
+    setErrors([]);
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { cursor: "always" } as MediaTrackConstraints,
+      });
+
+      await new Promise<void>((resolve) => {
+        const video = document.createElement("video");
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play().then(() => {
+            // One rAF to ensure the first frame is painted
+            requestAnimationFrame(() => {
+              const canvas = document.createElement("canvas");
+              canvas.width  = video.videoWidth;
+              canvas.height = video.videoHeight;
+              canvas.getContext("2d")!.drawImage(video, 0, 0);
+              stream.getTracks().forEach(t => t.stop());
+              video.srcObject = null;
+
+              canvas.toBlob(blob => {
+                if (blob) {
+                  const ts = new Date().toISOString().slice(0, 19).replace(/[T:]/g, "-");
+                  const file = new File([blob], `screenshot-${ts}.png`, { type: "image/png" });
+                  addFiles([file]);
+                }
+                resolve();
+              }, "image/png");
+            });
+          }).catch(() => {
+            stream.getTracks().forEach(t => t.stop());
+            resolve();
+          });
+        };
+        video.onerror = () => { stream.getTracks().forEach(t => t.stop()); resolve(); };
+      });
+    } catch (err: unknown) {
+      // NotAllowedError = user cancelled — don't show an error
+      if (err instanceof DOMException && err.name === "NotAllowedError") return;
+      setErrors(["Screen capture failed. Please try again or attach a file manually."]);
+    } finally {
+      setCapturing(false);
+    }
+  }, [files]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Drop zone handlers ───────────────────────────────────────────────────────
 
@@ -157,34 +211,56 @@ export function CaseAttachments({
         )}
       </label>
 
-      {/* Drop zone */}
+      {/* Drop zone + Capture Screen row */}
       {!atLimit && (
-        <div
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onDrop={onDrop}
-          onClick={() => inputRef.current?.click()}
-          className={`relative cursor-pointer rounded-lg border-2 border-dashed px-4 py-5 flex flex-col items-center gap-1.5 transition-colors select-none ${
-            dragOver
-              ? "border-primary bg-primary/5"
-              : "border-border hover:border-primary/50 hover:bg-muted/30"
-          }`}
-        >
-          <UploadCloud className={`w-6 h-6 ${dragOver ? "text-primary" : "text-muted-foreground"}`} />
-          <p className="text-[12px] text-muted-foreground text-center">
-            <span className="font-medium text-foreground">Click to browse</span>
-            {" "}or drag files here
-          </p>
-          <p className="text-[10px] text-muted-foreground">
-            Any file type · max {formatBytes(maxBytes)} each
-          </p>
-          <input
-            ref={inputRef}
-            type="file"
-            multiple
-            className="sr-only"
-            onChange={onInputChange}
-          />
+        <div className="space-y-2">
+          <div
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
+            onClick={() => inputRef.current?.click()}
+            className={`relative cursor-pointer rounded-lg border-2 border-dashed px-4 py-5 flex flex-col items-center gap-1.5 transition-colors select-none ${
+              dragOver
+                ? "border-primary bg-primary/5"
+                : "border-border hover:border-primary/50 hover:bg-muted/30"
+            }`}
+          >
+            <UploadCloud className={`w-6 h-6 ${dragOver ? "text-primary" : "text-muted-foreground"}`} />
+            <p className="text-[12px] text-muted-foreground text-center">
+              <span className="font-medium text-foreground">Click to browse</span>
+              {" "}or drag files here
+            </p>
+            <p className="text-[10px] text-muted-foreground">
+              Any file type · max {formatBytes(maxBytes)} each
+            </p>
+            <input
+              ref={inputRef}
+              type="file"
+              multiple
+              className="sr-only"
+              onChange={onInputChange}
+            />
+          </div>
+
+          {/* Screen capture */}
+          <button
+            type="button"
+            onClick={captureScreen}
+            disabled={capturing}
+            className="w-full flex items-center justify-center gap-2 rounded-lg border border-border bg-background hover:bg-muted/40 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-2 text-[12px] font-medium text-foreground transition-colors"
+          >
+            {capturing ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                Waiting for screen selection…
+              </>
+            ) : (
+              <>
+                <Monitor className="w-3.5 h-3.5 text-muted-foreground" />
+                Capture Screen
+              </>
+            )}
+          </button>
         </div>
       )}
 
