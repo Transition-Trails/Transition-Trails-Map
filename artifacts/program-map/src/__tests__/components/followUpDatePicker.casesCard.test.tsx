@@ -175,6 +175,56 @@ describe('CasesCard — followUpDateSupported default and post-fetch state', () 
     expect(screen.getByTestId('date-picker-allowed')).toBeInTheDocument();
     expect(screen.queryByTestId('date-picker-hidden')).toBeNull();
   });
+
+  // D9 ────────────────────────────────────────────────────────────────────────
+  it('D9: date picker stays hidden after SF reconnect when reconnect response omits followUpDateSupported', async () => {
+    // Track how many times the main cases endpoint has been called so we can
+    // return a 401 on the first mount and good data on the second (reconnect).
+    let sfCasesCallCount = 0;
+
+    fetchSpy = vi.spyOn(global, 'fetch').mockImplementation((url) => {
+      const u = String(url);
+      // Main cases list endpoint only — exclude /statuses and unrelated paths
+      if (u.includes('/api/sf/cases') && !u.includes('statuses')) {
+        sfCasesCallCount++;
+        if (sfCasesCallCount === 1) {
+          // First mount: SF unavailable — session has been cleared
+          return Promise.resolve(new Response(null, { status: 401 }));
+        }
+        // Second mount (after reconnect / page reload): returns cases but
+        // deliberately omits followUpDateSupported — picker must stay hidden.
+        return Promise.resolve(
+          jsonResponse({
+            cases: [CASE_FIXTURE],
+            orgBaseUrl: 'https://ex.salesforce.com',
+            // followUpDateSupported intentionally omitted
+          }),
+        );
+      }
+      // statuses + time-log summary — non-critical, return empty-but-ok
+      return Promise.resolve(jsonResponse({ statuses: [], summary: {} }));
+    });
+
+    // ── First render: SF unavailable ─────────────────────────────────────────
+    const { unmount } = render(<CasesCard />);
+    await waitFor(() =>
+      expect(
+        screen.getByText('Connect to Salesforce to see your cases.'),
+      ).toBeInTheDocument(),
+    );
+
+    // ── Simulate page reload that follows a successful SF reconnect ───────────
+    unmount();
+    render(<CasesCard />);
+
+    await waitFor(() =>
+      expect(screen.getByText('Test Case')).toBeInTheDocument(),
+    );
+
+    // The picker must remain hidden — followUpDateSupported was never set true
+    expect(screen.getByTestId('date-picker-hidden')).toBeInTheDocument();
+    expect(screen.queryByTestId('date-picker-allowed')).toBeNull();
+  });
 });
 
 // ── CasesPage tests ───────────────────────────────────────────────────────────
