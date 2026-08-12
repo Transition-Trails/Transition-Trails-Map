@@ -11,22 +11,29 @@
  *      with is whatever the enclosing HomebaseShell received from auth, not
  *      something hard-coded in ReleaseNotes itself.
  *
+ *   3. For homebase audience users (learner / coach / volunteer / team-as-homebase),
+ *      clicking "Take the tour" opens the overlay IN-PLACE — no URL navigation
+ *      happens (no pushState / popstate dispatch).
+ *
  * Test matrix:
  *
  *  T1. HomebaseTour audience="team"      → first step "Welcome to your Homebase"
  *  T2. HomebaseTour audience="coach"     → first step "Welcome, Coach"
  *  T3. HomebaseTour audience="learner"   → first step "Welcome to your Homebase"
  *  T4. HomebaseTour audience="volunteer" → first step "Welcome, Volunteer"
- *  T5. ReleaseNotes "Take the tour" button → calls startTour()
- *  T6. ReleaseNotes "Take the tour" button → navigates toward /homebase
+ *  T1b. open=false → no tour content rendered
+ *  T5. ReleaseNotes "Take the tour" (staff, non-homebase)  → calls startTour()
+ *  T6. ReleaseNotes "Take the tour" (staff, non-homebase)  → navigates toward /homebase
+ *  T7. ReleaseNotes "Take the tour" (homebase audience)    → overlay visible, NO URL change
  *
  * @vitest-environment jsdom
  */
 
 import '@testing-library/jest-dom';
-import React from 'react';
+import React, { useState } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
+import type { HomebaseAudience } from '@/hooks/useHomebaseAuth';
 
 // ── Stub framer-motion so AnimatePresence renders children immediately ─────────
 vi.mock('framer-motion', () => {
@@ -41,17 +48,32 @@ vi.mock('framer-motion', () => {
   };
 });
 
+// ── Configurable audience mock (controls isHombaseAudience in ReleaseNotes) ───
+
+let _mockAudience: HomebaseAudience | null = null;
+
+vi.mock('@/hooks/useHomebaseAuth', () => ({
+  useHomebaseAuth: () => ({
+    isLoading:   false,
+    isSignedIn:  _mockAudience !== null,
+    audience:    _mockAudience,
+    email:       _mockAudience ? 'test@example.com' : null,
+    displayName: _mockAudience ? 'Test User' : null,
+    coachLevel:  null,
+  }),
+}));
+
 // ── Stub hooks that make network calls ────────────────────────────────────────
 
 const mockStartTour = vi.fn();
 
 vi.mock('@/hooks/useHomebaseTour', () => ({
   useHomebaseTour: () => ({
-    isReady:        true,
-    tourActive:     false,
+    isReady:         true,
+    tourActive:      false,
     shouldAutoStart: false,
-    startTour:      mockStartTour,
-    completeTour:   vi.fn(),
+    startTour:       mockStartTour,
+    completeTour:    vi.fn(),
   }),
 }));
 
@@ -114,6 +136,9 @@ describe('HomebaseTour — audience-specific first step', () => {
         open={true}
         onComplete={vi.fn()}
         audience="team"
+        seenStepKeysAtOpen={new Set()}
+        onMarkStepSeen={vi.fn()}
+        onShowAllSteps={vi.fn()}
       />,
     );
 
@@ -129,6 +154,9 @@ describe('HomebaseTour — audience-specific first step', () => {
         open={true}
         onComplete={vi.fn()}
         audience="coach"
+        seenStepKeysAtOpen={new Set()}
+        onMarkStepSeen={vi.fn()}
+        onShowAllSteps={vi.fn()}
       />,
     );
 
@@ -144,6 +172,9 @@ describe('HomebaseTour — audience-specific first step', () => {
         open={true}
         onComplete={vi.fn()}
         audience="learner"
+        seenStepKeysAtOpen={new Set()}
+        onMarkStepSeen={vi.fn()}
+        onShowAllSteps={vi.fn()}
       />,
     );
 
@@ -159,6 +190,9 @@ describe('HomebaseTour — audience-specific first step', () => {
         open={true}
         onComplete={vi.fn()}
         audience="volunteer"
+        seenStepKeysAtOpen={new Set()}
+        onMarkStepSeen={vi.fn()}
+        onShowAllSteps={vi.fn()}
       />,
     );
 
@@ -174,6 +208,9 @@ describe('HomebaseTour — audience-specific first step', () => {
         open={false}
         onComplete={vi.fn()}
         audience="team"
+        seenStepKeysAtOpen={new Set()}
+        onMarkStepSeen={vi.fn()}
+        onShowAllSteps={vi.fn()}
       />,
     );
 
@@ -182,9 +219,9 @@ describe('HomebaseTour — audience-specific first step', () => {
   });
 });
 
-// ── ReleaseNotes replay button ─────────────────────────────────────────────────
+// ── ReleaseNotes replay button — staff (non-homebase) path ────────────────────
 
-describe('ReleaseNotes — tour replay button', () => {
+describe('ReleaseNotes — tour replay button (staff / non-homebase)', () => {
   let origPushState: typeof window.history.pushState;
   let origDispatch: typeof window.dispatchEvent;
   const navigatedPaths: string[] = [];
@@ -192,6 +229,7 @@ describe('ReleaseNotes — tour replay button', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     navigatedPaths.length = 0;
+    _mockAudience = null; // staff: no homebase audience
 
     origPushState = window.history.pushState.bind(window.history);
     origDispatch  = window.dispatchEvent.bind(window);
@@ -233,4 +271,92 @@ describe('ReleaseNotes — tour replay button', () => {
     // and the already-mounted HomebaseTour (with the correct audience) can open.
     expect(navigatedPaths).toContain('/homebase');
   });
+});
+
+// ── ReleaseNotes replay button — homebase audience path ───────────────────────
+
+describe('ReleaseNotes — tour replay button (homebase audience: learner)', () => {
+  /**
+   * Wrapper that wires ReleaseNotes + HomebaseTour together exactly as
+   * HomebaseShell does at runtime:
+   *
+   *   - mockStartTour is replaced with an implementation that flips tourActive
+   *     state, so clicking "Take the tour" in ReleaseNotes causes HomebaseTour
+   *     to mount with open=true.
+   *   - Both components share the same React tree, so DOM assertions work.
+   */
+  function HomebaseWrapper({ audience }: { audience: HomebaseAudience }) {
+    const [tourActive, setTourActive] = useState(false);
+
+    // Wire the shared mock so startTour() opens the overlay in this tree.
+    mockStartTour.mockImplementation(() => setTourActive(true));
+
+    return (
+      <>
+        <ReleaseNotes />
+        <HomebaseTour
+          open={tourActive}
+          onComplete={() => setTourActive(false)}
+          audience={audience}
+          seenStepKeysAtOpen={new Set()}
+          onMarkStepSeen={vi.fn()}
+          onShowAllSteps={vi.fn()}
+        />
+      </>
+    );
+  }
+
+  let origPushState: typeof window.history.pushState;
+  let origDispatch: typeof window.dispatchEvent;
+  const navigatedPaths: string[] = [];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    navigatedPaths.length = 0;
+    _mockAudience = 'learner'; // homebase audience
+
+    origPushState = window.history.pushState.bind(window.history);
+    origDispatch  = window.dispatchEvent.bind(window);
+
+    window.history.pushState = vi.fn((_state, _title, url) => {
+      if (typeof url === 'string') navigatedPaths.push(url);
+    });
+    window.dispatchEvent = vi.fn();
+  });
+
+  afterEach(() => {
+    window.history.pushState = origPushState;
+    window.dispatchEvent     = origDispatch;
+    vi.clearAllMocks();
+  });
+
+  // ── T7 ────────────────────────────────────────────────────────────────────────
+
+  test(
+    'T7: homebase audience user clicks "Take the tour" → overlay visible, no URL change',
+    () => {
+      render(<HomebaseWrapper audience="learner" />);
+
+      // Tour overlay must NOT be visible before the button is clicked.
+      expect(
+        screen.queryByRole('heading', { name: FIRST_STEP_TITLES.learner }),
+      ).not.toBeInTheDocument();
+
+      const btn = screen.getByRole('button', { name: /take the tour/i });
+      fireEvent.click(btn);
+
+      // startTour() must have been called (triggers the overlay).
+      expect(mockStartTour).toHaveBeenCalledTimes(1);
+
+      // The tour overlay must now be visible in-place.
+      expect(
+        screen.getByRole('heading', { name: FIRST_STEP_TITLES.learner }),
+      ).toBeInTheDocument();
+
+      // No navigation must have occurred — homebase audience users are already
+      // inside HomebaseShell; redirecting to /homebase would cause a flash.
+      expect(navigatedPaths).toHaveLength(0);
+      expect(window.dispatchEvent).not.toHaveBeenCalled();
+    },
+  );
 });
