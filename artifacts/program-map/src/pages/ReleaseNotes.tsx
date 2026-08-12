@@ -5,6 +5,7 @@ import { useSeenVersion } from "@/hooks/useSeenVersion";
 import { APP_VERSION } from "@/config/version";
 import { SubmitCaseDrawer } from "@/components/homebase/SubmitCaseDrawer";
 import { useHomebaseTour } from "@/hooks/useHomebaseTour";
+import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
 import { RELEASES, type ChangeKind, type ReleaseEntry, type Release } from "@/data/releaseData";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -83,6 +84,8 @@ export default function ReleaseNotes() {
   const [selectedVersion,  setSelectedVersion]  = useState<string>(RELEASES[0].version);
   const [showSubmitCase,   setShowSubmitCase]   = useState(false);
   const { startTour } = useHomebaseTour();
+  const { audience } = useHomebaseAuth();
+  const isHombaseAudience = audience !== null;
   const release = RELEASES.find((r) => r.version === selectedVersion) ?? RELEASES[0];
 
   const { lastSeenVersion, markSeen, isReady } = useSeenVersion();
@@ -133,8 +136,14 @@ export default function ReleaseNotes() {
               type="button"
               onClick={() => {
                 startTour();
-                window.history.pushState({}, "", "/homebase");
-                window.dispatchEvent(new PopStateEvent("popstate"));
+                // Homebase audience users are already inside HomebaseShell, which
+                // mounts HomebaseTour. Navigating to /homebase would cause a
+                // redirect flash. Staff (non-audience) still need the navigation
+                // because their tour renders inside TeamHomebase's HomebaseShell.
+                if (!isHombaseAudience) {
+                  window.history.pushState({}, "", "/homebase");
+                  window.dispatchEvent(new PopStateEvent("popstate"));
+                }
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted/60 text-[12px] font-medium text-foreground transition-colors"
             >
