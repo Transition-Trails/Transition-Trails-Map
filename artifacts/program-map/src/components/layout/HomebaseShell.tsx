@@ -365,27 +365,30 @@ function PennyBar({ displayName }: { displayName: string }) {
         <Send className="w-3.5 h-3.5" />
       </button>
 
-      {/* What's New release-notes indicator — only visible when there's an unseen release */}
-      {hasUnseenRelease && (
-        <a
-          href="/release-notes"
-          onClick={(e) => {
-            e.preventDefault();
-            markSeen();
-            window.history.pushState({}, "", "/release-notes");
-            window.dispatchEvent(new PopStateEvent("popstate"));
-          }}
-          title={`What's new in Trail OS v${APP_VERSION}`}
-          className="flex-shrink-0 flex items-center gap-1.5 pl-3 border-l border-border text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
-        >
+      {/* Release Notes — always visible; pulsing dot when there's an unseen release */}
+      <a
+        href="/release-notes"
+        onClick={(e) => {
+          e.preventDefault();
+          markSeen();
+          window.history.pushState({}, "", "/release-notes");
+          window.dispatchEvent(new PopStateEvent("popstate"));
+        }}
+        title={`Trail OS v${APP_VERSION} — Release notes`}
+        className="flex-shrink-0 flex items-center gap-1.5 pl-3 border-l border-border text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {hasUnseenRelease ? (
           <span className="relative flex h-2 w-2 flex-shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
           </span>
-          <Tag className="w-3 h-3" />
-          What&apos;s new
-        </a>
-      )}
+        ) : (
+          <Tag className="w-3 h-3 text-muted-foreground/60" />
+        )}
+        <span className="hidden sm:inline">
+          {hasUnseenRelease ? <span className="text-primary">What&apos;s new</span> : `v${APP_VERSION}`}
+        </span>
+      </a>
     </div>
   );
 }
