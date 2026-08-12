@@ -14,7 +14,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import {
   Paperclip, X, Image as ImageIcon,
-  FileText, File, UploadCloud, Monitor, Loader2,
+  FileText, File as FileIcon, UploadCloud, Monitor, Loader2,
 } from "lucide-react";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ function formatBytes(n: number): string {
 function fileIcon(type: string) {
   if (type.startsWith("image/")) return <ImageIcon className="w-3.5 h-3.5" />;
   if (type === "application/pdf") return <FileText className="w-3.5 h-3.5" />;
-  return <File className="w-3.5 h-3.5" />;
+  return <FileIcon className="w-3.5 h-3.5" />;
 }
 
 // ── FilePreview ────────────────────────────────────────────────────────────────
@@ -134,8 +134,9 @@ export function CaseAttachments({
     setErrors([]);
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { cursor: "always" } as MediaTrackConstraints,
-      });
+        video: { displaySurface: "browser" } as MediaTrackConstraints,
+        audio: false,
+      } as DisplayMediaStreamOptions);
 
       await new Promise<void>((resolve) => {
         const video = document.createElement("video");
