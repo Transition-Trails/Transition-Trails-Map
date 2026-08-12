@@ -23,7 +23,8 @@ import {
 } from "lucide-react";
 import { useToast }             from "@/hooks/use-toast";
 import { CaseRichTextEditor, htmlToPlainText } from "./CaseRichTextEditor";
-import { CaseAttachments, fileToBase64 }       from "./CaseAttachments";
+import { CaseAttachments }                      from "./CaseAttachments";
+import { fileToBase64 }                         from "@/lib/fileUtils";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
