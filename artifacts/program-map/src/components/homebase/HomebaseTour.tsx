@@ -208,6 +208,29 @@ export function HomebaseTour({ open, onComplete, audience }: HomebaseTourProps) 
   );
 }
 
+// ── Shared steps (declared before STEPS_BY_AUDIENCE to avoid TDZ errors) ─────
+
+const SHARED_WORKSPACE: TourStep = {
+  icon:  LayoutGrid,
+  color: "bg-sky-100 text-sky-600",
+  title: "Your workspace drawer",
+  body:  "The left panel gives you quick access to Google Workspace apps, collaboration tools, and your program links — all in one click.",
+};
+
+const SHARED_SLACK: TourStep = {
+  icon:  MessageSquare,
+  color: "bg-rose-100 text-rose-600",
+  title: "Team channels",
+  body:  "The Slack panel on the right keeps you connected to your team channels. Click the arrow icon to expand it at any time.",
+};
+
+const SHARED_RELEASE_NOTES: TourStep = {
+  icon:  Tag,
+  color: "bg-indigo-100 text-indigo-600",
+  title: "Stay up to date",
+  body:  "Whenever Trail OS is updated, a pulsing dot appears next to the version number in the top bar. Click it to read the release notes — and replay this tour any time from that page.",
+};
+
 const STEPS_BY_AUDIENCE: Record<HomebaseAudience, TourStep[]> = {
 
   // Staff / team — the full operational tour (original 7 steps, unchanged).
@@ -349,25 +372,4 @@ const STEPS_BY_AUDIENCE: Record<HomebaseAudience, TourStep[]> = {
     SHARED_SLACK,
     SHARED_RELEASE_NOTES,
   ],
-};
-
-const SHARED_WORKSPACE: TourStep = {
-  icon:  LayoutGrid,
-  color: "bg-sky-100 text-sky-600",
-  title: "Your workspace drawer",
-  body:  "The left panel gives you quick access to Google Workspace apps, collaboration tools, and your program links — all in one click.",
-};
-
-const SHARED_SLACK: TourStep = {
-  icon:  MessageSquare,
-  color: "bg-rose-100 text-rose-600",
-  title: "Team channels",
-  body:  "The Slack panel on the right keeps you connected to your team channels. Click the arrow icon to expand it at any time.",
-};
-
-const SHARED_RELEASE_NOTES: TourStep = {
-  icon:  Tag,
-  color: "bg-indigo-100 text-indigo-600",
-  title: "Stay up to date",
-  body:  "Whenever Trail OS is updated, a pulsing dot appears next to the version number in the top bar. Click it to read the release notes — and replay this tour any time from that page.",
 };

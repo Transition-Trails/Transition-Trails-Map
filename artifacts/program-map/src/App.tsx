@@ -584,6 +584,25 @@ function InnerApp() {
         )}
       </Route>
 
+      {/* /release-notes — audience-aware.
+           Homebase audiences (learner / coach / volunteer / team) see the page
+           inside their HomebaseShell so the tour overlay mounts correctly and
+           the "Take the tour" replay button uses the right audience-specific steps.
+           Staff (no audience) see the page inside AppShell as before. */}
+      <Route path="/release-notes">
+        {auth.isSignedIn ? (
+          auth.user?.audience ? (
+            <HomebaseShell audience={auth.user.audience} displayName={auth.user?.name ?? ""}>
+              <ReleaseNotes />
+            </HomebaseShell>
+          ) : (
+            <AppShell><ReleaseNotes /></AppShell>
+          )
+        ) : (
+          <SignInPage />
+        )}
+      </Route>
+
       {/* /homebase — entry point for team audience, staff, and superadmins.
            All signed-in staff (audience or no audience) land here instead of
            Mission Control so Homebase is the default workspace for everyone. */}
