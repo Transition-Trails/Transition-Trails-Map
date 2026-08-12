@@ -306,4 +306,32 @@ describe('SubmitCaseDrawer — initialType routing', () => {
       expect(screen.queryByText(FORM_SUBJECT_LABEL)).not.toBeInTheDocument();
     },
   );
+
+  // ── T4: never-resolving fetch → spinner visible, no type-picker, no form ──────
+
+  test(
+    'T4: slow fetch that never resolves → "Loading case types…" spinner is shown; type-picker and form are absent',
+    async () => {
+      // A fetch that never resolves, freezing the drawer in the loading state
+      global.fetch = vi.fn(() => new Promise(() => undefined)) as unknown as typeof fetch;
+
+      render(
+        <SubmitCaseDrawer
+          open={true}
+          onClose={() => undefined}
+        />,
+      );
+
+      // The loading spinner must appear once the useEffect fires
+      await waitFor(() => {
+        expect(screen.getByText(/loading case types…/i)).toBeInTheDocument();
+      });
+
+      // The type-picker instruction text must NOT be visible while loading
+      expect(screen.queryByText(TYPE_PICKER_TEXT)).not.toBeInTheDocument();
+
+      // The form's Subject label must NOT be visible while loading
+      expect(screen.queryByText(FORM_SUBJECT_LABEL)).not.toBeInTheDocument();
+    },
+  );
 });
