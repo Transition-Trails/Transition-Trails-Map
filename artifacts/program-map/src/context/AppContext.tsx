@@ -85,6 +85,8 @@ interface AppState {
   setCalendarPanelOpen: (v: boolean) => void;
   gmailPanelOpen: boolean;
   setGmailPanelOpen: (v: boolean) => void;
+  helpPanelOpen: boolean;
+  setHelpPanelOpen: (v: boolean) => void;
   pendingPennyQuery: string | null;
   setPendingPennyQuery: (q: string | null) => void;
   logTimeOpen:    boolean;
@@ -204,6 +206,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [askPennyOpen, setAskPennyOpen]             = useState(false);
   const [calendarPanelOpen, setCalendarPanelOpen]   = useState(false);
   const [gmailPanelOpen,    setGmailPanelOpen]      = useState(false);
+  const [helpPanelOpen,     setHelpPanelOpen]       = useState(false);
   const [pendingPennyQuery, setPendingPennyQuery]   = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [logTimeOpen,    setLogTimeOpen]    = useState(false);
@@ -351,6 +354,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       askPennyOpen, setAskPennyOpen,
       calendarPanelOpen, setCalendarPanelOpen,
       gmailPanelOpen, setGmailPanelOpen,
+      helpPanelOpen, setHelpPanelOpen,
       pendingPennyQuery, setPendingPennyQuery,
       mobileSidebarOpen, setMobileSidebarOpen,
       logTimeOpen, logTimePrefill, openLogTime, closeLogTime,

@@ -55,6 +55,8 @@ import { useSeenVersion } from "@/hooks/useSeenVersion";
 import { APP_VERSION } from "@/config/version";
 import { useHomebaseTour } from "@/hooks/useHomebaseTour";
 import { HomebaseTour } from "@/components/homebase/HomebaseTour";
+import { HelpPanel } from "@/components/layout/HelpPanel";
+import { useAppContext } from "@/context/AppContext";
 
 // ── Google Workspace app links ─────────────────────────────────────────────────
 
@@ -329,6 +331,7 @@ function PennyBar({ displayName }: { displayName: string }) {
   const [query, setQuery]     = useState("");
   const [sending, setSending] = useState(false);
   const { hasUnseenRelease, markSeen } = useSeenVersion();
+  const { helpPanelOpen, setHelpPanelOpen } = useAppContext();
 
   const handleSend = useCallback(async () => {
     if (!query.trim() || sending) return;
@@ -365,6 +368,20 @@ function PennyBar({ displayName }: { displayName: string }) {
         aria-label="Send"
       >
         <Send className="w-3.5 h-3.5" />
+      </button>
+
+      {/* Help guide toggle */}
+      <button
+        onClick={() => setHelpPanelOpen(!helpPanelOpen)}
+        title="Help guide — Salesforce Knowledge articles"
+        className={`flex-shrink-0 flex items-center gap-1.5 pl-3 border-l border-border text-[11px] font-medium transition-colors ${
+          helpPanelOpen
+            ? 'text-[#CC8400]'
+            : 'text-muted-foreground hover:text-foreground'
+        }`}
+      >
+        <BookOpen className="w-3.5 h-3.5" />
+        <span className="hidden sm:inline">Help</span>
       </button>
 
       {/* Release Notes — always visible; pulsing dot when there's an unseen release */}
@@ -480,6 +497,9 @@ export function HomebaseShell({
         onMarkStepSeen={markStepSeen}
         onShowAllSteps={showAllSteps}
       />
+
+      {/* Help panel — same component as AppShell; state lives in AppContext */}
+      <HelpPanel />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { CommandPalette } from '../CommandPalette';
 import { AskPennyPanel } from './AskPennyPanel';
 import { CalendarActionPanel } from './CalendarActionPanel';
 import { GmailActionPanel } from './GmailActionPanel';
+import { HelpPanel } from './HelpPanel';
 import { RailActionPanel } from '@/components/workspace/RailActionPanel';
 import { useAppContext } from '@/context/AppContext';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -57,6 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <AskPennyPanel />
       <CalendarActionPanel />
       <GmailActionPanel />
+      <HelpPanel />
       <GlobalActionPanel />
     </div>
   );

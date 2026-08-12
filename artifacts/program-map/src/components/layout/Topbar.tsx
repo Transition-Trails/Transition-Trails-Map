@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useGoogleAuth, useSignOut } from '@/hooks/useGoogleAuth';
-import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity, Mail } from 'lucide-react';
+import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity, Mail, BookOpen } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -398,6 +398,7 @@ export function Topbar() {
     askPennyOpen, setAskPennyOpen,
     calendarPanelOpen, setCalendarPanelOpen,
     gmailPanelOpen, setGmailPanelOpen,
+    helpPanelOpen, setHelpPanelOpen,
     mobileSidebarOpen, setMobileSidebarOpen,
   } = useAppContext();
 
@@ -441,6 +442,8 @@ export function Topbar() {
             } else {
               setAskPennyOpen(true);
               setCalendarPanelOpen(false);
+              setGmailPanelOpen(false);
+              setHelpPanelOpen(false);
             }
           }}
           title={`Ask ${TERMS.aiAssistant} (AI guide)`}
@@ -463,6 +466,7 @@ export function Topbar() {
               setCalendarPanelOpen(true);
               setAskPennyOpen(false);
               setGmailPanelOpen(false);
+              setHelpPanelOpen(false);
             }
           }}
           title={`Calendar — upcoming events & ${TERMS.aiAssistant} prep briefs`}
@@ -485,6 +489,7 @@ export function Topbar() {
               setGmailPanelOpen(true);
               setAskPennyOpen(false);
               setCalendarPanelOpen(false);
+              setHelpPanelOpen(false);
             }
           }}
           title={`Mail — inbox & ${TERMS.aiAssistant} draft assist`}
@@ -507,6 +512,29 @@ export function Topbar() {
         >
           <Layers className="w-3 h-3 flex-shrink-0" />
           <span className="hidden sm:inline">Insights</span>
+        </button>
+
+        {/* Help guide panel toggle */}
+        <button
+          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-colors whitespace-nowrap ${
+            helpPanelOpen
+              ? 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400] hover:bg-[#FFF3E0]'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#FFF3E0] hover:border-[#FFD08A] hover:text-[#CC8400]'
+          }`}
+          onClick={() => {
+            if (helpPanelOpen) {
+              setHelpPanelOpen(false);
+            } else {
+              setHelpPanelOpen(true);
+              setAskPennyOpen(false);
+              setCalendarPanelOpen(false);
+              setGmailPanelOpen(false);
+            }
+          }}
+          title="Help guide — Salesforce Knowledge articles"
+        >
+          <BookOpen className="w-3 h-3 flex-shrink-0" />
+          <span className="hidden sm:inline">{helpPanelOpen ? 'Close' : 'Help'}</span>
         </button>
 
         <Button
