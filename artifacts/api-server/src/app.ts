@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
@@ -7,6 +7,7 @@ import passport from "passport";
 import router from "./routes";
 import { logger } from "./lib/logger";
 import { pool } from "@workspace/db";
+import { reportBuildError } from "./lib/buildErrorReporter.js";
 
 const SESSION_SECRET = process.env["SESSION_SECRET"];
 if (!SESSION_SECRET) {
@@ -71,5 +72,25 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+// ── Global error handler ──────────────────────────────────────────────────────
+//
+// Catches unhandled errors that escape all route and middleware handlers.
+// Uses `reportBuildError` — the same centralized logging path available to
+// any route that catches an error locally — so both locally-caught errors
+// (via reportBuildError) and unhandled errors (via this handler) go through
+// the same classification + case-creation pipeline.
+//
+// IMPORTANT: the response body uses a stable generic message so that internal
+// error details (DB schema, connector diagnostics, env-var names) are never
+// disclosed to API callers.  Full details remain in the server log only.
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  reportBuildError(err, 'Unhandled API error');
+
+  // Return a generic message — never expose internal error details to callers.
+  res.status(500).json({ error: 'Internal server error' });
+});
 
 export default app;

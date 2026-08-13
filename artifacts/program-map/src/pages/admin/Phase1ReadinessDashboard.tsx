@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { TERMS } from '@/config/terminology';
+import { BuildErrorsCard } from '@/components/admin/BuildErrorsCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Network, Puzzle, Shield, BookOpen, Brain, Activity, Target,
@@ -537,6 +538,12 @@ export default function Phase1ReadinessDashboard() {
             </div>
 
           </div>
+        </div>
+
+        {/* ── Build Errors ─────────────────────────────────────────── */}
+        <div>
+          <p className="text-[14px] font-bold text-muted-foreground/60 mb-3">System Health</p>
+          <BuildErrorsCard />
         </div>
 
         {/* Footer note */}

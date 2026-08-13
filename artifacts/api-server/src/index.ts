@@ -1,6 +1,60 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { patchLoggerForBuildErrors } from "./lib/buildErrorReporter.js";
 import { pool } from "@workspace/db";
+
+// Patch logger.error BEFORE any routes or background tasks run.
+// After this point, every logger.error({ err: ... }) call anywhere in the process
+// automatically triggers build-error case creation for qualifying errors.
+patchLoggerForBuildErrors();
+
+/**
+ * Ensure the build_error_logs table exists.
+ *
+ * Uses raw SQL (not drizzle-kit push) so it runs idempotently at startup
+ * without requiring an interactive TTY.  ADD COLUMN IF NOT EXISTS guards
+ * against columns that were added in later schema versions.
+ */
+async function ensureBuildErrorLogsTable(): Promise<void> {
+  // Create table if it does not yet exist (idempotent across deployments).
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS "build_error_logs" (
+      "id"              serial        PRIMARY KEY,
+      "fingerprint"     text          NOT NULL,
+      "dedup_key"       text          NOT NULL DEFAULT '',
+      "error_name"      text          NOT NULL,
+      "error_message"   text          NOT NULL,
+      "stack_trace"     text,
+      "sf_case_id"      text,
+      "sf_case_number"  text,
+      "sf_org_base_url" text,
+      "resolution_plan" text,
+      "resolved_at"     timestamp,
+      "created_at"      timestamp     NOT NULL DEFAULT NOW()
+    );
+  `);
+  // Belt-and-suspenders: add any column that may be missing from older deployments.
+  await pool.query(`
+    ALTER TABLE "build_error_logs"
+      ADD COLUMN IF NOT EXISTS "dedup_key"       text NOT NULL DEFAULT '',
+      ADD COLUMN IF NOT EXISTS "sf_org_base_url" text,
+      ADD COLUMN IF NOT EXISTS "resolution_plan"  text,
+      ADD COLUMN IF NOT EXISTS "resolved_at"      timestamp;
+  `);
+  // Add the unique dedup constraint if not already present.
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'build_error_logs_dedup_key_unique'
+      ) THEN
+        ALTER TABLE "build_error_logs"
+          ADD CONSTRAINT "build_error_logs_dedup_key_unique" UNIQUE ("dedup_key");
+      END IF;
+    END$$;
+  `);
+}
 
 async function ensureSessionTable(): Promise<void> {
   await pool.query(`
@@ -40,7 +94,7 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-ensureSessionTable()
+Promise.all([ensureSessionTable(), ensureBuildErrorLogsTable()])
   .then(() => {
     app.listen(port, (err) => {
       if (err) {
@@ -51,6 +105,6 @@ ensureSessionTable()
     });
   })
   .catch((err) => {
-    logger.error({ err }, "Failed to ensure session table — aborting startup");
+    logger.error({ err }, "Failed to ensure required tables — aborting startup");
     process.exit(1);
   });
