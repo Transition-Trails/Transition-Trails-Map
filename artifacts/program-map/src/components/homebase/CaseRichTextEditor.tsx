@@ -53,6 +53,9 @@ interface CaseRichTextEditorProps {
   onImageCapture:  (file: File) => void;
   placeholder?:    string;
   disabled?:       boolean;
+  /** Seed the editor with this HTML when it mounts (or when this value changes).
+   *  The user can freely edit after seeding — changes are tracked via onChange. */
+  initialContent?: string;
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
@@ -61,6 +64,7 @@ export function CaseRichTextEditor({
   onChange, onImageCapture,
   placeholder = "Describe the issue, steps to reproduce, or any relevant context…",
   disabled = false,
+  initialContent,
 }: CaseRichTextEditorProps) {
 
   const editor = useEditor({
@@ -75,6 +79,8 @@ export function CaseRichTextEditor({
       Underline,
       Placeholder.configure({ placeholder }),
     ],
+    // Seed from initialContent when the editor first mounts.
+    content:  initialContent ?? "",
     editable: !disabled,
     onUpdate({ editor }) {
       onChange(editor.getHTML());
@@ -101,9 +107,24 @@ export function CaseRichTextEditor({
   });
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor) return undefined;
     editor.setEditable(!disabled);
+    return undefined;
   }, [disabled, editor]);
+
+  // Sync initialContent into the editor if the prop arrives or changes after
+  // mount (e.g. when the parent re-opens with a new seed).
+  // setContent(html, false) triggers onUpdate so the parent's onChange state
+  // stays in sync; false = do not emit a history record (keeps undo clean).
+  // Sync initialContent into the editor whenever the prop changes (including
+  // when it becomes undefined/empty — so the editor resets cleanly on re-open
+  // without pre-fill, preventing stale release-note text showing through).
+  // setContent triggers onUpdate, keeping the parent's onChange state in sync.
+  useEffect(() => {
+    if (!editor) return undefined;
+    editor.commands.setContent(initialContent ?? "");
+    return undefined;
+  }, [editor, initialContent]);
 
   if (!editor) return null;
 

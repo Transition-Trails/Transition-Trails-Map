@@ -54,6 +54,10 @@ export interface SubmitCaseDrawerProps {
   /** Pre-select a record type by name (case-insensitive). Falls back to the
    *  type-picker screen if the name doesn't match any type in the org. */
   initialType?:  string;
+  /** Pre-fill the Subject field when the drawer opens. */
+  initialSubject?: string;
+  /** Pre-fill the Description field (HTML) when the drawer opens. */
+  initialDescription?: string;
 }
 
 type Step      = "type" | "form" | "result";
@@ -211,7 +215,7 @@ export function AttachProgressRow({ progress }: { progress: AttachProgress }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType }: SubmitCaseDrawerProps) {
+export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, initialSubject, initialDescription }: SubmitCaseDrawerProps) {
   const { toast } = useToast();
 
   // ── Steps
@@ -256,6 +260,10 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType }: Su
 
   useEffect(() => {
     if (!open) return;
+    // Always seed both fields so opening without pre-fill values explicitly
+    // resets them to empty (reliable for any caller, not just the flag path).
+    setSubject(initialSubject ?? "");
+    setDescHtml(initialDescription ?? "");
     setTypesLoading(true);
     fetch("/api/sf/cases/record-types")
       .then(r => r.ok ? r.json() as Promise<{ recordTypes: RecordType[] }> : Promise.reject())
@@ -532,6 +540,7 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType }: Su
                 <CaseRichTextEditor
                   onChange={setDescHtml}
                   onImageCapture={handleImageCapture}
+                  initialContent={initialDescription}
                 />
                 <p className="text-[11px] text-muted-foreground">
                   Paste a screenshot here and it will be added as an attachment below.

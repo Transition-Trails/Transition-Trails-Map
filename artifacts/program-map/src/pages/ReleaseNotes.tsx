@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tag, Wrench, Sparkles, ArrowUpCircle, ChevronRight, MessageSquarePlus, PlayCircle } from "lucide-react";
+import { Tag, Wrench, Sparkles, ArrowUpCircle, ChevronRight, MessageSquarePlus, PlayCircle, Flag } from "lucide-react";
 import { useSeenVersion } from "@/hooks/useSeenVersion";
 import { APP_VERSION } from "@/config/version";
 import { SubmitCaseDrawer } from "@/components/homebase/SubmitCaseDrawer";
@@ -29,6 +29,35 @@ const KIND_META: Record<ChangeKind, { label: string; icon: React.ReactNode; colo
     color: "bg-amber-50 text-amber-700 border-amber-200",
   },
 };
+
+// ── Report-issue pre-fill helpers ─────────────────────────────────────────────
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/** Truncate `text` to `maxLen` chars at a word boundary, appending "…". */
+function truncateAtWord(text: string, maxLen: number): string {
+  if (text.length <= maxLen) return text;
+  const sliced = text.slice(0, maxLen);
+  const lastSpace = sliced.lastIndexOf(" ");
+  return (lastSpace > 0 ? sliced.slice(0, lastSpace) : sliced) + "…";
+}
+
+function makeReportSubject(version: string, text: string): string {
+  return `Issue with v${version}: ${truncateAtWord(text, 80)}`;
+}
+
+function makeReportDescription(version: string, date: string, kind: ChangeKind, text: string): string {
+  const kindLabel = KIND_META[kind].label;
+  return [
+    `<p><strong>Version:</strong> v${escapeHtml(version)} — ${escapeHtml(date)}</p>`,
+    `<p><strong>Change kind:</strong> ${escapeHtml(kindLabel)}</p>`,
+    `<p><strong>Entry:</strong> ${escapeHtml(text)}</p>`,
+    `<p>&nbsp;</p>`,
+    `<p>Describe the issue below:</p>`,
+  ].join("");
+}
 
 function KindBadge({ kind }: { kind: ChangeKind }) {
   const meta = KIND_META[kind];
@@ -85,6 +114,7 @@ function isNewerVersion(a: string, b: string): boolean {
 export default function ReleaseNotes() {
   const [selectedVersion,  setSelectedVersion]  = useState<string>(RELEASES[0].version);
   const [showSubmitCase,   setShowSubmitCase]   = useState(false);
+  const [reportingEntry,   setReportingEntry]   = useState<{ version: string; date: string; kind: ChangeKind; text: string } | null>(null);
   const { startTour } = useHomebaseTour();
   const { startTour: startMCTour } = useMissionControlTour();
   const [, navigate] = useLocation();
@@ -270,10 +300,10 @@ export default function ReleaseNotes() {
                     </div>
                     <ul className="space-y-2.5 pl-1">
                       {items.map((entry, i) => (
-                        <li key={i} className="flex items-baseline gap-2.5 text-[12px] text-foreground/80 leading-relaxed">
+                        <li key={i} className="group flex items-baseline gap-2.5 text-[12px] text-foreground/80 leading-relaxed">
                           <span className="mt-2 w-1 h-1 rounded-full bg-muted-foreground/40 shrink-0" />
                           {showNewBadges && <NewBadge />}
-                          <span>
+                          <span className="flex-1 min-w-0">
                             {entry.text}
                             {entry.action && (
                               <button
@@ -297,6 +327,18 @@ export default function ReleaseNotes() {
                               </button>
                             )}
                           </span>
+                          {/* Flag icon: always visible on mobile, hover-only on desktop */}
+                          <button
+                            type="button"
+                            title="Report an issue with this change"
+                            onClick={() => {
+                              setReportingEntry({ version: release.version, date: release.date, kind, text: entry.text });
+                              setShowSubmitCase(true);
+                            }}
+                            className="self-start mt-1 shrink-0 p-0.5 rounded opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-muted-foreground/40 hover:text-amber-500 focus-visible:opacity-100 transition-all"
+                          >
+                            <Flag className="w-3 h-3" />
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -345,8 +387,10 @@ export default function ReleaseNotes() {
 
       <SubmitCaseDrawer
         open={showSubmitCase}
-        onClose={() => setShowSubmitCase(false)}
+        onClose={() => { setShowSubmitCase(false); setReportingEntry(null); }}
         initialType="General"
+        initialSubject={reportingEntry ? makeReportSubject(reportingEntry.version, reportingEntry.text) : undefined}
+        initialDescription={reportingEntry ? makeReportDescription(reportingEntry.version, reportingEntry.date, reportingEntry.kind, reportingEntry.text) : undefined}
       />
     </div>
   );
