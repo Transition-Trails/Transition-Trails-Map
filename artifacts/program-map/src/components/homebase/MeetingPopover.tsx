@@ -9,13 +9,14 @@
  * border-2 border-primary/25, w-80, side="bottom", align="start".
  */
 
-import { ReactNode, Fragment } from "react";
+import { ReactNode, Fragment, useState } from "react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ExternalLink, CheckSquare, Square, FileText } from "lucide-react";
+import { ExternalLink, CheckSquare, Square, FileText, Plus, Check, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -148,6 +149,112 @@ function formatDate(iso: string): string {
   });
 }
 
+// ── ActionItemRow ─────────────────────────────────────────────────────────────
+// Renders one action item with an inline "Add as SF Task" button.
+// Tracks its own creating/created state so each row is independent.
+
+function ActionItemRow({
+  item,
+  meetingTitle,
+}: {
+  item:         FathomActionItem;
+  meetingTitle: string;
+}) {
+  const { toast }                     = useToast();
+  const [creating, setCreating]       = useState(false);
+  const [created,  setCreated]        = useState(false);
+
+  async function addAsTask(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (creating || created) return;
+    setCreating(true);
+    try {
+      // SF Subject max is 255 chars
+      const subject = item.description.length > 255
+        ? item.description.slice(0, 252) + "…"
+        : item.description;
+      const descParts = [
+        `From meeting: ${meetingTitle}`,
+        item.assigneeName ? `Assigned to: ${item.assigneeName}` : null,
+      ].filter(Boolean);
+
+      const res  = await fetch("/api/sf/tasks", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({
+          subject,
+          description: descParts.join("\n"),
+          priority:    "Normal",
+        }),
+      });
+      const data = await res.json() as { id?: string; success?: boolean; error?: string };
+
+      if (res.ok && data.success) {
+        setCreated(true);
+        toast({
+          title:       "Task added to Salesforce",
+          description: subject.length > 80 ? subject.slice(0, 77) + "…" : subject,
+        });
+      } else {
+        toast({ title: "Couldn't create task", description: data.error ?? "Unknown error", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Couldn't create task", description: "Network error — please try again.", variant: "destructive" });
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  return (
+    <li className="flex items-start gap-2 group/item">
+      {/* Checkbox icon */}
+      <div className="flex-shrink-0 mt-0.5">
+        {item.completed
+          ? <CheckSquare className="w-3.5 h-3.5 text-emerald-600" />
+          : <Square      className="w-3.5 h-3.5 text-muted-foreground/50" />
+        }
+      </div>
+
+      {/* Description + assignee */}
+      <span
+        className={`text-[12px] leading-snug break-words flex-1 min-w-0 ${
+          item.completed ? "line-through text-muted-foreground/60" : "text-foreground/80"
+        }`}
+        style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
+      >
+        {linkifyText(item.description).map((node, j) => (
+          <Fragment key={j}>{node}</Fragment>
+        ))}
+        {item.assigneeName && (
+          <span className="text-muted-foreground ml-1">— {item.assigneeName}</span>
+        )}
+      </span>
+
+      {/* Add as SF Task button */}
+      <button
+        onClick={addAsTask}
+        disabled={creating}
+        title={created ? "Added to Salesforce" : "Add as Salesforce Task"}
+        className={`flex-shrink-0 flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all mt-0.5 ${
+          created
+            ? "text-emerald-600 bg-emerald-50"
+            : "opacity-0 group-hover/item:opacity-100 text-muted-foreground hover:text-primary hover:bg-primary/10"
+        } disabled:opacity-50`}
+      >
+        {creating
+          ? <Loader2 className="w-3 h-3 animate-spin" />
+          : created
+            ? <Check className="w-3 h-3" />
+            : <Plus  className="w-3 h-3" />
+        }
+        <span className={creating ? "sr-only" : ""}>
+          {created ? "Added" : "Task"}
+        </span>
+      </button>
+    </li>
+  );
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
@@ -243,28 +350,13 @@ export function MeetingPopover({ meeting, children }: MeetingPopoverProps) {
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">
               Action Items
             </p>
-            <ul className="space-y-1.5 max-h-40 overflow-y-auto overflow-x-hidden pr-0.5">
+            <ul className="space-y-1.5 max-h-44 overflow-y-auto overflow-x-hidden pr-0.5">
               {meeting.action_items.map((item, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  {item.completed ? (
-                    <CheckSquare className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <Square className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0 mt-0.5" />
-                  )}
-                  <span
-                    className={`text-[12px] leading-snug break-words ${item.completed ? "line-through text-muted-foreground/60" : "text-foreground/80"}`}
-                    style={{ overflowWrap: "break-word", wordBreak: "break-word" }}
-                  >
-                    {linkifyText(item.description).map((node, j) => (
-                      <Fragment key={j}>{node}</Fragment>
-                    ))}
-                    {item.assigneeName && (
-                      <span className="text-muted-foreground ml-1 not-line-through">
-                        — {item.assigneeName}
-                      </span>
-                    )}
-                  </span>
-                </li>
+                <ActionItemRow
+                  key={i}
+                  item={item}
+                  meetingTitle={meeting.title}
+                />
               ))}
             </ul>
           </div>
