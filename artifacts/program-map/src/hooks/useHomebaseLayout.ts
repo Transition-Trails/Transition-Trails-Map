@@ -5,15 +5,15 @@
  *   - cardOrder  — ordered array of card IDs (drag-to-reorder)
  *   - collapsed  — Set of card IDs currently collapsed
  *
- * Storage keys:
+ * Storage keys (default prefix "homebase"):
  *   homebase:card-order      — JSON string[]
  *   homebase:card-collapsed  — JSON string[]
+ *
+ * Pass `storagePrefix` to namespace a separate layout (e.g. "coach-homebase").
+ * Pass `defaultOrder` to define the baseline card order for that layout.
  */
 
 import { useState, useCallback } from "react";
-
-const ORDER_KEY     = "homebase:card-order";
-const COLLAPSED_KEY = "homebase:card-collapsed";
 
 export const DEFAULT_CARD_ORDER = [
   "today-tasks",
@@ -26,33 +26,45 @@ export const DEFAULT_CARD_ORDER = [
 
 export type CardId = typeof DEFAULT_CARD_ORDER[number];
 
-function readOrder(): string[] {
-  try {
-    const raw = localStorage.getItem(ORDER_KEY);
-    if (!raw) return [...DEFAULT_CARD_ORDER];
-    const parsed = JSON.parse(raw) as string[];
-    // Guard against stale / partial saves — must contain all default IDs.
-    if (DEFAULT_CARD_ORDER.every(id => parsed.includes(id))) return parsed;
-  } catch { /* ignore */ }
-  return [...DEFAULT_CARD_ORDER];
+interface UseHomebaseLayoutOptions {
+  /** localStorage key prefix. Defaults to "homebase". */
+  storagePrefix?: string;
+  /** Baseline card order used when no saved order exists or the saved order is stale. */
+  defaultOrder?: string[];
 }
 
-function readCollapsed(): Set<string> {
+function readOrder(orderKey: string, defaults: string[]): string[] {
   try {
-    const raw = localStorage.getItem(COLLAPSED_KEY);
+    const raw = localStorage.getItem(orderKey);
+    if (!raw) return [...defaults];
+    const parsed = JSON.parse(raw) as string[];
+    // Guard against stale / partial saves — must contain all default IDs.
+    if (defaults.every(id => parsed.includes(id))) return parsed;
+  } catch { /* ignore */ }
+  return [...defaults];
+}
+
+function readCollapsed(collapsedKey: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(collapsedKey);
     if (raw) return new Set(JSON.parse(raw) as string[]);
   } catch { /* ignore */ }
   return new Set();
 }
 
-export function useHomebaseLayout() {
-  const [cardOrder,  setCardOrderState] = useState<string[]>(() => readOrder());
-  const [collapsed,  setCollapsed]      = useState<Set<string>>(() => readCollapsed());
+export function useHomebaseLayout(options?: UseHomebaseLayoutOptions) {
+  const prefix       = options?.storagePrefix ?? "homebase";
+  const defaults     = options?.defaultOrder  ?? [...DEFAULT_CARD_ORDER];
+  const ORDER_KEY     = `${prefix}:card-order`;
+  const COLLAPSED_KEY = `${prefix}:card-collapsed`;
+
+  const [cardOrder, setCardOrderState] = useState<string[]>(() => readOrder(ORDER_KEY, defaults));
+  const [collapsed, setCollapsed]      = useState<Set<string>>(() => readCollapsed(COLLAPSED_KEY));
 
   const setCardOrder = useCallback((ids: string[]) => {
     setCardOrderState(ids);
     try { localStorage.setItem(ORDER_KEY, JSON.stringify(ids)); } catch { /* ignore */ }
-  }, []);
+  }, [ORDER_KEY]);
 
   const toggleCollapse = useCallback((id: string) => {
     setCollapsed(prev => {
@@ -61,7 +73,7 @@ export function useHomebaseLayout() {
       try { localStorage.setItem(COLLAPSED_KEY, JSON.stringify([...next])); } catch { /* ignore */ }
       return next;
     });
-  }, []);
+  }, [COLLAPSED_KEY]);
 
   const resetLayout = useCallback(() => {
     const defaultOrder = [...DEFAULT_CARD_ORDER];

@@ -6,17 +6,48 @@
  *
  * Layout:
  *   ─ Level header strip
- *   ─ PennyPreparedBand
- *   ─ LogTimeRow
- *   ─ ArtifactsCard
- *   ─ SquadGrid
- *   ─ 2-col grid: CoachCasesCard | CoachWeekCard
- *   ─ LeadTeamCard (lead coach contact, full width, bottom)
+ *   ─ PennyPreparedBand  (fixed, not sortable)
+ *   ─ LogTimeRow         (fixed, not sortable)
+ *   ─ Sortable card stack:
+ *       ArtifactsCard | SquadGrid | TodayTasksCard
+ *       CoachCasesCard | CoachWeekCard | LeadTeamCard
+ *
+ * Cards support drag-to-reorder and collapse/expand.
+ * Both preferences persist in localStorage under the "coach-homebase" prefix.
  *
  * Right rail: SlimSlackPanel (wired in HomebaseShell)
  */
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import {
+  Folder,
+  Users,
+  CheckSquare,
+  BookOpen,
+  CalendarDays,
+  UserCheck,
+  Shield,
+  MessageSquare,
+  Hash,
+  Plus,
+  type LucideIcon,
+} from "lucide-react";
+import {
+  DndContext,
+  PointerSensor,
+  KeyboardSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  verticalListSortingStrategy,
+  sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+
 import { HomebaseShell }      from "@/components/layout/HomebaseShell";
 import { LogTimeRow }         from "@/components/homebase/LogTimeRow";
 import { PennyPreparedBand }  from "@/components/homebase/PennyPreparedBand";
@@ -26,7 +57,8 @@ import { CoachCasesCard }     from "@/components/homebase/CoachCasesCard";
 import { CoachWeekCard }      from "@/components/homebase/CoachWeekCard";
 import { TodayTasksCard }     from "@/components/homebase/TodayTasksCard";
 import { SubmitCaseDrawer }   from "@/components/homebase/SubmitCaseDrawer";
-import { Shield, MessageSquare, Hash, Users, Plus } from "lucide-react";
+import { SortableCard }       from "@/components/homebase/SortableCard";
+import { useHomebaseLayout }  from "@/hooks/useHomebaseLayout";
 import {
   useCoachPennyPrepared,
   useCoachArtifacts,
@@ -37,6 +69,28 @@ import {
 } from "@/hooks/useHomebaseCoach";
 import type { LeadState, CoachLevel } from "@/hooks/useHomebaseCoach";
 import type { HomebaseAudience }      from "@/hooks/useHomebaseAuth";
+
+// ── Coach card IDs and metadata ───────────────────────────────────────────────
+
+export const COACH_DEFAULT_CARD_ORDER = [
+  "artifacts",
+  "squad",
+  "today-tasks",
+  "coach-cases",
+  "coach-week",
+  "lead-team",
+] as const;
+
+export type CoachCardId = typeof COACH_DEFAULT_CARD_ORDER[number];
+
+const COACH_CARD_META: Record<string, { title: string; icon: LucideIcon }> = {
+  "artifacts":   { title: "Artifacts",      icon: Folder       },
+  "squad":       { title: "My Squad",       icon: Users        },
+  "today-tasks": { title: "Today's Tasks",  icon: CheckSquare  },
+  "coach-cases": { title: "My Cases",       icon: BookOpen     },
+  "coach-week":  { title: "This Week",      icon: CalendarDays },
+  "lead-team":   { title: "Your Team",      icon: UserCheck    },
+};
 
 // ── Inline lead team card ─────────────────────────────────────────────────────
 
@@ -164,6 +218,69 @@ export default function CoachHomebase({
 
   const pennyHasItems = (pennyResult.data?.items?.length ?? 0) > 0;
 
+  // ── Card layout (order + collapsed), namespaced to coach ─────────────────
+  const { cardOrder, setCardOrder, collapsed, toggleCollapse } = useHomebaseLayout({
+    storagePrefix: "coach-homebase",
+    defaultOrder:  [...COACH_DEFAULT_CARD_ORDER],
+  });
+
+  // ── DnD sensors ──────────────────────────────────────────────────────────
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = cardOrder.indexOf(active.id as string);
+      const newIndex = cardOrder.indexOf(over.id  as string);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setCardOrder(arrayMove(cardOrder, oldIndex, newIndex));
+      }
+    }
+  }, [cardOrder, setCardOrder]);
+
+  // ── Card render ───────────────────────────────────────────────────────────
+  function renderCard(id: string) {
+    switch (id) {
+      case "artifacts":
+        return (
+          <ArtifactsCard
+            isLoading={artifactResult.isLoading}
+            artifactsState={artifactResult.data}
+            error={artifactResult.error}
+            coachLevel={coachLevel}
+          />
+        );
+      case "squad":
+        return (
+          <SquadGrid
+            isLoading={squadResult.isLoading}
+            squadState={squadResult.data}
+            error={squadResult.error}
+            coachLevel={coachLevel}
+          />
+        );
+      case "today-tasks":
+        return <TodayTasksCard />;
+      case "coach-cases":
+        return (
+          <CoachCasesCard
+            isLoading={casesResult.isLoading}
+            casesState={casesResult.data}
+            error={casesResult.error}
+          />
+        );
+      case "coach-week":
+        return <CoachWeekCard />;
+      case "lead-team":
+        return <LeadTeamCard leadState={leadResult.data} coachLevel={coachLevel} />;
+      default:
+        return null;
+    }
+  }
+
   return (
     <HomebaseShell
       audience={audience}
@@ -193,51 +310,48 @@ export default function CoachHomebase({
           </div>
         </div>
 
-        {/* 2 — Penny has prepared */}
+        {/* 2 — Penny has prepared (fixed, not sortable) */}
         <PennyPreparedBand
           isLoading={pennyResult.isLoading}
           preparedState={pennyResult.data}
           error={pennyResult.error}
         />
 
-        {/* 3 — Log time */}
+        {/* 3 — Log time (fixed, not sortable) */}
         <LogTimeRow
           audience={audience}
           defaultActivity="Squad coaching"
           buttonVariant={pennyHasItems ? "secondary" : "primary"}
         />
 
-        {/* 4 — Artifacts */}
-        <ArtifactsCard
-          isLoading={artifactResult.isLoading}
-          artifactsState={artifactResult.data}
-          error={artifactResult.error}
-          coachLevel={coachLevel}
-        />
+        {/* 4 — Sortable card stack */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={cardOrder} strategy={verticalListSortingStrategy}>
+            <div className="flex flex-col gap-3">
+              {cardOrder.map(id => {
+                const meta = COACH_CARD_META[id];
+                if (!meta) return null;
+                return (
+                  <SortableCard
+                    key={id}
+                    id={id}
+                    title={meta.title}
+                    icon={meta.icon}
+                    isCollapsed={collapsed.has(id)}
+                    onToggleCollapse={() => toggleCollapse(id)}
+                  >
+                    {renderCard(id)}
+                  </SortableCard>
+                );
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
 
-        {/* 5 — Squad */}
-        <SquadGrid
-          isLoading={squadResult.isLoading}
-          squadState={squadResult.data}
-          error={squadResult.error}
-          coachLevel={coachLevel}
-        />
-
-        {/* 6 — Today's Tasks */}
-        <TodayTasksCard />
-
-        {/* 7 — Two-column grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <CoachCasesCard
-            isLoading={casesResult.isLoading}
-            casesState={casesResult.data}
-            error={casesResult.error}
-          />
-          <CoachWeekCard />
-        </div>
-
-        {/* 8 — Lead team card */}
-        <LeadTeamCard leadState={leadResult.data} coachLevel={coachLevel} />
       </div>
 
       <SubmitCaseDrawer
