@@ -153,3 +153,110 @@ describe('POST /api/slack/validate/test-message — authenticated staff (non-adm
     expect(['no_token', 'no_channel']).toContain(res.body.error);
   });
 });
+
+// ── 5. Target → channel ID routing ───────────────────────────────────────────
+//
+// Confirms that each target value resolves to the correct env var and sends
+// that channel ID to chat.postMessage. Uses a real bot token so the no_token
+// guard does not fire, then mocks fetch to capture the payload.
+
+describe('POST /api/slack/validate/test-message — channel routing by target', () => {
+  const BOT_TOKEN        = 'xoxb-test-token';
+  const PENNY_CHANNEL_ID = 'C111PENNY';
+  const ADMIN_CHANNEL_ID = 'C222ADMIN';
+  const DEFAULT_CHANNEL_ID = 'C333DEFAULT';
+
+  /** Returns the channel value that was sent to chat.postMessage, or null. */
+  function capturedChannel(fetchMock: ReturnType<typeof vi.fn>): string | null {
+    for (const [, init] of fetchMock.mock.calls as [string, RequestInit][]) {
+      const url = fetchMock.mock.calls.find(
+        ([u]: [string]) => u === 'https://slack.com/api/chat.postMessage'
+      )?.[0];
+      if (!url) continue;
+      const body = JSON.parse(init?.body as string ?? '{}') as { channel?: string };
+      return body.channel ?? null;
+    }
+    return null;
+  }
+
+  beforeEach(() => {
+    process.env['SLACK_BOT_TOKEN']        = BOT_TOKEN;
+    process.env['SLACK_PENNY_CHANNEL_ID'] = PENNY_CHANNEL_ID;
+    process.env['SLACK_ADMIN_CHANNEL_ID'] = ADMIN_CHANNEL_ID;
+    process.env['SLACK_CHANNEL_ID']       = DEFAULT_CHANNEL_ID;
+  });
+
+  it("routes target='penny' to SLACK_PENNY_CHANNEL_ID", async () => {
+    // Sign in first so the Google auth fetch mock is no longer in play.
+    const agent = await signInWithGroups([GROUPS.everyday]);
+
+    // Now replace global.fetch with the Slack mock for the actual API call.
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ ok: true, ts: '111.222', channel: PENNY_CHANNEL_ID }),
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const res = await agent
+      .post('/api/slack/validate/test-message')
+      .send({ target: 'penny' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+
+    const postCall = fetchMock.mock.calls.find(
+      ([u]: [string]) => u === 'https://slack.com/api/chat.postMessage'
+    );
+    expect(postCall).toBeDefined();
+    const sentChannel = (JSON.parse((postCall as [string, RequestInit])[1].body as string) as { channel: string }).channel;
+    expect(sentChannel).toBe(PENNY_CHANNEL_ID);
+  });
+
+  it("routes target='admin' to SLACK_ADMIN_CHANNEL_ID", async () => {
+    const agent = await signInWithGroups([GROUPS.everyday]);
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ ok: true, ts: '111.333', channel: ADMIN_CHANNEL_ID }),
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const res = await agent
+      .post('/api/slack/validate/test-message')
+      .send({ target: 'admin' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+
+    const postCall = fetchMock.mock.calls.find(
+      ([u]: [string]) => u === 'https://slack.com/api/chat.postMessage'
+    );
+    expect(postCall).toBeDefined();
+    const sentChannel = (JSON.parse((postCall as [string, RequestInit])[1].body as string) as { channel: string }).channel;
+    expect(sentChannel).toBe(ADMIN_CHANNEL_ID);
+  });
+
+  it("routes target='default' to SLACK_CHANNEL_ID", async () => {
+    const agent = await signInWithGroups([GROUPS.everyday]);
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ ok: true, ts: '111.444', channel: DEFAULT_CHANNEL_ID }),
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const res = await agent
+      .post('/api/slack/validate/test-message')
+      .send({ target: 'default' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+
+    const postCall = fetchMock.mock.calls.find(
+      ([u]: [string]) => u === 'https://slack.com/api/chat.postMessage'
+    );
+    expect(postCall).toBeDefined();
+    const sentChannel = (JSON.parse((postCall as [string, RequestInit])[1].body as string) as { channel: string }).channel;
+    expect(sentChannel).toBe(DEFAULT_CHANNEL_ID);
+  });
+});
