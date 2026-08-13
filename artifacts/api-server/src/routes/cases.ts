@@ -185,7 +185,9 @@ router.patch("/sf/cases/:id/status", async (req, res) => {
     await client.updateRecord("Case", id, { Status: status });
     return res.json({ success: true, status });
   } catch (e: unknown) {
-    return res.status(500).json({ error: e instanceof Error ? e.message : String(e) });
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.warn({ caseId: id, status, sfUserId, err: msg }, "sf/cases status update failed");
+    return res.status(500).json({ error: msg });
   }
 });
 

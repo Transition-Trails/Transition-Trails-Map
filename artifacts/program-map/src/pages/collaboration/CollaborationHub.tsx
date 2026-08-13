@@ -286,14 +286,15 @@ function OverviewTab() {
   const isAdmin = userTier === 'admin' || userTier === 'superadmin';
 
   const { data: slackData, isLoading: slackLoading }    = useQuery<SlackValidation>({ queryKey: ['/api/slack/validate'],    staleTime: 60_000 });
-  const { data: gmailData, isLoading: gmailLoading }    = useQuery<GmailThread[]>({ queryKey: ['/api/gmail/threads'],     staleTime: 30_000 });
+  const { data: gmailData, isLoading: gmailLoading }    = useQuery<{ threads: GmailThread[]; fetchedAt: string }>({ queryKey: ['/api/gmail/threads'],     staleTime: 30_000 });
   const { data: calData,   isLoading: calLoading }      = useQuery<CalendarEvent[]>({ queryKey: ['/api/calendar/events'],   staleTime: 30_000 });
   const { data: driveData, isLoading: driveLoading }    = useQuery<DriveStatus>({ queryKey: ['/api/drive/status'],    staleTime: 60_000 });
 
-  const unreadCount  = gmailLoading ? '…' : (gmailData?.filter(t => t.unread).length ?? 0);
+  const gmailThreads = gmailData?.threads ?? [];
+  const unreadCount  = gmailLoading ? '…' : gmailThreads.filter(t => t.unread).length;
   const nextEvent    = calLoading   ? '…' : (calData?.[0]?.summary ?? 'No upcoming events');
   const slackStatus  = slackLoading ? 'loading' : slackData?.status === 'ok' ? 'live' : slackData ? 'error' : 'unknown';
-  const gmailStatus  = gmailLoading ? 'loading' : gmailData           ? 'live'    : 'unknown';
+  const gmailStatus  = gmailLoading ? 'loading' : gmailData?.threads   ? 'live'    : 'unknown';
   const calStatus    = calLoading   ? 'loading' : calData             ? 'live'    : 'unknown';
   const driveStatus  = driveLoading ? 'loading' : driveData?.connected ? 'live'   : driveData ? 'error' : 'unknown';
 
