@@ -28,6 +28,7 @@ import {
   Newspaper,
   ChevronDown,
   ChevronRight,
+  RotateCcw,
   type LucideIcon,
 } from "lucide-react";
 import { Link } from "wouter";
@@ -114,7 +115,7 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
   const [showSubmitCase, setShowSubmitCase]       = useState(false);
 
   // ── Card layout state (order + collapsed) ────────────────────────────────
-  const { cardOrder, setCardOrder, collapsed, toggleCollapse } = useHomebaseLayout();
+  const { cardOrder, setCardOrder, collapsed, toggleCollapse, resetLayout } = useHomebaseLayout();
 
   // Separate collapse for the What's New section (not part of the sortable grid)
   const [whatsNewOpen, toggleWhatsNew] = useCollapsible("whats-new-section", true);
@@ -225,10 +226,21 @@ export default function TeamHomebase({ displayName, isStaff = false }: TeamHomeb
 
         {/* ── Sortable card grid ─────────────────────────────────────────── */}
         <div className="space-y-3 min-w-0">
-          {/* Section label */}
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
-            Today
-          </p>
+          {/* Section label + reset */}
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+              Today
+            </p>
+            <button
+              type="button"
+              onClick={resetLayout}
+              className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+              title="Restore default card order and expand all cards"
+            >
+              <RotateCcw className="w-3 h-3" />
+              Reset layout
+            </button>
+          </div>
 
           <DndContext
             sensors={sensors}

@@ -63,5 +63,15 @@ export function useHomebaseLayout() {
     });
   }, []);
 
-  return { cardOrder, setCardOrder, collapsed, toggleCollapse };
+  const resetLayout = useCallback(() => {
+    const defaultOrder = [...DEFAULT_CARD_ORDER];
+    setCardOrderState(defaultOrder);
+    setCollapsed(new Set());
+    try {
+      localStorage.removeItem(ORDER_KEY);
+      localStorage.removeItem(COLLAPSED_KEY);
+    } catch { /* ignore */ }
+  }, []);
+
+  return { cardOrder, setCardOrder, collapsed, toggleCollapse, resetLayout };
 }
