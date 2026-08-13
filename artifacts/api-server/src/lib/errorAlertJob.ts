@@ -286,3 +286,29 @@ export function stopErrorAlertJob(): void {
 export function _resetRateLimitForTesting(): void {
   lastAlertAt.clear();
 }
+
+// ── Rate-limit status getter ───────────────────────────────────────────────────
+
+export interface RateLimitEntry {
+  route: string;
+  lastAlertedAt: number;   // ms epoch
+  nextAvailableAt: number; // ms epoch
+  cooldownMs: number;      // RATE_LIMIT_MS
+}
+
+/**
+ * Return a snapshot of the current rate-limit state as a plain array.
+ * Callers receive a copy — the internal Map is not exposed directly.
+ */
+export function getRateLimitStatus(): RateLimitEntry[] {
+  const entries: RateLimitEntry[] = [];
+  for (const [route, lastAlertedAt] of lastAlertAt) {
+    entries.push({
+      route,
+      lastAlertedAt,
+      nextAvailableAt: lastAlertedAt + RATE_LIMIT_MS,
+      cooldownMs: RATE_LIMIT_MS,
+    });
+  }
+  return entries;
+}

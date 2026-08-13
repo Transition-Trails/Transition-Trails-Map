@@ -18,7 +18,7 @@ import {
   LayoutDashboard, Mail, Radio, Network, MessageSquare,
   CheckCircle2, AlertCircle, Clock, RefreshCw,
   Slack, HardDrive, CalendarDays, ChevronRight,
-  Zap, ArrowRight, Hash, FileText, Bell, Settings2, Save,
+  Zap, ArrowRight, Hash, FileText, Bell, Settings2, Save, Timer,
 } from 'lucide-react';
 
 // Tab content — existing components
@@ -46,6 +46,19 @@ interface AlertSettings {
   envFallback: number;
 }
 
+interface RateLimitEntry {
+  route: string;
+  lastAlertedAt: string;
+  nextAvailableAt: string;
+  cooldownMs: number;
+  msRemaining: number;
+}
+
+interface AlertStatusResponse {
+  entries: RateLimitEntry[];
+  timestamp: string;
+}
+
 // ── Alert Settings Card (admin-only) ──────────────────────────────────────────
 
 function AlertSettingsCard() {
@@ -59,6 +72,20 @@ function AlertSettingsCard() {
       return res.json() as Promise<AlertSettings>;
     },
   });
+
+  const { data: statusData } = useQuery<AlertStatusResponse>({
+    queryKey: ['/api/slack/alert-settings/status'],
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const res = await fetch('/api/slack/alert-settings/status');
+      if (!res.ok) throw new Error(`Failed to load rate-limit status (${res.status})`);
+      return res.json() as Promise<AlertStatusResponse>;
+    },
+  });
+
+  // Entries that are still in cooldown (msRemaining > 0)
+  const activeCooldowns = statusData?.entries.filter(e => e.msRemaining > 0) ?? [];
 
   const [threshold,     setThreshold]     = useState<string>('');
   const [windowMinutes, setWindowMinutes] = useState<string>('');
@@ -159,6 +186,29 @@ function AlertSettingsCard() {
               className="mt-1 rounded border border-border px-2.5 py-1.5 text-[14px] font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 w-full"
             />
           </div>
+        </div>
+      )}
+
+      {/* Rate-limit cooldown notice */}
+      {activeCooldowns.length > 0 && (
+        <div className="rounded border border-[#FFD08A] bg-[#FFF3E0] px-3 py-2 flex flex-col gap-1.5">
+          <div className="flex items-center gap-1.5">
+            <Timer className="w-3.5 h-3.5 text-[#CC8400] shrink-0" />
+            <span className="text-[13px] font-semibold text-[#CC8400]">
+              Rate limit active — alerts are paused for the following routes:
+            </span>
+          </div>
+          {activeCooldowns.map(e => {
+            const minsRemaining = Math.ceil(e.msRemaining / 60_000);
+            return (
+              <div key={e.route} className="flex items-center justify-between text-[13px] text-[#CC8400] pl-5">
+                <span className="font-mono truncate max-w-[260px]">{e.route}</span>
+                <span className="font-semibold shrink-0 ml-2">
+                  Next alert in {minsRemaining} min
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
 

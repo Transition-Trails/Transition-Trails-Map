@@ -4,6 +4,7 @@ import { db } from "@workspace/db";
 import { alertSettingsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAdmin } from "../middlewares/requireAuth.js";
+import { getRateLimitStatus } from "../lib/errorAlertJob.js";
 
 const router = Router();
 
@@ -703,6 +704,23 @@ router.get("/slack/alert-settings", async (req, res) => {
     req.log.warn({ err }, "alert-settings GET: DB error");
     res.json(defaultPayload);
   }
+});
+
+// ─── GET /slack/alert-settings/status ────────────────────────────────────────
+// Returns the current in-memory rate-limit state for all routes that have been
+// alerted. Used by the frontend to show "Next alert available in X min" notices.
+// Requires admin-group membership.
+
+router.get("/slack/alert-settings/status", requireAdmin, (_req, res) => {
+  const now     = Date.now();
+  const entries = getRateLimitStatus().map(e => ({
+    route:           e.route,
+    lastAlertedAt:   new Date(e.lastAlertedAt).toISOString(),
+    nextAvailableAt: new Date(e.nextAvailableAt).toISOString(),
+    cooldownMs:      e.cooldownMs,
+    msRemaining:     Math.max(0, e.nextAvailableAt - now),
+  }));
+  res.json({ entries, timestamp: new Date(now).toISOString() });
 });
 
 // ─── PATCH /slack/alert-settings ─────────────────────────────────────────────
