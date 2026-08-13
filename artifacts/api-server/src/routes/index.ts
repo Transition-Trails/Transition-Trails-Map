@@ -82,6 +82,10 @@ const PUBLIC_PATHS: readonly string[] = [
   '/google/oauth/start',
   '/google/oauth/callback',
   '/google/oauth/session', // prefix — matches /google/oauth/session/:id
+  // Lightweight Slack status probe — called by CaseHoverCard on mount before
+  // any user interaction, so it must be reachable without a staff session.
+  // Returns { configured: true/false } based solely on env-var presence.
+  '/slack/status',
   // Slack webhook (HMAC-authenticated by Slack's signature, not user session)
   '/slack/events',
   // Slack user OAuth callback (browser redirect from Slack; session cookie is
