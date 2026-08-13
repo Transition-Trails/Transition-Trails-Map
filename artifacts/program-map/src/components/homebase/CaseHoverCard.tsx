@@ -139,16 +139,32 @@ export function CaseHoverCard({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Slack ping
+  // slackConfigured values:
+  //   null      — status check in flight (button disabled while loading)
+  //   true      — Slack is configured (button enabled)
+  //   false     — Slack is confirmed not configured (button disabled with tooltip)
+  //   "unknown" — status check failed; keep button enabled (optimistic) rather
+  //               than silently blocking staff from pinging
   const [pinging,          setPinging]          = useState(false);
   const [pingResult,       setPingResult]       = useState<"sent" | "error" | null>(null);
-  const [slackConfigured,  setSlackConfigured]  = useState<boolean | null>(null);
+  const [slackConfigured,  setSlackConfigured]  = useState<boolean | "unknown" | null>(null);
 
-  // Check Slack status once on mount
+  // Check Slack status once on mount.
+  // Falls back to "unknown" (optimistic / button stays enabled) when:
+  //   • the network request fails entirely
+  //   • the server returns a non-2xx status
+  //   • the response body is missing or has a non-boolean `configured` field
   useEffect(() => {
     fetch("/api/slack/status")
-      .then(r => r.json())
-      .then((d: { configured: boolean }) => setSlackConfigured(d.configured))
-      .catch(() => setSlackConfigured(false));
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((d: unknown) => {
+        const configured = (d as Record<string, unknown>)?.configured;
+        setSlackConfigured(typeof configured === "boolean" ? configured : "unknown");
+      })
+      .catch(() => setSlackConfigured("unknown"));
   }, []);
 
   // Sync when case prop changes
@@ -339,24 +355,35 @@ export function CaseHoverCard({
                   </Tooltip>
                 </TooltipProvider>
               ) : (
-                <button
-                  onClick={pingOwnerOnSlack}
-                  disabled={pinging || slackConfigured === null}
-                  title={`Send ${c.OwnerName} a Slack status-check message`}
-                  className={`flex-shrink-0 flex items-center gap-1 text-[11px] font-semibold transition-colors disabled:opacity-50 ${
-                    pingResult === "sent"
-                      ? "text-emerald-600"
-                      : "text-sky-600 hover:text-sky-700"
-                  }`}
-                >
-                  {pinging
-                    ? <Loader2 className="w-3 h-3 animate-spin" />
-                    : pingResult === "sent"
-                      ? <Check className="w-3 h-3" />
-                      : <Hash className="w-3 h-3" />
-                  }
-                  {pinging ? "Pinging…" : pingResult === "sent" ? "Sent!" : "Ping on Slack"}
-                </button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={pingOwnerOnSlack}
+                        disabled={pinging || slackConfigured === null}
+                        className={`flex-shrink-0 flex items-center gap-1 text-[11px] font-semibold transition-colors disabled:opacity-50 ${
+                          pingResult === "sent"
+                            ? "text-emerald-600"
+                            : "text-sky-600 hover:text-sky-700"
+                        }`}
+                      >
+                        {pinging
+                          ? <Loader2 className="w-3 h-3 animate-spin" />
+                          : pingResult === "sent"
+                            ? <Check className="w-3 h-3" />
+                            : <Hash className="w-3 h-3" />
+                        }
+                        {pinging ? "Pinging…" : pingResult === "sent" ? "Sent!" : "Ping on Slack"}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      {slackConfigured === "unknown"
+                        ? "Slack status check failed — sending anyway"
+                        : `Send ${c.OwnerName} a Slack status-check message`
+                      }
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )
             )}
           </div>
