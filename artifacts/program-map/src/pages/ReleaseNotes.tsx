@@ -170,14 +170,14 @@ export default function ReleaseNotes() {
               type="button"
               onClick={() => {
                 if (isHombaseAudience) {
-                  // Homebase audience: Homebase tour, already inside HomebaseShell
-                  // which mounts HomebaseTour — no navigation needed.
+                  // Homebase audience: already inside HomebaseShell which mounts
+                  // HomebaseTour — call startTour() in-place, no navigation needed.
                   startTour();
                 } else {
-                  // Staff: Mission Control tour. Navigate there first so
-                  // MissionControlTour (mounted in Home.tsx) can render.
-                  startMCTour();
-                  navigate("/mission-control");
+                  // Staff: call startTour() then navigate to /homebase so
+                  // HomebaseShell mounts and HomebaseTour can open.
+                  startTour();
+                  navigate("/homebase");
                 }
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted/60 text-[12px] font-medium text-foreground transition-colors"
