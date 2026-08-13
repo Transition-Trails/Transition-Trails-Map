@@ -104,10 +104,13 @@ router.get("/calendar/events", async (_req, res) => {
   try {
     const token = await getAccessToken();
 
-    const now        = new Date();
-    // Start from midnight today so past meetings earlier in the day are included.
-    const startOfDay = new Date(now);
-    startOfDay.setHours(0, 0, 0, 0);
+    const now = new Date();
+    // Use the browser-supplied local midnight if provided (avoids UTC/local
+    // timezone mismatch where server midnight ≠ user's midnight).
+    const fromParam   = (_req.query as Record<string, string>)["from"];
+    const startOfDay  = fromParam ? new Date(fromParam) : (() => {
+      const d = new Date(now); d.setHours(0, 0, 0, 0); return d;
+    })();
     const week = new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     const params = new URLSearchParams({

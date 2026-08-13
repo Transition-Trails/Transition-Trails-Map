@@ -225,7 +225,11 @@ export function TodayMeetingsCard() {
     setLoading(true);
     setUnavailable(false);
     try {
-      const res = await fetch("/api/calendar/events");
+      // Pass the browser's local midnight so the server fetches from the
+      // correct day boundary regardless of server timezone (UTC).
+      const localMidnight = new Date();
+      localMidnight.setHours(0, 0, 0, 0);
+      const res = await fetch(`/api/calendar/events?from=${encodeURIComponent(localMidnight.toISOString())}`);
       if (!res.ok) {
         setUnavailable(true);
         setLoading(false);
