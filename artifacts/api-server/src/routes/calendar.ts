@@ -104,15 +104,18 @@ router.get("/calendar/events", async (_req, res) => {
   try {
     const token = await getAccessToken();
 
-    const now   = new Date();
-    const week  = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const now        = new Date();
+    // Start from midnight today so past meetings earlier in the day are included.
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+    const week = new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     const params = new URLSearchParams({
-      timeMin:       now.toISOString(),
+      timeMin:       startOfDay.toISOString(),
       timeMax:       week.toISOString(),
       singleEvents:  "true",
       orderBy:       "startTime",
-      maxResults:    "10",
+      maxResults:    "25",
       fields:        "items(id,summary,description,location,start,end,attendees,htmlLink,hangoutLink,conferenceData,status)",
     });
 
