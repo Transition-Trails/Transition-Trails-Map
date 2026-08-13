@@ -85,7 +85,7 @@ vi.mock('@workspace/db/schema', () => ({
 // ── Lazy imports after mocks ───────────────────────────────────────────────────
 
 import { checkRate, rateBuckets, RATE_MAX_CALLS, RATE_WINDOW_MS, KNOWN_FEATURES, KNOWN_ACTIONS } from '../routes/track.js';
-import { parseDateRange } from '../routes/adminUsers.js';
+import { parseDateRange, localMidnightUtc, parseSingleDayWindow } from '../routes/adminUsers.js';
 import app from '../app.js';
 import type { Request } from 'express';
 
@@ -212,6 +212,324 @@ describe('parseDateRange — UTC day-window helper', () => {
     const expected = new Date();
     expected.setUTCDate(expected.getUTCDate() - 30);
     expect(isoDate(dayStart)).toBe(isoDate(expected));
+  });
+});
+
+// ── 3b. localMidnightUtc — timezone-aware UTC instant for local midnight ──────
+
+describe('localMidnightUtc — UTC instant for local midnight', () => {
+  /**
+   * For a given date+tz combination we know the expected UTC offset.
+   * Verify that dayStart falls within a 1-second window of the known offset.
+   *
+   * All assertions use a non-DST date (2026-01-15, winter) so the offset is
+   * stable and predictable for each timezone.
+   */
+
+  it('UTC: local midnight equals UTC midnight (zero offset)', () => {
+    const result = localMidnightUtc('2026-01-15', 'UTC');
+    expect(result.toISOString()).toBe('2026-01-15T00:00:00.000Z');
+  });
+
+  it('America/New_York (EST, UTC-5): local midnight = UTC+5h', () => {
+    // In January New York is on EST = UTC-5
+    // Local midnight → UTC 05:00
+    const result = localMidnightUtc('2026-01-15', 'America/New_York');
+    expect(result.toISOString()).toBe('2026-01-15T05:00:00.000Z');
+  });
+
+  it('America/Los_Angeles (PST, UTC-8): local midnight = UTC+8h', () => {
+    // In January LA is on PST = UTC-8
+    // Local midnight → UTC 08:00
+    const result = localMidnightUtc('2026-01-15', 'America/Los_Angeles');
+    expect(result.toISOString()).toBe('2026-01-15T08:00:00.000Z');
+  });
+
+  it('America/Chicago (CST, UTC-6): local midnight = UTC+6h', () => {
+    const result = localMidnightUtc('2026-01-15', 'America/Chicago');
+    expect(result.toISOString()).toBe('2026-01-15T06:00:00.000Z');
+  });
+
+  it('Europe/London (GMT, UTC+0): local midnight equals UTC midnight in winter', () => {
+    // January: London is on GMT (no summer time yet)
+    const result = localMidnightUtc('2026-01-15', 'Europe/London');
+    expect(result.toISOString()).toBe('2026-01-15T00:00:00.000Z');
+  });
+
+  it('Asia/Tokyo (JST, UTC+9): local midnight = UTC previous day +15h', () => {
+    // UTC+9: local midnight occurs 9 hours *before* UTC midnight
+    // 2026-01-15 00:00 JST = 2026-01-14 15:00 UTC
+    const result = localMidnightUtc('2026-01-15', 'Asia/Tokyo');
+    expect(result.toISOString()).toBe('2026-01-14T15:00:00.000Z');
+  });
+
+  it('Asia/Kolkata (IST, UTC+5:30): local midnight = UTC previous day +18:30', () => {
+    // UTC+5:30: 2026-01-15 00:00 IST = 2026-01-14 18:30 UTC
+    const result = localMidnightUtc('2026-01-15', 'Asia/Kolkata');
+    expect(result.toISOString()).toBe('2026-01-14T18:30:00.000Z');
+  });
+
+  it('Australia/Sydney (AEST, UTC+10 in winter): local midnight = UTC previous day at 14:00', () => {
+    // July (winter in Sydney) = AEST = UTC+10; no DST
+    // 2026-07-15 00:00 AEST = 2026-07-14 14:00 UTC
+    const result = localMidnightUtc('2026-07-15', 'Australia/Sydney');
+    expect(result.toISOString()).toBe('2026-07-14T14:00:00.000Z');
+  });
+
+  it('Australia/Sydney DST fall-back 2026-04-05: local midnight computed with pre-transition offset', () => {
+    // Sydney falls back from AEDT (UTC+11) to AEST (UTC+10) at 03:00 on 2026-04-05.
+    // Transition occurs at 2026-04-04T16:00Z.
+    // At UTC midnight 2026-04-05T00:00Z Sydney is already in AEST (+10h) — reading
+    // the offset there would give 2026-04-04T14:00Z (01:00 AEDT), which is wrong.
+    // The iterative algorithm corrects to 2026-04-04T13:00Z (00:00 AEDT). ✓
+    const result = localMidnightUtc('2026-04-05', 'Australia/Sydney');
+    expect(result.toISOString()).toBe('2026-04-04T13:00:00.000Z');
+  });
+
+  it('Australia/Sydney DST spring-forward 2026-10-04: local midnight computed with pre-transition offset', () => {
+    // Sydney springs forward from AEST (UTC+10) to AEDT (UTC+11) at 02:00 on 2026-10-04.
+    // Transition at 2026-10-03T16:00Z.
+    // At UTC midnight 2026-10-04T00:00Z Sydney is already in AEDT (+11h).
+    // Iterative algorithm finds 2026-10-03T14:00Z (00:00 AEST). ✓
+    const result = localMidnightUtc('2026-10-04', 'Australia/Sydney');
+    expect(result.toISOString()).toBe('2026-10-03T14:00:00.000Z');
+  });
+
+  it('America/Santiago spring-forward through midnight 2026-09-06: returns first valid local instant, not nonexistent midnight', () => {
+    // Santiago springs forward from CLT (UTC-4) to CLST (UTC-3) at midnight on
+    // 2026-09-06: 00:00 CLT → 01:00 CLST, so midnight itself is skipped.
+    // The iterative algorithm oscillates here; binary search correctly returns
+    // the first valid local instant of Sep 6: 01:00 CLST = 04:00 UTC.
+    const result = localMidnightUtc('2026-09-06', 'America/Santiago');
+    expect(result.toISOString()).toBe('2026-09-06T04:00:00.000Z');
+  });
+
+  it('Pacific/Fiji (UTC+12): local midnight = UTC previous day at 12:00', () => {
+    // UTC+12: 2026-01-15 00:00 FJT = 2026-01-14 12:00 UTC
+    // At UTC midnight the local hour is 12 (same calendar date) — must NOT be
+    // misclassified as a negative offset. The binary-search algorithm handles this.
+    const result = localMidnightUtc('2026-01-15', 'Pacific/Fiji');
+    expect(result.toISOString()).toBe('2026-01-14T12:00:00.000Z');
+  });
+
+  it('Pacific/Auckland (NZDT, UTC+13 in January): local midnight = UTC previous day at 11:00', () => {
+    // New Zealand Daylight Time (southern-hemisphere summer, January): UTC+13
+    // 2026-01-15 00:00 NZDT = 2026-01-14 11:00 UTC
+    const result = localMidnightUtc('2026-01-15', 'Pacific/Auckland');
+    expect(result.toISOString()).toBe('2026-01-14T11:00:00.000Z');
+  });
+
+  it('Pacific/Kiritimati (UTC+14): local midnight = UTC previous day at 10:00', () => {
+    // Kiritimati (Line Islands) is always UTC+14 with no DST.
+    // 2026-01-15 00:00 LINT = 2026-01-14 10:00 UTC
+    const result = localMidnightUtc('2026-01-15', 'Pacific/Kiritimati');
+    expect(result.toISOString()).toBe('2026-01-14T10:00:00.000Z');
+  });
+
+});
+
+// ── localMidnightUtc — dayEnd (next local midnight) is tested via parseSingleDayWindow below.
+
+// ── 3c. parseSingleDayWindow — date + tz query-param parsing ──────────────────
+
+describe('parseSingleDayWindow — timezone-aware single-day window', () => {
+  function makeReq(query: Record<string, string>): import('express').Request {
+    return { query } as unknown as import('express').Request;
+  }
+
+  it('uses UTC when no tz param is supplied', () => {
+    const { dayStart, effectiveTz } = parseSingleDayWindow('2026-08-13', null);
+    expect(effectiveTz).toBe('UTC');
+    expect(dayStart.toISOString()).toBe('2026-08-13T00:00:00.000Z');
+  });
+
+  it('falls back to UTC for an invalid timezone string', () => {
+    const { effectiveTz } = parseSingleDayWindow('2026-08-13', 'Not/ATimezone');
+    expect(effectiveTz).toBe('UTC');
+  });
+
+  it('applies America/Los_Angeles offset so day window matches local midnight (PDT, UTC-7 in summer)', () => {
+    // August 13 is in PDT (UTC-7)
+    // Local midnight 2026-08-13 00:00 PDT = 2026-08-13 07:00 UTC
+    const { dayStart, dayEnd, effectiveTz, effectiveDate } =
+      parseSingleDayWindow('2026-08-13', 'America/Los_Angeles');
+    expect(effectiveTz).toBe('America/Los_Angeles');
+    expect(effectiveDate).toBe('2026-08-13');
+    expect(dayStart.toISOString()).toBe('2026-08-13T07:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-08-14T07:00:00.000Z');
+  });
+
+  it('applies America/New_York offset (EST, UTC-5) in winter', () => {
+    // January 15 is in EST (UTC-5)
+    // Local midnight 2026-01-15 00:00 EST = 2026-01-15 05:00 UTC
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-01-15', 'America/New_York');
+    expect(dayStart.toISOString()).toBe('2026-01-15T05:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-01-16T05:00:00.000Z');
+  });
+
+  it('applies Asia/Tokyo offset (JST, UTC+9) correctly', () => {
+    // 2026-01-15 00:00 JST = 2026-01-14 15:00 UTC
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-01-15', 'Asia/Tokyo');
+    expect(dayStart.toISOString()).toBe('2026-01-14T15:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-01-15T15:00:00.000Z');
+  });
+
+  it('window spans exactly 24 hours on a non-DST-transition day', () => {
+    // June 1 is mid-summer — no DST transition — so every tz should give exactly 24h
+    for (const tz of ['UTC', 'America/Los_Angeles', 'Asia/Tokyo', 'Asia/Kolkata']) {
+      const { dayStart, dayEnd } = parseSingleDayWindow('2026-06-01', tz);
+      expect(dayEnd.getTime() - dayStart.getTime()).toBe(24 * 60 * 60 * 1000);
+    }
+  });
+
+  it('America/Santiago spring-forward 2026-09-06: 23-hour day starting at first valid local instant', () => {
+    // Midnight is skipped (00:00 CLT → 01:00 CLST). dayStart = 04:00Z (01:00 CLST).
+    // dayEnd = localMidnightUtc('2026-09-07', Santiago) = Sep 7 00:00 CLST = Sep 6T03:00Z.
+    // Duration = Sep6T03:00Z+1day - Sep6T04:00Z = 23 hours.
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-09-06', 'America/Santiago');
+    expect(dayStart.toISOString()).toBe('2026-09-06T04:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-09-07T03:00:00.000Z');
+    const durationHours = (dayEnd.getTime() - dayStart.getTime()) / (60 * 60 * 1000);
+    expect(durationHours).toBe(23);
+  });
+
+  it('America/Santiago spring-forward 2026-09-06: an event at 03:59Z (previous local day) is NOT in the window', () => {
+    // 2026-09-06T03:59Z = Sep 5, 23:59 CLT — still the previous local day.
+    // It must fall outside the Sep 6 window whose dayStart = 04:00Z.
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-09-06', 'America/Santiago');
+    const prevDayEvent = new Date('2026-09-06T03:59:00.000Z');
+    expect(prevDayEvent >= dayStart && prevDayEvent < dayEnd).toBe(false);
+  });
+
+  it('America/Santiago spring-forward 2026-09-06: an event at 04:00Z (first valid instant) IS in the window', () => {
+    // 2026-09-06T04:00Z = Sep 6, 01:00 CLST — the first valid local instant of Sep 6.
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-09-06', 'America/Santiago');
+    const firstInstant = new Date('2026-09-06T04:00:00.000Z');
+    expect(firstInstant >= dayStart && firstInstant < dayEnd).toBe(true);
+  });
+
+  it('Australia/Sydney DST fall-back 2026-04-05: 25-hour day (dayStart=13:00Z, dayEnd=14:00Z next day)', () => {
+    // Transition at 2026-04-04T16:00Z (03:00 AEDT → 02:00 AEST).
+    // dayStart = 2026-04-04T13:00Z (Apr 5 00:00 AEDT)
+    // dayEnd   = 2026-04-05T14:00Z (Apr 6 00:00 AEST) — 25 hours
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-04-05', 'Australia/Sydney');
+    expect(dayStart.toISOString()).toBe('2026-04-04T13:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-04-05T14:00:00.000Z');
+    const durationHours = (dayEnd.getTime() - dayStart.getTime()) / (60 * 60 * 1000);
+    expect(durationHours).toBe(25);
+  });
+
+  it('Australia/Sydney DST spring-forward 2026-10-04: 23-hour day (dayStart=14:00Z, dayEnd=13:00Z next day)', () => {
+    // Transition at 2026-10-03T16:00Z (02:00 AEST → 03:00 AEDT).
+    // dayStart = 2026-10-03T14:00Z (Oct 4 00:00 AEST)
+    // dayEnd   = 2026-10-04T13:00Z (Oct 5 00:00 AEDT) — 23 hours
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-10-04', 'Australia/Sydney');
+    expect(dayStart.toISOString()).toBe('2026-10-03T14:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-10-04T13:00:00.000Z');
+    const durationHours = (dayEnd.getTime() - dayStart.getTime()) / (60 * 60 * 1000);
+    expect(durationHours).toBe(23);
+  });
+
+  it('DST spring-forward: 2026-03-08 in America/Los_Angeles is a 23-hour day', () => {
+    // Clocks spring forward from 02:00 PST to 03:00 PDT on this date.
+    // dayStart = 2026-03-08 00:00 PST = 08:00 UTC
+    // dayEnd   = 2026-03-09 00:00 PDT = 07:00 UTC
+    // Duration = 23 hours (NOT 24)
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-03-08', 'America/Los_Angeles');
+    expect(dayStart.toISOString()).toBe('2026-03-08T08:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-03-09T07:00:00.000Z');
+    const durationHours = (dayEnd.getTime() - dayStart.getTime()) / (60 * 60 * 1000);
+    expect(durationHours).toBe(23);
+  });
+
+  it('DST fall-back: 2026-11-01 in America/Los_Angeles is a 25-hour day', () => {
+    // Clocks fall back from 02:00 PDT to 01:00 PST on this date.
+    // dayStart = 2026-11-01 00:00 PDT = 07:00 UTC
+    // dayEnd   = 2026-11-02 00:00 PST = 08:00 UTC
+    // Duration = 25 hours (NOT 24)
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-11-01', 'America/Los_Angeles');
+    expect(dayStart.toISOString()).toBe('2026-11-01T07:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-11-02T08:00:00.000Z');
+    const durationHours = (dayEnd.getTime() - dayStart.getTime()) / (60 * 60 * 1000);
+    expect(durationHours).toBe(25);
+  });
+
+  it('dayEnd is the next local midnight, not dayStart + 24h', () => {
+    // On a normal (non-DST) day the distinction doesn't matter numerically,
+    // but the implementation must call localMidnightUtc for dayEnd too.
+    // Verify: dayEnd should format as local midnight in the target timezone.
+    const tz = 'America/Los_Angeles';
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-01-15', tz);
+    const startLocal = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(dayStart);
+    const endLocal   = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(dayEnd);
+    expect(startLocal).toBe('2026-01-15');
+    expect(endLocal).toBe('2026-01-16');
+  });
+
+  it('spring-forward: a session fired at 01:59 local (last pre-spring-forward minute) is captured', () => {
+    // 2026-03-08 01:59 PST = 09:59 UTC — must be inside the 23-hour window [08:00Z, 07:00+1dZ)
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-03-08', 'America/Los_Angeles');
+    const eventUtc = new Date('2026-03-08T09:59:00.000Z');
+    expect(eventUtc >= dayStart && eventUtc < dayEnd).toBe(true);
+  });
+
+  it('spring-forward: a session fired at 02:30 local (skipped hour) does not exist; 03:00 PDT is still inside the window', () => {
+    // After clocks spring, 03:00 PDT = 10:00 UTC — still inside the 23-hour window
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-03-08', 'America/Los_Angeles');
+    const eventUtc = new Date('2026-03-08T10:00:00.000Z'); // 03:00 PDT
+    expect(eventUtc >= dayStart && eventUtc < dayEnd).toBe(true);
+  });
+
+  it('fall-back: a session fired during the repeated hour is captured inside the window', () => {
+    // 2026-11-01 01:30 PDT = 08:30 UTC (first pass of 01:30)
+    // 2026-11-01 01:30 PST = 09:30 UTC (second pass, after clock falls back)
+    // Both are inside the 25-hour window [07:00Z, 08:00+1dZ)
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-11-01', 'America/Los_Angeles');
+    const firstPass  = new Date('2026-11-01T08:30:00.000Z');
+    const secondPass = new Date('2026-11-01T09:30:00.000Z');
+    expect(firstPass  >= dayStart && firstPass  < dayEnd).toBe(true);
+    expect(secondPass >= dayStart && secondPass < dayEnd).toBe(true);
+  });
+
+  it('returns effectiveDate matching the supplied date param', () => {
+    const { effectiveDate } = parseSingleDayWindow('2026-08-13', 'America/Chicago');
+    expect(effectiveDate).toBe('2026-08-13');
+  });
+
+  it('rejects a malformed date string and falls back to today in the effective timezone', () => {
+    const { effectiveDate, effectiveTz } = parseSingleDayWindow('not-a-date', 'America/Los_Angeles');
+    expect(effectiveTz).toBe('America/Los_Angeles');
+    // effectiveDate should be a valid YYYY-MM-DD string (today in LA)
+    expect(effectiveDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('UTC window is unchanged vs the old UTC-only behaviour for a non-DST date', () => {
+    // Regression anchor: a UTC request with the new function must produce
+    // the same window as the old hardcoded UTC logic.
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-03-10', 'UTC');
+    expect(dayStart.toISOString()).toBe('2026-03-10T00:00:00.000Z');
+    expect(dayEnd.toISOString()).toBe('2026-03-11T00:00:00.000Z');
+  });
+
+  it('a session at 23:59 local time is captured inside the local-day window', () => {
+    // A staff member in LA fires an event at 2026-08-13 23:59 PDT
+    // = 2026-08-14 06:59 UTC
+    // The local day window for 2026-08-13 LA = [07:00 UTC, next-midnight UTC)
+    const { dayStart, dayEnd } = parseSingleDayWindow('2026-08-13', 'America/Los_Angeles');
+    const eventUtc = new Date('2026-08-14T06:59:00.000Z');
+    expect(eventUtc >= dayStart).toBe(true);
+    expect(eventUtc <  dayEnd).toBe(true);
+  });
+
+  it('a session at 23:59 local time falls OUTSIDE the UTC-only window (demonstrates the pre-fix bug)', () => {
+    // Same event (2026-08-14 06:59 UTC) placed in the *UTC* window for 2026-08-13:
+    // UTC window = [2026-08-13T00:00Z, 2026-08-14T00:00Z)
+    // 06:59 UTC on 2026-08-14 is *after* the UTC window → session would be attributed
+    // to the wrong date without timezone correction.
+    const utcDayStart = new Date('2026-08-13T00:00:00.000Z');
+    const utcDayEnd   = new Date('2026-08-14T00:00:00.000Z');
+    const eventUtc    = new Date('2026-08-14T06:59:00.000Z');
+    expect(eventUtc >= utcDayStart && eventUtc < utcDayEnd).toBe(false);
   });
 });
 

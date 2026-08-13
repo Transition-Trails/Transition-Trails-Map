@@ -406,26 +406,170 @@ router.get('/admin/audit-log', async (req, res) => {
   }
 });
 
+// ── Timezone-aware single-day window helper ───────────────────────────────────
+
+/**
+ * Returns true when `tz` is a valid IANA timezone identifier.
+ * Uses Intl to validate without any extra libraries.
+ */
+function isValidTimezone(tz: string): boolean {
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Returns the first UTC millisecond whose local calendar date (formatted in
+ * `tz`) equals `dateStr`.
+ *
+ * On normal days this equals local midnight. When DST springs forward
+ * *through* midnight (e.g. America/Santiago: 00:00 CLT → 01:00 CLST,
+ * skipping midnight entirely), this returns the first valid local instant of
+ * the day instead (e.g. 01:00 CLST). Fall-back days (midnight repeated) return
+ * the first occurrence of midnight.
+ *
+ * Algorithm — binary search over a ±15-hour window around UTC midnight:
+ *   - ±15 h covers every IANA offset (range UTC-12 through UTC+14).
+ *   - Finds the transition point where the local calendar date changes from
+ *     dateStr-1 to dateStr — the exact start of the local day.
+ *   - Converges to 1-second precision in ≤ 17 Intl.formatToParts calls.
+ *   - Never oscillates: iterative approaches fail when DST springs forward
+ *     exactly at midnight (the signed-distance function has no fixed point at
+ *     or near the nonexistent midnight).
+ *
+ * Exported so it can be unit-tested without starting a server.
+ */
+export function localMidnightUtc(dateStr: string, tz: string): Date {
+  const [ry, rm, rd] = dateStr.split('-').map(Number);
+  const reqDateOnlyMs = Date.UTC(ry!, rm! - 1, rd!);
+
+  // Formatter created once and reused across all binary-search iterations.
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  });
+
+  /** Returns the local calendar date for a given UTC instant, as epoch ms. */
+  function localDateMs(utcMs: number): number {
+    const parts = fmt.formatToParts(new Date(utcMs));
+    const get = (t: string): number =>
+      parseInt(parts.find(p => p.type === t)?.value ?? '0', 10);
+    return Date.UTC(get('year'), get('month') - 1, get('day'));
+  }
+
+  // Binary search for the first UTC second where localDate transitions from
+  // dateStr-1 to dateStr.
+  //
+  // Invariant throughout:
+  //   localDateMs(lo) < reqDateOnlyMs  (lo is still in the previous local day)
+  //   localDateMs(hi) >= reqDateOnlyMs (hi is already in reqDate or later)
+  //
+  // Both invariants hold at initialisation for the full IANA offset range:
+  //   lo = utcMidnight - 15h: even UTC+14 shows (reqDate - 1h) here, so prev day. ✓
+  //   hi = utcMidnight + 15h: even UTC-12 shows (reqDate + 3h) here, so reqDate. ✓
+  let lo = reqDateOnlyMs - 15 * 3_600_000;
+  let hi = reqDateOnlyMs + 15 * 3_600_000;
+
+  while (hi - lo > 1) { // 1-millisecond precision
+    const mid = Math.trunc((lo + hi) / 2);
+    if (localDateMs(mid) < reqDateOnlyMs) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+
+  return new Date(hi);
+}
+
+/**
+ * Returns true when `dateStr` is a syntactically and calendrically valid
+ * YYYY-MM-DD date.  Rejects values like "2026-02-30" that pass the format
+ * regex but represent days that don't exist (JavaScript normalises them).
+ */
+function isValidCalendarDate(dateStr: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const check = new Date(Date.UTC(y!, m! - 1, d!));
+  return (
+    check.getUTCFullYear() === y      &&
+    check.getUTCMonth()    === m! - 1 &&
+    check.getUTCDate()     === d
+  );
+}
+
+/**
+ * Returns the YYYY-MM-DD string for the calendar day that follows dateStr,
+ * computed via UTC-noon arithmetic to avoid DST ambiguity.
+ * The result is a plain date string (no timezone dependency) suitable for
+ * passing back into localMidnightUtc.
+ */
+function nextCalendarDate(dateStr: string): string {
+  // Parse as UTC noon — well away from any DST boundary — then advance one day.
+  const d = new Date(`${dateStr}T12:00:00.000Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Compute the [dayStart, dayEnd) window for a single day, respecting the
+ * caller's local timezone.
+ *
+ * dayEnd is the UTC instant of the *next* local midnight — not dayStart + 24h.
+ * This means DST spring-forward days produce a 23-hour window and fall-back
+ * days produce a 25-hour window, which is exactly right.
+ *
+ * Query params:
+ *   date  YYYY-MM-DD  (defaults to "today" in the effective timezone)
+ *   tz    IANA name   (defaults to UTC when absent or invalid)
+ *
+ * Exported for unit tests.
+ */
+export function parseSingleDayWindow(
+  dateParam: string | null,
+  tzParam:   string | null,
+): { dayStart: Date; dayEnd: Date; effectiveTz: string; effectiveDate: string } {
+  const effectiveTz = (tzParam && isValidTimezone(tzParam)) ? tzParam : 'UTC';
+
+  // Resolve the effective date: use provided date, or today in the effective timezone.
+  // isValidCalendarDate rejects impossible dates like "2026-02-30" that pass the
+  // format regex but would be silently normalised by JavaScript's Date constructor.
+  let effectiveDate: string;
+  if (dateParam && isValidCalendarDate(dateParam)) {
+    effectiveDate = dateParam;
+  } else {
+    // "Today" in the staff member's timezone
+    effectiveDate = new Intl.DateTimeFormat('en-CA', { timeZone: effectiveTz }).format(new Date());
+  }
+
+  const dayStart = localMidnightUtc(effectiveDate, effectiveTz);
+  // dayEnd = next local midnight, NOT dayStart + 24h.
+  // On DST spring-forward the window is 23 h; on fall-back it is 25 h.
+  const dayEnd   = localMidnightUtc(nextCalendarDate(effectiveDate), effectiveTz);
+  return { dayStart, dayEnd, effectiveTz, effectiveDate };
+}
+
 // ── GET /admin/activity-summary ───────────────────────────────────────────────
 //
-// Returns per-user session data for a given UTC date.
-// One row per user who had any audit event that day.
-// Response: { email, audience, firstSeen, lastSeen, durationMinutes, eventCount, topFeatures }[]
+// Returns per-user session data for a given date, respecting the caller's
+// local timezone so that day boundaries match local midnight rather than UTC.
+//
+// Query params:
+//   date  YYYY-MM-DD  (defaults to today in the effective timezone)
+//   tz    IANA name   (e.g. America/Los_Angeles; defaults to UTC)
+//
+// Response: { summary: SessionEntry[]; date: string; tz: string }
 
 router.get('/admin/activity-summary', async (req, res) => {
   try {
     const dateParam = typeof req.query.date === 'string' ? req.query.date.trim() : null;
-    let dayStart: Date;
-    let dayEnd:   Date;
+    const tzParam   = typeof req.query.tz   === 'string' ? req.query.tz.trim()   : null;
 
-    if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
-      dayStart = new Date(`${dateParam}T00:00:00.000Z`);
-    } else {
-      // Default: today (UTC)
-      const now = new Date();
-      dayStart  = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    }
-    dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+    const { dayStart, dayEnd, effectiveTz, effectiveDate } =
+      parseSingleDayWindow(dateParam, tzParam);
 
     const rows = await db
       .select()
@@ -499,7 +643,7 @@ router.get('/admin/activity-summary', async (req, res) => {
     // Sort by firstSeen ascending
     summary.sort((a, b) => a.firstSeen.localeCompare(b.firstSeen));
 
-    res.json({ summary, date: dayStart.toISOString().slice(0, 10) });
+    res.json({ summary, date: effectiveDate, tz: effectiveTz });
   } catch (err) {
     logger.error({ err }, 'adminUsers GET /admin/activity-summary threw');
     res.status(500).json({ error: 'Failed to load activity summary' });

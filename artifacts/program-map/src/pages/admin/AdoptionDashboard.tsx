@@ -106,12 +106,57 @@ function audienceLabel(a: string | null): string {
 
 // ── API helpers ───────────────────────────────────────────────────────────────
 
-async function fetchSessions(date: string): Promise<SessionEntry[]> {
-  const res = await fetch(`/api/admin/activity-summary?date=${encodeURIComponent(date)}`);
+async function fetchSessions(date: string, tz: string): Promise<SessionEntry[]> {
+  const p = new URLSearchParams({ date, tz });
+  const res = await fetch(`/api/admin/activity-summary?${p}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json() as { summary: SessionEntry[] };
   return data.summary ?? [];
 }
+
+/** Returns the browser's IANA timezone string (e.g. "America/Los_Angeles"). */
+function browserTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return 'UTC';
+  }
+}
+
+/**
+ * Returns "today" as a YYYY-MM-DD string in the given IANA timezone.
+ * Falls back to UTC when the timezone is unrecognised.
+ */
+function todayInTz(tz: string): string {
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date());
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+
+/**
+ * A curated list of common IANA timezone identifiers presented in the selector.
+ * Grouped roughly by UTC offset for quick scanning.
+ */
+const COMMON_TIMEZONES: { label: string; value: string }[] = [
+  { label: 'UTC',                      value: 'UTC' },
+  { label: 'ET — New York (UTC-5/-4)', value: 'America/New_York' },
+  { label: 'CT — Chicago (UTC-6/-5)',  value: 'America/Chicago' },
+  { label: 'MT — Denver (UTC-7/-6)',   value: 'America/Denver' },
+  { label: 'PT — LA (UTC-8/-7)',       value: 'America/Los_Angeles' },
+  { label: 'AK — Anchorage (UTC-9/-8)',value: 'America/Anchorage' },
+  { label: 'HI — Honolulu (UTC-10)',   value: 'Pacific/Honolulu' },
+  { label: 'London (UTC+0/+1)',        value: 'Europe/London' },
+  { label: 'Paris (UTC+1/+2)',         value: 'Europe/Paris' },
+  { label: 'Nairobi (UTC+3)',          value: 'Africa/Nairobi' },
+  { label: 'Dubai (UTC+4)',            value: 'Asia/Dubai' },
+  { label: 'Kolkata (UTC+5:30)',       value: 'Asia/Kolkata' },
+  { label: 'Bangkok (UTC+7)',          value: 'Asia/Bangkok' },
+  { label: 'Singapore (UTC+8)',        value: 'Asia/Singapore' },
+  { label: 'Tokyo (UTC+9)',            value: 'Asia/Tokyo' },
+  { label: 'Sydney (UTC+10/+11)',      value: 'Australia/Sydney' },
+];
 
 async function fetchFailureSummary(
   dateFrom:    string,
@@ -179,7 +224,9 @@ function DateRangeToolbar({
 // ── Sessions Tab ──────────────────────────────────────────────────────────────
 
 function SessionsTab() {
-  const [date,     setDate]     = useState(todayIso);
+  const [tz,       setTz]       = useState(browserTimezone);
+  // Initialize date as "today" in the browser's timezone, not UTC midnight
+  const [date,     setDate]     = useState(() => todayInTz(browserTimezone()));
   const [sessions, setSessions] = useState<SessionEntry[]>([]);
   const [loading,  setLoading]  = useState(false);
   const [error,    setError]    = useState<string | null>(null);
@@ -188,13 +235,21 @@ function SessionsTab() {
   function load() {
     setLoading(true);
     setError(null);
-    fetchSessions(date)
+    fetchSessions(date, tz)
       .then(setSessions)
       .catch(e => setError(e instanceof Error ? e.message : 'Failed to load'))
       .finally(() => setLoading(false));
   }
 
-  useEffect(() => { load(); }, [date]); // eslint-disable-line react-hooks/exhaustive-deps
+  // When the timezone changes, clamp date to "today in the new timezone" so
+  // the selected date never exceeds the date picker's max.
+  useEffect(() => {
+    const maxDate = todayInTz(tz);
+    if (date > maxDate) setDate(maxDate);
+  }, [tz]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reload whenever date or timezone changes
+  useEffect(() => { load(); }, [date, tz]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
     if (!search.trim()) return sessions;
@@ -220,8 +275,25 @@ function SessionsTab() {
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-1.5">
             <span className="text-[12px] font-bold text-muted-foreground/60">Date</span>
-            <input type="date" value={date} max={todayIso()} onChange={e => setDate(e.target.value)}
+            <input type="date" value={date} max={todayInTz(tz)} onChange={e => setDate(e.target.value)}
               className="text-[13px] rounded border border-border bg-background text-foreground px-2 py-1 outline-none focus:border-ring" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[12px] font-bold text-muted-foreground/60">Timezone</span>
+            <select
+              value={tz}
+              onChange={e => setTz(e.target.value)}
+              className="text-[13px] rounded border border-border bg-background text-foreground px-2 py-1 outline-none focus:border-ring max-w-[220px]"
+              title="Day boundaries use local midnight in the selected timezone"
+            >
+              {/* If the browser timezone isn't in our curated list, prepend it */}
+              {!COMMON_TIMEZONES.some(t => t.value === tz) && (
+                <option value={tz}>{tz} (browser)</option>
+              )}
+              {COMMON_TIMEZONES.map(t => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </select>
           </div>
           <div className="relative">
             <input value={search} onChange={e => setSearch(e.target.value)}
