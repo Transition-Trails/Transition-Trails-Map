@@ -17,7 +17,7 @@
 
 import { useState } from "react";
 import { Link } from "wouter";
-import { BookOpen, Video, Sparkles, MessageSquare, Users, CalendarClock, Hash, Plus } from "lucide-react";
+import { BookOpen, Video, Sparkles, MessageSquare, Users, CalendarClock, Hash, Plus, ClipboardCheck } from "lucide-react";
 import { HomebaseShell }       from "@/components/layout/HomebaseShell";
 import { SubmitCaseDrawer }    from "@/components/homebase/SubmitCaseDrawer";
 import { LogTimeRow }          from "@/components/homebase/LogTimeRow";
@@ -74,6 +74,30 @@ function RecordDemoCard() {
         className="mt-3 flex items-center justify-center rounded-lg border border-border px-3 py-1.5 text-sm text-foreground hover:bg-muted/30 transition-colors"
       >
         Start recording
+      </Link>
+    </div>
+  );
+}
+
+function AssessmentCard() {
+  return (
+    <div className="rounded-xl border border-[#9FC3AE] bg-[#F4FAF6] p-4">
+      <div className="flex items-start gap-3">
+        <div className="w-8 h-8 rounded-lg bg-[#E6F0EA] flex items-center justify-center flex-shrink-0">
+          <ClipboardCheck className="w-4 h-4 text-[#2F6B3F]" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground leading-snug">Skill Assessment</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5">
+            Penny will walk you through a competency check — takes 10–20 min.
+          </p>
+        </div>
+      </div>
+      <Link
+        href="/homebase/assessment"
+        className="mt-3 flex items-center justify-center rounded-lg bg-[#2F6B3F] text-white px-3 py-1.5 text-sm font-medium hover:bg-[#245531] transition-colors"
+      >
+        Start assessment
       </Link>
     </div>
   );
@@ -230,6 +254,7 @@ export default function LearnerHomebase({ audience, displayName }: LearnerHomeba
               weekState={weekResult.data}
               error={weekResult.error}
             />
+            <AssessmentCard />
             <RecordDemoCard />
           </div>
         </div>
