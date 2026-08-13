@@ -144,6 +144,9 @@ router.get("/sf/cases", async (req, res) => {
     AccountName:        ((r["Account"] as Record<string,unknown>|null)?.["Name"] as string|null) ?? null,
   }));
 
+  // Never cache this response — a newly synced case must appear immediately
+  // on the next fetch without the browser serving a stale 304.
+  res.set("Cache-Control", "no-store");
   return res.json({ cases, orgBaseUrl, followUpDateSupported });
 });
 
