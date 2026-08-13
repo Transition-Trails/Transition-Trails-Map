@@ -23,6 +23,7 @@ import { HomebaseShell } from "@/components/layout/HomebaseShell";
 import { DomainReadsSidebar } from "@/components/homebase/DomainReadsSidebar";
 import { MCItemRenderer, type ConfidenceLevel } from "@/components/homebase/MCItemRenderer";
 import { ScenarioItemRenderer, type CoachSignals, type ScenarioItem } from "@/components/homebase/ScenarioItemRenderer";
+import BuildCheckItemRenderer from "@/components/homebase/BuildCheckItemRenderer";
 import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
 import { useAppContext } from "@/context/AppContext";
 
@@ -273,6 +274,7 @@ function ItemShell({
   currentItem,
   domainReads,
   totalItems,
+  sessionId,
   onRespond,
   submitting,
 }: {
@@ -281,6 +283,7 @@ function ItemShell({
   currentItem: AssessmentItem | null;
   domainReads: DomainState[];
   totalItems:  number;
+  sessionId:   number | null;
   onRespond:   (answer: string, confidence: ConfidenceLevel, signals?: CoachSignals) => Promise<void>;
   submitting:  boolean;
 }) {
@@ -347,16 +350,26 @@ function ItemShell({
             />
           )}
 
+          {currentItem?.itemType === "build-check" && sessionId && (
+            <BuildCheckItemRenderer
+              item={currentItem as unknown as import("@/components/homebase/BuildCheckItemRenderer").BuildCheckItem}
+              sessionId={sessionId}
+              onSubmit={onRespond}
+              submitting={submitting}
+            />
+          )}
+
           {currentItem &&
             currentItem.itemType !== "mc" &&
-            currentItem.itemType !== "scenario" && (
+            currentItem.itemType !== "scenario" &&
+            currentItem.itemType !== "build-check" && (
             <div
               className="rounded-xl border p-4 min-h-[160px] flex items-center justify-center"
               style={{ borderColor: "#E2E4E1", borderStyle: "dashed", color: "#9CA3AF" }}
             >
               <div className="text-center">
                 <p className="text-[13px] font-medium">{typeLabel} renderer</p>
-                <p className="text-[11px] mt-1">Coming in Task 5</p>
+                <p className="text-[11px] mt-1">Coming soon</p>
               </div>
             </div>
           )}
@@ -619,6 +632,7 @@ export default function LearnerAssessment() {
             currentItem={currentItem}
             domainReads={domainReads}
             totalItems={TOTAL_ESTIMATE}
+            sessionId={session?.id ?? null}
             onRespond={handleRespond}
             submitting={submitting}
           />

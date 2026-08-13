@@ -216,6 +216,26 @@ export function getEffectiveSfToken(req: Request): SfCredentials | null {
  *
  * Returns null only when all three options are unavailable.
  */
+/**
+ * Returns a fetch bound to the LEARNER's own Salesforce OAuth session.
+ * Unlike getEffectiveSfFetch, this intentionally does NOT fall back to shared
+ * service-account credentials or the Replit Connector.
+ *
+ * Use this for any operation where assessment integrity requires that the
+ * action is verified against the individual learner's personal dev org —
+ * e.g. build-check verify/respond.  Returns null when the learner has no
+ * active per-user SF session, which must be surfaced to the caller as
+ * sfNotConnected (503) rather than silently falling back to shared state.
+ */
+export function getLearnerSfFetch(
+  req: Request,
+): ((url: string, init?: RequestInit) => Promise<Response>) | null {
+  if (req.session.sfAccessToken && req.session.sfInstanceUrl) {
+    return makeSfDirectFetch(req.session.sfAccessToken, req.session.sfInstanceUrl);
+  }
+  return null;
+}
+
 export function getEffectiveSfFetch(
   req: Request
 ): ((url: string, init?: RequestInit) => Promise<Response>) | null {

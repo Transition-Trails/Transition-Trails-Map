@@ -694,16 +694,257 @@ const ITEMS: Omit<InsertAssessmentItem, "id">[] = [
     },
     explanation: "Create a minimal Permission Set that grants only the object and field access needed. Assign it to the contractor's user. Use manual sharing or sharing rules to expose the specific records. After 30 days, remove the permission set assignment and deactivate the user if access is no longer needed.",
   },
+  // ── Build-check items (one per domain — server-side SF verification) ──────────
+
+  {
+    domain: "config-setup", domainLabel: "Configuration and Setup", domainWeight: "0.18",
+    itemType: "build-check",
+    question: "Create a custom object called 'Learner Record' in your Salesforce developer org, then configure its org-wide default sharing to Private.",
+    rubric: {
+      steps: [
+        "Log in to your Salesforce developer org at https://login.salesforce.com",
+        "Navigate to Setup → Object Manager, then click Create → Custom Object",
+        "Set the Singular Label to \"Learner Record\" and the Plural Label to \"Learner Records\" — the API name auto-fills as Learner_Record__c",
+        "After saving the object, go to Setup → Sharing Settings",
+        "In the Organization-Wide Defaults section, click Edit",
+        "Find Learner Record in the list, set Default Internal Access to \"Private\", and click Save",
+      ],
+      verificationCriteria: [
+        {
+          id: "obj-exists",
+          label: "Custom object created",
+          method: "describe",
+          description: "Penny will confirm that Learner_Record__c exists in your org via an SObject describe call.",
+          checkConfig: { method: "describe", objectApi: "Learner_Record__c" },
+        },
+        {
+          id: "sharing-private",
+          label: "Sharing model is Private",
+          method: "tooling",
+          description: "Penny will query EntityDefinition via the Tooling API to confirm the org-wide default sharing for Learner_Record__c is set to Private (DefaultSharingAccess = 'None').",
+          checkConfig: {
+            method: "tooling",
+            query: "SELECT DefaultSharingAccess FROM EntityDefinition WHERE QualifiedApiName = 'Learner_Record__c' LIMIT 1",
+            expectFieldValue: { field: "DefaultSharingAccess", value: "None" },
+          },
+        },
+      ],
+    },
+    explanation: "Setting the sharing model to Private means only the record owner can read it by default. This is the foundation of Salesforce record-level security.",
+  },
+  {
+    domain: "object-manager-builder", domainLabel: "Object Manager and Lightning App Builder", domainWeight: "0.18",
+    itemType: "build-check",
+    question: "Add a custom Text(255) field called 'Training Notes' to the standard Contact object in your Salesforce developer org.",
+    rubric: {
+      steps: [
+        "Go to Setup → Object Manager → Contact → Fields & Relationships, then click New",
+        "Select 'Text' as the field type and click Next",
+        "Set Field Label to \"Training Notes\" — the API name Training_Notes__c auto-fills",
+        "Set Length to 255 and leave other defaults",
+        "Complete the wizard and click Save",
+      ],
+      verificationCriteria: [
+        {
+          id: "field-exists",
+          label: "Custom field exists on Contact",
+          method: "describe",
+          description: "Penny will describe the Contact object and confirm that Training_Notes__c is present in the field list.",
+          checkConfig: { method: "describe", objectApi: "Contact", fieldApi: "Training_Notes__c" },
+        },
+      ],
+    },
+    explanation: "Custom fields extend standard objects with org-specific data. The Object Manager is the central hub for all schema changes.",
+  },
+  {
+    domain: "sales-marketing", domainLabel: "Sales and Marketing Applications", domainWeight: "0.12",
+    itemType: "build-check",
+    question: "Create an Account record and a related Opportunity in your Salesforce developer org with Stage set to 'Prospecting'.",
+    rubric: {
+      steps: [
+        "Go to the Accounts tab and click New — create an Account named \"Training Corporation\"",
+        "Open the new Account and click the New Opportunity related action (or go to Opportunities → New)",
+        "Link the Opportunity to \"Training Corporation\", set Stage to \"Prospecting\", and set a Close Date at least 30 days out",
+        "Save the Opportunity",
+      ],
+      verificationCriteria: [
+        {
+          id: "opp-prospecting",
+          label: "Opportunity with Stage 'Prospecting' exists",
+          method: "soql",
+          description: "Penny will query your org for an Opportunity with StageName = 'Prospecting' linked to an Account.",
+          checkConfig: {
+            method: "soql",
+            query: "SELECT Id FROM Opportunity WHERE StageName = 'Prospecting' AND AccountId != null LIMIT 1",
+            expectMinCount: 1,
+          },
+        },
+      ],
+    },
+    explanation: "The Opportunity object is the core of the Sales Cloud. Linking it to an Account establishes the relationship between pipeline and customer data.",
+  },
+  {
+    domain: "service-support", domainLabel: "Service and Support Applications", domainWeight: "0.11",
+    itemType: "build-check",
+    question: "Create a Case in your Salesforce developer org with Priority set to High, Status set to New, and a Subject that starts with 'Training:'.",
+    rubric: {
+      steps: [
+        "Go to the Cases tab and click New",
+        "Set the Subject to \"Training: Object Configuration Issue\"",
+        "Set Priority to \"High\" and Status to \"New\"",
+        "Save the Case",
+      ],
+      verificationCriteria: [
+        {
+          id: "case-high-priority",
+          label: "High-priority training Case exists",
+          method: "soql",
+          description: "Penny will query your org for a Case with Priority = 'High', Status = 'New', and a Subject starting with 'Training:'.",
+          checkConfig: {
+            method: "soql",
+            query: "SELECT Id FROM Case WHERE Priority = 'High' AND Status = 'New' AND Subject LIKE 'Training:%' LIMIT 1",
+            expectMinCount: 1,
+          },
+        },
+      ],
+    },
+    explanation: "Cases are the central object in Service Cloud. Priority and Status drive escalation rules, SLA enforcement, and queue routing.",
+  },
+  {
+    domain: "productivity", domainLabel: "Productivity and Collaboration", domainWeight: "0.07",
+    itemType: "build-check",
+    question: "Create an Event in your Salesforce developer org with Subject set exactly to 'Training Check-in'.",
+    rubric: {
+      steps: [
+        "Go to the Calendar tab or the Activities section on any record",
+        "Click New Event (or Log a Call → Event)",
+        "Set the Subject to exactly \"Training Check-in\"",
+        "Set a Start Date within the next 7 days",
+        "Save the Event",
+      ],
+      verificationCriteria: [
+        {
+          id: "event-exists",
+          label: "Training Check-in event exists",
+          method: "soql",
+          description: "Penny will query your org for an Event with Subject = 'Training Check-in'.",
+          checkConfig: {
+            method: "soql",
+            query: "SELECT Id FROM Event WHERE Subject = 'Training Check-in' LIMIT 1",
+            expectMinCount: 1,
+          },
+        },
+      ],
+    },
+    explanation: "Events and Tasks are the Activity objects in Salesforce. They can be related to multiple records using Shared Activities and drive productivity reporting.",
+  },
+  {
+    domain: "data-analytics", domainLabel: "Data and Analytics Management", domainWeight: "0.13",
+    itemType: "build-check",
+    question: "Create a report in your Salesforce developer org and save it with the name 'Training: Account Overview'.",
+    rubric: {
+      steps: [
+        "Go to the Reports tab and click New Report",
+        "Select 'Accounts' as the report type and click Start Report",
+        "Add at least Account Name and Account Owner as columns",
+        "Click Save & Run — set the report name to exactly \"Training: Account Overview\"",
+        "Save the report in any folder",
+      ],
+      verificationCriteria: [
+        {
+          id: "report-exists",
+          label: "Report 'Training: Account Overview' exists",
+          method: "tooling",
+          description: "Penny will use the Tooling API to confirm that a report named 'Training: Account Overview' exists in your org.",
+          checkConfig: {
+            method: "tooling",
+            query: "SELECT Id, Name FROM Report WHERE Name = 'Training: Account Overview' LIMIT 1",
+            expectMinCount: 1,
+          },
+        },
+      ],
+    },
+    explanation: "Reports are the primary analytics tool in Salesforce. Report types determine which objects and fields are available as columns and filters.",
+  },
+  {
+    domain: "workflow-automation", domainLabel: "Workflow and Process Automation", domainWeight: "0.15",
+    itemType: "build-check",
+    question: "Build and activate a Screen Flow in your Salesforce developer org with API name 'Training_Intake' that displays a welcome message.",
+    rubric: {
+      steps: [
+        "Go to Setup → Flows → New Flow",
+        "Select 'Screen Flow' and click Create",
+        "Add a Screen element — inside it, add a 'Display Text' component with the text \"Welcome to your training session\"",
+        "Connect the Start node to the Screen element with a connector",
+        "Click Save — set the Flow Label to \"Training Intake\" and the API Name to \"Training_Intake\"",
+        "Click Activate to make the flow active",
+      ],
+      verificationCriteria: [
+        {
+          id: "flow-active",
+          label: "Active Flow 'Training_Intake' exists",
+          method: "tooling",
+          description: "Penny will use the Tooling API to confirm that an active Flow with DeveloperName = 'Training_Intake' exists in your org.",
+          checkConfig: {
+            method: "tooling",
+            query: "SELECT Id, DeveloperName, Status FROM Flow WHERE DeveloperName = 'Training_Intake' AND Status = 'Active' LIMIT 1",
+            expectMinCount: 1,
+          },
+        },
+      ],
+    },
+    explanation: "Screen Flows are the recommended tool for guided user experiences in Salesforce. Activating a flow publishes it to users — without activation, it remains a draft only you can see.",
+  },
+  {
+    domain: "security-access", domainLabel: "Security and Access Management", domainWeight: "0.06",
+    itemType: "build-check",
+    question: "Create a custom Permission Set labeled 'Training Access' in your Salesforce developer org and grant it Read access to Cases.",
+    rubric: {
+      steps: [
+        "Go to Setup → Permission Sets → New",
+        "Set the Label to \"Training Access\" — the API Name auto-fills as Training_Access",
+        "Save the Permission Set",
+        "Open the new Permission Set → Object Settings → Cases",
+        "Enable Read access for Cases and click Save",
+      ],
+      verificationCriteria: [
+        {
+          id: "pset-exists",
+          label: "Permission Set 'Training Access' exists",
+          method: "soql",
+          description: "Penny will query your org for a custom Permission Set with Label = 'Training Access'.",
+          checkConfig: {
+            method: "soql",
+            query: "SELECT Id FROM PermissionSet WHERE Label = 'Training Access' AND IsCustom = true LIMIT 1",
+            expectMinCount: 1,
+          },
+        },
+        {
+          id: "pset-case-read",
+          label: "Case Read access granted",
+          method: "soql",
+          description: "Penny will verify that the 'Training Access' Permission Set grants Read permission to the Case object.",
+          checkConfig: {
+            method: "soql",
+            query: "SELECT Id FROM ObjectPermissions WHERE Parent.Label = 'Training Access' AND SobjectType = 'Case' AND PermissionsRead = true LIMIT 1",
+            expectMinCount: 1,
+          },
+        },
+      ],
+    },
+    explanation: "Permission Sets are the recommended way to grant additional access above a user's profile. They can be assigned to individual users without changing their base profile.",
+  },
 ];
 
 // ── Seeder function ────────────────────────────────────────────────────────────
 //
 // Idempotent per item-type: each type is seeded independently so that running
-// the seeder against an existing MC-populated database still inserts scenario
-// items added in later releases.  Safe to call on every server start.
+// the seeder against an existing MC or scenario-populated database still inserts
+// build-check items added in later releases.  Safe to call on every server start.
 
-const MC_ITEMS       = ITEMS.filter(i => !i.itemType || i.itemType === "mc");
-const SCENARIO_ITEMS = ITEMS.filter(i => i.itemType === "scenario");
+const MC_ITEMS          = ITEMS.filter(i => !i.itemType || i.itemType === "mc");
+const SCENARIO_ITEMS    = ITEMS.filter(i => i.itemType === "scenario");
+const BUILD_CHECK_ITEMS = ITEMS.filter(i => i.itemType === "build-check");
 
 export async function seedAssessmentItems(): Promise<void> {
   // ── MC items ────────────────────────────────────────────────────────────────
@@ -730,6 +971,19 @@ export async function seedAssessmentItems(): Promise<void> {
     console.log(`[seed] Inserted ${SCENARIO_ITEMS.length} scenario assessment items`);
   } else {
     console.log(`[seed] Scenario items already present (${scenarioCount} rows) — skipping`);
+  }
+
+  // ── Build-check items ───────────────────────────────────────────────────────
+  const [{ buildCheckCount }] = await db
+    .select({ buildCheckCount: count() })
+    .from(assessmentItemsTable)
+    .where(eq(assessmentItemsTable.itemType, "build-check"));
+
+  if (Number(buildCheckCount) === 0) {
+    await db.insert(assessmentItemsTable).values(BUILD_CHECK_ITEMS);
+    console.log(`[seed] Inserted ${BUILD_CHECK_ITEMS.length} build-check assessment items`);
+  } else {
+    console.log(`[seed] Build-check items already present (${buildCheckCount} rows) — skipping`);
   }
 }
 

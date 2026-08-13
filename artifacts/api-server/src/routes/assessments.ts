@@ -5,12 +5,13 @@
  * Trail OS v1.7 Skill Assessment feature.
  *
  * Routes:
- *   POST   /assessments/sessions             — start or resume a session
- *   GET    /assessments/sessions/:id         — get session + domain-reads state
- *   GET    /assessments/next-item/:sessionId — adaptive next item selector
- *   POST   /assessments/sessions/:id/respond — record a response
- *   POST   /assessments/sessions/:id/complete — mark session done
- *   GET    /assessments/sessions/:id/results  — per-domain debrief data
+ *   POST   /assessments/sessions                           — start or resume a session
+ *   GET    /assessments/sessions/:id                       — get session + domain-reads state
+ *   GET    /assessments/next-item/:sessionId               — adaptive next item selector
+ *   POST   /assessments/sessions/:id/respond               — record a response
+ *   POST   /assessments/sessions/:id/items/:itemId/verify  — run build-check verification (SF calls)
+ *   POST   /assessments/sessions/:id/complete              — mark session done
+ *   GET    /assessments/sessions/:id/results               — per-domain debrief data
  *
  * Auth:
  *   Learner routes (start/respond/complete/next-item) use requireHomebaseAuth
@@ -34,6 +35,8 @@ import { requireHomebaseAuth, requireStaff } from "../middlewares/requireAuth.js
 import { logger }                            from "../lib/logger.js";
 import { seedAssessmentItems }               from "../scripts/seedAssessmentItems.js";
 import { scoreScenarioResponse }             from "../lib/assessmentScoring.js";
+import { getLearnerSfFetch }                  from "../lib/salesforceOAuth.js";
+import { parseBuildCheckRubric, runBuildChecks } from "../lib/buildCheckRunner.js";
 
 const router = Router();
 
@@ -295,6 +298,9 @@ router.post("/assessments/sessions/:id/respond", requireHomebaseAuth, async (req
     longestInsertion,
     pasteRatio,
     screenShared,
+    // NOTE: verificationResults from the client is NEVER used for scoring.
+    // Build-check items are re-verified server-side in the scoring block below.
+    // Accepting it here prevents client confusion; it has no effect on isCorrect.
   } = (req.body ?? {}) as {
     itemId?:           number;
     answer?:           string;
@@ -342,13 +348,41 @@ router.post("/assessments/sessions/:id/respond", requireHomebaseAuth, async (req
 
   if (dupe) return res.status(409).json({ error: "Item already answered in this session" });
 
-  // Score MC items; scenario items are scored asynchronously by Penny
-  let isCorrect: boolean | null = null;
-  let score: string | null      = null;
+  // Score items by type:
+  //   mc          — immediate pass/fail against correctOption
+  //   build-check — re-run SF checks server-side; NEVER trust client-supplied results
+  //   scenario    — scored asynchronously by Penny after insert
+  let isCorrect: boolean | null          = null;
+  let score: string | null               = null;
+  let rubricScoresForInsert: unknown     = null;
 
   if (item.itemType === "mc" && item.correctOption) {
     isCorrect = answer.trim().toLowerCase() === item.correctOption.toLowerCase();
     score     = isCorrect ? "1" : "0";
+  } else if (item.itemType === "build-check") {
+    // Security: the client's verificationResults are ignored.
+    // We re-run every SF check here so the server is the sole authority on pass/fail.
+    // Build-check requires the learner's own personal SF dev org session.
+    // getLearnerSfFetch returns null (never shared service account or connector)
+    // so a learner without a connected org correctly gets 503.
+    const sfFetch = getLearnerSfFetch(req);
+    if (!sfFetch) {
+      return res.status(503).json({
+        sfNotConnected: true,
+        error: "Connect your Salesforce developer org to verify this item.",
+      });
+    }
+    const buildRubric = parseBuildCheckRubric(item.rubric);
+    if (buildRubric && buildRubric.verificationCriteria.length > 0) {
+      const checkResults    = await runBuildChecks(sfFetch, buildRubric.verificationCriteria);
+      isCorrect             = checkResults.every(r => r.passed);
+      score                 = isCorrect ? "1" : "0";
+      rubricScoresForInsert = checkResults;
+      logger.info(
+        { sessionId, itemId, isCorrect, failCount: checkResults.filter(r => !r.passed).length },
+        "build-check respond: server-side re-verification completed",
+      );
+    }
   }
 
   const [response] = await db
@@ -366,6 +400,7 @@ router.post("/assessments/sessions/:id/respond", requireHomebaseAuth, async (req
       longestInsertion: longestInsertion ?? null,
       pasteRatio:       pasteRatio != null ? String(pasteRatio) : null,
       screenShared:     screenShared     ?? null,
+      rubricScores:     rubricScoresForInsert ?? null,
     })
     .returning();
 
@@ -388,6 +423,77 @@ router.post("/assessments/sessions/:id/respond", requireHomebaseAuth, async (req
     domainReads,
   });
 });
+
+// ── POST /assessments/sessions/:id/items/:itemId/verify ───────────────────────
+// Run build-check verification for one item against the learner's connected SF org.
+// Stateless — no DB write; results are sent back to the client and submitted
+// via the normal respond route when the learner clicks Continue.
+//
+// 503 with { sfNotConnected: true } when no SF session is available.
+
+router.post(
+  "/assessments/sessions/:id/items/:itemId/verify",
+  requireHomebaseAuth,
+  async (req, res) => {
+    const sessionId = parseInt(String(req.params["id"]     ?? ""), 10);
+    const itemId    = parseInt(String(req.params["itemId"] ?? ""), 10);
+    if (isNaN(sessionId) || isNaN(itemId)) {
+      return res.status(400).json({ error: "Invalid session or item id" });
+    }
+
+    const learnerEmail = res.locals["effectiveEmail"] as string;
+
+    // Verify session belongs to this learner
+    const [session] = await db
+      .select()
+      .from(skillAssessmentSessionsTable)
+      .where(
+        and(
+          eq(skillAssessmentSessionsTable.id, sessionId),
+          eq(skillAssessmentSessionsTable.learnerEmail, learnerEmail),
+          eq(skillAssessmentSessionsTable.status, "active"),
+        ),
+      )
+      .limit(1);
+
+    if (!session) return res.status(404).json({ error: "Active session not found" });
+
+    // Load item
+    const [item] = await db
+      .select()
+      .from(assessmentItemsTable)
+      .where(eq(assessmentItemsTable.id, itemId))
+      .limit(1);
+
+    if (!item)                          return res.status(404).json({ error: "Item not found" });
+    if (item.itemType !== "build-check") return res.status(400).json({ error: "Item is not a build-check type" });
+
+    // Parse the rubric
+    const rubric = parseBuildCheckRubric(item.rubric);
+    if (!rubric || rubric.verificationCriteria.length === 0) {
+      return res.status(400).json({ error: "Item has no verification criteria configured" });
+    }
+
+    // Build-check requires the learner's own personal SF dev org session.
+    // getLearnerSfFetch never falls back to shared service-account or connector,
+    // so a learner without a connected org correctly gets 503 here.
+    const sfFetch = getLearnerSfFetch(req);
+    if (!sfFetch) {
+      return res.status(503).json({ sfNotConnected: true, error: "Connect your Salesforce developer org to verify this item." });
+    }
+
+    // Run all checks in parallel
+    const results = await runBuildChecks(sfFetch, rubric.verificationCriteria);
+    const allPassed = results.every(r => r.passed);
+
+    logger.info(
+      { sessionId, itemId, allPassed, failCount: results.filter(r => !r.passed).length },
+      "build-check verification completed",
+    );
+
+    return res.json({ results, allPassed });
+  },
+);
 
 // ── POST /assessments/sessions/:id/complete ────────────────────────────────────
 
