@@ -9,8 +9,17 @@ import {
   filterStaleHealthIssues,
 } from "../lib/integrationHealth.js";
 import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
+import { requireAdmin } from "../middlewares/requireAuth.js";
 
 const router = Router();
+
+// ── Recording storage ─────────────────────────────────────────────────────────
+
+// ── SF data-category cache (1-hour TTL) ───────────────────────────────────────
+interface KnSfSubCategory { name: string; label: string; }
+interface KnSfCategoryGroup { name: string; label: string; categories: KnSfSubCategory[]; }
+let sfCategoryCacheExpiry = 0;
+let sfCategoryCache: KnSfCategoryGroup[] = [];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -1694,6 +1703,31 @@ router.get("/knowledge/sf-article-types", async (req, res): Promise<void> => {
 });
 
 // GET /api/knowledge/articles
+// GET /api/knowledge/sf-categories  — SF DataCategoryGroup list with 1-hour in-memory cache
+router.get("/knowledge/sf-categories", async (req, res): Promise<void> => {
+  try {
+    const now = Date.now();
+    if (sfCategoryCache.length === 0 || now > sfCategoryCacheExpiry) {
+      const client = new ConnectorSalesforceClient();
+      // Reuse the established SfDataCategoryGroupsResponse shape (key: categoryGroups)
+      // and the existing flattenCategories helper for recursive child support.
+      const data = await client.rest<SfDataCategoryGroupsResponse>(
+        "/services/data/v62.0/support/dataCategoryGroups?sObjectType=KnowledgeArticleVersion"
+      );
+      sfCategoryCache = (data.categoryGroups ?? []).map(g => ({
+        name:       g.name,
+        label:      g.label,
+        categories: flattenCategories(g.topCategories ?? []).map(({ name, label }) => ({ name, label })),
+      }));
+      sfCategoryCacheExpiry = now + 60 * 60 * 1000; // 1 hour
+    }
+    res.json({ groups: sfCategoryCache });
+  } catch (err) {
+    req.log.warn("SF categories fetch failed (returning empty): " + String(err));
+    res.json({ groups: [] });
+  }
+});
+
 router.get("/knowledge/articles", async (req, res): Promise<void> => {
   try {
     const rows = await db
@@ -1722,8 +1756,9 @@ router.get("/knowledge/articles/:id", async (req, res): Promise<void> => {
 // POST /api/knowledge/articles  — create draft
 router.post("/knowledge/articles", async (req, res): Promise<void> => {
   try {
-    const { title, summary = "", body = "", category = "", articleType = "", urlName } = req.body as {
+    const { title, summary = "", body = "", category = "", articleType = "", urlName, dataCategoryGroup, dataCategory } = req.body as {
       title: string; summary?: string; body?: string; category?: string; articleType?: string; urlName?: string;
+      dataCategoryGroup?: string; dataCategory?: string;
     };
     if (!title?.trim()) { res.status(400).json({ error: "title is required" }); return; }
     const authoredBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
@@ -1738,6 +1773,8 @@ router.post("/knowledge/articles", async (req, res): Promise<void> => {
       urlName: urlName?.trim() || slugify(title),
       status: "draft",
       authoredBy,
+      dataCategoryGroup: dataCategoryGroup || null,
+      dataCategory:      dataCategory      || null,
     }).returning();
     res.status(201).json({ article: row });
   } catch (err) {
@@ -1756,17 +1793,20 @@ router.patch("/knowledge/articles/:id", async (req, res): Promise<void> => {
       res.status(409).json({ error: "Only draft articles can be edited. Recall it first." });
       return;
     }
-    const { title, summary, body, category, articleType, urlName } = req.body as Partial<{
+    const { title, summary, body, category, articleType, urlName, dataCategoryGroup, dataCategory } = req.body as Partial<{
       title: string; summary: string; body: string; category: string; articleType: string; urlName: string;
+      dataCategoryGroup: string; dataCategory: string;
     }>;
     const [updated] = await db.update(knowledgeArticlesTable)
       .set({
-        ...(title       !== undefined && { title: title.trim() }),
-        ...(summary     !== undefined && { summary }),
-        ...(body        !== undefined && { body }),
-        ...(category    !== undefined && { category }),
-        ...(articleType !== undefined && { articleType }),
-        ...(urlName     !== undefined && { urlName: urlName.trim() || slugify(title ?? current.title) }),
+        ...(title             !== undefined && { title: title.trim() }),
+        ...(summary           !== undefined && { summary }),
+        ...(body              !== undefined && { body }),
+        ...(category          !== undefined && { category }),
+        ...(articleType       !== undefined && { articleType }),
+        ...(urlName           !== undefined && { urlName: urlName.trim() || slugify(title ?? current.title) }),
+        ...(dataCategoryGroup !== undefined && { dataCategoryGroup: dataCategoryGroup || null }),
+        ...(dataCategory      !== undefined && { dataCategory: dataCategory || null }),
         updatedAt: new Date(),
       })
       .where(eq(knowledgeArticlesTable.id, req.params.id))
@@ -1788,9 +1828,10 @@ router.post("/knowledge/articles/:id/submit", async (req, res): Promise<void> =>
       return;
     }
     const [updated] = await db.update(knowledgeArticlesTable)
-      .set({ status: "pending-review", reviewNote: null, updatedAt: new Date() })
+      .set({ status: "pending-review", reviewNote: null, submittedAt: new Date(), updatedAt: new Date() })
       .where(eq(knowledgeArticlesTable.id, req.params.id))
       .returning();
+
     res.json({ article: updated });
   } catch (err) {
     req.log.error(err, "Failed to submit article for review");
@@ -1798,10 +1839,11 @@ router.post("/knowledge/articles/:id/submit", async (req, res): Promise<void> =>
   }
 });
 
-// POST /api/knowledge/articles/:id/approve  — pending-review → approved
-router.post("/knowledge/articles/:id/approve", async (req, res): Promise<void> => {
+// POST /api/knowledge/articles/:id/approve  — pending-review → approved (admin only)
+router.post("/knowledge/articles/:id/approve", requireAdmin, async (req, res): Promise<void> => {
+  const id = req.params['id'] as string;
   try {
-    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, id));
     if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
     if (rows[0]!.status !== "pending-review") {
       res.status(409).json({ error: `Cannot approve: article is currently '${rows[0]!.status}'` });
@@ -1810,8 +1852,9 @@ router.post("/knowledge/articles/:id/approve", async (req, res): Promise<void> =
     const reviewedBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
     const [updated] = await db.update(knowledgeArticlesTable)
       .set({ status: "approved", reviewedBy, reviewedAt: new Date(), reviewNote: null, updatedAt: new Date() })
-      .where(eq(knowledgeArticlesTable.id, req.params.id))
+      .where(eq(knowledgeArticlesTable.id, id))
       .returning();
+
     res.json({ article: updated });
   } catch (err) {
     req.log.error(err, "Failed to approve article");
@@ -1819,10 +1862,11 @@ router.post("/knowledge/articles/:id/approve", async (req, res): Promise<void> =
   }
 });
 
-// POST /api/knowledge/articles/:id/request-changes  — pending-review → draft (with note)
-router.post("/knowledge/articles/:id/request-changes", async (req, res): Promise<void> => {
+// POST /api/knowledge/articles/:id/request-changes  — pending-review → draft (admin only)
+router.post("/knowledge/articles/:id/request-changes", requireAdmin, async (req, res): Promise<void> => {
+  const id = req.params['id'] as string;
   try {
-    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, id));
     if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
     if (rows[0]!.status !== "pending-review") {
       res.status(409).json({ error: `Cannot request changes: article is currently '${rows[0]!.status}'` });
@@ -1832,7 +1876,7 @@ router.post("/knowledge/articles/:id/request-changes", async (req, res): Promise
     const reviewedBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
     const [updated] = await db.update(knowledgeArticlesTable)
       .set({ status: "draft", reviewedBy, reviewNote: note || null, updatedAt: new Date() })
-      .where(eq(knowledgeArticlesTable.id, req.params.id))
+      .where(eq(knowledgeArticlesTable.id, id))
       .returning();
     res.json({ article: updated });
   } catch (err) {
@@ -1892,6 +1936,26 @@ router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<v
     }
     sfVersionId = createResult.id;
     req.log.info({ sfVersionId }, "SF Knowledge article version created");
+
+    // Step 1.5: Assign data category selection if the author chose one.
+    // The selection object follows the pattern {ArticleType}__DataCategorySelection.
+    if (article.dataCategoryGroup && article.dataCategory && sfVersionId) {
+      const selectionObjectName = objectName.replace(/__kav$/i, "__DataCategorySelection");
+      try {
+        await client.createRecord(selectionObjectName, {
+          ParentId:              sfVersionId,
+          DataCategoryGroupName: article.dataCategoryGroup,
+          DataCategoryName:      article.dataCategory,
+        });
+        req.log.info(
+          { selectionObjectName, group: article.dataCategoryGroup, category: article.dataCategory },
+          "SF data category assigned"
+        );
+      } catch (catErr) {
+        // Non-fatal — the article still publishes without the category assignment.
+        req.log.warn(`Could not assign SF data category (non-fatal): ${String(catErr)}`);
+      }
+    }
 
     // Step 2: Retrieve the KnowledgeArticleId from the created record so we can link to it.
     try {

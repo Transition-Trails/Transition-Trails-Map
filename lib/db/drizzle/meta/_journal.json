@@ -64,6 +64,13 @@
       "when": 1786550000000,
       "tag": "0009_create_submitted_cases",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1786600000000,
+      "tag": "0010_knowledge_authoring_fields",
+      "breakpoints": true
     }
   ]
 }

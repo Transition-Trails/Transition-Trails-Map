@@ -4,11 +4,12 @@ import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
+import ImageExt from '@tiptap/extension-image';
 import { useEffect, useCallback } from 'react';
 import {
   Bold, Italic, Underline as UnderlineIcon, Link as LinkIcon,
   List, ListOrdered, Heading2, Heading3, AlignLeft, AlignCenter,
-  AlignRight, Undo, Redo, Minus,
+  AlignRight, Undo, Redo, Minus, Camera,
 } from 'lucide-react';
 
 interface RichTextEditorProps {
@@ -60,11 +61,32 @@ export function RichTextEditor({
       }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Placeholder.configure({ placeholder }),
+      ImageExt.configure({ allowBase64: true, inline: true }),
     ],
     content: value,
     editable: !disabled,
     onUpdate({ editor }) {
       onChange(editor.getHTML());
+    },
+    editorProps: {
+      handlePaste: (view, event) => {
+        const items = Array.from(event.clipboardData?.items ?? []);
+        const imageItem = items.find(i => i.type.startsWith('image/'));
+        if (!imageItem) return false;
+        event.preventDefault();
+        const file = imageItem.getAsFile();
+        if (!file) return false;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const src = reader.result as string;
+          const { state, dispatch } = view;
+          const imgNode = state.schema.nodes['image']?.create({ src });
+          if (!imgNode) return;
+          dispatch(state.tr.replaceSelectionWith(imgNode));
+        };
+        reader.readAsDataURL(file);
+        return true;
+      },
     },
   });
 
@@ -181,6 +203,30 @@ export function RichTextEditor({
             onClick={() => editor.chain().focus().setHorizontalRule().run()}
           >
             <Minus className="w-3.5 h-3.5" />
+          </ToolbarButton>
+
+          <Divider />
+
+          {/* Screenshot from clipboard */}
+          <ToolbarButton title="Paste screenshot from clipboard"
+            onClick={() => {
+              void navigator.clipboard.read().then(items => {
+                for (const item of items) {
+                  const imgType = item.types.find(t => t.startsWith('image/'));
+                  if (imgType) {
+                    void item.getType(imgType).then(blob => {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        editor.chain().focus().setImage({ src: reader.result as string }).run();
+                      };
+                      reader.readAsDataURL(blob);
+                    });
+                    break;
+                  }
+                }
+              });
+            }}>
+            <Camera className="w-3.5 h-3.5" />
           </ToolbarButton>
 
           <Divider />

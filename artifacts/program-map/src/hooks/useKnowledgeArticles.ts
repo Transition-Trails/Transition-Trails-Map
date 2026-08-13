@@ -19,9 +19,20 @@ export interface KnowledgeArticle {
   reviewedAt: string | null;
   reviewNote: string | null;
   publishedAt: string | null;
+  submittedAt: string | null;
   sfArticleId: string | null;
   sfVersionId: string | null;
   sfPublishStatus: string | null;
+  // SF Data Category fields
+  dataCategoryGroup: string | null;
+  dataCategory: string | null;
+  // SF review Case
+  sfReviewCaseId: string | null;
+  sfReviewCaseNumber: string | null;
+  // Reviewer email (denormalized)
+  reviewerEmail: string | null;
+  // Screen recording
+  recordingUrl: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,6 +45,8 @@ export interface ArticleFormData {
   articleType: string;
   reviewCycle: ReviewCycle;
   urlName?: string;
+  dataCategoryGroup?: string;
+  dataCategory?: string;
 }
 
 const API = '/api/knowledge/articles';

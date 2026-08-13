@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -17,8 +17,10 @@ import {
   Clock, CloudUpload, Trash2, Send, Eye, RotateCcw, Loader2,
   Sparkles, Brain, Target, RefreshCw, X, ExternalLink, FileText,
   AlertTriangle, ChevronRight, BarChart2, Database, Download,
+  Camera,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTierFlags } from '@/hooks/useTierFlags';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -71,6 +73,19 @@ function useArticleTypes() {
       .finally(() => setLoading(false));
   }, []);
   return { types, loading };
+}
+
+interface SfSubCategory   { name: string; label: string; }
+interface SfCategoryGroup { name: string; label: string; categories: SfSubCategory[]; }
+function useSfCategories() {
+  const [groups, setGroups] = useState<SfCategoryGroup[]>([]);
+  useEffect(() => {
+    fetch('/api/knowledge/sf-categories', { credentials: 'include' })
+      .then(r => r.json() as Promise<{ groups: SfCategoryGroup[] }>)
+      .then(d => setGroups(d.groups ?? []))
+      .catch(() => setGroups([]));
+  }, []);
+  return groups;
 }
 
 // ── Status helpers ─────────────────────────────────────────────────────────────
@@ -264,7 +279,6 @@ function ArticleEditor({
 }: ArticleEditorProps) {
   const { types: articleTypes, loading: typesLoading } = useArticleTypes();
   const { data: sfOrgData } = useSfOrgUrl();
-
   const [title,       setTitle]       = useState(article?.title       ?? '');
   const [summary,     setSummary]     = useState(article?.summary     ?? '');
   const [body,        setBody]        = useState(article?.body        ?? '');
@@ -273,7 +287,17 @@ function ArticleEditor({
   const [reviewCycle, setReviewCycle] = useState<ReviewCycle>(article?.reviewCycle ?? 'Quarterly');
   const [dirty,       setDirty]       = useState(false);
   const [reviewNote,  setReviewNote]  = useState('');
-  const [showRejectForm, setShowRejectForm] = useState(false);
+  const [showRejectForm,    setShowRejectForm]    = useState(false);
+  const [dataCategoryGroup, setDataCategoryGroup] = useState(article?.dataCategoryGroup ?? '');
+  const [dataCategory,      setDataCategory]      = useState(article?.dataCategory      ?? '');
+  const handleSaveRef    = useRef<() => Promise<void>>(() => Promise.resolve());
+  // Incremented on every user edit. Captured at save-start; only clears dirty when
+  // unchanged after the request resolves (auto-save race guard).
+  const dirtyGenRef      = useRef(0);
+  // Bumped after a save completes with a stale gen, so the auto-save effect
+  // re-runs and schedules a fresh 30-second timer for the trailing edits.
+  const [saveTrigger, setSaveTrigger] = useState(0);
+  const sfCategoryGroups = useSfCategories();
 
   useEffect(() => {
     setTitle(article?.title       ?? '');
@@ -282,6 +306,8 @@ function ArticleEditor({
     setCategory(article?.category ?? CATEGORIES[0]!);
     setArticleType(article?.articleType ?? '');
     setReviewCycle(article?.reviewCycle ?? 'Quarterly');
+    setDataCategoryGroup(article?.dataCategoryGroup ?? '');
+    setDataCategory(article?.dataCategory ?? '');
     setDirty(false);
     setShowRejectForm(false);
     setReviewNote('');
@@ -291,7 +317,18 @@ function ArticleEditor({
     if (!articleType && articleTypes.length > 0) setArticleType(articleTypes[0]!.value);
   }, [articleTypes, articleType]);
 
-  function mark<T>(setter: (v: T) => void) { return (v: T) => { setter(v); setDirty(true); }; }
+  // Auto-save every 30 s when the draft has unsaved changes.
+  // saveTrigger is bumped after a save that had trailing edits, forcing this effect
+  // to re-run even though dirty was already true (dirty-unchanged → no re-run otherwise).
+  useEffect(() => {
+    if (!dirty || isNew) return;
+    const timer = setTimeout(() => { void handleSaveRef.current(); }, 30_000);
+    return () => clearTimeout(timer);
+  }, [dirty, isNew, saveTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function mark<T>(setter: (v: T) => void) {
+    return (v: T) => { setter(v); setDirty(true); dirtyGenRef.current++; };
+  }
 
   // ── Empty state ──────────────────────────────────────────────────────────
   if (!isNew && !article) {
@@ -464,12 +501,40 @@ function ArticleEditor({
 
   // ── Edit / new form ──────────────────────────────────────────────────────
   async function handleSave() {
+    const genAtSave = dirtyGenRef.current; // snapshot before the async request
     try {
-      await onSave({ title, summary, body, category, articleType, reviewCycle, urlName: slugify(title) });
-      setDirty(false);
+      await onSave({ title, summary, body, category, articleType, reviewCycle, urlName: slugify(title), dataCategoryGroup, dataCategory });
+      if (dirtyGenRef.current === genAtSave) {
+        // No edits arrived during the request — mark clean.
+        setDirty(false);
+      } else {
+        // Trailing edits arrived while the request was in-flight. dirty is already
+        // true so the auto-save effect won't re-run on its own; bump saveTrigger to
+        // force it to schedule a fresh 30-second timer for those edits.
+        setSaveTrigger(t => t + 1);
+      }
     } catch {
       // onSave already showed a toast; keep dirty=true so the save button stays enabled for retry
     }
+  }
+  handleSaveRef.current = handleSave;
+
+  async function pasteScreenshot() {
+    try {
+      const cbItems = await navigator.clipboard.read();
+      for (const item of cbItems) {
+        const imgType = item.types.find(t => t.startsWith('image/'));
+        if (imgType) {
+          const blob = await item.getType(imgType);
+          const reader = new FileReader();
+          reader.onload = () => {
+            mark(setBody)(body + '<img src="' + (reader.result as string) + '" alt="screenshot" style="max-width:100%" />');
+          };
+          reader.readAsDataURL(blob);
+          break;
+        }
+      }
+    } catch { /* clipboard access denied or no image */ }
   }
 
   return (
@@ -564,6 +629,32 @@ function ArticleEditor({
             </div>
           </div>
 
+          {/* SF Data Categories — only shown when the org has Knowledge data category groups */}
+          {sfCategoryGroups.length > 0 && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase">SF Category Group</label>
+                <select value={dataCategoryGroup}
+                  onChange={e => { mark(setDataCategoryGroup)(e.target.value); mark(setDataCategory)(''); }}
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[#2F6F7E]/30">
+                  <option value="">Select group…</option>
+                  {sfCategoryGroups.map(g => <option key={g.name} value={g.name}>{g.label}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase">SF Sub-Category</label>
+                <select value={dataCategory} onChange={e => mark(setDataCategory)(e.target.value)}
+                  disabled={!dataCategoryGroup}
+                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[#2F6F7E]/30 disabled:opacity-50">
+                  <option value="">Select sub-category…</option>
+                  {(sfCategoryGroups.find(g => g.name === dataCategoryGroup)?.categories ?? []).map(c => (
+                    <option key={c.name} value={c.name}>{c.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+
           {/* Summary */}
           <div className="space-y-1.5">
             <label className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase">Summary</label>
@@ -575,7 +666,15 @@ function ArticleEditor({
 
           {/* Body */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase">Body *</label>
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase">Body *</label>
+              {!isNew && article?.id && (
+                <button type="button" title="Paste screenshot from clipboard" onClick={() => void pasteScreenshot()}
+                  className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground hover:text-foreground border border-border rounded-lg px-2 py-1 hover:bg-muted transition-colors">
+                  <Camera className="w-3 h-3" />Screenshot
+                </button>
+              )}
+            </div>
             <RichTextEditor value={body} onChange={v => mark(setBody)(v)}
               placeholder="Write your article here. Use the toolbar for headings, lists, links, and formatting."
               minHeight={360} />
@@ -1301,7 +1400,7 @@ function KnowledgeGovernanceRail({
 
 const GOV_TABS: { id: GovTab; label: string; icon: React.ElementType }[] = [
   { id: 'health',  label: 'Article Health', icon: BarChart2   },
-  { id: 'review',  label: 'Review Queue',   icon: Eye         },
+  { id: 'review',  label: 'Pending Review', icon: Eye         },
   { id: 'sources', label: 'Source Health',  icon: Database    },
   { id: 'sf',      label: 'SF Articles',    icon: CloudUpload },
 ];
@@ -1318,6 +1417,7 @@ export default function KnowledgeHub() {
   });
   function setMode(m: HubMode) { setModeRaw(m); lsWrite(LS_MODE, m); }
 
+  const { isAdminOrAbove: isAdmin } = useTierFlags();
   const [govTab, setGovTab] = useState<GovTab>('health');
 
   const {
@@ -1502,7 +1602,7 @@ export default function KnowledgeHub() {
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Tab bar */}
             <div className="shrink-0 border-b border-border bg-background px-5 flex items-center gap-0.5">
-              {GOV_TABS.map(t => {
+              {GOV_TABS.filter(t => t.id !== 'review' || isAdmin).map(t => {
                 const Icon     = t.icon;
                 const isActive = govTab === t.id;
                 const badge    = t.id === 'review' ? articles.filter(a => a.status === 'pending-review').length : 0;
