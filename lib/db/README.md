@@ -68,8 +68,46 @@ cd lib/db && tsc --build --force
 
 1. Edit (or create) the relevant file under `src/schema/`.
 2. Export it from `src/index.ts` if it's a new table.
-3. Run `pnpm run typecheck` from the workspace root to verify the whole workspace compiles.
-4. Run the Drizzle migration: `pnpm --filter @workspace/api-server run db:push` (dev) or apply the migration in production via the deployment checklist.
+3. Write a SQL migration file in `drizzle/` (e.g. `0015_my_change.sql`) using `CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS` so it is safe to re-run.
+4. Add the migration entry to `drizzle/meta/_journal.json` (copy the format of the last entry, incrementing `idx`).
+5. Run `pnpm run typecheck` from the workspace root to verify the whole workspace compiles.
+6. Apply the migration to dev:
+
+```bash
+# From the workspace root — applies every SQL file in lib/db/drizzle/ via psql
+bash scripts/apply-migrations.sh
+```
+
+## Applying migrations (no-TTY environments)
+
+`drizzle-kit push` requires a TTY for interactive prompts and fails immediately with
+`EOF` when stdin is closed — which is the case in the post-merge hook, CI, and any
+non-interactive shell. **Always use `psql` to apply migrations**, not `drizzle-kit push`.
+
+```bash
+# Apply all pending migrations (idempotent — safe to re-run)
+bash scripts/apply-migrations.sh
+```
+
+### How the migration runner works
+
+`scripts/apply-migrations.sh` maintains a `_trail_migrations` ledger table in the
+database. On each run it:
+
+1. Creates the ledger table if it doesn't exist.
+2. **Bootstraps** existing databases — if the ledger is empty but the database already
+   has tables (previously set up via `drizzle-kit push`), every SQL file currently in
+   the migrations directory is seeded into the ledger so it is not re-applied.
+3. Applies any migration file **not yet in the ledger** inside a `BEGIN`/`COMMIT`
+   transaction with `ON_ERROR_STOP=1`. A failure stops the script immediately and rolls
+   back the partial migration; the ledger row is not written, so the file will be
+   retried on the next run.
+
+This means the script is safe to run multiple times — already-applied files are always
+skipped — and failures are never silently swallowed.
+
+The post-merge hook (`scripts/post-merge.sh`) calls `apply-migrations.sh` automatically,
+so every clean clone or CI environment gets a fully-migrated database without manual steps.
 
 > **Never edit files in `dist/` by hand.** They are generated output and will be overwritten
 > on the next `tsc --build` run.

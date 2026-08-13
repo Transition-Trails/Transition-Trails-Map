@@ -1,4 +1,4 @@
-CREATE TABLE "slack_user_tokens" (
+CREATE TABLE IF NOT EXISTS "slack_user_tokens" (
   "id" serial PRIMARY KEY NOT NULL,
   "user_email" text NOT NULL,
   "access_token" text NOT NULL,

@@ -1,4 +1,4 @@
-CREATE TABLE "trail_os_audit_log" (
+CREATE TABLE IF NOT EXISTS "trail_os_audit_log" (
 "id" serial PRIMARY KEY NOT NULL,
 "event_type" text NOT NULL,
 "actor_email" text NOT NULL,

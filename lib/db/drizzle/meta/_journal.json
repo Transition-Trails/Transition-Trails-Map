@@ -78,6 +78,83 @@
       "when": 1786624846349,
       "tag": "0011_create_user_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1786650000000,
+      "tag": "0012_create_assessment_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1786660000000,
+      "tag": "0013_assessment_rubric_signals",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1786670000000,
+      "tag": "0014_create_alert_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1786680000000,
+      "tag": "0015_create_article_reviews",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1786690000000,
+      "tag": "0016_create_module_drafts",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1786700000000,
+      "tag": "0017_create_persona_health_dismissals",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1786710000000,
+      "tag": "0018_create_session_logs",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1786720000000,
+      "tag": "0019_create_conversations",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1786730000000,
+      "tag": "0020_create_messages",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1786740000000,
+      "tag": "0021_create_build_error_logs",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1786750000000,
+      "tag": "0022_add_penny_logs_audience",
+      "breakpoints": true
     }
   ]
 }

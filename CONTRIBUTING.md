@@ -375,6 +375,41 @@ Admin-only tools (not inside the `AdminView` URL-routing) must:
 
 ---
 
+## Database Migrations
+
+Trail OS uses Drizzle ORM for schema definitions. SQL migration files live in `lib/db/drizzle/`.
+
+### Applying migrations (clean setup or after pulling new migrations)
+
+```bash
+# From the workspace root — applies every SQL file in lib/db/drizzle/ via psql
+bash scripts/apply-migrations.sh
+```
+
+The script is **idempotent** — safe to run multiple times. It maintains a
+`_trail_migrations` ledger table that records every successfully applied file.
+Files already in the ledger are skipped; new files are applied inside a transaction
+with `ON_ERROR_STOP=1` so failures stop the script immediately and roll back the partial
+migration rather than being silently swallowed.
+
+The post-merge hook runs the script automatically, so contributor clones and CI
+environments are always kept up to date.
+
+> ⚠️ **Do NOT use `drizzle-kit push` in scripts or CI.** It requires an interactive TTY
+> and exits immediately with an `EOF` error when stdin is closed, leaving the database
+> partially migrated with no error message. Use `apply-migrations.sh` instead.
+
+### Adding a new migration
+
+1. Create `lib/db/drizzle/<NNNN>_my_description.sql` using `IF NOT EXISTS` guards.
+2. Add the entry to `lib/db/drizzle/meta/_journal.json` (copy the last entry, increment `idx`).
+3. Edit or create the matching Drizzle schema file under `lib/db/src/schema/`.
+4. Export from `lib/db/src/schema/index.ts` if it's a new table.
+5. Run `bash scripts/apply-migrations.sh` to apply the file locally.
+6. Run `pnpm run typecheck` to verify the workspace compiles cleanly.
+
+---
+
 ## Working with Data
 
 ### Adding a new data file
