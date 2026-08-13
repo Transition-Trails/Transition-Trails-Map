@@ -37,3 +37,6 @@ export * from "./fathomUserKeys";
 export * from "./submittedCases";
 export * from "./buildErrorLogs";
 export * from "./userPreferences";
+export * from "./skillAssessmentSessions";
+export * from "./assessmentItems";
+export * from "./assessmentResponses";

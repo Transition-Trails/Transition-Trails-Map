@@ -41,6 +41,7 @@ import userPrefsRouter          from "./userPrefs";
 import timeLogsRouter           from "./timeLogs";
 import sfSearchRouter           from "./sfSearch";
 import buildErrorsRouter        from "./buildErrors";
+import assessmentsRouter        from "./assessments";
 import { requireStaff, requireAdmin, requireSuperAdmin, isSuperAdmin, effectiveIdentityMiddleware } from "../middlewares/requireAuth";
 import { db } from "@workspace/db";
 import { trailOsAuditLogTable } from "@workspace/db/schema";
@@ -107,6 +108,11 @@ const staffAuthGate: RequestHandler = (req, res, next) => {
   // Homebase routes (/homebase/*) use requireHomebaseAuth, not staff auth.
   // The /auth/homebase/status endpoint is in PUBLIC_PATHS below (no auth needed).
   if (path.startsWith('/homebase')) return next();
+
+  // Assessment routes (/assessments/*) are used by Homebase learners/coaches.
+  // Learner-facing endpoints apply requireHomebaseAuth individually.
+  // The staff-only results sub-route has an explicit requireStaff guard in the router.
+  if (path.startsWith('/assessments')) return next();
 
   // Slack homebase routes — OAuth flow and user data endpoints.
   // requireSlackAuth on each individual route is the effective access control;
@@ -254,5 +260,6 @@ router.use(userPrefsRouter);
 router.use(timeLogsRouter);
 router.use(sfSearchRouter);
 router.use(buildErrorsRouter);
+router.use(assessmentsRouter);
 
 export default router;
