@@ -30,12 +30,44 @@ import {
   assessmentItemsTable,
   assessmentResponsesTable,
 }                          from "@workspace/db/schema";
-import { eq, and, count, sql, not, inArray } from "drizzle-orm";
+import { eq, and, count, sql, not, inArray, desc } from "drizzle-orm";
 import { requireHomebaseAuth, requireStaff } from "../middlewares/requireAuth.js";
 import { logger }                            from "../lib/logger.js";
 import { seedAssessmentItems }               from "../scripts/seedAssessmentItems.js";
 import { scoreScenarioResponse }             from "../lib/assessmentScoring.js";
-import { getLearnerSfFetch }                  from "../lib/salesforceOAuth.js";
+import { getLearnerSfFetch, getEffectiveSfFetch, makeSfDirectFetch } from "../lib/salesforceOAuth.js";
+
+// ── Shared-credential-only SF fetch ───────────────────────────────────────────
+// For system records (Assessment_Result__c) that must land in the canonical
+// coaching org, not in a learner's personal dev-org session.
+// Tries: (1) env-var service account, (2) Replit Connector proxy.
+// Never uses req.session tokens — calling code must NOT pass `req`.
+function getSharedSfFetch(): ((url: string, init?: RequestInit) => Promise<Response>) | null {
+  const accessToken = process.env["SALESFORCE_ACCESS_TOKEN"];
+  const instanceUrl = process.env["SALESFORCE_INSTANCE_URL"];
+  if (accessToken && instanceUrl) {
+    return makeSfDirectFetch(accessToken, instanceUrl);
+  }
+  try {
+    const { ReplitConnectors } = require("@replit/connectors-sdk") as typeof import("@replit/connectors-sdk");
+    const connectors = new ReplitConnectors();
+    const proxyFetch = connectors.createProxyFetch("salesforce");
+    const proxyUrl   = connectors.getProxyUrl();
+    return (path: string, init?: RequestInit): Promise<Response> => {
+      const url = path.startsWith("http") ? path : `${proxyUrl}${path}`;
+      return proxyFetch(url, init);
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ── Confidence enum → boolean ─────────────────────────────────────────────────
+// The confidence picker stores strings: "confident" | "fairly_sure" | "guessing".
+// Only "confident" is treated as high-confidence for calibration purposes.
+function isHighConfidence(confidence: string | null | undefined): boolean {
+  return confidence === "confident";
+}
 import { parseBuildCheckRubric, runBuildChecks } from "../lib/buildCheckRunner.js";
 
 const router = Router();
@@ -528,8 +560,256 @@ router.post("/assessments/sessions/:id/complete", requireHomebaseAuth, async (re
   logger.info({ sessionId, learnerEmail }, "assessment session completed");
 
   const domainReads = await computeDomainReads(sessionId);
-  return res.json({ session: updated, domainReads, alreadyCompleted: false });
+
+  // ── Fire-and-forget Salesforce write ────────────────────────────────────────
+  // Write an Assessment_Result__c record so coaches have a permanent SF record.
+  // Uses the shared connector credentials (not the learner's SF dev-org session).
+  // Non-blocking: a failed SF write never prevents the response.
+  const responses = await db
+    .select({ isCorrect: assessmentResponsesTable.isCorrect })
+    .from(assessmentResponsesTable)
+    .where(eq(assessmentResponsesTable.sessionId, sessionId));
+  const totalAnswered = responses.length;
+  const totalCorrect  = responses.filter(r => r.isCorrect).length;
+  const overallScore  = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+  const passed        = overallScore >= 70;
+
+  try {
+    // Use shared credentials only — never the learner's per-user SF session —
+    // so the record lands in the canonical coaching org.
+    const sfFetch = getSharedSfFetch();
+    if (!sfFetch) throw new Error("No shared SF credentials available");
+    const sfPayload = {
+      Name:                  `${updated.instance.toUpperCase()} — ${learnerEmail.split("@")[0]?.slice(0, 30) ?? "learner"}`,
+      Score__c:              overallScore,
+      Passed__c:             passed,
+      Total_Items_Answered__c: totalAnswered,
+      Correct_Items__c:      totalCorrect,
+      Session_Instance__c:   updated.instance,
+      Learner_Email__c:      learnerEmail,
+      Domain_Scores_JSON__c: JSON.stringify(
+        domainReads.map(d => ({ domain: d.domain, score: d.answeredCount > 0 ? Math.round((d.correctCount / d.answeredCount) * 100) : null }))
+      ).slice(0, 32000),
+      Completed_Date__c:     updated.completedAt?.toISOString().split("T")[0] ?? new Date().toISOString().split("T")[0],
+    };
+    void sfFetch(`/services/data/v62.0/sobjects/Assessment_Result__c`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body:    JSON.stringify(sfPayload),
+    }).then(async r => {
+      if (!r.ok) {
+        const body = await r.text().catch(() => "(unreadable)");
+        logger.warn({ sessionId, sfStatus: r.status, body }, "Assessment_Result__c SF write returned non-2xx (non-blocking)");
+      } else {
+        logger.info({ sessionId, sfStatus: r.status, passed }, "Assessment_Result__c written to SF");
+      }
+    }).catch((sfErr: unknown) => {
+      logger.warn({ sfErr, sessionId }, "Assessment_Result__c SF write failed (non-blocking)");
+    });
+  } catch (sfSetupErr: unknown) {
+    logger.warn({ sfSetupErr, sessionId }, "SF connector unavailable for assessment result write (non-blocking)");
+  }
+
+  return res.json({ session: updated, domainReads, alreadyCompleted: false, overallScore, passed });
 });
+
+// ── GET /assessments/sessions/:id/debrief ─────────────────────────────────────
+// Learner-owned debrief data: domain scores + confidence calibration.
+// Does NOT expose correctOption — only the learner who owns the session can call this.
+
+router.get("/assessments/sessions/:id/debrief", requireHomebaseAuth, async (req, res) => {
+  const sessionId = parseInt(String(req.params["id"] ?? ""), 10);
+  if (isNaN(sessionId)) return res.status(400).json({ error: "Invalid session id" });
+
+  const learnerEmail = res.locals["effectiveEmail"] as string;
+
+  const [session] = await db
+    .select()
+    .from(skillAssessmentSessionsTable)
+    .where(and(
+      eq(skillAssessmentSessionsTable.id, sessionId),
+      eq(skillAssessmentSessionsTable.learnerEmail, learnerEmail),
+    ))
+    .limit(1);
+
+  if (!session) return res.status(404).json({ error: "Session not found" });
+
+  // Debrief is only valid for completed sessions — reject mid-assessment requests
+  // to prevent score data from being read before the adaptive flow is finished.
+  if (session.status !== "completed") {
+    return res.status(409).json({ error: "Session is not yet completed" });
+  }
+
+  const domainReads = await computeDomainReads(sessionId);
+
+  // Responses without correctOption (never expose answer key to the learner)
+  const responses = await db
+    .select({
+      confidence:    assessmentResponsesTable.confidence,
+      isCorrect:     assessmentResponsesTable.isCorrect,
+      domain:        assessmentItemsTable.domain,
+      domainLabel:   assessmentItemsTable.domainLabel,
+      itemType:      assessmentItemsTable.itemType,
+      rubricScores:  assessmentResponsesTable.rubricScores,
+    })
+    .from(assessmentResponsesTable)
+    .innerJoin(assessmentItemsTable, eq(assessmentResponsesTable.itemId, assessmentItemsTable.id))
+    .where(eq(assessmentResponsesTable.sessionId, sessionId))
+    .orderBy(assessmentResponsesTable.respondedAt);
+
+  // Confidence calibration — "confident" string = high-confidence.
+  // The picker stores "confident" | "fairly_sure" | "guessing"; only "confident"
+  // meets the threshold. isHighConfidence() handles this mapping explicitly
+  // so NaN from Number(string) never silently zeroes out the counts.
+  let calibrated = 0, misconception = 0, insight = 0, needsWork = 0;
+
+  // Per-domain calibration map
+  const domainCalMap = new Map<string, {
+    domain: string; domainLabel: string;
+    calibrated: number; misconception: number; insight: number; needsWork: number;
+    total: number; correct: number;
+  }>();
+
+  for (const r of responses) {
+    const isConf  = isHighConfidence(r.confidence);
+    const correct = r.isCorrect ?? false;
+
+    if (isConf && correct)  calibrated++;
+    else if (isConf)         misconception++;
+    else if (correct)        insight++;
+    else                     needsWork++;
+
+    if (!domainCalMap.has(r.domain)) {
+      domainCalMap.set(r.domain, { domain: r.domain, domainLabel: r.domainLabel, calibrated: 0, misconception: 0, insight: 0, needsWork: 0, total: 0, correct: 0 });
+    }
+    const dc = domainCalMap.get(r.domain)!;
+    dc.total++;
+    if (correct) dc.correct++;
+    if (isConf && correct)  dc.calibrated++;
+    else if (isConf)         dc.misconception++;
+    else if (correct)        dc.insight++;
+    else                     dc.needsWork++;
+  }
+
+  const totalAnswered = responses.length;
+  const totalCorrect  = responses.filter(r => r.isCorrect).length;
+  const overallScore  = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+
+  return res.json({
+    session,
+    domainReads,
+    confidenceCalibration: { calibrated, misconception, insight, needsWork, total: totalAnswered },
+    domainCalibration: Array.from(domainCalMap.values()),
+    summary: {
+      totalAnswered,
+      totalCorrect,
+      overallScore,
+      passed: overallScore >= 70,
+      settledDomains: domainReads.filter(d => d.read === "settled").length,
+      totalDomains: domainReads.length,
+    },
+  });
+});
+
+// ── GET /assessments/staff/sessions ───────────────────────────────────────────
+// Coach view: all assessment sessions for a specific learner by email.
+// Staff-only. Returns per-session domain scores + calibration summary.
+
+router.get(
+  "/assessments/staff/sessions",
+  requireStaff as import("express").RequestHandler,
+  async (req, res) => {
+    const learnerEmail = String(req.query["learnerEmail"] ?? "").trim();
+    if (!learnerEmail) return res.status(400).json({ error: "learnerEmail query param required" });
+
+    const sessions = await db
+      .select()
+      .from(skillAssessmentSessionsTable)
+      .where(eq(skillAssessmentSessionsTable.learnerEmail, learnerEmail))
+      .orderBy(desc(skillAssessmentSessionsTable.startedAt));
+
+    // Enrich each session with domain reads + overall score
+    const enriched = await Promise.all(sessions.map(async s => {
+      const domainReads = await computeDomainReads(s.id);
+      const resps = await db
+        .select({ confidence: assessmentResponsesTable.confidence, isCorrect: assessmentResponsesTable.isCorrect })
+        .from(assessmentResponsesTable)
+        .where(eq(assessmentResponsesTable.sessionId, s.id));
+
+      const total   = resps.length;
+      const correct = resps.filter(r => r.isCorrect).length;
+      const score   = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+      // Confidence calibration — "confident" string = high-confidence.
+      let calibrated = 0, misconception = 0;
+      for (const r of resps) {
+        const isConf = isHighConfidence(r.confidence);
+        if (isConf && r.isCorrect)  calibrated++;
+        else if (isConf)             misconception++;
+      }
+
+      return { ...s, domainReads, overallScore: score, passed: score >= 70, totalAnswered: total, totalCorrect: correct, calibrated, misconception };
+    }));
+
+    return res.json({ sessions: enriched });
+  },
+);
+
+// ── GET /assessments/staff/overview ───────────────────────────────────────────
+// Staff Assessments page: aggregate view of all completed sessions across learners.
+// Staff-only. Replaces the hardcoded LEARNER_RESULTS array in the frontend.
+
+router.get(
+  "/assessments/staff/overview",
+  requireStaff as import("express").RequestHandler,
+  async (req, res) => {
+    const completed = await db
+      .select()
+      .from(skillAssessmentSessionsTable)
+      .where(eq(skillAssessmentSessionsTable.status, "completed"))
+      .orderBy(desc(skillAssessmentSessionsTable.completedAt))
+      .limit(100);
+
+    const enriched = await Promise.all(completed.map(async s => {
+      const resps = await db
+        .select({ isCorrect: assessmentResponsesTable.isCorrect })
+        .from(assessmentResponsesTable)
+        .where(eq(assessmentResponsesTable.sessionId, s.id));
+
+      const total   = resps.length;
+      const correct = resps.filter(r => r.isCorrect).length;
+      const score   = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+      return {
+        id:           s.id,
+        learnerEmail: s.learnerEmail,
+        instance:     s.instance,
+        completedAt:  s.completedAt,
+        startedAt:    s.startedAt,
+        score,
+        passed:       score >= 70,
+        totalAnswered: total,
+        totalCorrect:  correct,
+      };
+    }));
+
+    const total        = enriched.length;
+    const passedCount  = enriched.filter(s => s.passed).length;
+    const avgScore     = total > 0 ? Math.round(enriched.reduce((acc, s) => acc + s.score, 0) / total) : 0;
+    const needsCoaching = enriched.filter(s => !s.passed).length;
+
+    return res.json({
+      sessions: enriched,
+      stats: {
+        total,
+        passed:       passedCount,
+        passRate:     total > 0 ? Math.round((passedCount / total) * 100) : 0,
+        avgScore,
+        needsCoaching,
+      },
+    });
+  },
+);
 
 // ── GET /assessments/sessions/:id/results ─────────────────────────────────────
 // Staff-accessible results endpoint — explicit requireStaff guard because the

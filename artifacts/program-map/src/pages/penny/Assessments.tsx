@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { curriculumAssessments, CONTENT_STATUS_CONFIG } from '@/data/curriculumData';
@@ -9,28 +9,32 @@ import {
   TrendingUp, Zap, X,
 } from 'lucide-react';
 
-// ── Per-learner assessment results (cross-referenced data) ────────────────────
+// ── Live session data from the DB ─────────────────────────────────────────────
 
-interface LearnerResult {
-  learner: string;
-  program: string;
-  assessmentId: string;
-  score: number;
-  passed: boolean;
-  attempts: number;
-  date: string;
-  pennyCoached: boolean;
+interface LiveSession {
+  id:            number;
+  learnerEmail:  string;
+  instance:      string;
+  completedAt:   string | null;
+  score:         number;
+  passed:        boolean;
+  totalAnswered: number;
+  totalCorrect:  number;
 }
 
-const LEARNER_RESULTS: LearnerResult[] = [
-  { learner: 'Jordan M.',  program: "Explorer's Trail",  assessmentId: 'asmnt-1-1', score: 87, passed: true,  attempts: 1, date: '2026-05-15', pennyCoached: true  },
-  { learner: 'Riley P.',   program: 'Foundations Trail', assessmentId: 'asmnt-2-1', score: 92, passed: true,  attempts: 1, date: '2026-06-01', pennyCoached: true  },
-  { learner: 'Avery K.',   program: 'Guided Trail',      assessmentId: 'asmnt-1-2', score: 74, passed: false, attempts: 2, date: '2026-06-03', pennyCoached: true  },
-  { learner: 'Taylor R.',  program: 'Foundations Trail', assessmentId: 'asmnt-1-1', score: 81, passed: true,  attempts: 1, date: '2026-05-18', pennyCoached: false },
-  { learner: 'Drew H.',    program: "Explorer's Trail",  assessmentId: 'asmnt-1-3', score: 68, passed: false, attempts: 1, date: '2026-06-08', pennyCoached: false },
-  { learner: 'Alex F.',    program: 'Guided Trail',      assessmentId: 'asmnt-3-3', score: 95, passed: true,  attempts: 1, date: '2026-05-30', pennyCoached: true  },
-  { learner: 'Casey L.',   program: "Explorer's Trail",  assessmentId: 'asmnt-1-1', score: 60, passed: false, attempts: 3, date: '2026-05-22', pennyCoached: true  },
-];
+interface OverviewStats {
+  total:         number;
+  passed:        number;
+  passRate:      number;
+  avgScore:      number;
+  needsCoaching: number;
+}
+
+const INSTANCE_LABELS_SHORT: Record<string, string> = {
+  'now':    'Baseline',
+  'week-6': 'Week 6',
+  'end':    'Final',
+};
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -53,13 +57,22 @@ export default function Assessments() {
   const [filterStatus,   setFilterStatus]   = useState<'all' | 'needs-coaching' | 'failed'>('all');
   const [activeCoaching, setActiveCoaching] = useState<AgentCoaching | null>(null);
 
-  const totalPassed   = LEARNER_RESULTS.filter(r => r.passed).length;
-  const needsCoaching = LEARNER_RESULTS.filter(r => !r.pennyCoached && !r.passed).length;
-  const avgScore      = Math.round(LEARNER_RESULTS.reduce((s, r) => s + r.score, 0) / LEARNER_RESULTS.length);
+  // ── Live data from DB ────────────────────────────────────────────────────────
+  const [sessions,  setSessions]  = useState<LiveSession[]>([]);
+  const [stats,     setStats]     = useState<OverviewStats | null>(null);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [dataError,   setDataError]   = useState<string | null>(null);
 
-  const filtered = LEARNER_RESULTS.filter(r => {
-    if (filterStatus === 'needs-coaching') return !r.pennyCoached && !r.passed;
-    if (filterStatus === 'failed')         return !r.passed;
+  useEffect(() => {
+    fetch('/api/assessments/staff/overview')
+      .then(r => { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json() as Promise<{ sessions: LiveSession[]; stats: OverviewStats }>; })
+      .then(data => { setSessions(data.sessions ?? []); setStats(data.stats ?? null); setDataLoading(false); })
+      .catch((err: unknown) => { setDataError(err instanceof Error ? err.message : 'Failed to load assessment data'); setDataLoading(false); });
+  }, []);
+
+  const filtered = sessions.filter(s => {
+    if (filterStatus === 'needs-coaching') return !s.passed;
+    if (filterStatus === 'failed')         return !s.passed;
     return true;
   });
 
@@ -69,7 +82,7 @@ export default function Assessments() {
 
     const query = passed
       ? `${learner} passed the "${assessmentName}" assessment with a score of ${score}%. What personalised next step should Penny suggest to extend their learning momentum?`
-      : `${learner} scored ${score}% on the "${assessmentName}" assessment (passing score: ${(asmnt?.passingScore as number) ?? 75}%). They haven't passed yet. What coaching approach should Penny use to help them prepare for a retake?`;
+      : `${learner} scored ${score}% on the "${assessmentName}" assessment. They haven't passed yet. What coaching approach should Penny use to help them prepare for a retake?`;
 
     // 1. Open Penny right panel immediately
     setPendingPennyQuery(query);
@@ -143,13 +156,13 @@ export default function Assessments() {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats — live from DB */}
         <div className="grid grid-cols-4 gap-3">
           {[
-            { label: 'Assessments',    value: curriculumAssessments.length, color: 'text-foreground',  icon: ClipboardCheck },
-            { label: 'Pass Rate',      value: `${Math.round((totalPassed / LEARNER_RESULTS.length) * 100)}%`, color: 'text-[#2F6B3F]', icon: TrendingUp },
-            { label: 'Avg Score',      value: `${avgScore}%`,               color: 'text-[#2F6F7E]',     icon: BarChart2 },
-            { label: 'Needs Coaching', value: needsCoaching,                color: 'text-[#CC8400]',   icon: Brain },
+            { label: 'Completed',      value: dataLoading ? '…' : String(stats?.total ?? 0),                            color: 'text-foreground',  icon: ClipboardCheck },
+            { label: 'Pass Rate',      value: dataLoading ? '…' : `${stats?.passRate ?? 0}%`,                           color: 'text-[#2F6B3F]',   icon: TrendingUp },
+            { label: 'Avg Score',      value: dataLoading ? '…' : `${stats?.avgScore ?? 0}%`,                           color: 'text-[#2F6F7E]',   icon: BarChart2 },
+            { label: 'Needs Coaching', value: dataLoading ? '…' : String(stats?.needsCoaching ?? 0),                    color: 'text-[#CC8400]',   icon: Brain },
           ].map(s => (
             <div key={s.label} className="rounded-lg border border-border bg-card p-4">
               <s.icon className={`w-4 h-4 ${s.color} mb-1.5`} />
@@ -159,11 +172,11 @@ export default function Assessments() {
           ))}
         </div>
 
-        {/* Learner results */}
+        {/* Live session results */}
         <div>
           <div className="flex items-center justify-between mb-2.5 gap-3">
-            <p className="text-[14px] font-bold  text-muted-foreground/60">
-              Learner Results
+            <p className="text-[14px] font-bold text-muted-foreground/60">
+              Completed Sessions · Live
             </p>
             <div className="flex items-center gap-1.5">
               {(['all', 'failed', 'needs-coaching'] as const).map(f => (
@@ -182,46 +195,58 @@ export default function Assessments() {
             </div>
           </div>
 
+          {dataError && (
+            <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] p-3 mb-3 flex items-center gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0" />
+              <p className="text-[14px] text-[#A93F2F]">{dataError}</p>
+            </div>
+          )}
+
           <div className="rounded-xl border border-border overflow-hidden">
-            <div className="grid grid-cols-[1fr_180px_70px_70px_80px_80px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
-              {['Learner', 'Assessment', 'Score', 'Passed', 'Attempts', 'AI Coach'].map(h => (
-                <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
+            <div className="grid grid-cols-[1fr_140px_70px_70px_90px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
+              {['Learner', 'Assessment', 'Score', 'Passed', 'AI Coach'].map(h => (
+                <p key={h} className="text-[14px] font-bold text-muted-foreground/60">{h}</p>
               ))}
             </div>
             <div className="bg-card divide-y divide-border">
-              {filtered.map(r => {
-                const asmnt    = curriculumAssessments.find(a => a.id === r.assessmentId);
-                const scoreClr = r.score >= 85 ? 'text-[#2F6B3F]' : r.score >= 75 ? 'text-[#2F6F7E]' : 'text-[#A93F2F]';
+              {dataLoading && (
+                <div className="px-4 py-8 flex items-center justify-center gap-2">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-muted-foreground/50" />
+                  <span className="text-[14px] text-muted-foreground">Loading sessions…</span>
+                </div>
+              )}
+              {!dataLoading && filtered.map(s => {
+                const scoreClr = s.score >= 85 ? 'text-[#2F6B3F]' : s.score >= 70 ? 'text-[#2F6F7E]' : 'text-[#A93F2F]';
+                const coachKey = `${s.learnerEmail}-${s.id}`;
+                const instLabel = INSTANCE_LABELS_SHORT[s.instance] ?? s.instance;
+                const dateStr = s.completedAt ? new Date(s.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—';
                 return (
                   <div
-                    key={`${r.learner}-${r.assessmentId}`}
-                    className="grid grid-cols-[1fr_180px_70px_70px_80px_80px] gap-x-3 items-center px-4 py-3 hover:bg-muted/20 transition-colors"
+                    key={s.id}
+                    className="grid grid-cols-[1fr_140px_70px_70px_90px] gap-x-3 items-center px-4 py-3 hover:bg-muted/20 transition-colors"
                   >
                     <div>
-                      <p className="text-[14px] font-semibold text-foreground">{r.learner}</p>
-                      <p className="text-[14px] text-muted-foreground">{r.program}</p>
+                      <p className="text-[14px] font-semibold text-foreground truncate" title={s.learnerEmail}>
+                        {s.learnerEmail.split('@')[0]}
+                      </p>
+                      <p className="text-[14px] text-muted-foreground/60 truncate">{s.learnerEmail}</p>
                     </div>
                     <div>
-                      <p className="text-[14px] text-foreground truncate">{asmnt?.name ?? r.assessmentId}</p>
-                      <p className="text-[14px] text-muted-foreground">{r.date}</p>
+                      <p className="text-[14px] text-foreground">{instLabel}</p>
+                      <p className="text-[14px] text-muted-foreground">{dateStr}</p>
                     </div>
-                    <p className={`text-[14px] font-bold ${scoreClr}`}>{r.score}%</p>
+                    <p className={`text-[14px] font-bold ${scoreClr}`}>{s.score}%</p>
                     <div>
-                      {r.passed
+                      {s.passed
                         ? <CheckCircle2 className="w-4 h-4 text-[#2F6B3F]" />
                         : <AlertTriangle className="w-4 h-4 text-[#A93F2F]" />
                       }
                     </div>
-                    <p className="text-[14px] text-muted-foreground">{r.attempts}×</p>
                     <div className="flex items-center gap-1">
-                      {r.pennyCoached
-                        ? <Sparkles className="w-3.5 h-3.5 text-[#2F6F7E]" aria-label="Penny coaching active" />
-                        : null
-                      }
                       <button
-                        onClick={() => void coachWithBothAIs(r.learner, r.assessmentId, r.score, r.passed)}
+                        onClick={() => void coachWithBothAIs(s.learnerEmail, String(s.id), s.score, s.passed)}
                         className={`flex items-center gap-0.5 text-[14px] border rounded-md px-1.5 py-0.5 transition-colors ${
-                          activeCoaching?.key === `${r.learner}-${r.assessmentId}` && activeCoaching.status === 'loading'
+                          activeCoaching?.key === coachKey && activeCoaching.status === 'loading'
                             ? 'text-cyan-700 border-cyan-300 bg-cyan-50'
                             : 'text-primary border-primary/20 hover:bg-primary/5'
                         }`}
@@ -230,15 +255,19 @@ export default function Assessments() {
                       >
                         <Brain className="w-2.5 h-2.5" />
                         <Bot className="w-2.5 h-2.5 -ml-0.5" />
-                        <span className="ml-0.5">{r.passed ? 'Next' : 'Coach'}</span>
+                        <span className="ml-0.5">{s.passed ? 'Next' : 'Coach'}</span>
                       </button>
                     </div>
                   </div>
                 );
               })}
-              {filtered.length === 0 && (
-                <div className="px-4 py-8 text-center text-[14px] text-muted-foreground">
-                  No results match this filter.
+              {!dataLoading && filtered.length === 0 && (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-[14px] text-muted-foreground">
+                    {sessions.length === 0
+                      ? 'No completed assessment sessions yet. Sessions appear here once learners finish their first Penny assessment.'
+                      : 'No results match this filter.'}
+                  </p>
                 </div>
               )}
             </div>

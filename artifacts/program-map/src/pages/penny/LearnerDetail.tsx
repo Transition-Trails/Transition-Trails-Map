@@ -5,7 +5,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   ArrowLeft, User, MessageSquare, ClipboardList, Briefcase,
   CheckCircle2, XCircle, X, Pencil, Loader2, CalendarDays, Clock, Users,
-  ChevronDown, ChevronUp,
+  ChevronDown, ChevronUp, ClipboardCheck, BarChart2, AlertTriangle, Brain,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@ interface CareerReview {
   areaScores:    string;
 }
 
-type TabId = 'profile' | 'conversations' | 'quests' | 'career' | 'sessions';
+type TabId = 'profile' | 'conversations' | 'quests' | 'career' | 'sessions' | 'assessments';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -67,6 +67,7 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'profile',       label: 'Profile',          icon: User },
   { id: 'conversations', label: 'Conversations',     icon: MessageSquare },
   { id: 'sessions',      label: 'Sessions',          icon: CalendarDays },
+  { id: 'assessments',   label: 'Assessments',       icon: ClipboardCheck },
   { id: 'quests',        label: 'Quest Submissions', icon: ClipboardList },
   { id: 'career',        label: 'Career Reviews',    icon: Briefcase },
 ];
@@ -367,6 +368,200 @@ function CareerPanel({ contactId }: { contactId: string }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ── Assessments panel ──────────────────────────────────────────────────────────
+
+const INSTANCE_LABELS: Record<string, string> = {
+  'now':    'Baseline',
+  'week-6': 'Week 6',
+  'end':    'Final',
+};
+
+const DOMAIN_BAR_COLORS: Record<string, string> = {
+  'config-setup':           '#3B82F6',
+  'object-manager-builder': '#7C3AED',
+  'sales-marketing':        '#10B981',
+  'service-support':        '#F97316',
+  'productivity':           '#F59E0B',
+  'data-analytics':         '#14B8A6',
+  'workflow-automation':    '#6366F1',
+  'security-access':        '#F43F5E',
+};
+
+interface AssessmentSessionRecord {
+  id:            number;
+  learnerEmail:  string;
+  instance:      string;
+  status:        string;
+  completedAt:   string | null;
+  startedAt:     string;
+  overallScore:  number;
+  passed:        boolean;
+  totalAnswered: number;
+  totalCorrect:  number;
+  calibrated:    number;
+  misconception: number;
+  domainReads:   Array<{
+    domain: string; domainLabel: string;
+    answeredCount: number; correctCount: number;
+    read: 'settled' | 'reading' | 'not_yet';
+  }>;
+}
+
+function AssessmentSessionCard({ session }: { session: AssessmentSessionRecord }) {
+  const [expanded, setExpanded] = useState(false);
+  const inst  = INSTANCE_LABELS[session.instance] ?? session.instance;
+  const score = session.overallScore;
+  const scoreColor = session.passed ? '#2F6B3F' : score >= 55 ? '#CC8400' : '#A93F2F';
+  const scoreBg    = session.passed ? '#E6F0EA' : score >= 55 ? '#FFF3E0' : '#FBEAE6';
+  const domains    = session.domainReads.filter(d => d.answeredCount > 0);
+
+  return (
+    <div className="rounded-lg border border-border bg-card">
+      <button className="w-full text-left p-3.5" onClick={() => setExpanded(v => !v)}>
+        <div className="flex items-center gap-3">
+          <ClipboardCheck className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[14px] font-semibold text-foreground">{inst} Assessment</span>
+              <span
+                className="text-[11px] font-bold border rounded-full px-1.5 py-0.5"
+                style={{ background: scoreBg, color: scoreColor, borderColor: scoreColor + '50' }}
+              >
+                {session.passed ? 'Passed' : 'Not yet'}
+              </span>
+              <span className="text-[14px] font-bold" style={{ color: scoreColor }}>{score}%</span>
+              {session.completedAt && (
+                <span className="text-[14px] text-muted-foreground">{formatDate(session.completedAt)}</span>
+              )}
+            </div>
+            <div className="flex items-center gap-3 mt-0.5 text-[14px] text-muted-foreground">
+              <span>{session.totalAnswered} items · {session.totalCorrect} correct</span>
+              {session.misconception > 0 && (
+                <span className="flex items-center gap-1 text-[#A93F2F]">
+                  <AlertTriangle className="w-3 h-3" />{session.misconception} misconception{session.misconception > 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="text-muted-foreground/40 shrink-0">
+            {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </div>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-border/50 px-4 py-3 bg-muted/10 space-y-3">
+          {/* Domain scores */}
+          {domains.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wide">Domain Breakdown</p>
+              {domains.map(d => {
+                const pct  = d.answeredCount > 0 ? Math.round((d.correctCount / d.answeredCount) * 100) : 0;
+                const bar  = DOMAIN_BAR_COLORS[d.domain] ?? '#6B7280';
+                const settled = d.read === 'settled';
+                return (
+                  <div key={d.domain} className="flex items-center gap-2">
+                    <p className="text-[12px] text-muted-foreground w-36 shrink-0 truncate" title={d.domainLabel}>{d.domainLabel}</p>
+                    <div className="flex-1 h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: bar }} />
+                    </div>
+                    <span className="text-[12px] font-semibold w-8 text-right shrink-0" style={{ color: bar }}>{pct}%</span>
+                    <span className="text-[10px] rounded-full px-1.5 py-0.5 border shrink-0 w-14 text-center"
+                      style={settled ? { background: '#E6F0EA', color: '#2F6B3F', borderColor: '#9FC3AE' } : { background: '#EDF5F8', color: '#2F6F7E', borderColor: '#7FAFC6' }}>
+                      {settled ? 'Settled' : 'Reading'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Confidence calibration */}
+          <div>
+            <p className="text-[11px] font-bold text-muted-foreground/60 uppercase tracking-wide mb-1.5">Confidence Calibration</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[
+                { label: 'Calibrated',         count: session.calibrated,    color: '#2F6B3F', bg: '#E6F0EA', icon: CheckCircle2 },
+                { label: 'Misconception risk',  count: session.misconception, color: '#A93F2F', bg: '#FBEAE6', icon: AlertTriangle },
+              ].map(c => (
+                <div key={c.label} className="rounded border px-2.5 py-2 flex items-center gap-2"
+                  style={{ background: c.bg, borderColor: c.color + '40' }}>
+                  <c.icon className="w-3 h-3 shrink-0" style={{ color: c.color }} />
+                  <span className="text-[12px] font-bold" style={{ color: c.color }}>{c.count}</span>
+                  <span className="text-[12px] text-muted-foreground">{c.label}</span>
+                </div>
+              ))}
+            </div>
+            {session.misconception > 0 && (
+              <p className="text-[11px] text-[#A93F2F] mt-1.5 flex items-center gap-1">
+                <Brain className="w-3 h-3 shrink-0" />
+                Use the Coach button to generate a Penny debrief for these misconception areas.
+              </p>
+            )}
+          </div>
+          <p className="text-[14px] text-muted-foreground/40">Session #{session.id}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AssessmentsPanel({ learnerEmail }: { learnerEmail: string | null }) {
+  const [sessions, setSessions] = useState<AssessmentSessionRecord[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!learnerEmail) { setLoading(false); return; }
+    fetch(`/api/assessments/staff/sessions?learnerEmail=${encodeURIComponent(learnerEmail)}`)
+      .then(r => { if (!r.ok) throw new Error(`${r.status} ${r.statusText}`); return r.json() as Promise<{ sessions: AssessmentSessionRecord[] }>; })
+      .then(data => { setSessions(data.sessions ?? []); setLoading(false); })
+      .catch((err: unknown) => { setError(err instanceof Error ? err.message : 'Failed to load assessment sessions'); setLoading(false); });
+  }, [learnerEmail]);
+
+  if (!learnerEmail) return <p className="text-[14px] text-muted-foreground text-center py-8">No email on record — cannot look up assessments.</p>;
+  if (loading)       return <SkeletonBlock lines={5} />;
+  if (error)         return <ErrorBox message={error} />;
+  if (sessions.length === 0) return (
+    <div className="text-center py-8 space-y-2">
+      <ClipboardCheck className="w-8 h-8 text-muted-foreground/30 mx-auto" />
+      <p className="text-[14px] text-muted-foreground">No assessment sessions yet for this learner.</p>
+      <p className="text-[14px] text-muted-foreground/60">Sessions appear here once the learner completes a Penny assessment.</p>
+    </div>
+  );
+
+  const passedCount = sessions.filter(s => s.passed).length;
+  const avgScore    = sessions.length > 0 ? Math.round(sessions.reduce((acc, s) => acc + s.overallScore, 0) / sessions.length) : 0;
+
+  return (
+    <div className="space-y-4">
+      {/* Summary bar */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: 'Sessions',  value: sessions.length,                  icon: ClipboardCheck },
+          { label: 'Passed',    value: `${passedCount}/${sessions.length}`, icon: CheckCircle2 },
+          { label: 'Avg Score', value: `${avgScore}%`,                   icon: BarChart2 },
+        ].map(s => (
+          <div key={s.label} className="rounded-lg border border-border bg-card p-3 text-center">
+            <s.icon className="w-3.5 h-3.5 text-muted-foreground/60 mx-auto mb-1" />
+            <p className="text-base font-bold text-foreground">{s.value}</p>
+            <p className="text-[11px] text-muted-foreground">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Session cards */}
+      <div className="space-y-2">
+        {sessions.map(s => <AssessmentSessionCard key={s.id} session={s} />)}
+      </div>
+
+      <p className="text-[14px] text-muted-foreground/40 text-center">
+        Matched by learner email · Trail OS local DB
+      </p>
     </div>
   );
 }
@@ -1010,6 +1205,11 @@ export default function LearnerDetail({ params }: { params?: { contactId?: strin
             {loadedTabs.current.has('quests') && (
               <div className={activeTab !== 'quests' ? 'hidden' : ''}>
                 <QuestsPanel contactId={contactId} />
+              </div>
+            )}
+            {loadedTabs.current.has('assessments') && (
+              <div className={activeTab !== 'assessments' ? 'hidden' : ''}>
+                <AssessmentsPanel learnerEmail={profile?.email ?? null} />
               </div>
             )}
             {loadedTabs.current.has('career') && (

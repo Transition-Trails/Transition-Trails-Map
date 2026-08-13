@@ -24,6 +24,7 @@ import { DomainReadsSidebar } from "@/components/homebase/DomainReadsSidebar";
 import { MCItemRenderer, type ConfidenceLevel } from "@/components/homebase/MCItemRenderer";
 import { ScenarioItemRenderer, type CoachSignals, type ScenarioItem } from "@/components/homebase/ScenarioItemRenderer";
 import BuildCheckItemRenderer from "@/components/homebase/BuildCheckItemRenderer";
+import AssessmentDebrief from "@/components/homebase/AssessmentDebrief";
 import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
 import { useAppContext } from "@/context/AppContext";
 
@@ -407,39 +408,7 @@ function ItemShell({
   );
 }
 
-// ── Debrief stub ──────────────────────────────────────────────────────────────
-
-function DebriefStub({ session }: { session: Session | null }) {
-  const [, navigate] = useLocation();
-  return (
-    <div className="flex flex-col items-center justify-center h-full p-6 text-center gap-4">
-      <div
-        className="w-14 h-14 rounded-full flex items-center justify-center"
-        style={{ background: "#EAF4EC" }}
-      >
-        <CheckCircle className="w-7 h-7" style={{ color: "#2F6B3F" }} />
-      </div>
-      <div>
-        <h2 className="text-lg font-bold" style={{ color: "#2A2E2C" }}>Assessment complete!</h2>
-        <p className="text-[14px] mt-1" style={{ color: "#4A4F4D" }}>
-          Your coach will review your results. Full debrief is coming in the next update.
-        </p>
-        {session && (
-          <p className="text-[11px] mt-1 font-mono" style={{ color: "#9CA3AF" }}>
-            Session #{session.id}
-          </p>
-        )}
-      </div>
-      <button
-        onClick={() => navigate("/")}
-        className="mt-2 px-5 py-2.5 rounded-xl font-semibold text-white text-[14px]"
-        style={{ background: "#2F6B3F" }}
-      >
-        Back to Homebase
-      </button>
-    </div>
-  );
-}
+// DebriefStub removed — replaced by AssessmentDebrief component
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
@@ -499,6 +468,18 @@ export default function LearnerAssessment() {
 
     if (data.domainReads) setDomainReads(data.domainReads);
     if (data.done) {
+      // Mark session complete in DB + trigger SF write before showing debrief.
+      // Fire-and-forget — don't block the transition on the complete call.
+      try {
+        const completed = await apiJson<{ session: Session; domainReads: DomainState[]; alreadyCompleted: boolean }>(
+          `/api/assessments/sessions/${sessionId}/complete`,
+          { method: "POST" },
+        );
+        if (completed.session) setSession(completed.session);
+        if (completed.domainReads) setDomainReads(completed.domainReads);
+      } catch {
+        // Non-blocking — proceed to debrief even if complete call fails.
+      }
       setView("debrief");
       return true;
     }
@@ -639,7 +620,13 @@ export default function LearnerAssessment() {
         </div>
       )}
 
-      {view === "debrief" && <DebriefStub session={session} />}
+      {view === "debrief" && session && (
+        <AssessmentDebrief
+          sessionId={session.id}
+          session={session}
+          initialDomainReads={domainReads}
+        />
+      )}
 
     </HomebaseShell>
   );
