@@ -8,6 +8,9 @@
  * Covered:
  *  1. GET /api/slack/validate — unauthenticated caller receives 401
  *  2. GET /api/slack/validate — everyday-tier staff user receives 200
+ *  3. POST /api/slack/validate/test-message — unauthenticated caller receives 401
+ *  4. POST /api/slack/validate/test-message — everyday-tier staff user receives 400
+ *     (no_token or no_channel, not 401/403)
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -107,5 +110,46 @@ describe('GET /api/slack/validate — authenticated staff (non-admin)', () => {
     const res   = await agent.get('/api/slack/validate');
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('checks');
+  });
+});
+
+// ── 3. POST /slack/validate/test-message — unauthenticated receives 401 ────────
+
+describe('POST /api/slack/validate/test-message — unauthenticated', () => {
+  it('returns 401 with error=not_authenticated when there is no session', async () => {
+    const res = await request(app)
+      .post('/api/slack/validate/test-message')
+      .send({ target: 'penny' });
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe('not_authenticated');
+  });
+});
+
+// ── 4. POST /slack/validate/test-message — everyday staff receives 400 ─────────
+//
+// With no bot token in env (cleared in beforeEach), the handler returns 400
+// { ok: false, error: "no_token" } before any Slack API call is attempted.
+// This confirms the endpoint is accessible to non-admin staff (not 401/403).
+
+describe('POST /api/slack/validate/test-message — authenticated staff (non-admin)', () => {
+  it('returns 400 (no_token) — not 401/403 — for an everyday-tier staff user', async () => {
+    const agent = await signInWithGroups([GROUPS.everyday]);
+    const res   = await agent
+      .post('/api/slack/validate/test-message')
+      .send({ target: 'penny' });
+    expect(res.status).toBe(400);
+    expect(res.body.ok).toBe(false);
+    // Must be a domain error (no_token or no_channel), never an auth rejection.
+    expect(['no_token', 'no_channel']).toContain(res.body.error);
+  });
+
+  it('returns 400 (no_token) — not 401/403 — for a power-tier staff user (non-admin)', async () => {
+    const agent = await signInWithGroups([GROUPS.power]);
+    const res   = await agent
+      .post('/api/slack/validate/test-message')
+      .send({ target: 'penny' });
+    expect(res.status).toBe(400);
+    expect(res.body.ok).toBe(false);
+    expect(['no_token', 'no_channel']).toContain(res.body.error);
   });
 });
