@@ -1,16 +1,20 @@
 /**
  * TodayMeetingsCard
  *
- * Shows Google Calendar events that start today. Extracts a Google Meet join
- * link from each event's location or description and surfaces it as a "Join"
- * button so staff can launch the meeting without leaving Homebase.
+ * Shows Google Calendar events that start today or this week. Extracts a
+ * Google Meet join link from each event's location or description and surfaces
+ * it as a "Join" button so staff can launch the meeting without leaving
+ * Homebase.
  *
  * States: loading | unavailable | empty | list
+ * View modes: today | this-week
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { CalendarDays, Loader2, Video, Clock, ExternalLink, RefreshCw } from "lucide-react";
 import { CalendarHoverCard } from "./CalendarHoverCard";
+
+type ViewMode = "today" | "this-week";
 
 // ── Types (mirrors CalendarEventOut from the API) ──────────────────────────────
 
@@ -66,16 +70,51 @@ function formatTime(dt: GCalDateTime): string {
   });
 }
 
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth()    === b.getMonth()    &&
+    a.getDate()     === b.getDate()
+  );
+}
+
 function isToday(dt: GCalDateTime): boolean {
   const str = dt.dateTime ?? dt.date;
   if (!str) return false;
-  const evDate  = new Date(str);
-  const today   = new Date();
-  return (
-    evDate.getFullYear() === today.getFullYear() &&
-    evDate.getMonth()    === today.getMonth()    &&
-    evDate.getDate()     === today.getDate()
-  );
+  return isSameDay(new Date(str), new Date());
+}
+
+/** True if the event touches the current calendar week (Mon–Sun). */
+function isThisWeek(ev: CalEvent): boolean {
+  const now      = new Date();
+  // Monday of current week at 00:00:00
+  const dayOfWeek = now.getDay(); // 0=Sun,1=Mon,...
+  const diffToMon = (dayOfWeek + 6) % 7;  // days since Monday
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - diffToMon);
+  weekStart.setHours(0, 0, 0, 0);
+  // Sunday end of week at 23:59:59
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+
+  const startStr = ev.start.dateTime ?? ev.start.date ?? "";
+  const endStr   = ev.end.dateTime   ?? ev.end.date   ?? "";
+  if (!startStr) return false;
+
+  const evStart = new Date(startStr);
+  const evEnd   = endStr ? new Date(endStr) : evStart;
+  // Event overlaps the week if it starts before weekEnd AND ends after weekStart
+  return evStart <= weekEnd && evEnd >= weekStart;
+}
+
+/** Short label for the event date when showing the full-week view. */
+function formatEventDate(dt: GCalDateTime): string {
+  const str = dt.dateTime ?? dt.date;
+  if (!str) return "";
+  const d = new Date(str);
+  if (isSameDay(d, new Date())) return "Today";
+  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
 function isHappeningNow(ev: CalEvent): boolean {
@@ -92,11 +131,12 @@ function stripHtml(html: string): string {
 
 // ── Event row ─────────────────────────────────────────────────────────────────
 
-function MeetingRow({ ev }: { ev: CalEvent }) {
+function MeetingRow({ ev, showDate = false }: { ev: CalEvent; showDate?: boolean }) {
   const meetLink  = getMeetLink(ev);
   const now       = isHappeningNow(ev);
   const startTime = formatTime(ev.start);
   const endTime   = formatTime(ev.end);
+  const dateLabel = showDate ? formatEventDate(ev.start) : null;
   const desc      = ev.description ? stripHtml(ev.description) : "";
 
   // Trim description to keep the card compact
@@ -107,6 +147,15 @@ function MeetingRow({ ev }: { ev: CalEvent }) {
       <CalendarHoverCard event={ev}>
         {/* Clickable trigger area: time row + title + description */}
         <button className="w-full text-left space-y-1 focus:outline-none">
+          {/* Date label (week view only) */}
+          {dateLabel && (
+            <p className={`text-[10px] font-semibold uppercase tracking-widest ${
+              dateLabel === "Today" ? "text-primary" : "text-muted-foreground/60"
+            }`}>
+              {dateLabel}
+            </p>
+          )}
+
           {/* Time row */}
           <div className="flex items-center justify-between gap-2">
             <div className={`flex items-center gap-1.5 text-[11px] font-medium ${now ? "text-emerald-600" : "text-muted-foreground"}`}>
@@ -167,9 +216,10 @@ function MeetingRow({ ev }: { ev: CalEvent }) {
 // ── TodayMeetingsCard ─────────────────────────────────────────────────────────
 
 export function TodayMeetingsCard() {
-  const [events,      setEvents]      = useState<CalEvent[]>([]);
+  const [allEvents,   setAllEvents]   = useState<CalEvent[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [unavailable, setUnavailable] = useState(false);
+  const [viewMode,    setViewMode]    = useState<ViewMode>("today");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -182,15 +232,13 @@ export function TodayMeetingsCard() {
         return;
       }
       const data = await res.json() as { events: CalEvent[] };
-      // Keep only events that start (or span) today, sorted by start time
-      const todayEvents = (data.events ?? [])
-        .filter(ev => isToday(ev.start) || isToday(ev.end))
-        .sort((a, b) => {
-          const aTime = a.start.dateTime ?? a.start.date ?? "";
-          const bTime = b.start.dateTime ?? b.start.date ?? "";
-          return aTime.localeCompare(bTime);
-        });
-      setEvents(todayEvents);
+      // Store all week events returned by the API, sorted by start time.
+      const sorted = (data.events ?? []).sort((a, b) => {
+        const aTime = a.start.dateTime ?? a.start.date ?? "";
+        const bTime = b.start.dateTime ?? b.start.date ?? "";
+        return aTime.localeCompare(bTime);
+      });
+      setAllEvents(sorted);
     } catch {
       setUnavailable(true);
     } finally {
@@ -200,27 +248,64 @@ export function TodayMeetingsCard() {
 
   useEffect(() => { void load(); }, [load]);
 
+  // Filter client-side based on active view mode.
+  const events = useMemo(() => {
+    if (viewMode === "today") {
+      return allEvents.filter(ev => isToday(ev.start) || isToday(ev.end));
+    }
+    return allEvents.filter(ev => isThisWeek(ev));
+  }, [allEvents, viewMode]);
+
+  const title = viewMode === "today" ? "Today's Meetings" : "This Week";
+
   return (
     <div className="rounded-xl border border-border bg-white overflow-hidden h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 flex-shrink-0">
         <div className="flex items-center gap-2">
           <CalendarDays className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-semibold text-foreground">Today's Meetings</span>
+          <span className="text-sm font-semibold text-foreground">{title}</span>
           {!loading && !unavailable && events.length > 0 && (
             <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
               {events.length}
             </span>
           )}
         </div>
-        <a
-          href="https://calendar.google.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[12px] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Calendar →
-        </a>
+
+        <div className="flex items-center gap-2">
+          {/* View toggle */}
+          <div className="flex items-center rounded-md border border-border overflow-hidden">
+            <button
+              onClick={() => setViewMode("today")}
+              className={`px-2 py-0.5 text-[11px] font-medium transition-colors ${
+                viewMode === "today"
+                  ? "bg-primary text-white"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              Today
+            </button>
+            <button
+              onClick={() => setViewMode("this-week")}
+              className={`px-2 py-0.5 text-[11px] font-medium border-l border-border transition-colors ${
+                viewMode === "this-week"
+                  ? "bg-primary text-white"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              This Week
+            </button>
+          </div>
+
+          <a
+            href="https://calendar.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Calendar →
+          </a>
+        </div>
       </div>
 
       {/* Body */}
@@ -232,7 +317,7 @@ export function TodayMeetingsCard() {
         ) : unavailable ? (
           <div className="py-4 space-y-2">
             <p className="text-sm text-muted-foreground">
-              Connect Google Calendar to see today's meetings.
+              Connect Google Calendar to see your meetings.
             </p>
             <a
               href="/admin/integrations/google-auth"
@@ -244,7 +329,9 @@ export function TodayMeetingsCard() {
           </div>
         ) : events.length === 0 ? (
           <div className="py-4 text-center">
-            <p className="text-sm text-muted-foreground">No meetings today.</p>
+            <p className="text-sm text-muted-foreground">
+              {viewMode === "today" ? "No meetings today." : "No meetings this week."}
+            </p>
             <a
               href="https://calendar.google.com/calendar/r/eventedit"
               target="_blank"
@@ -256,7 +343,9 @@ export function TodayMeetingsCard() {
           </div>
         ) : (
           <ul>
-            {events.map(ev => <MeetingRow key={ev.id} ev={ev} />)}
+            {events.map(ev => (
+              <MeetingRow key={ev.id} ev={ev} showDate={viewMode === "this-week"} />
+            ))}
           </ul>
         )}
       </div>

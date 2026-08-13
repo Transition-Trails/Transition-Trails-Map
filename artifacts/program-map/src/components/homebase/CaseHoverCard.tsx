@@ -15,7 +15,7 @@ import { useState, useRef, useEffect, ReactNode } from "react";
 import {
   Popover, PopoverContent, PopoverTrigger,
 } from "@/components/ui/popover";
-import { ExternalLink, Clock, Loader2, Check, User, MessageSquare } from "lucide-react";
+import { ExternalLink, Clock, Loader2, Check, User, MessageSquare, Hash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/context/AppContext";
 
@@ -135,10 +135,15 @@ export function CaseHoverCard({
   const [commentsDisabled, setCommentsDisabled] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Slack ping
+  const [pinging,    setPinging]    = useState(false);
+  const [pingResult, setPingResult] = useState<"sent" | "error" | null>(null);
+
   // Sync when case prop changes
   useEffect(() => {
     setCurrentStatus(c.Status       ?? "New");
     setFollowUpDate( c.FollowUpDate ?? "");
+    setPingResult(null);
   }, [c.Id, c.Status, c.FollowUpDate]);
 
   // Reset comment on open
@@ -153,6 +158,33 @@ export function CaseHoverCard({
   }, [comment, open]);
 
   // ── Savers ──────────────────────────────────────────────────────────────────
+
+  async function pingOwnerOnSlack() {
+    if (pinging || !c.OwnerName) return;
+    setPinging(true);
+    setPingResult(null);
+    try {
+      const res = await fetch(`/api/sf/cases/${c.Id}/ping-owner`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ caseNumber: c.CaseNumber, subject: c.Subject }),
+      });
+      const data = await res.json() as { ok: boolean; ownerName?: string; error?: string };
+      if (data.ok) {
+        setPingResult("sent");
+        const firstName = data.ownerName ? data.ownerName.split(" ")[0] : c.OwnerName;
+        toast({ title: `Slack DM sent to ${firstName}`, description: "They'll receive a status-check message shortly." });
+      } else {
+        setPingResult("error");
+        toast({ title: "Couldn't send Slack DM", description: data.error ?? "Unknown error", variant: "destructive" });
+      }
+    } catch {
+      setPingResult("error");
+      toast({ title: "Couldn't send Slack DM", description: "Network error — please try again.", variant: "destructive" });
+    } finally {
+      setPinging(false);
+    }
+  }
 
   async function handleStatusChange(newStatus: string) {
     if (newStatus === currentStatus || savingStatus) return;
@@ -269,11 +301,33 @@ export function CaseHoverCard({
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-1">
             Assigned To
           </p>
-          <div className="flex items-center gap-1.5">
-            <User className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
-            <span className="text-[12px] text-foreground/80 font-medium">
-              {c.OwnerName ?? "Unassigned"}
-            </span>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <User className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
+              <span className="text-[12px] text-foreground/80 font-medium truncate">
+                {c.OwnerName ?? "Unassigned"}
+              </span>
+            </div>
+            {c.OwnerName && (
+              <button
+                onClick={pingOwnerOnSlack}
+                disabled={pinging}
+                title={`Send ${c.OwnerName} a Slack status-check message`}
+                className={`flex-shrink-0 flex items-center gap-1 text-[11px] font-semibold transition-colors disabled:opacity-50 ${
+                  pingResult === "sent"
+                    ? "text-emerald-600"
+                    : "text-sky-600 hover:text-sky-700"
+                }`}
+              >
+                {pinging
+                  ? <Loader2 className="w-3 h-3 animate-spin" />
+                  : pingResult === "sent"
+                    ? <Check className="w-3 h-3" />
+                    : <Hash className="w-3 h-3" />
+                }
+                {pinging ? "Pinging…" : pingResult === "sent" ? "Sent!" : "Ping on Slack"}
+              </button>
+            )}
           </div>
         </div>
 

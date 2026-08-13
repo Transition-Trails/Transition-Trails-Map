@@ -2,9 +2,11 @@
  * Cases routes — /api/sf/cases  &  /api/cases
  *
  * GET    /sf/cases                    — list cases owned by the current SF user
+ *                                       (add ?assignedTo=all for org-wide view)
  * PATCH  /sf/cases/:id/status         — update Status field
  * PATCH  /sf/cases/:id                — update FollowUpDate
  * POST   /sf/cases/:id/comments       — create a CaseComment (internal note)
+ * POST   /sf/cases/:id/ping-owner     — send a Slack DM to the case owner
  * GET    /sf/cases/record-types       — active record types for Case
  * GET    /sf/cases/queues             — SF queues that support Case
  * POST   /sf/cases/:caseId/attachments — upload files to a SF Case
@@ -65,13 +67,25 @@ router.get("/sf/cases", async (req, res) => {
   let followUpDateSupported    = false;
   let lastModifiedBySupported  = false;
 
-  const buildSoql = (withModifiedBy: boolean, withFollowUp: boolean) =>
-    `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, LastModifiedDate` +
-    (withModifiedBy ? `, LastModifiedBy.Name` : ``) +
-    (withFollowUp   ? `, FollowUpDate`        : ``) +
-    `, Owner.Name, Contact.Name, Account.Name ` +
-    `FROM Case WHERE OwnerId = '${sfUserId}' ${statusClause} ` +
-    `ORDER BY CreatedDate DESC LIMIT 50`;
+  // ?assignedTo=all removes the OwnerId filter so staff can see all org cases.
+  // SF sharing rules still apply — only cases the connected user can read are returned.
+  const assignedToAll = (req.query["assignedTo"] as string) === "all";
+
+  const buildSoql = (withModifiedBy: boolean, withFollowUp: boolean) => {
+    const cols =
+      `SELECT Id, CaseNumber, Subject, Priority, Status, CreatedDate, LastModifiedDate` +
+      (withModifiedBy ? `, LastModifiedBy.Name` : ``) +
+      (withFollowUp   ? `, FollowUpDate`        : ``) +
+      `, Owner.Name, Contact.Name, Account.Name `;
+    // When fetching all org cases, "AND IsClosed = false" → "WHERE IsClosed = false".
+    const where = assignedToAll
+      ? (statusClause ? `WHERE ${statusClause.slice(4)} ` : ``)
+      : `WHERE OwnerId = '${sfUserId}' ${statusClause} `;
+    const order = assignedToAll
+      ? `ORDER BY Owner.Name ASC, CreatedDate DESC`
+      : `ORDER BY CreatedDate DESC`;
+    return `${cols}FROM Case ${where}${order} LIMIT ${assignedToAll ? 200 : 50}`;
+  };
 
   const attempts: Array<[boolean, boolean]> = [
     [true,  true ],
@@ -665,6 +679,109 @@ router.post("/cases/:id/retry", async (req, res) => {
       .returning();
 
     return res.status(502).json({ case: updated ?? claimed, synced: false, error: syncError });
+  }
+});
+
+// ── POST /sf/cases/:id/ping-owner ─────────────────────────────────────────────
+// Looks up the case owner's email in Salesforce, resolves their Slack user ID
+// via users.lookupByEmail, and sends a status-check DM via the bot token.
+// Returns { ok, ownerName, slackUserId } on success; 422 when the owner can't
+// be resolved; 500 on Slack send failure.
+
+router.post("/sf/cases/:id/ping-owner", async (req, res) => {
+  const id            = req.params["id"] as string;
+  const { caseNumber, subject } = req.body as { caseNumber?: string; subject?: string };
+
+  const botToken = process.env["SLACK_BOT_TOKEN"] ?? process.env["SLACK_BOT_USER_OAUTH_TOKEN"];
+  if (!botToken) {
+    return res.status(400).json({ ok: false, error: "SLACK_BOT_TOKEN is not configured." });
+  }
+
+  // ── 1. Fetch the owner's email from Salesforce ──────────────────────────────
+  let ownerEmail: string | null = null;
+  let ownerName:  string | null = null;
+
+  try {
+    let sfClient: ReturnType<typeof getSalesforceClient> | null = null;
+    try { sfClient = getSalesforceClient(req); } catch { /* no SF session */ }
+
+    if (sfClient) {
+      const result = await sfClient.query<Record<string, unknown>>(
+        `SELECT Owner.Email, Owner.Name FROM Case WHERE Id = '${id}' LIMIT 1`,
+      );
+      const row   = result.records[0];
+      const owner = row?.["Owner"] as Record<string, unknown> | null;
+      ownerEmail  = (owner?.["Email"] as string | null) ?? null;
+      ownerName   = (owner?.["Name"]  as string | null) ?? null;
+    }
+  } catch (e: unknown) {
+    logger.warn({ err: e, caseId: id }, "ping-case-owner: SF email lookup failed");
+  }
+
+  if (!ownerEmail) {
+    return res.status(422).json({
+      ok:    false,
+      error: "Could not resolve the owner's email from Salesforce.",
+    });
+  }
+
+  const caseRef  = caseNumber ? `#${caseNumber}` : `(SF ID: ${id})`;
+  const subj     = subject ?? "a Salesforce case";
+  const firstName = ownerName ? ownerName.split(" ")[0] : null;
+  const greeting  = firstName ? ` ${firstName}` : "";
+  const message   =
+    `👋 Hi${greeting}! Quick status check on Case ${caseRef}: *${subj}*. ` +
+    `Can you share a brief update when you get a chance? Thanks!`;
+
+  // ── 2. Resolve Slack user by email ─────────────────────────────────────────
+  let slackUserId: string | null = null;
+  try {
+    const lookupUrl = new URL("https://slack.com/api/users.lookupByEmail");
+    lookupUrl.searchParams.set("email", ownerEmail);
+    const lookupRes  = await fetch(lookupUrl.toString(), {
+      headers: { Authorization: `Bearer ${botToken}` },
+    });
+    const lookupData = await lookupRes.json() as { ok: boolean; user?: { id: string } };
+    if (lookupData.ok && lookupData.user?.id) slackUserId = lookupData.user.id;
+  } catch (e: unknown) {
+    logger.warn({ ownerEmail, err: e }, "ping-case-owner: Slack user lookup failed");
+  }
+
+  if (!slackUserId) {
+    const displayName = ownerName ?? ownerEmail;
+    return res.status(422).json({
+      ok:    false,
+      error: `${displayName} was not found in Slack. They may not have a Slack account linked to that email.`,
+    });
+  }
+
+  // ── 3. Open DM and send message ─────────────────────────────────────────────
+  try {
+    const openRes  = await fetch("https://slack.com/api/conversations.open", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${botToken}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({ users: slackUserId }),
+    });
+    const openData = await openRes.json() as { ok: boolean; channel?: { id: string } };
+
+    if (!openData.ok || !openData.channel?.id) throw new Error("conversations.open failed");
+
+    await fetch("https://slack.com/api/chat.postMessage", {
+      method:  "POST",
+      headers: { Authorization: `Bearer ${botToken}`, "Content-Type": "application/json" },
+      body:    JSON.stringify({
+        channel:      openData.channel.id,
+        text:         message,
+        unfurl_links: false,
+        unfurl_media: false,
+      }),
+    });
+
+    logger.info({ caseId: id, ownerEmail, caseNumber }, "ping-case-owner: DM sent");
+    return res.json({ ok: true, ownerName, slackUserId });
+  } catch (e: unknown) {
+    logger.warn({ ownerEmail, slackUserId, err: e }, "ping-case-owner: DM send failed");
+    return res.status(500).json({ ok: false, error: "Failed to send Slack DM. Please try again." });
   }
 });
 

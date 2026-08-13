@@ -7,12 +7,13 @@
  * Primary tabs: Open | All | Closed
  */
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, Fragment } from "react";
 import {
   Loader2, RefreshCw, Briefcase, Clock,
   ChevronsUpDown, ChevronUp, ChevronDown, Plus,
-  AlertCircle, CheckCircle2, RotateCw,
+  AlertCircle, CheckCircle2, RotateCw, User,
 } from "lucide-react";
+import { useTierFlags } from "@/hooks/useTierFlags";
 import { useToast }        from "@/hooks/use-toast";
 import { openSfAuthPopup } from "@/utils/openSfAuthPopup";
 import { useAppContext }   from "@/context/AppContext";
@@ -39,7 +40,7 @@ interface SubmittedCase {
   createdAt:      string;
 }
 
-type FilterTab      = "open" | "all" | "closed";
+type FilterTab      = "open" | "all" | "closed" | "by-owner";
 type SortField      = "CaseNumber" | "Subject" | "Status" | "OwnerName" | "Priority" | "CreatedDate" | "LastModifiedDate";
 type SortDir        = "asc" | "desc";
 type StatusFilter   = "All" | "New" | "Working" | "Escalated" | "Closed";
@@ -126,6 +127,7 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 export default function CasesPage() {
   const { toast } = useToast();
   const { openLogTime } = useAppContext();
+  const { isPowerOrAbove } = useTierFlags();
 
   // Remote state
   const [cases,              setCases]              = useState<SfCase[]>([]);
@@ -155,7 +157,9 @@ export default function CasesPage() {
     setLoading(true);
     setSfUnavailable(false);
     try {
-      const res  = await fetch(`/api/sf/cases?status=${tab}`);
+      const statusParam  = tab === "by-owner" ? "open" : tab;
+      const assignedTo   = tab === "by-owner" ? "&assignedTo=all" : "";
+      const res  = await fetch(`/api/sf/cases?status=${statusParam}${assignedTo}`);
       if (res.status === 401) { setSfUnavailable(true); setLoading(false); return; }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json() as {
@@ -287,6 +291,17 @@ export default function CasesPage() {
     else { setSortField(field); setSortDir(field === "CreatedDate" ? "desc" : "asc"); }
   }
 
+  // Owner-group case counts — used for the group-header row in "by-owner" view.
+  const ownerCounts = useMemo(() => {
+    if (filter !== "by-owner") return {} as Record<string, number>;
+    const counts: Record<string, number> = {};
+    for (const c of visibleCases) {
+      const key = c.OwnerName ?? "Unassigned";
+      counts[key] = (counts[key] ?? 0) + 1;
+    }
+    return counts;
+  }, [filter, visibleCases]);
+
   // ── Optimistic handlers ───────────────────────────────────────────────────────
 
   function handleStatusChange(id: string, status: string) {
@@ -330,9 +345,10 @@ export default function CasesPage() {
   // ── Render ────────────────────────────────────────────────────────────────────
 
   const TABS: { id: FilterTab; label: string }[] = [
-    { id: "open",   label: "Open"   },
-    { id: "all",    label: "All"    },
-    { id: "closed", label: "Closed" },
+    { id: "open",     label: "Open"     },
+    { id: "all",      label: "All"      },
+    { id: "closed",   label: "Closed"   },
+    ...(isPowerOrAbove ? [{ id: "by-owner" as FilterTab, label: "By Owner" }] : []),
   ];
 
   const STATUS_CHIP_VALUES:   StatusFilter[]   = ["All", "New", "Working", "Escalated", "Closed"];
@@ -350,7 +366,7 @@ export default function CasesPage() {
             Cases
           </p>
           <h1 className="text-xl font-semibold text-foreground">
-            My Cases
+            {filter === "by-owner" ? "All Cases by Owner" : "My Cases"}
             {!loading && !sfUnavailable && cases.length > 0 && filtersActive && (
               <span className="ml-2 text-sm font-normal text-muted-foreground">
                 {visibleCases.length} of {cases.length}
@@ -584,8 +600,9 @@ export default function CasesPage() {
           <div className="px-6 py-10 text-center space-y-2">
             <Briefcase className="w-8 h-8 text-muted-foreground/30 mx-auto" />
             <p className="text-sm text-muted-foreground">
-              {filter === "open"   ? "No open cases assigned to you."
+              {filter === "open"     ? "No open cases assigned to you."
                : filter === "closed" ? "No closed cases found."
+               : filter === "by-owner" ? "No open cases found in this org."
                : "No cases found."}
             </p>
           </div>
@@ -616,13 +633,31 @@ export default function CasesPage() {
               </tr>
             </thead>
             <tbody>
-              {visibleCases.map(c => {
-                const statusCls = STATUS_BADGE[c.Status ?? ""]   ?? "bg-slate-100 text-slate-600";
-                const priCls    = PRIORITY_BADGE[c.Priority ?? ""] ?? "bg-muted text-muted-foreground border border-border";
+              {visibleCases.map((c, idx) => {
+                const statusCls  = STATUS_BADGE[c.Status ?? ""]    ?? "bg-slate-100 text-slate-600";
+                const priCls     = PRIORITY_BADGE[c.Priority ?? ""] ?? "bg-muted text-muted-foreground border border-border";
+                const prevOwner  = idx > 0 ? visibleCases[idx - 1]?.OwnerName : null;
+                const showHeader = filter === "by-owner" && c.OwnerName !== prevOwner;
+                const ownerKey   = c.OwnerName ?? "Unassigned";
 
                 return (
+                  <Fragment key={c.Id}>
+                    {showHeader && (
+                      <tr className="bg-muted/30 border-y border-border/40">
+                        <td colSpan={8} className="pl-4 px-3 py-2">
+                          <div className="flex items-center gap-2">
+                            <User className="w-3.5 h-3.5 text-muted-foreground/60 flex-shrink-0" />
+                            <span className="text-[12px] font-semibold text-foreground/80">
+                              {ownerKey}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground/50">
+                              {ownerCounts[ownerKey] ?? 0} case{(ownerCounts[ownerKey] ?? 0) !== 1 ? "s" : ""}
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   <tr
-                    key={c.Id}
                     className="group/row border-b border-border/50 last:border-0 transition-colors hover:bg-muted/10"
                   >
                     {/* Case # */}
@@ -712,6 +747,7 @@ export default function CasesPage() {
                       </button>
                     </td>
                   </tr>
+                  </Fragment>
                 );
               })}
             </tbody>
