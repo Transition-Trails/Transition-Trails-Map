@@ -97,28 +97,123 @@ export interface CalendarEventOut {
   attendeeCount: number;
 }
 
-// ─── GET /api/calendar/events ─────────────────────────────────────────────────
-// Returns the next 10 calendar events from the primary calendar.
+// ─── Fetch primary calendar metadata (with 5-min in-memory cache) ─────────────
 
-router.get("/calendar/events", async (_req, res) => {
+interface CalendarMeta { timeZone: string }
+let cachedCalMeta: { value: CalendarMeta; expiresAt: number } | null = null;
+
+async function getPrimaryCalendarMeta(token: string): Promise<CalendarMeta> {
+  if (cachedCalMeta && Date.now() < cachedCalMeta.expiresAt) {
+    return cachedCalMeta.value;
+  }
+  try {
+    const resp = await fetch(
+      "https://www.googleapis.com/calendar/v3/calendars/primary?fields=timeZone",
+      { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(8_000) },
+    );
+    if (resp.ok) {
+      const data = await resp.json() as { timeZone?: string };
+      const meta: CalendarMeta = { timeZone: data.timeZone ?? "UTC" };
+      cachedCalMeta = { value: meta, expiresAt: Date.now() + 5 * 60 * 1000 };
+      return meta;
+    }
+  } catch { /* fall through to UTC fallback */ }
+  return { timeZone: "UTC" };
+}
+
+// ─── Timezone-aware week-boundary helper ─────────────────────────────────────
+//
+// Returns UTC Date objects for Monday 00:00:00 and Sunday 23:59:59.999 of the
+// week containing `now`, expressed in the given IANA timezone.
+//
+// Algorithm — "sv-SE offset probe":
+//   1. Use Intl.DateTimeFormat to extract the calendar date and weekday of
+//      `now` in the target timezone.
+//   2. Compute the calendar dates of Monday and Sunday for that week.
+//   3. For each boundary, find the UTC offset at noon on that date using the
+//      sv-SE locale trick (sv-SE always produces "YYYY-MM-DD HH:mm:ss").
+//   4. Subtract the offset from the local-midnight UTC representation to get
+//      the true UTC instant for 00:00:00 / 23:59:59.999 in the target tz.
+
+function currentWeekBoundsInTz(tz: string, now: Date): { timeMin: Date; timeMax: Date } {
+  const dtfParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    year: "numeric", month: "numeric", day: "numeric", weekday: "short",
+  }).formatToParts(now);
+
+  const get = (type: string) => dtfParts.find(p => p.type === type)?.value ?? "";
+  const year  = parseInt(get("year"),  10);
+  const month = parseInt(get("month"), 10) - 1;  // 0-indexed
+  const day   = parseInt(get("day"),   10);
+
+  const DOW_SHORT: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+  const dow = DOW_SHORT[get("weekday")] ?? 0;
+
+  const diffToMon = (dow + 6) % 7;   // 0 on Mon, 1 on Tue … 6 on Sun
+  const monDay    = day - diffToMon;
+
+  // Convert "YYYY-MM-DD 00:00:00 in tz" → UTC Date using a noon probe.
+  const localMidnightAsUtc = (lYear: number, lMonth0: number, lDay: number): Date => {
+    const probeUtc = new Date(Date.UTC(lYear, lMonth0, lDay, 12, 0, 0));
+    const localStr = new Intl.DateTimeFormat("sv-SE", {
+      timeZone: tz,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    }).format(probeUtc);
+    const localAsUtcMs = Date.parse(localStr.replace(" ", "T") + "Z");
+    const offsetMs = localAsUtcMs - probeUtc.getTime();
+    const midnightLocalAsUtcMs = Date.UTC(lYear, lMonth0, lDay, 0, 0, 0);
+    return new Date(midnightLocalAsUtcMs - offsetMs);
+  };
+
+  const timeMin = localMidnightAsUtc(year, month, monDay);
+  // End of Sunday = start of next Monday − 1 ms
+  const nextMonMin = localMidnightAsUtc(year, month, monDay + 7);
+  const timeMax = new Date(nextMonMin.getTime() - 1);
+
+  return { timeMin, timeMax };
+}
+
+// ─── GET /api/calendar/events ─────────────────────────────────────────────────
+// Returns calendar events from the primary calendar.
+// ?week=true  → timeMin = Monday 00:00:00 in the calendar owner's timezone,
+//               timeMax = Sunday 23:59:59.999 in the same timezone.
+// ?from=<iso> → timeMin = browser-supplied local midnight (today view);
+//               timeMax = timeMin + 7 days.
+// default     → timeMin = now; timeMax = now + 7 days (upcoming only).
+
+router.get("/calendar/events", async (req, res) => {
   try {
     const token = await getAccessToken();
 
     const now = new Date();
-    // Use the browser-supplied local midnight if provided (avoids UTC/local
-    // timezone mismatch where server midnight ≠ user's midnight).
-    const fromParam   = (_req.query as Record<string, string>)["from"];
-    const startOfDay  = fromParam ? new Date(fromParam) : (() => {
-      const d = new Date(now); d.setHours(0, 0, 0, 0); return d;
-    })();
-    const week = new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000);
+    let timeMin: Date;
+    let timeMax: Date;
+
+    if (req.query["week"] === "true") {
+      // Fetch the calendar's configured timezone so week boundaries are correct
+      // regardless of the API server's timezone (UTC on Replit).
+      const meta = await getPrimaryCalendarMeta(token);
+      ({ timeMin, timeMax } = currentWeekBoundsInTz(meta.timeZone, now));
+    } else {
+      // Accept a browser-supplied local midnight (?from=) so the today view
+      // starts at the correct day boundary even when the server is in UTC.
+      const fromParam = (req.query as Record<string, string>)["from"];
+      const fromDate  = fromParam ? new Date(fromParam) : null;
+      timeMin = (fromDate && !isNaN(fromDate.getTime())) ? fromDate : now;
+      timeMax = new Date(timeMin.getTime() + 7 * 24 * 60 * 60 * 1000);
+    }
+
+    // Allow more results for the full-week view so earlier-in-week events
+    // are not silently truncated.
+    const maxResults = req.query["week"] === "true" ? "50" : "25";
 
     const params = new URLSearchParams({
-      timeMin:       startOfDay.toISOString(),
-      timeMax:       week.toISOString(),
+      timeMin:       timeMin.toISOString(),
+      timeMax:       timeMax.toISOString(),
       singleEvents:  "true",
       orderBy:       "startTime",
-      maxResults:    "25",
+      maxResults,
       fields:        "items(id,summary,description,location,start,end,attendees,htmlLink,hangoutLink,conferenceData,status)",
     });
 

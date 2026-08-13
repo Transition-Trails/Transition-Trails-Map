@@ -254,9 +254,9 @@ export default function CasesPage() {
     if (priorityFilter !== "All") list = list.filter(c => c.Priority === priorityFilter);
 
     list.sort((a, b) => {
-      // In "by-owner" view, always group by owner first; the user-selected
-      // sort then applies within each owner's group.
-      if (filter === "by-owner") {
+      // In "by-owner" mode, always sort primarily by OwnerName (ascending) so
+      // every owner's cases stay together and group headers never repeat.
+      if (filter === "by-owner" && sortField !== "OwnerName") {
         const ownerCmp = (a.OwnerName ?? "").localeCompare(b.OwnerName ?? "");
         if (ownerCmp !== 0) return ownerCmp;
       }
@@ -291,7 +291,7 @@ export default function CasesPage() {
     });
 
     return list;
-  }, [cases, statusFilter, priorityFilter, sortField, sortDir]);
+  }, [cases, filter, statusFilter, priorityFilter, sortField, sortDir]);
 
   function toggleSort(field: SortField) {
     if (sortField === field) setSortDir(d => d === "asc" ? "desc" : "asc");

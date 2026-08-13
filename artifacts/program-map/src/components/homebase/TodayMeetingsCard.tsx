@@ -125,6 +125,12 @@ function isHappeningNow(ev: CalEvent): boolean {
   return now >= start && now <= end;
 }
 
+/** True if the event has already ended (entirely in the past). */
+function isPast(ev: CalEvent): boolean {
+  const endStr = ev.end.dateTime ?? ev.end.date;
+  if (!endStr) return false;
+  return new Date(endStr).getTime() < Date.now();
+}
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -134,6 +140,7 @@ function stripHtml(html: string): string {
 function MeetingRow({ ev, showDate = false }: { ev: CalEvent; showDate?: boolean }) {
   const meetLink  = getMeetLink(ev);
   const now       = isHappeningNow(ev);
+  const past      = !now && isPast(ev);
   const startTime = formatTime(ev.start);
   const endTime   = formatTime(ev.end);
   const dateLabel = showDate ? formatEventDate(ev.start) : null;
@@ -143,7 +150,7 @@ function MeetingRow({ ev, showDate = false }: { ev: CalEvent; showDate?: boolean
   const shortDesc = desc.length > 100 ? desc.slice(0, 97) + "…" : desc;
 
   return (
-    <li className={`py-3 border-b border-border/50 last:border-0 ${now ? "opacity-100" : ""}`}>
+    <li className={`py-3 border-b border-border/50 last:border-0 ${past ? "opacity-50" : ""}`}>
       <CalendarHoverCard event={ev}>
         {/* Clickable trigger area: time row + title + description */}
         <button className="w-full text-left space-y-1 focus:outline-none">
@@ -221,22 +228,30 @@ export function TodayMeetingsCard() {
   const [unavailable, setUnavailable] = useState(false);
   const [viewMode,    setViewMode]    = useState<ViewMode>("today");
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (mode: ViewMode) => {
     setLoading(true);
     setUnavailable(false);
     try {
-      // Pass the browser's local midnight so the server fetches from the
-      // correct day boundary regardless of server timezone (UTC).
-      const localMidnight = new Date();
-      localMidnight.setHours(0, 0, 0, 0);
-      const res = await fetch(`/api/calendar/events?from=${encodeURIComponent(localMidnight.toISOString())}`);
+      let url: string;
+      if (mode === "this-week") {
+        // ?week=true → server uses the calendar's configured timezone to compute
+        // Mon 00:00 – Sun 23:59:59 so past meetings from earlier this week appear.
+        url = "/api/calendar/events?week=true";
+      } else {
+        // Pass the browser's local midnight so the server starts from the correct
+        // day boundary regardless of server timezone (UTC on Replit).
+        const localMidnight = new Date();
+        localMidnight.setHours(0, 0, 0, 0);
+        url = `/api/calendar/events?from=${encodeURIComponent(localMidnight.toISOString())}`;
+      }
+      const res = await fetch(url);
       if (!res.ok) {
         setUnavailable(true);
         setLoading(false);
         return;
       }
       const data = await res.json() as { events: CalEvent[] };
-      // Store all week events returned by the API, sorted by start time.
+      // Store events returned by the API, sorted by start time.
       const sorted = (data.events ?? []).sort((a, b) => {
         const aTime = a.start.dateTime ?? a.start.date ?? "";
         const bTime = b.start.dateTime ?? b.start.date ?? "";
@@ -250,7 +265,7 @@ export function TodayMeetingsCard() {
     }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void load(viewMode); }, [load, viewMode]);
 
   // Filter client-side based on active view mode.
   const events = useMemo(() => {
