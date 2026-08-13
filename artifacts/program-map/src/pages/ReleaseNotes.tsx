@@ -169,14 +169,15 @@ export default function ReleaseNotes() {
             <button
               type="button"
               onClick={() => {
-                startTour();
-                // Homebase audience users are already inside HomebaseShell, which
-                // mounts HomebaseTour. Navigating to /homebase would cause a
-                // redirect flash. Staff (non-audience) still need the navigation
-                // because their tour renders inside TeamHomebase's HomebaseShell.
-                if (!isHombaseAudience) {
-                  window.history.pushState({}, "", "/homebase");
-                  window.dispatchEvent(new PopStateEvent("popstate"));
+                if (isHombaseAudience) {
+                  // Homebase audience: Homebase tour, already inside HomebaseShell
+                  // which mounts HomebaseTour — no navigation needed.
+                  startTour();
+                } else {
+                  // Staff: Mission Control tour. Navigate there first so
+                  // MissionControlTour (mounted in Home.tsx) can render.
+                  startMCTour();
+                  navigate("/mission-control");
                 }
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted/60 text-[12px] font-medium text-foreground transition-colors"
