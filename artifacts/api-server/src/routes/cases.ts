@@ -22,6 +22,7 @@ import { SF_API_VERSION }       from "../lib/sfConstants.js";
 import { logger }               from "../lib/logger.js";
 import { db, submittedCasesTable } from "@workspace/db";
 import { eq, desc, and, inArray } from "drizzle-orm";
+import { isSuperAdmin, isAdmin } from "../middlewares/requireAuth.js";
 
 const router = Router();
 
@@ -69,7 +70,23 @@ router.get("/sf/cases", async (req, res) => {
 
   // ?assignedTo=all removes the OwnerId filter so staff can see all org cases.
   // SF sharing rules still apply — only cases the connected user can read are returned.
+  // Requires Power-or-above tier — enforce server-side, not just client-side.
   const assignedToAll = (req.query["assignedTo"] as string) === "all";
+  if (assignedToAll) {
+    const email  = req.session.googleEmail ?? "";
+    const groups = req.session.googleGroups ?? [];
+    const powerGroup = (process.env["GOOGLE_GROUP_POWER"] ?? "trailospennyadmin@transitiontrails.org").toLowerCase().trim();
+    const isPowerOrAbove =
+      isSuperAdmin(email) ||
+      isAdmin(groups, email) ||
+      groups.map(g => g.toLowerCase()).includes(powerGroup);
+    if (!isPowerOrAbove) {
+      return res.status(403).json({
+        error:   "not_authorized",
+        message: "Viewing all org cases requires Power-level access or above.",
+      });
+    }
+  }
 
   const buildSoql = (withModifiedBy: boolean, withFollowUp: boolean) => {
     const cols =
@@ -692,6 +709,11 @@ router.post("/sf/cases/:id/ping-owner", async (req, res) => {
   const id            = req.params["id"] as string;
   const { caseNumber, subject } = req.body as { caseNumber?: string; subject?: string };
 
+  // Validate Salesforce ID format (15 or 18 alphanumeric characters).
+  if (!/^[a-zA-Z0-9]{15}([a-zA-Z0-9]{3})?$/.test(id)) {
+    return res.status(400).json({ ok: false, error: "Invalid Salesforce case ID." });
+  }
+
   const botToken = process.env["SLACK_BOT_TOKEN"] ?? process.env["SLACK_BOT_USER_OAUTH_TOKEN"];
   if (!botToken) {
     return res.status(400).json({ ok: false, error: "SLACK_BOT_TOKEN is not configured." });
@@ -766,7 +788,7 @@ router.post("/sf/cases/:id/ping-owner", async (req, res) => {
 
     if (!openData.ok || !openData.channel?.id) throw new Error("conversations.open failed");
 
-    await fetch("https://slack.com/api/chat.postMessage", {
+    const postRes  = await fetch("https://slack.com/api/chat.postMessage", {
       method:  "POST",
       headers: { Authorization: `Bearer ${botToken}`, "Content-Type": "application/json" },
       body:    JSON.stringify({
@@ -776,6 +798,21 @@ router.post("/sf/cases/:id/ping-owner", async (req, res) => {
         unfurl_media: false,
       }),
     });
+    const postData = await postRes.json() as { ok: boolean; error?: string };
+
+    if (!postData.ok) {
+      const errMap: Record<string, string> = {
+        missing_scope:    "Bot token is missing the chat:write scope — contact your admin to fix the Slack app permissions.",
+        invalid_auth:     "Slack bot token is invalid or revoked — contact your admin.",
+        not_in_channel:   "Bot is not a member of the DM channel. Try again or contact your admin.",
+        channel_not_found: "DM channel was not found. Please try again.",
+        is_archived:      "The conversation channel is archived.",
+        rate_limited:     "Slack rate limit hit — please wait a moment and try again.",
+      };
+      const detail = errMap[postData.error ?? ""] ?? `Slack error: ${postData.error ?? "unknown"}`;
+      logger.warn({ caseId: id, ownerEmail, slackError: postData.error }, "ping-case-owner: chat.postMessage failed");
+      return res.status(500).json({ ok: false, error: detail });
+    }
 
     logger.info({ caseId: id, ownerEmail, caseNumber }, "ping-case-owner: DM sent");
     return res.json({ ok: true, ownerName, slackUserId });

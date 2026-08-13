@@ -65,6 +65,15 @@ function detectChannelRole(name: string): "penny" | "admin" | "default" {
   return "default";
 }
 
+// ─── GET /slack/status ────────────────────────────────────────────────────────
+// Lightweight check — just reports whether the bot token is present.
+// Used by the frontend to disable Slack-dependent UI before the user tries it.
+
+router.get("/slack/status", (_req, res) => {
+  const botToken = process.env["SLACK_BOT_TOKEN"] ?? process.env["SLACK_BOT_USER_OAUTH_TOKEN"];
+  res.json({ configured: Boolean(botToken) });
+});
+
 // ─── GET /slack/validate ──────────────────────────────────────────────────────
 
 router.get("/slack/validate", async (req, res) => {

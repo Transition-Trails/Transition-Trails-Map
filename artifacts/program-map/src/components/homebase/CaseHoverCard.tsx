@@ -15,6 +15,9 @@ import { useState, useRef, useEffect, ReactNode } from "react";
 import {
   Popover, PopoverContent, PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { ExternalLink, Clock, Loader2, Check, User, MessageSquare, Hash } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/context/AppContext";
@@ -136,8 +139,17 @@ export function CaseHoverCard({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Slack ping
-  const [pinging,    setPinging]    = useState(false);
-  const [pingResult, setPingResult] = useState<"sent" | "error" | null>(null);
+  const [pinging,          setPinging]          = useState(false);
+  const [pingResult,       setPingResult]       = useState<"sent" | "error" | null>(null);
+  const [slackConfigured,  setSlackConfigured]  = useState<boolean | null>(null);
+
+  // Check Slack status once on mount
+  useEffect(() => {
+    fetch("/api/slack/status")
+      .then(r => r.json())
+      .then((d: { configured: boolean }) => setSlackConfigured(d.configured))
+      .catch(() => setSlackConfigured(false));
+  }, []);
 
   // Sync when case prop changes
   useEffect(() => {
@@ -309,24 +321,43 @@ export function CaseHoverCard({
               </span>
             </div>
             {c.OwnerName && (
-              <button
-                onClick={pingOwnerOnSlack}
-                disabled={pinging}
-                title={`Send ${c.OwnerName} a Slack status-check message`}
-                className={`flex-shrink-0 flex items-center gap-1 text-[11px] font-semibold transition-colors disabled:opacity-50 ${
-                  pingResult === "sent"
-                    ? "text-emerald-600"
-                    : "text-sky-600 hover:text-sky-700"
-                }`}
-              >
-                {pinging
-                  ? <Loader2 className="w-3 h-3 animate-spin" />
-                  : pingResult === "sent"
-                    ? <Check className="w-3 h-3" />
-                    : <Hash className="w-3 h-3" />
-                }
-                {pinging ? "Pinging…" : pingResult === "sent" ? "Sent!" : "Ping on Slack"}
-              </button>
+              slackConfigured === false ? (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span
+                        className="flex-shrink-0 flex items-center gap-1 text-[11px] font-semibold text-muted-foreground/40 cursor-not-allowed select-none"
+                        aria-disabled="true"
+                      >
+                        <Hash className="w-3 h-3" />
+                        Ping on Slack
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      Slack integration not configured — contact your admin
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <button
+                  onClick={pingOwnerOnSlack}
+                  disabled={pinging || slackConfigured === null}
+                  title={`Send ${c.OwnerName} a Slack status-check message`}
+                  className={`flex-shrink-0 flex items-center gap-1 text-[11px] font-semibold transition-colors disabled:opacity-50 ${
+                    pingResult === "sent"
+                      ? "text-emerald-600"
+                      : "text-sky-600 hover:text-sky-700"
+                  }`}
+                >
+                  {pinging
+                    ? <Loader2 className="w-3 h-3 animate-spin" />
+                    : pingResult === "sent"
+                      ? <Check className="w-3 h-3" />
+                      : <Hash className="w-3 h-3" />
+                  }
+                  {pinging ? "Pinging…" : pingResult === "sent" ? "Sent!" : "Ping on Slack"}
+                </button>
+              )
             )}
           </div>
         </div>

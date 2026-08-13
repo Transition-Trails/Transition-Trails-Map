@@ -254,6 +254,13 @@ export default function CasesPage() {
     if (priorityFilter !== "All") list = list.filter(c => c.Priority === priorityFilter);
 
     list.sort((a, b) => {
+      // In "by-owner" view, always group by owner first; the user-selected
+      // sort then applies within each owner's group.
+      if (filter === "by-owner") {
+        const ownerCmp = (a.OwnerName ?? "").localeCompare(b.OwnerName ?? "");
+        if (ownerCmp !== 0) return ownerCmp;
+      }
+
       let cmp = 0;
       switch (sortField) {
         case "CreatedDate":
