@@ -232,6 +232,8 @@ router.get("/drive/folders", async (req, res): Promise<void> => {
       actorEmail: (req.session?.googleEmail ?? 'anonymous').toLowerCase(),
       metadata:   { route: req.path, status: 500, message: msg.slice(0, 300), integration: 'google_drive' },
     });
+    // Prevent responseLogger from writing a duplicate audit row for this response.
+    res.locals['errorLogged'] = true;
     res.status(500).json({ error: msg, folders: [] });
   }
 });

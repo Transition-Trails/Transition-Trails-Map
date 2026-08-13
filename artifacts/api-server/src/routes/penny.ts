@@ -445,6 +445,8 @@ router.post("/penny/ask", async (req, res) => {
       audience:   req.session.googleAudience ?? null,
       metadata:   { route: '/api/penny/ask', status: 502, message: msg.slice(0, 300), integration: 'penny' },
     });
+    // Prevent responseLogger from writing a duplicate audit row for this response.
+    res.locals['errorLogged'] = true;
     return res.status(502).json({ error: msg });
   }
 });

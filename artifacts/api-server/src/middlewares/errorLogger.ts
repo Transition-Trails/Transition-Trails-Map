@@ -34,6 +34,10 @@ export const errorLogger: ErrorRequestHandler = (err, req, res, next) => {
       ?? req.socket?.remoteAddress
       ?? null;
 
+    // Mark this response as logged so responseLogger (finish-event middleware)
+    // skips it and does not write a duplicate audit entry.
+    res.locals['errorLogged'] = true;
+
     // Fire-and-forget — never let the audit write delay the error response
     void insertAuditEvent({
       eventType:  'error',

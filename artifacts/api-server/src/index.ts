@@ -1,6 +1,7 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 import { patchLoggerForBuildErrors } from "./lib/buildErrorReporter.js";
+import { startErrorAlertJob } from "./lib/errorAlertJob.js";
 import { pool } from "@workspace/db";
 
 // Patch logger.error BEFORE any routes or background tasks run.
@@ -102,6 +103,7 @@ Promise.all([ensureSessionTable(), ensureBuildErrorLogsTable()])
         process.exit(1);
       }
       logger.info({ port }, "Server listening");
+      startErrorAlertJob();
     });
   })
   .catch((err) => {

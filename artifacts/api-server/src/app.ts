@@ -9,6 +9,7 @@ import { logger } from "./lib/logger";
 import { pool } from "@workspace/db";
 import { reportBuildError } from "./lib/buildErrorReporter.js";
 import { errorLogger } from "./middlewares/errorLogger.js";
+import { responseLogger } from "./middlewares/responseLogger.js";
 
 const SESSION_SECRET = process.env["SESSION_SECRET"];
 if (!SESSION_SECRET) {
@@ -71,6 +72,12 @@ app.use(express.json({
   },
 }));
 app.use(express.urlencoded({ extended: true }));
+
+// ── Response-finish audit logger ──────────────────────────────────────────────
+// Attaches a finish listener to every request so explicit res.status(5xx) calls
+// (which never flow through the 4-arg error pipeline) are captured as error
+// audit events.  errorLogger sets res.locals.errorLogged to prevent duplicates.
+app.use(responseLogger);
 
 app.use("/api", router);
 
