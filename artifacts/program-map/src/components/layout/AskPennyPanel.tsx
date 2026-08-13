@@ -10,6 +10,7 @@ import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
 import { TERMS } from '@/config/terminology';
+import { useTrackEvent } from '@/hooks/useTrackEvent';
 
 // ── Route-link renderer ───────────────────────────────────────────────────────
 // Detects Trail OS route paths in Penny's reply and makes them clickable.
@@ -245,6 +246,7 @@ function buildHistory(msgs: Message[]) {
 export function AskPennyPanel() {
   const { askPennyOpen, setAskPennyOpen, userTier, pendingPennyQuery, setPendingPennyQuery } = useAppContext();
   const [location, navigate] = useLocation();
+  const { trackEvent } = useTrackEvent();
   const pageLabel  = getPageLabel(location);
 
   function handleRouteLink(path: string) {
@@ -273,6 +275,8 @@ export function AskPennyPanel() {
   // Focus input when panel opens; auto-fire pending signal query
   useEffect(() => {
     if (!askPennyOpen) return undefined;
+    // Track panel open
+    trackEvent('penny', 'open');
     if (pendingPennyQuery) {
       const captured = pendingPennyQuery;
       const t = setTimeout(() => {
@@ -309,6 +313,8 @@ export function AskPennyPanel() {
     const text = retryText ?? input.trim();
     if (!text || loading) return;
     lastQueryRef.current = text;
+    // Track query submission (fire-and-forget; do NOT include prompt text — may contain PII)
+    trackEvent('penny', 'query_submit');
 
     const history = buildHistory(messages);
     const userMsg: Message = { role: 'user', content: text, time: ts() };

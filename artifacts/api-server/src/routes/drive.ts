@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import { insertAuditEvent } from "../lib/auditLog.js";
 
 const router = Router();
 
@@ -226,6 +227,11 @@ router.get("/drive/folders", async (req, res): Promise<void> => {
       res.status(503).json({ error: "Drive integration not configured", folders: [] });
       return;
     }
+    void insertAuditEvent({
+      eventType:  'error',
+      actorEmail: (req.session?.googleEmail ?? 'anonymous').toLowerCase(),
+      metadata:   { route: req.path, status: 500, message: msg.slice(0, 300), integration: 'google_drive' },
+    });
     res.status(500).json({ error: msg, folders: [] });
   }
 });

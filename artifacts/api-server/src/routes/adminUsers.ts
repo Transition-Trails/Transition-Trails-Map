@@ -16,7 +16,7 @@
 import { Router } from 'express';
 import { db } from '@workspace/db';
 import { trailOsAuditLogTable } from '@workspace/db/schema';
-import { eq, desc, and, gte, lt, max, inArray, sql } from 'drizzle-orm';
+import { eq, desc, and, gte, lt, max, min, inArray, asc, sql } from 'drizzle-orm';
 import { logger } from '../lib/logger.js';
 import { getAdminAccessToken } from '../lib/googleAdmin.js';
 import { SF_API_VERSION } from '../lib/sfConstants.js';
@@ -333,24 +333,44 @@ router.get('/admin/audit-log', async (req, res) => {
       ? req.query.actorEmail.toLowerCase().trim()
       : null;
 
-    // date param: YYYY-MM-DD → inclusive day range [midnight, next midnight)
+    const eventTypeFilter = typeof req.query.eventType === 'string' && req.query.eventType.trim()
+      ? req.query.eventType.trim()
+      : null;
+
+    // dateFrom / dateTo allow arbitrary multi-day ranges (used by Failures + Feature Usage tabs).
+    // Single-day `date` param is still supported for backward compat (defaults to [midnight, next midnight)).
+    const dateFrom = typeof req.query.dateFrom === 'string' ? req.query.dateFrom.trim() : null;
+    const dateTo   = typeof req.query.dateTo   === 'string' ? req.query.dateTo.trim()   : null;
+
     const dateParam = typeof req.query.date === 'string' ? req.query.date.trim() : null;
     let dayStart: Date | null = null;
     let dayEnd:   Date | null = null;
-    if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+
+    if (dateFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateFrom)) {
+      dayStart = new Date(`${dateFrom}T00:00:00.000Z`);
+    } else if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
       dayStart = new Date(`${dateParam}T00:00:00.000Z`);
-      dayEnd   = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+    }
+
+    if (dateTo && /^\d{4}-\d{2}-\d{2}$/.test(dateTo)) {
+      // dateTo is inclusive — extend to end of that day
+      dayEnd = new Date(`${dateTo}T00:00:00.000Z`);
+      dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+    } else if (dayStart && !dateFrom) {
+      // Single-day: dayStart → next midnight
+      dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
     }
 
     const page   = Math.max(1, parseInt(String(req.query.page  ?? '1'),  10));
-    const limit  = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10)));
+    const limit  = Math.min(200, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10)));
     const offset = (page - 1) * limit;
 
     // Build where conditions
     const conditions = [
-      actorEmail ? eq(trailOsAuditLogTable.actorEmail, actorEmail) : null,
-      dayStart   ? gte(trailOsAuditLogTable.createdAt, dayStart)   : null,
-      dayEnd     ? lt(trailOsAuditLogTable.createdAt,  dayEnd)     : null,
+      actorEmail      ? eq(trailOsAuditLogTable.actorEmail, actorEmail)        : null,
+      eventTypeFilter ? eq(trailOsAuditLogTable.eventType,  eventTypeFilter)   : null,
+      dayStart        ? gte(trailOsAuditLogTable.createdAt, dayStart)           : null,
+      dayEnd          ? lt(trailOsAuditLogTable.createdAt,  dayEnd)             : null,
     ].filter(Boolean) as Parameters<typeof and>;
 
     const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -385,5 +405,304 @@ router.get('/admin/audit-log', async (req, res) => {
     res.status(500).json({ error: 'Failed to load audit log' });
   }
 });
+
+// ── GET /admin/activity-summary ───────────────────────────────────────────────
+//
+// Returns per-user session data for a given UTC date.
+// One row per user who had any audit event that day.
+// Response: { email, audience, firstSeen, lastSeen, durationMinutes, eventCount, topFeatures }[]
+
+router.get('/admin/activity-summary', async (req, res) => {
+  try {
+    const dateParam = typeof req.query.date === 'string' ? req.query.date.trim() : null;
+    let dayStart: Date;
+    let dayEnd:   Date;
+
+    if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+      dayStart = new Date(`${dateParam}T00:00:00.000Z`);
+    } else {
+      // Default: today (UTC)
+      const now = new Date();
+      dayStart  = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    }
+    dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+
+    const rows = await db
+      .select()
+      .from(trailOsAuditLogTable)
+      .where(and(
+        gte(trailOsAuditLogTable.createdAt, dayStart),
+        lt(trailOsAuditLogTable.createdAt, dayEnd),
+      ))
+      .orderBy(asc(trailOsAuditLogTable.createdAt));
+
+    // Group rows by actorEmail
+    const byUser = new Map<string, {
+      audience:    string | null;
+      firstSeen:   Date;
+      lastSeen:    Date;
+      eventCount:  number;
+      featureCounts: Map<string, number>;
+    }>();
+
+    for (const row of rows) {
+      const key = row.actorEmail.toLowerCase();
+      const feature =
+        row.eventType === 'feature_use'
+          ? ((row.metadata as Record<string, unknown> | null)?.feature as string | undefined) ?? null
+          : null;
+
+      const existing = byUser.get(key);
+      if (!existing) {
+        const featureCounts = new Map<string, number>();
+        if (feature) featureCounts.set(feature, 1);
+        byUser.set(key, {
+          audience:   row.audience ?? null,
+          firstSeen:  row.createdAt,
+          lastSeen:   row.createdAt,
+          eventCount: 1,
+          featureCounts,
+        });
+      } else {
+        if (row.createdAt > existing.lastSeen) existing.lastSeen = row.createdAt;
+        existing.eventCount++;
+        if (feature) {
+          existing.featureCounts.set(feature, (existing.featureCounts.get(feature) ?? 0) + 1);
+        }
+        // Use the most-specific audience we've seen (non-null wins)
+        if (!existing.audience && row.audience) existing.audience = row.audience;
+      }
+    }
+
+    // Build response array
+    const summary = [...byUser.entries()].map(([email, data]) => {
+      const durationMs      = data.lastSeen.getTime() - data.firstSeen.getTime();
+      const durationMinutes = Math.round(durationMs / 60_000);
+
+      // Top 3 features by usage count
+      const topFeatures = [...data.featureCounts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([name]) => name);
+
+      return {
+        email,
+        audience:        data.audience,
+        firstSeen:       data.firstSeen.toISOString(),
+        lastSeen:        data.lastSeen.toISOString(),
+        durationMinutes,
+        eventCount:      data.eventCount,
+        topFeatures,
+      };
+    });
+
+    // Sort by firstSeen ascending
+    summary.sort((a, b) => a.firstSeen.localeCompare(b.firstSeen));
+
+    res.json({ summary, date: dayStart.toISOString().slice(0, 10) });
+  } catch (err) {
+    logger.error({ err }, 'adminUsers GET /admin/activity-summary threw');
+    res.status(500).json({ error: 'Failed to load activity summary' });
+  }
+});
+
+// ── GET /admin/feature-usage-summary ─────────────────────────────────────────
+//
+// Server-side aggregation of feature_use events — no row-count cap.
+// Returns counts grouped by feature name (and a separate user-breakdown list).
+//
+// Query params:
+//   dateFrom  YYYY-MM-DD (default: 30 days ago, inclusive)
+//   dateTo    YYYY-MM-DD (default: today, inclusive)
+
+router.get('/admin/feature-usage-summary', async (req, res) => {
+  try {
+    const { dayStart, dayEnd } = parseDateRange(req);
+
+    // Aggregate by feature — no LIMIT; all rows in range included
+    const featureRows = await db
+      .select({
+        feature:     sql<string>`${trailOsAuditLogTable.metadata}->>'feature'`,
+        totalUses:   sql<number>`cast(count(*) as int)`,
+        uniqueUsers: sql<number>`cast(count(distinct ${trailOsAuditLogTable.actorEmail}) as int)`,
+        firstUsed:   min(trailOsAuditLogTable.createdAt),
+        lastUsed:    max(trailOsAuditLogTable.createdAt),
+      })
+      .from(trailOsAuditLogTable)
+      .where(and(
+        eq(trailOsAuditLogTable.eventType, 'feature_use'),
+        gte(trailOsAuditLogTable.createdAt, dayStart),
+        lt(trailOsAuditLogTable.createdAt, dayEnd),
+        sql`${trailOsAuditLogTable.metadata}->>'feature' is not null`,
+        sql`${trailOsAuditLogTable.metadata}->>'feature' != ''`,
+      ))
+      .groupBy(sql`${trailOsAuditLogTable.metadata}->>'feature'`)
+      .orderBy(sql`count(*) desc`);
+
+    // Per-user breakdown (for the "by user" toggle)
+    const userRows = await db
+      .select({
+        email:        trailOsAuditLogTable.actorEmail,
+        totalUses:    sql<number>`cast(count(*) as int)`,
+        featureCount: sql<number>`cast(count(distinct ${trailOsAuditLogTable.metadata}->>'feature') as int)`,
+      })
+      .from(trailOsAuditLogTable)
+      .where(and(
+        eq(trailOsAuditLogTable.eventType, 'feature_use'),
+        gte(trailOsAuditLogTable.createdAt, dayStart),
+        lt(trailOsAuditLogTable.createdAt, dayEnd),
+      ))
+      .groupBy(trailOsAuditLogTable.actorEmail)
+      .orderBy(sql`count(*) desc`);
+
+    res.json({
+      features: featureRows.map(r => ({
+        feature:     r.feature,
+        totalUses:   r.totalUses,
+        uniqueUsers: r.uniqueUsers,
+        firstUsed:   r.firstUsed?.toISOString() ?? null,
+        lastUsed:    r.lastUsed?.toISOString()  ?? null,
+      })),
+      userBreakdown: userRows.map(r => ({
+        email:        r.email,
+        totalUses:    r.totalUses,
+        featureCount: r.featureCount,
+      })),
+      dateFrom: dayStart.toISOString().slice(0, 10),
+      dateTo:   new Date(dayEnd.getTime() - 1).toISOString().slice(0, 10),
+    });
+  } catch (err) {
+    logger.error({ err }, 'adminUsers GET /admin/feature-usage-summary threw');
+    res.status(500).json({ error: 'Failed to load feature usage summary' });
+  }
+});
+
+// ── GET /admin/failure-summary ────────────────────────────────────────────────
+//
+// Server-side aggregation of error events — no row-count cap.
+// Returns failures grouped by (route, status, truncated message).
+//
+// Query params:
+//   dateFrom    YYYY-MM-DD (default: 7 days ago, inclusive)
+//   dateTo      YYYY-MM-DD (default: today, inclusive)
+//   routePrefix (optional) — only include rows where route starts with this
+//   actorEmail  (optional) — only include rows for this email
+
+router.get('/admin/failure-summary', async (req, res) => {
+  try {
+    const { dayStart, dayEnd } = parseDateRange(req, 7);
+
+    const actorEmailFilter = typeof req.query.actorEmail === 'string' && req.query.actorEmail.trim()
+      ? req.query.actorEmail.toLowerCase().trim()
+      : null;
+    const routePrefix = typeof req.query.routePrefix === 'string' && req.query.routePrefix.trim()
+      ? req.query.routePrefix.trim()
+      : null;
+
+    const conditions = [
+      eq(trailOsAuditLogTable.eventType, 'error'),
+      gte(trailOsAuditLogTable.createdAt, dayStart),
+      lt(trailOsAuditLogTable.createdAt, dayEnd),
+      actorEmailFilter ? eq(trailOsAuditLogTable.actorEmail, actorEmailFilter) : null,
+      routePrefix
+        ? sql`${trailOsAuditLogTable.metadata}->>'route' ilike ${routePrefix + '%'}`
+        : null,
+    ].filter(Boolean) as Parameters<typeof and>;
+
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // Run the grouped failure query AND the global distinct-user count in parallel.
+    // The distinct count must be computed over the full filtered set independently —
+    // summing per-group affectedUsers would double-count a user who appears in
+    // multiple route/status/message groups.
+    const [failureRows, distinctResult] = await Promise.all([
+      db
+        .select({
+          route:         sql<string>`coalesce(${trailOsAuditLogTable.metadata}->>'route', '')`,
+          status:        sql<number>`coalesce((${trailOsAuditLogTable.metadata}->>'status')::int, 500)`,
+          message:       sql<string>`coalesce(left(${trailOsAuditLogTable.metadata}->>'message', 120), '')`,
+          count:         sql<number>`cast(count(*) as int)`,
+          affectedUsers: sql<number>`cast(count(distinct ${trailOsAuditLogTable.actorEmail}) as int)`,
+          firstAt:       min(trailOsAuditLogTable.createdAt),
+          lastAt:        max(trailOsAuditLogTable.createdAt),
+        })
+        .from(trailOsAuditLogTable)
+        .where(where)
+        .groupBy(
+          sql`coalesce(${trailOsAuditLogTable.metadata}->>'route', '')`,
+          sql`coalesce((${trailOsAuditLogTable.metadata}->>'status')::int, 500)`,
+          sql`coalesce(left(${trailOsAuditLogTable.metadata}->>'message', 120), '')`,
+        )
+        .orderBy(sql`count(*) desc`),
+      // Separate query: count distinct users across ALL error events in range,
+      // not per group — prevents double-counting users with errors on multiple routes.
+      db
+        .select({ count: sql<number>`cast(count(distinct ${trailOsAuditLogTable.actorEmail}) as int)` })
+        .from(trailOsAuditLogTable)
+        .where(where),
+    ]);
+
+    // Compute top-level stats using the independently-queried distinct user count
+    const totalErrors   = failureRows.reduce((s, r) => s + r.count, 0);
+    const topRoute      = failureRows[0]?.route ?? '—';
+    const trueAffectedUsers = distinctResult[0]?.count ?? 0;
+
+    res.json({
+      failures: failureRows.map(r => ({
+        route:         r.route,
+        status:        r.status,
+        message:       r.message,
+        count:         r.count,
+        affectedUsers: r.affectedUsers,
+        firstAt:       r.firstAt?.toISOString() ?? null,
+        lastAt:        r.lastAt?.toISOString()  ?? null,
+      })),
+      stats: {
+        totalErrors,
+        topRoute,
+        affectedUsers: trueAffectedUsers,
+      },
+      dateFrom: dayStart.toISOString().slice(0, 10),
+      dateTo:   new Date(dayEnd.getTime() - 1).toISOString().slice(0, 10),
+    });
+  } catch (err) {
+    logger.error({ err }, 'adminUsers GET /admin/failure-summary threw');
+    res.status(500).json({ error: 'Failed to load failure summary' });
+  }
+});
+
+// ── Shared date-range helper (exported for unit tests) ───────────────────────
+
+export function parseDateRange(
+  req: import('express').Request,
+  defaultDaysBack = 30,
+): { dayStart: Date; dayEnd: Date } {
+  const dateFrom = typeof req.query.dateFrom === 'string' ? req.query.dateFrom.trim() : null;
+  const dateTo   = typeof req.query.dateTo   === 'string' ? req.query.dateTo.trim()   : null;
+
+  const now = new Date();
+
+  let dayStart: Date;
+  if (dateFrom && /^\d{4}-\d{2}-\d{2}$/.test(dateFrom)) {
+    dayStart = new Date(`${dateFrom}T00:00:00.000Z`);
+  } else {
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    d.setUTCDate(d.getUTCDate() - defaultDaysBack);
+    dayStart = d;
+  }
+
+  let dayEnd: Date;
+  if (dateTo && /^\d{4}-\d{2}-\d{2}$/.test(dateTo)) {
+    const d = new Date(`${dateTo}T00:00:00.000Z`);
+    d.setUTCDate(d.getUTCDate() + 1); // inclusive: extend to end of day
+    dayEnd = d;
+  } else {
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    d.setUTCDate(d.getUTCDate() + 1); // today inclusive
+    dayEnd = d;
+  }
+
+  return { dayStart, dayEnd };
+}
 
 export default router;

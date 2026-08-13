@@ -8,6 +8,7 @@ import router from "./routes";
 import { logger } from "./lib/logger";
 import { pool } from "@workspace/db";
 import { reportBuildError } from "./lib/buildErrorReporter.js";
+import { errorLogger } from "./middlewares/errorLogger.js";
 
 const SESSION_SECRET = process.env["SESSION_SECRET"];
 if (!SESSION_SECRET) {
@@ -72,6 +73,11 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+// ── Error audit logger (must precede the generic error handler) ───────────────
+// Writes a trail_os_audit_log `error` row for every unhandled 5xx before the
+// generic handler consumes the error.
+app.use(errorLogger);
 
 // ── Global error handler ──────────────────────────────────────────────────────
 //

@@ -58,6 +58,8 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
 };
 
 import { ImpersonationBanner } from "@/components/layout/ImpersonationBanner";
+import AdoptionDashboard from "@/pages/admin/AdoptionDashboard";
+import { useTrackEvent } from "@/hooks/useTrackEvent";
 import Home                from "@/pages/Home";
 import TrailOSOverview     from "@/pages/TrailOSOverview";
 import ReleaseNotes        from "@/pages/ReleaseNotes";
@@ -162,6 +164,36 @@ import AccessNotGranted   from "@/pages/AccessNotGranted";
 function Redirect({ to }: { to: string }) {
   const [, setLocation] = useLocation();
   useEffect(() => { setLocation(to); }, [to]);
+  return null;
+}
+
+// ── HubTracker — fires a feature_use event when staff navigate to major hubs ──
+// Renders nothing. Only fires for authenticated staff users (mounted conditionally).
+function HubTracker() {
+  const [location] = useLocation();
+  const { trackEvent } = useTrackEvent();
+  const prevRef = useRef('');
+
+  useEffect(() => {
+    if (location === prevRef.current) return;
+    prevRef.current = location;
+    // Map route prefixes to canonical feature names
+    const HUB_MAP: Array<[string, string]> = [
+      ['/penny',         'penny'],
+      ['/knowledge',     'knowledge'],
+      ['/program',       'programs'],
+      ['/collaboration', 'collaboration'],
+      ['/governance',    'governance'],
+      ['/operations',    'sf_ops'],
+    ];
+    for (const [prefix, feature] of HUB_MAP) {
+      if (location === prefix || location.startsWith(`${prefix}/`)) {
+        trackEvent(feature, 'navigate');
+        return;
+      }
+    }
+  }, [location, trackEvent]);
+
   return null;
 }
 
@@ -395,6 +427,7 @@ function Router() {
       <Route path="/admin/integrations/secrets"         component={IntegrationSecretsAudit} />
       <Route path="/admin/integrations"                 component={IntegrationHub} />
 
+      <Route path="/admin/adoption"         component={AdoptionDashboard} />
       <Route path="/admin/:section"          component={Admin} />
       <Route path="/admin">               <Redirect to="/admin/integrations" /></Route>
 
@@ -554,6 +587,8 @@ function InnerApp() {
 
   return (
     <>
+      {/* Hub navigation tracker — staff only, renders nothing */}
+      {auth.isSignedIn && !auth.user?.audience && <HubTracker />}
       {/* Global modals — always mounted regardless of which shell is active */}
       <GlobalLogTimeModal />
 

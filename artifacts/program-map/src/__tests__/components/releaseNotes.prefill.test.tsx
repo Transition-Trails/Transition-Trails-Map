@@ -327,7 +327,9 @@ describe('ReleaseNotes — flag icon pre-fill (initialSubject / initialDescripti
       // Click fourth flag → LONG_TEXT (fix)
       capturedDrawerProps = null;
       fireEvent.click(flags[3]);
-      const fourthSubject = capturedDrawerProps?.initialSubject;
+      // Cast to DrawerProps | null to prevent TypeScript from holding the `null`
+      // narrowing from the reset above (the click handler re-assigns the variable).
+      const fourthSubject = (capturedDrawerProps as DrawerProps | null)?.initialSubject;
 
       expect(firstSubject).toContain(FIXTURE.SHORT_TEXT);   // not truncated
       expect(firstSubject).not.toContain('…');

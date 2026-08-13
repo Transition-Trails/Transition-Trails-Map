@@ -42,9 +42,9 @@ import timeLogsRouter           from "./timeLogs";
 import sfSearchRouter           from "./sfSearch";
 import buildErrorsRouter        from "./buildErrors";
 import assessmentsRouter        from "./assessments";
-import { requireStaff, requireAdmin, requireSuperAdmin, isSuperAdmin, effectiveIdentityMiddleware } from "../middlewares/requireAuth";
-import { db } from "@workspace/db";
-import { trailOsAuditLogTable } from "@workspace/db/schema";
+import trackRouter              from "./track";
+import { requireStaff, requireAdmin, requireSuperAdmin, effectiveIdentityMiddleware } from "../middlewares/requireAuth";
+import { insertAuditEvent } from "../lib/auditLog";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -164,7 +164,10 @@ const ADMIN_PREFIXES: string[] = [
   '/admin/role-owners',    // GET/PATCH /api/admin/role-owners
   '/admin/persona-health', // GET/PATCH /api/admin/persona-health
   '/admin/users',          // GET /api/admin/users — user directory
-  '/admin/audit-log',      // GET /api/admin/audit-log — login audit log
+  '/admin/audit-log',           // GET /api/admin/audit-log — login audit log
+  '/admin/activity-summary',    // GET /api/admin/activity-summary — adoption dashboard
+  '/admin/feature-usage-summary', // GET /api/admin/feature-usage-summary — adoption feature stats
+  '/admin/failure-summary',       // GET /api/admin/failure-summary — adoption failure stats
 ];
 
 router.use(ADMIN_PREFIXES as unknown as string, requireAdmin as RequestHandler);
@@ -204,14 +207,14 @@ router.use((req, _res, next) => {
     const body = req.body as Record<string, unknown> | undefined;
     const bodySummary = body ? Object.keys(body).join(', ') : '';
 
-    db.insert(trailOsAuditLogTable).values({
+    void insertAuditEvent({
       eventType:   'impersonation_action',
       actorEmail:  superadminEmail,
       targetEmail: impersonatedEmail,
       audience:    req.session.impersonatedAudience ?? null,
       ipAddress:   ip,
       metadata:    { method: req.method, path: req.path, bodyFields: bodySummary },
-    }).catch(err => logger.error({ err }, 'impersonationActionMiddleware: audit log write failed'));
+    });
   }
   next();
 });
@@ -261,5 +264,6 @@ router.use(timeLogsRouter);
 router.use(sfSearchRouter);
 router.use(buildErrorsRouter);
 router.use(assessmentsRouter);
+router.use(trackRouter);
 
 export default router;

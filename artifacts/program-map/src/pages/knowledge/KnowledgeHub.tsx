@@ -1411,11 +1411,22 @@ export default function KnowledgeHub() {
   const [location, navigate] = useLocation();
   const { toast }  = useToast();
 
-  const [mode, setModeRaw] = useState<HubMode>(() => {
-    if (location.startsWith('/knowledge/governance')) return 'governance';
-    return lsRead<HubMode>(LS_MODE, 'builder');
-  });
-  function setMode(m: HubMode) { setModeRaw(m); lsWrite(LS_MODE, m); }
+  // Mode is driven by the URL, not by localStorage, so that navigating to
+  // /knowledge always lands in builder mode and /knowledge/governance always
+  // lands in governance mode — regardless of what was previously stored.
+  const [mode, setModeRaw] = useState<HubMode>(() =>
+    location.startsWith('/knowledge/governance') ? 'governance' : 'builder'
+  );
+
+  function setMode(m: HubMode) {
+    setModeRaw(m);
+    // Keep the URL in sync so the browser back-button and direct links work.
+    if (m === 'governance' && !location.startsWith('/knowledge/governance')) {
+      navigate('/knowledge/governance', { replace: true });
+    } else if (m === 'builder' && location.startsWith('/knowledge/governance')) {
+      navigate('/knowledge', { replace: true });
+    }
+  }
 
   const { isAdminOrAbove: isAdmin } = useTierFlags();
   const [govTab, setGovTab] = useState<GovTab>('health');
@@ -1470,8 +1481,10 @@ export default function KnowledgeHub() {
 
   const selectedArticle = selectedId ? (articles.find(a => a.id === selectedId) ?? null) : null;
 
+  // Sync mode when the user navigates in/out of the governance URL directly
+  // (e.g. browser back button, sidebar link) without going through setMode.
   useEffect(() => {
-    if (location.startsWith('/knowledge/governance')) setMode('governance');
+    setModeRaw(location.startsWith('/knowledge/governance') ? 'governance' : 'builder');
   }, [location]);
 
   // ── Action handlers ────────────────────────────────────────────────────────

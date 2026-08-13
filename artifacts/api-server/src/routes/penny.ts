@@ -30,6 +30,7 @@ import { db } from "@workspace/db";
 import { pennyLogsTable } from "@workspace/db/schema";
 import { desc, gte, sql } from "drizzle-orm";
 import type { CapabilityId } from "@workspace/api-zod";
+import { insertAuditEvent } from "../lib/auditLog.js";
 
 const router = Router();
 
@@ -438,6 +439,12 @@ router.post("/penny/ask", async (req, res) => {
       });
     }
     const msg = `Penny could not generate a response: ${e instanceof Error ? e.message : String(e)}`;
+    void insertAuditEvent({
+      eventType:  'error',
+      actorEmail: (req.session.googleEmail ?? 'anonymous').toLowerCase(),
+      audience:   req.session.googleAudience ?? null,
+      metadata:   { route: '/api/penny/ask', status: 502, message: msg.slice(0, 300), integration: 'penny' },
+    });
     return res.status(502).json({ error: msg });
   }
 });
