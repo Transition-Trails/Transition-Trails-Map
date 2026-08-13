@@ -224,7 +224,16 @@ export function CaseHoverCard({
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        let reason = "Try again.";
+        try {
+          const body = await res.json() as { error?: string };
+          if (body.error) reason = body.error;
+        } catch { /* ignore parse errors */ }
+        setCurrentStatus(prev);
+        toast({ variant: "destructive", title: "Couldn't update status", description: reason });
+        return;
+      }
       onStatusChange?.(c.Id, newStatus);
       if (newStatus === "Closed") setOpen(false);
     } catch {
