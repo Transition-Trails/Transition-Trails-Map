@@ -61,7 +61,7 @@ interface AlertStatusResponse {
 
 // ── Alert Settings Card (admin-only) ──────────────────────────────────────────
 
-function AlertSettingsCard() {
+export function AlertSettingsCard() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery<AlertSettings>({
     queryKey: ['/api/slack/alert-settings'],
@@ -84,8 +84,9 @@ function AlertSettingsCard() {
     },
   });
 
-  // Entries that are still in cooldown (msRemaining > 0)
-  const activeCooldowns = statusData?.entries.filter(e => e.msRemaining > 0) ?? [];
+  // Entries that are still in cooldown (msRemaining > 0).
+  // Guard with ?. on entries so a malformed status payload never crashes the card.
+  const activeCooldowns = statusData?.entries?.filter(e => e.msRemaining > 0) ?? [];
 
   const [threshold,     setThreshold]     = useState<string>('');
   const [windowMinutes, setWindowMinutes] = useState<string>('');
