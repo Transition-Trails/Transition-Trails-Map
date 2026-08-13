@@ -16,7 +16,7 @@
 import { Router } from 'express';
 import { db } from '@workspace/db';
 import { trailOsAuditLogTable } from '@workspace/db/schema';
-import { eq, desc, and, max, inArray, sql } from 'drizzle-orm';
+import { eq, desc, and, gte, lt, max, inArray, sql } from 'drizzle-orm';
 import { logger } from '../lib/logger.js';
 import { getAdminAccessToken } from '../lib/googleAdmin.js';
 import { SF_API_VERSION } from '../lib/sfConstants.js';
@@ -329,33 +329,45 @@ router.get('/admin/users', async (_req, res) => {
 
 router.get('/admin/audit-log', async (req, res) => {
   try {
-    const actorEmail = typeof req.query.actorEmail === 'string'
+    const actorEmail = typeof req.query.actorEmail === 'string' && req.query.actorEmail.trim()
       ? req.query.actorEmail.toLowerCase().trim()
       : null;
-    const page  = Math.max(1, parseInt(String(req.query.page  ?? '1'),  10));
-    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10)));
+
+    // date param: YYYY-MM-DD → inclusive day range [midnight, next midnight)
+    const dateParam = typeof req.query.date === 'string' ? req.query.date.trim() : null;
+    let dayStart: Date | null = null;
+    let dayEnd:   Date | null = null;
+    if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+      dayStart = new Date(`${dateParam}T00:00:00.000Z`);
+      dayEnd   = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+    }
+
+    const page   = Math.max(1, parseInt(String(req.query.page  ?? '1'),  10));
+    const limit  = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10)));
     const offset = (page - 1) * limit;
 
-    const rows = await db
-      .select()
-      .from(trailOsAuditLogTable)
-      .where(
-        actorEmail
-          ? eq(trailOsAuditLogTable.actorEmail, actorEmail)
-          : undefined,
-      )
-      .orderBy(desc(trailOsAuditLogTable.createdAt))
-      .limit(limit)
-      .offset(offset);
+    // Build where conditions
+    const conditions = [
+      actorEmail ? eq(trailOsAuditLogTable.actorEmail, actorEmail) : null,
+      dayStart   ? gte(trailOsAuditLogTable.createdAt, dayStart)   : null,
+      dayEnd     ? lt(trailOsAuditLogTable.createdAt,  dayEnd)     : null,
+    ].filter(Boolean) as Parameters<typeof and>;
 
-    const countResult = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(trailOsAuditLogTable)
-      .where(
-        actorEmail
-          ? eq(trailOsAuditLogTable.actorEmail, actorEmail)
-          : undefined,
-      );
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [rows, countResult] = await Promise.all([
+      db
+        .select()
+        .from(trailOsAuditLogTable)
+        .where(where)
+        .orderBy(desc(trailOsAuditLogTable.createdAt))
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(trailOsAuditLogTable)
+        .where(where),
+    ]);
 
     const total = countResult[0]?.count ?? 0;
 

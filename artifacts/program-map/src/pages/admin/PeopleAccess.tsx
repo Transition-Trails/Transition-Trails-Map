@@ -5,6 +5,7 @@ import {
   CheckCircle2, XCircle, MinusCircle,
   ArrowUpDown, ArrowUp, ArrowDown, Search, X, ChevronRight,
   Pencil, UserCheck, AlertTriangle, Save, ChevronDown,
+  ScrollText, CalendarDays, Clock, Loader2, ChevronUp,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -17,7 +18,7 @@ import type { PlatformRole } from '@/data/platformRoles';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type Tab = 'matrix' | 'access' | 'owners';
+type Tab = 'matrix' | 'access' | 'owners' | 'audit';
 
 type TierKey = 'everyday' | 'power' | 'admin' | 'superadmin';
 type FilterTier   = TierKey | 'all';
@@ -1219,12 +1220,365 @@ function RoleOwnersTab() {
   );
 }
 
+// ── Audit Log tab ─────────────────────────────────────────────────────────────
+
+interface AuditRow {
+  id:          number;
+  eventType:   string;
+  actorEmail:  string;
+  targetEmail: string | null;
+  audience:    string | null;
+  ipAddress:   string | null;
+  metadata:    Record<string, unknown> | null;
+  createdAt:   string;
+}
+
+interface AuditUserEntry { email: string; name: string; }
+
+const EVENT_BADGE: Record<string, { cls: string; label: string }> = {
+  login:               { cls: 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F]', label: 'Login' },
+  impersonation_start: { cls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]', label: 'Impersonate ▶' },
+  impersonation_end:   { cls: 'bg-[#FFF3E0] border-[#FFD08A] text-[#CC8400]', label: 'Impersonate ■' },
+  error:               { cls: 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F]', label: 'Error' },
+};
+
+function eventBadge(eventType: string) {
+  return EVENT_BADGE[eventType] ?? {
+    cls:   'bg-muted border-border text-muted-foreground',
+    label: eventType.replace(/_/g, ' '),
+  };
+}
+
+function formatDetailSummary(row: AuditRow): string {
+  if (row.targetEmail) return `Target: ${row.targetEmail}`;
+  if (row.metadata) {
+    const m = row.metadata;
+    if (typeof m['reason'] === 'string')  return m['reason'];
+    if (typeof m['error']  === 'string')  return m['error'];
+    if (typeof m['tier']   === 'string')  return `Tier assigned: ${m['tier']}`;
+    if (typeof m['audience'] === 'string') return `Audience: ${m['audience']}`;
+    const keys = Object.keys(m);
+    if (keys.length > 0) return `${keys[0]}: ${String(m[keys[0]])}`;
+  }
+  return '—';
+}
+
+function formatTimestamp(iso: string): string {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: true,
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function todayIso(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function AuditLogTab() {
+  const [userEmail,   setUserEmail]   = useState('');
+  const [date,        setDate]        = useState('');
+  const [userSearch,  setUserSearch]  = useState('');
+  const [rows,        setRows]        = useState<AuditRow[]>([]);
+  const [total,       setTotal]       = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading,     setLoading]     = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error,       setError]       = useState<string | null>(null);
+  const [expandedId,  setExpandedId]  = useState<number | null>(null);
+  const [users,       setUsers]       = useState<AuditUserEntry[]>([]);
+
+  // Fetch user list for dropdown
+  useEffect(() => {
+    fetch('/api/admin/users')
+      .then(r => r.ok ? r.json() : { users: [] })
+      .then((d: { users: AuditUserEntry[] }) => {
+        const sorted = [...(d.users ?? [])].sort((a, b) =>
+          (a.name || a.email).localeCompare(b.name || b.email));
+        setUsers(sorted);
+      })
+      .catch(() => {});
+  }, []);
+
+  const fetchPage = useCallback((page: number, append = false) => {
+    const params = new URLSearchParams({ limit: '50', page: String(page) });
+    if (userEmail) params.set('actorEmail', userEmail);
+    if (date)      params.set('date', date);
+
+    if (append) setLoadingMore(true); else setLoading(true);
+    setError(null);
+
+    fetch(`/api/admin/audit-log?${params.toString()}`)
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+      .then((data: { rows: AuditRow[]; total: number }) => {
+        setRows(prev => append ? [...prev, ...data.rows] : data.rows);
+        setTotal(data.total);
+        setCurrentPage(page);
+      })
+      .catch(e => setError(e instanceof Error ? e.message : 'Failed to load audit log'))
+      .finally(() => { setLoading(false); setLoadingMore(false); });
+  }, [userEmail, date]);
+
+  // Re-fetch when filters change
+  useEffect(() => { fetchPage(1); }, [fetchPage]);
+
+  const hasFilters = userEmail !== '' || date !== '';
+
+  function clearFilters() {
+    setUserEmail('');
+    setDate('');
+    setUserSearch('');
+  }
+
+  const filteredUsers = useMemo(() =>
+    users.filter(u =>
+      u.email.toLowerCase().includes(userSearch.toLowerCase()) ||
+      (u.name ?? '').toLowerCase().includes(userSearch.toLowerCase())
+    ), [users, userSearch]);
+
+  const hasMore = rows.length < total;
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden">
+
+      {/* ── Filter toolbar ────────────────────────────────────────────────────── */}
+      <div className="flex-shrink-0 border-b border-border bg-card px-5 py-2.5">
+        <div className="flex items-center gap-3 flex-wrap">
+
+          {/* User filter */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[13px] font-bold text-muted-foreground/50">User</span>
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground/40 pointer-events-none" />
+              <input
+                value={userSearch}
+                onChange={e => setUserSearch(e.target.value)}
+                placeholder="Search users…"
+                className="pl-6 pr-2 py-1 text-[13px] rounded-md border border-border bg-background text-foreground placeholder-muted-foreground/40 outline-none focus:border-ring w-44"
+              />
+            </div>
+            {filteredUsers.length > 0 || userEmail ? (
+              <select
+                value={userEmail}
+                onChange={e => { setUserEmail(e.target.value); setUserSearch(''); }}
+                className="text-[13px] rounded-md border border-border bg-background text-foreground px-2 py-1 outline-none focus:border-ring max-w-[200px]"
+              >
+                <option value="">All users</option>
+                {filteredUsers.map(u => (
+                  <option key={u.email} value={u.email}>
+                    {u.name ? `${u.name} (${u.email})` : u.email}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+            {userEmail && (
+              <button
+                onClick={() => setUserEmail('')}
+                className="text-[13px] text-muted-foreground hover:text-foreground flex items-center gap-0.5"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          <div className="w-px h-4 bg-border/60" />
+
+          {/* Day filter */}
+          <div className="flex items-center gap-1.5">
+            <CalendarDays className="w-3.5 h-3.5 text-muted-foreground/50" />
+            <span className="text-[13px] font-bold text-muted-foreground/50">Day</span>
+            <input
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              className="text-[13px] rounded-md border border-border bg-background text-foreground px-2 py-1 outline-none focus:border-ring"
+            />
+            <button
+              onClick={() => setDate(todayIso())}
+              className={`text-[13px] px-2 py-1 rounded-md border font-semibold transition-colors ${
+                date === todayIso()
+                  ? 'bg-foreground border-foreground text-background'
+                  : 'border-border text-muted-foreground hover:border-ring/50 hover:text-foreground'
+              }`}
+            >
+              Today
+            </button>
+            {date && (
+              <button
+                onClick={() => setDate('')}
+                className="text-[13px] text-muted-foreground hover:text-foreground flex items-center gap-0.5"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Count + clear */}
+          <div className="ml-auto flex items-center gap-2">
+            {!loading && (
+              <span className="text-[13px] text-muted-foreground">
+                {total === 0 ? 'No events' : `${rows.length} of ${total} event${total !== 1 ? 's' : ''}`}
+              </span>
+            )}
+            {hasFilters && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3 h-3" /> Clear filters
+              </button>
+            )}
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── Table area ────────────────────────────────────────────────────────── */}
+      <div className="flex-1 overflow-auto">
+
+        {loading && (
+          <div className="flex items-center justify-center gap-2 py-16 text-muted-foreground">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-[14px]">Loading events…</span>
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="flex items-center justify-center gap-2 py-16 text-[#A93F2F]">
+            <AlertTriangle className="w-4 h-4" />
+            <span className="text-[14px]">{error}</span>
+          </div>
+        )}
+
+        {!loading && !error && rows.length === 0 && (
+          <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
+            <ScrollText className="w-8 h-8 opacity-30" />
+            <p className="text-[14px]">No events match your filters.</p>
+            {hasFilters && (
+              <button
+                onClick={clearFilters}
+                className="text-[13px] text-primary hover:underline"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        )}
+
+        {!loading && rows.length > 0 && (
+          <table className="w-full border-collapse text-[13px]">
+            <thead className="bg-card border-b border-border sticky top-0 z-10">
+              <tr>
+                <th className="text-left px-4 py-2.5 font-bold text-muted-foreground/70 w-44">
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Timestamp</span>
+                </th>
+                <th className="text-left px-4 py-2.5 font-bold text-muted-foreground/70 w-52">User</th>
+                <th className="text-left px-4 py-2.5 font-bold text-muted-foreground/70 w-36">Event</th>
+                <th className="text-left px-4 py-2.5 font-bold text-muted-foreground/70">Detail</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, i) => {
+                const badge     = eventBadge(row.eventType);
+                const isExpanded = expandedId === row.id;
+                const summary   = formatDetailSummary(row);
+                const hasDetail = row.metadata !== null || row.targetEmail !== null || row.ipAddress !== null;
+
+                return (
+                  <tr
+                    key={row.id}
+                    className={`border-b border-border/50 ${
+                      i % 2 === 0 ? 'bg-card' : 'bg-muted/10'
+                    } ${hasDetail ? 'cursor-pointer hover:bg-muted/20' : ''}`}
+                    onClick={() => hasDetail && setExpandedId(isExpanded ? null : row.id)}
+                  >
+                    <td className="px-4 py-2.5 text-muted-foreground whitespace-nowrap align-top">
+                      {formatTimestamp(row.createdAt)}
+                    </td>
+                    <td className="px-4 py-2.5 font-mono text-[12px] text-foreground align-top max-w-[200px] truncate">
+                      {row.actorEmail}
+                    </td>
+                    <td className="px-4 py-2.5 align-top">
+                      <span className={`inline-flex items-center text-[12px] font-semibold px-1.5 py-0.5 rounded border ${badge.cls}`}>
+                        {badge.label}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5 align-top">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-muted-foreground truncate">{summary}</p>
+                          {isExpanded && (
+                            <div className="mt-2 space-y-1.5 text-[12px]">
+                              {row.targetEmail && (
+                                <p><span className="font-semibold text-muted-foreground/70">Target:</span> <span className="font-mono">{row.targetEmail}</span></p>
+                              )}
+                              {row.audience && (
+                                <p><span className="font-semibold text-muted-foreground/70">Audience:</span> {row.audience}</p>
+                              )}
+                              {row.ipAddress && (
+                                <p><span className="font-semibold text-muted-foreground/70">IP:</span> <span className="font-mono">{row.ipAddress}</span></p>
+                              )}
+                              {row.metadata && Object.keys(row.metadata).length > 0 && (
+                                <div>
+                                  <p className="font-semibold text-muted-foreground/70 mb-1">Metadata:</p>
+                                  <pre className="bg-muted/40 rounded px-2 py-1.5 text-[11px] overflow-x-auto whitespace-pre-wrap break-all">
+                                    {JSON.stringify(row.metadata, null, 2)}
+                                  </pre>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        {hasDetail && (
+                          <button className="shrink-0 text-muted-foreground/50 hover:text-foreground mt-0.5">
+                            {isExpanded
+                              ? <ChevronUp   className="w-3.5 h-3.5" />
+                              : <ChevronDown className="w-3.5 h-3.5" />
+                            }
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+
+        {/* Load more */}
+        {hasMore && !loading && (
+          <div className="flex items-center justify-center py-4 border-t border-border/40">
+            <button
+              onClick={() => fetchPage(currentPage + 1, true)}
+              disabled={loadingMore}
+              className="flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground hover:text-foreground border border-border rounded-md px-4 py-1.5 hover:border-ring/50 transition-colors disabled:opacity-50"
+            >
+              {loadingMore
+                ? <><Loader2 className="w-3 h-3 animate-spin" /> Loading…</>
+                : `Load more (${total - rows.length} remaining)`
+              }
+            </button>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'matrix', label: 'Permission Matrix' },
   { id: 'access', label: 'Access Tiers & Auth' },
   { id: 'owners', label: 'Role Owners' },
+  { id: 'audit',  label: 'Audit Log' },
 ];
 
 export default function PeopleAccess() {
@@ -1232,6 +1586,7 @@ export default function PeopleAccess() {
     const hash = typeof window !== 'undefined' ? window.location.hash : '';
     if (hash === '#owners') return 'owners';
     if (hash === '#access') return 'access';
+    if (hash === '#audit')  return 'audit';
     return 'matrix';
   });
   const { userTier, setUserTier } = useAppContext();
@@ -1241,6 +1596,7 @@ export default function PeopleAccess() {
       const hash = window.location.hash;
       if (hash === '#owners') setActiveTab('owners');
       else if (hash === '#access') setActiveTab('access');
+      else if (hash === '#audit')  setActiveTab('audit');
       else if (hash === '#matrix') setActiveTab('matrix');
     }
     applyHash();
@@ -1287,6 +1643,7 @@ export default function PeopleAccess() {
         {activeTab === 'matrix' && <PermissionMatrixTab />}
         {activeTab === 'access' && <AccessTiersTab userTier={userTier} setUserTier={setUserTier} />}
         {activeTab === 'owners' && <RoleOwnersTab />}
+        {activeTab === 'audit'  && <AuditLogTab />}
       </div>
 
     </div>
