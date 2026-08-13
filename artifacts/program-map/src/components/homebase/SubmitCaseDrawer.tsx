@@ -247,6 +247,9 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, init
   // ── Double-submit guard
   const submittingRef = useRef(false);
 
+  // ── Track whether the drawer was open on the previous render cycle ──────────
+  const prevOpenRef = useRef(false);
+
   // ── Capture images pasted / dropped into the editor ─────────────────────────
   const handleImageCapture = useCallback((file: File) => {
     setAttachments(prev => {
@@ -256,14 +259,38 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, init
     toast({ title: "Screenshot captured", description: `${file.name} added to attachments` });
   }, [toast]);
 
-  // ── Load record types when drawer opens ─────────────────────────────────────
+  // ── Load record types when drawer opens; re-seed fields when props change ────
+  //
+  // Depends on `open`, `initialSubject`, and `initialDescription` so that when
+  // the user rapidly clicks two different flag icons without closing the drawer
+  // in between, the second entry's context *always* replaces the first — both
+  // subject and description — preventing a stale or mixed submission.
+  //
+  // Record types are only (re-)fetched on a false→true open transition so that
+  // a prop change while the drawer is already open does not reset the step or
+  // restart the fetch.
 
   useEffect(() => {
-    if (!open) return;
-    // Always seed both fields so opening without pre-fill values explicitly
-    // resets them to empty (reliable for any caller, not just the flag path).
+    if (!open) {
+      // Record that we are now closed so the next open is a true transition.
+      prevOpenRef.current = false;
+      return;
+    }
+
+    const justOpened = !prevOpenRef.current;
+    prevOpenRef.current = true;
+
+    // Always replace both context-derived fields whenever the drawer opens OR
+    // whenever the caller changes the pre-fill props while already open.
+    // Clicking a different flag icon is explicit intent to switch entries, so
+    // any in-progress edits to the previous entry's fields are discarded to
+    // avoid a subject/description mismatch.
     setSubject(initialSubject ?? "");
     setDescHtml(initialDescription ?? "");
+
+    // Only fetch record types on a true open transition.
+    if (!justOpened) return;
+
     setTypesLoading(true);
     fetch("/api/sf/cases/record-types")
       .then(r => r.ok ? r.json() as Promise<{ recordTypes: RecordType[] }> : Promise.reject())
@@ -295,7 +322,7 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, init
         void loadQueues();
       })
       .finally(() => setTypesLoading(false));
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, initialSubject, initialDescription]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadQueues() {
     setQueuesLoading(true);
