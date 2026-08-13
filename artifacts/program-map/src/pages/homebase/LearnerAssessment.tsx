@@ -16,11 +16,12 @@
  * Auth: requires a valid homebase learner session (requireHomebaseAuth on API).
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
-import { Sparkles, Lock, Clock, ChevronRight, CheckCircle } from "lucide-react";
+import { Lock, Clock, ChevronRight, CheckCircle } from "lucide-react";
 import { HomebaseShell } from "@/components/layout/HomebaseShell";
 import { DomainReadsSidebar } from "@/components/homebase/DomainReadsSidebar";
+import { MCItemRenderer, type ConfidenceLevel } from "@/components/homebase/MCItemRenderer";
 import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
 import { useAppContext } from "@/context/AppContext";
 
@@ -269,15 +270,19 @@ function ItemShell({
   currentItem,
   domainReads,
   totalItems,
+  onRespond,
+  submitting,
 }: {
   itemNumber:  number;
   elapsed:     number;
   currentItem: AssessmentItem | null;
   domainReads: DomainState[];
   totalItems:  number;
+  onRespond:   (answer: string, confidence: ConfidenceLevel) => Promise<void>;
+  submitting:  boolean;
 }) {
-  const domain  = currentItem?.domain ?? "";
-  const clr     = DOMAIN_COLORS[domain] ?? { bar: "#9CA3AF", chip: "#F9FAFB", label: "#6B7280" };
+  const domain    = currentItem?.domain ?? "";
+  const clr       = DOMAIN_COLORS[domain] ?? { bar: "#9CA3AF", chip: "#F9FAFB", label: "#6B7280" };
   const typeLabel = ITEM_TYPE_LABELS[currentItem?.itemType ?? "mc"] ?? currentItem?.itemType;
 
   return (
@@ -289,7 +294,7 @@ function ItemShell({
         style={{ background: "white", borderColor: "#E2E4E1" }}
       >
         <span className="text-[12px] font-semibold" style={{ color: "#6B7280" }}>
-          Item {itemNumber} of {totalItems}
+          Item {itemNumber}
         </span>
 
         {currentItem && (
@@ -316,23 +321,31 @@ function ItemShell({
       {/* ── Content + sidebar ──────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* Main content slot — item renderers (Tasks 3/4/5) mount here */}
+        {/* Main content slot */}
         <div
           className="flex-1 overflow-y-auto p-4"
           data-slot="assessment-item-content"
         >
-          {currentItem ? (
+          {!currentItem && <LoadingView />}
+
+          {currentItem?.itemType === "mc" && (
+            <MCItemRenderer
+              item={currentItem}
+              onSubmit={onRespond}
+              submitting={submitting}
+            />
+          )}
+
+          {currentItem && currentItem.itemType !== "mc" && (
             <div
               className="rounded-xl border p-4 min-h-[160px] flex items-center justify-center"
               style={{ borderColor: "#E2E4E1", borderStyle: "dashed", color: "#9CA3AF" }}
             >
               <div className="text-center">
-                <p className="text-[13px] font-medium">Item renderer loading…</p>
-                <p className="text-[11px] mt-1">MC / Scenario / Build-Check components slot in here</p>
+                <p className="text-[13px] font-medium">{typeLabel} renderer</p>
+                <p className="text-[11px] mt-1">Coming in Tasks 4 &amp; 5</p>
               </div>
             </div>
-          ) : (
-            <LoadingView />
           )}
         </div>
 
@@ -417,6 +430,7 @@ export default function LearnerAssessment() {
   const [itemNumber,  setItemNumber]  = useState(1);
   const [elapsed,     setElapsed]     = useState(0);
   const [starting,    setStarting]    = useState(false);
+  const [submitting,  setSubmitting]  = useState(false);
   const [error,       setError]       = useState<string | null>(null);
 
   // Estimate total items based on settling logic: ~40 items across 8 domains (5 per domain)
@@ -492,6 +506,30 @@ export default function LearnerAssessment() {
     }
   }
 
+  async function handleRespond(answer: string, confidence: ConfidenceLevel) {
+    if (!session) return;
+    setSubmitting(true);
+    try {
+      const data = await apiJson<{
+        response:    unknown;
+        domainReads: DomainState[];
+      }>(
+        `/api/assessments/sessions/${session.id}/respond`,
+        {
+          method: "POST",
+          body:   JSON.stringify({ itemId: currentItem?.id, answer, confidence }),
+        },
+      );
+      if (data.domainReads) setDomainReads(data.domainReads);
+      setItemNumber(n => n + 1);
+      await fetchNextItem(session.id);
+    } catch {
+      setError("Could not save your answer. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function resumeSession(sessionId: number) {
     setView("loading");
     try {
@@ -559,6 +597,8 @@ export default function LearnerAssessment() {
             currentItem={currentItem}
             domainReads={domainReads}
             totalItems={TOTAL_ESTIMATE}
+            onRespond={handleRespond}
+            submitting={submitting}
           />
         </div>
       )}
