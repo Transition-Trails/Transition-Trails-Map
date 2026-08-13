@@ -113,6 +113,7 @@ import SessionLog              from "@/pages/penny/SessionLog";
 import TrailQuests             from "@/pages/penny/TrailQuests";
 import Intelligence            from "@/pages/penny/Intelligence";
 import Assessments             from "@/pages/penny/Assessments";
+import QuestionBank            from "@/pages/penny/QuestionBank";
 import AgentforceCenter        from "@/pages/penny/AgentforceCenter";
 import PennyHealth             from "@/pages/operations/PennyHealth";
 import PennyAssetLibrary       from "@/pages/penny/PennyAssetLibrary";
@@ -376,6 +377,7 @@ function Router() {
       <Route path="/penny/trail-quests">       <PennyPageShell><TrailQuests /></PennyPageShell></Route>
       <Route path="/penny/intelligence">       <PennyPageShell><Intelligence /></PennyPageShell></Route>
       <Route path="/penny/assessments">        <PennyPageShell><Assessments /></PennyPageShell></Route>
+      <Route path="/penny/question-bank">     <PennyPageShell><QuestionBank /></PennyPageShell></Route>
       <Route path="/penny/agentforce">         <PennyPageShell><AgentforceCenter /></PennyPageShell></Route>
       <Route path="/penny/health">             <PennyPageShell><PennyHealth /></PennyPageShell></Route>
       <Route path="/penny/asset-library">      <PennyPageShell><PennyAssetLibrary /></PennyPageShell></Route>

@@ -77,6 +77,7 @@ const navGroups: NavGroup[] = [
       { id: 'penny-trail-quests',  path: '/penny/trail-quests',  label: 'Trail Quests',     minTier: 'admin' },
       { id: 'penny-assessments',   path: '/penny/assessments',   label: 'Assessments',      minTier: 'admin' },
       { id: 'penny-config-label',  label: `Configure ${TERMS.aiAssistant}`,     isLabel: true },
+      { id: 'penny-question-bank', path: '/penny/question-bank', label: 'Question Bank',    minTier: 'admin' },
       { id: 'penny-trail-configs', path: '/penny/trail-configs', label: 'Trail Configs',    minTier: 'admin' },
       { id: 'penny-prompts',       path: '/penny/prompts',       label: 'Prompt Studio',    minTier: 'admin' },
       { id: 'penny-capabilities',  path: '/penny/capabilities',  label: 'Capabilities',     minTier: 'admin' },

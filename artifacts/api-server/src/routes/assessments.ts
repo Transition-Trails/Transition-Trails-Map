@@ -891,4 +891,107 @@ router.get("/assessments/sessions/:id/results", requireStaff as import("express"
   });
 });
 
+// ── Question Bank CRUD (admin) ────────────────────────────────────────────────
+// GET  /assessments/items            — list all items (staff)
+// POST /assessments/items            — create item (staff)
+// PATCH /assessments/items/:id       — update item (staff)
+// DELETE /assessments/items/:id      — delete item (staff)
+
+router.get("/assessments/items", requireStaff, async (_req, res) => {
+  try {
+    const items = await db
+      .select()
+      .from(assessmentItemsTable)
+      .orderBy(assessmentItemsTable.domain, assessmentItemsTable.id);
+    return res.json({ items });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.warn({ err: msg }, "assessments/items GET failed");
+    return res.status(500).json({ error: msg });
+  }
+});
+
+router.post("/assessments/items", requireStaff, async (req, res) => {
+  const b = req.body as Record<string, unknown>;
+  const { domain, domainLabel, domainWeight, itemType, question, options, correctOption, rubric, explanation, weight } = b;
+
+  if (!domain || !domainLabel || !itemType || !question) {
+    return res.status(400).json({ error: "domain, domainLabel, itemType, and question are required." });
+  }
+  if (!["mc", "scenario", "build-check"].includes(itemType as string)) {
+    return res.status(400).json({ error: "itemType must be mc, scenario, or build-check." });
+  }
+  if (itemType === "mc" && !correctOption) {
+    return res.status(400).json({ error: "correctOption is required for mc items." });
+  }
+
+  try {
+    const [item] = await db.insert(assessmentItemsTable).values({
+      domain:        String(domain),
+      domainLabel:   String(domainLabel),
+      domainWeight:  String(domainWeight ?? "0.125"),
+      itemType:      String(itemType),
+      question:      String(question),
+      options:       options ?? null,
+      correctOption: correctOption ? String(correctOption) : null,
+      rubric:        rubric ?? null,
+      explanation:   explanation ? String(explanation) : null,
+      weight:        String(weight ?? "1"),
+    }).returning();
+    return res.status(201).json({ item });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.warn({ err: msg }, "assessments/items POST failed");
+    return res.status(500).json({ error: msg });
+  }
+});
+
+router.patch("/assessments/items/:id", requireStaff, async (req, res) => {
+  const id = Number(req.params["id"]);
+  if (!id || isNaN(id)) return res.status(400).json({ error: "Invalid item ID." });
+
+  const b = req.body as Record<string, unknown>;
+  const allowed = ["domain","domainLabel","domainWeight","itemType","question","options","correctOption","rubric","explanation","weight"] as const;
+  const updates: Record<string, unknown> = {};
+  for (const k of allowed) {
+    if (k in b) updates[k] = b[k];
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: "No updatable fields provided." });
+  }
+
+  try {
+    const [item] = await db
+      .update(assessmentItemsTable)
+      .set(updates as Partial<typeof assessmentItemsTable.$inferInsert>)
+      .where(eq(assessmentItemsTable.id, id))
+      .returning();
+    if (!item) return res.status(404).json({ error: "Item not found." });
+    return res.json({ item });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.warn({ id, err: msg }, "assessments/items PATCH failed");
+    return res.status(500).json({ error: msg });
+  }
+});
+
+router.delete("/assessments/items/:id", requireStaff, async (req, res) => {
+  const id = Number(req.params["id"]);
+  if (!id || isNaN(id)) return res.status(400).json({ error: "Invalid item ID." });
+
+  try {
+    const deleted = await db
+      .delete(assessmentItemsTable)
+      .where(eq(assessmentItemsTable.id, id))
+      .returning({ id: assessmentItemsTable.id });
+    if (deleted.length === 0) return res.status(404).json({ error: "Item not found." });
+    return res.status(204).end();
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.warn({ id, err: msg }, "assessments/items DELETE failed");
+    return res.status(500).json({ error: msg });
+  }
+});
+
 export default router;
