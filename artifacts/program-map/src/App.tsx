@@ -23,7 +23,26 @@ const basePath = (import.meta.env.BASE_URL as string).replace(/\/$/, "");
 //   403 → signed in but not permitted → dispatch event so UI can show a clear
 //          "ask your administrator" message rather than a silent failure.
 const _origFetch = window.fetch.bind(window);
-const queryClient = new QueryClient();
+
+// ── QueryClient — default query function ──────────────────────────────────────
+// Many queries across the app use only a queryKey (e.g. ['/api/slack/validate']).
+// The default queryFn treats queryKey[0] as the fetch URL so those queries
+// resolve without each call site duplicating the fetch boilerplate.
+// Queries that supply their own queryFn take precedence over this default.
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryFn: async ({ queryKey }) => {
+        const url = queryKey[0];
+        if (typeof url !== 'string') throw new Error('queryKey[0] must be a URL string');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`API error ${res.status}: ${res.statusText}`);
+        return res.json() as Promise<unknown>;
+      },
+      retry: 1,
+    },
+  },
+});
 
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
   const res = await _origFetch(input, init);

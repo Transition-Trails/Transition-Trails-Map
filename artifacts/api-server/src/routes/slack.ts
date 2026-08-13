@@ -1,5 +1,9 @@
 import { Router } from "express";
 import crypto from "crypto";
+import { db } from "@workspace/db";
+import { alertSettingsTable } from "@workspace/db/schema";
+import { eq } from "drizzle-orm";
+import { requireAdmin } from "../middlewares/requireAuth.js";
 
 const router = Router();
 
@@ -653,6 +657,118 @@ router.post('/slack/events', async (req, res) => {
     .then(reply => postSlackReply(botToken, channel, reply, threadTs))
     .then(() => req.log.info({ channel, threadTs }, 'Penny reply posted to Slack'))
     .catch((err: unknown) => req.log.error({ err }, 'Slack adapter: Penny dispatch failed'));
+});
+
+// ─── GET /slack/alert-settings ───────────────────────────────────────────────
+// Returns the current alert threshold and window, falling back to env/defaults.
+
+router.get("/slack/alert-settings", async (req, res) => {
+  const envThreshold = (() => {
+    const raw = process.env["ERROR_ALERT_THRESHOLD"];
+    if (!raw) return 10;
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) && n > 0 ? n : 10;
+  })();
+
+  const defaultPayload = {
+    threshold:     envThreshold,
+    windowMinutes: 15,
+    updatedBy:     null as string | null,
+    updatedAt:     null as string | null,
+    source:        "default" as const,
+    envFallback:   envThreshold,
+  };
+
+  try {
+    const rows = await db
+      .select()
+      .from(alertSettingsTable)
+      .where(eq(alertSettingsTable.id, "default"))
+      .limit(1);
+
+    if (rows.length > 0 && rows[0]) {
+      res.json({
+        threshold:     rows[0].threshold,
+        windowMinutes: rows[0].windowMinutes,
+        updatedBy:     rows[0].updatedBy ?? null,
+        updatedAt:     rows[0].updatedAt?.toISOString() ?? null,
+        source:        "db",
+        envFallback:   envThreshold,
+      });
+      return;
+    }
+
+    res.json(defaultPayload);
+  } catch (err) {
+    req.log.warn({ err }, "alert-settings GET: DB error");
+    res.json(defaultPayload);
+  }
+});
+
+// ─── PATCH /slack/alert-settings ─────────────────────────────────────────────
+// Body: { threshold?: number; windowMinutes?: number }
+// Upserts the singleton alert_settings row.  Changes take effect on the next
+// errorAlertJob polling cycle (≤60 s) without a server restart.
+// Requires admin-group membership (requireAdmin).
+
+router.patch("/slack/alert-settings", requireAdmin, async (req, res) => {
+  const body = req.body as { threshold?: unknown; windowMinutes?: unknown };
+
+  const threshold     = typeof body.threshold     === "number" ? Math.round(body.threshold)     : null;
+  const windowMinutes = typeof body.windowMinutes === "number" ? Math.round(body.windowMinutes) : null;
+
+  if (threshold !== null && (threshold < 1 || threshold > 10_000)) {
+    res.status(400).json({ ok: false, error: "threshold must be between 1 and 10 000" });
+    return;
+  }
+  if (windowMinutes !== null && (windowMinutes < 1 || windowMinutes > 1440)) {
+    res.status(400).json({ ok: false, error: "windowMinutes must be between 1 and 1440" });
+    return;
+  }
+  if (threshold === null && windowMinutes === null) {
+    res.status(400).json({ ok: false, error: "provide threshold and/or windowMinutes" });
+    return;
+  }
+
+  const updatedBy = req.session.googleEmail ?? null;
+
+  try {
+    // Read current values so we can merge the patch.
+    const existing = await db
+      .select()
+      .from(alertSettingsTable)
+      .where(eq(alertSettingsTable.id, "default"))
+      .limit(1);
+
+    const current = existing[0] ?? { threshold: 10, windowMinutes: 15 };
+
+    const newThreshold     = threshold     ?? current.threshold;
+    const newWindowMinutes = windowMinutes ?? current.windowMinutes;
+
+    await db
+      .insert(alertSettingsTable)
+      .values({
+        id:            "default",
+        threshold:     newThreshold,
+        windowMinutes: newWindowMinutes,
+        updatedBy,
+        updatedAt:     new Date(),
+      })
+      .onConflictDoUpdate({
+        target: alertSettingsTable.id,
+        set: {
+          threshold:     newThreshold,
+          windowMinutes: newWindowMinutes,
+          updatedBy,
+          updatedAt:     new Date(),
+        },
+      });
+
+    res.json({ ok: true, threshold: newThreshold, windowMinutes: newWindowMinutes });
+  } catch (err) {
+    req.log.error({ err }, "alert-settings PATCH: DB error");
+    res.status(500).json({ ok: false, error: "db_error" });
+  }
 });
 
 // ─── POST /slack/notify-reviewer ─────────────────────────────────────────────

@@ -8,8 +8,8 @@
  *   Channels  — admin: channel catalog, templates, notification rules, briefs
  */
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { HubShell } from '@/components/layout/HubShell';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -18,7 +18,7 @@ import {
   LayoutDashboard, Mail, Radio, Network, MessageSquare,
   CheckCircle2, AlertCircle, Clock, RefreshCw,
   Slack, HardDrive, CalendarDays, ChevronRight,
-  Zap, ArrowRight, Hash, FileText, Bell,
+  Zap, ArrowRight, Hash, FileText, Bell, Settings2, Save,
 } from 'lucide-react';
 
 // Tab content — existing components
@@ -36,6 +36,156 @@ interface SlackValidation { status: string; passed?: number; failed?: number; ti
 interface GmailThread { unread?: boolean; }
 interface CalendarEvent { summary?: string; start?: { dateTime?: string; date?: string }; }
 interface DriveStatus { connected?: boolean; folderName?: string; lastSync?: string; }
+
+interface AlertSettings {
+  threshold: number;
+  windowMinutes: number;
+  updatedBy: string | null;
+  updatedAt: string | null;
+  source: 'db' | 'default';
+  envFallback: number;
+}
+
+// ── Alert Settings Card (admin-only) ──────────────────────────────────────────
+
+function AlertSettingsCard() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery<AlertSettings>({
+    queryKey: ['/api/slack/alert-settings'],
+    staleTime: 30_000,
+    queryFn: async () => {
+      const res = await fetch('/api/slack/alert-settings');
+      if (!res.ok) throw new Error(`Failed to load alert settings (${res.status})`);
+      return res.json() as Promise<AlertSettings>;
+    },
+  });
+
+  const [threshold,     setThreshold]     = useState<string>('');
+  const [windowMinutes, setWindowMinutes] = useState<string>('');
+  const [initialized,   setInitialized]   = useState(false);
+  const [saved,         setSaved]         = useState(false);
+  const [err,           setErr]           = useState<string | null>(null);
+
+  // Populate inputs once data first arrives; do not overwrite mid-edit
+  useEffect(() => {
+    if (data && !initialized) {
+      setThreshold(String(data.threshold));
+      setWindowMinutes(String(data.windowMinutes));
+      setInitialized(true);
+    }
+  }, [data, initialized]);
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const t = parseInt(threshold, 10);
+      const w = parseInt(windowMinutes, 10);
+      if (!Number.isFinite(t) || t < 1) throw new Error('Threshold must be a positive whole number.');
+      if (!Number.isFinite(w) || w < 1) throw new Error('Window must be a positive whole number.');
+      const res = await fetch('/api/slack/alert-settings', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ threshold: t, windowMinutes: w }),
+      });
+      if (!res.ok) {
+        const body = await res.json() as { error?: string };
+        throw new Error(body.error ?? 'Failed to save settings.');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['/api/slack/alert-settings'] });
+      setSaved(true);
+      setErr(null);
+      setTimeout(() => setSaved(false), 3000);
+    },
+    onError: (e: Error) => {
+      setErr(e.message);
+    },
+  });
+
+  return (
+    <div className="rounded-lg border border-border bg-white p-4 flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Settings2 className="w-4 h-4 text-muted-foreground" />
+          <span className="text-[15px] font-semibold text-foreground">Error Alert Settings</span>
+        </div>
+        {data?.source === 'db' && data.updatedAt && (
+          <span className="text-[14px] text-muted-foreground/60">
+            Last saved {new Date(data.updatedAt).toLocaleDateString()}
+            {data.updatedBy ? ` by ${data.updatedBy.split('@')[0]}` : ''}
+          </span>
+        )}
+      </div>
+      <p className="text-[14px] text-muted-foreground leading-snug">
+        Configure when the error-spike monitor posts a Slack alert to the admin channel.
+        Changes take effect on the next polling cycle (within 60 s) without a restart.
+      </p>
+
+      {isLoading ? (
+        <p className="text-[14px] text-muted-foreground/60">Loading…</p>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-[13px] font-semibold text-foreground">
+              Error threshold
+            </label>
+            <p className="text-[13px] text-muted-foreground">Alert when errors exceed this count</p>
+            <input
+              type="number"
+              min={1}
+              max={10000}
+              value={threshold}
+              onChange={e => setThreshold(e.target.value)}
+              className="mt-1 rounded border border-border px-2.5 py-1.5 text-[14px] font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 w-full"
+            />
+            {data?.envFallback !== undefined && data.source === 'default' && (
+              <p className="text-[13px] text-muted-foreground/60">
+                Env fallback: {data.envFallback}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[13px] font-semibold text-foreground">
+              Window (minutes)
+            </label>
+            <p className="text-[13px] text-muted-foreground">Rolling window for counting errors</p>
+            <input
+              type="number"
+              min={1}
+              max={1440}
+              value={windowMinutes}
+              onChange={e => setWindowMinutes(e.target.value)}
+              className="mt-1 rounded border border-border px-2.5 py-1.5 text-[14px] font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 w-full"
+            />
+          </div>
+        </div>
+      )}
+
+      {err && (
+        <p className="text-[13px] text-[#A93F2F] bg-[#FBEAE6] border border-[#E8B9B4] rounded px-2.5 py-1.5">
+          {err}
+        </p>
+      )}
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending || isLoading}
+          className="inline-flex items-center gap-1.5 text-[14px] font-semibold px-3 py-1.5 rounded bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+        >
+          <Save className="w-3.5 h-3.5" />
+          {mutation.isPending ? 'Saving…' : 'Save settings'}
+        </button>
+        {saved && (
+          <span className="flex items-center gap-1 text-[14px] text-[#2F6B3F] font-semibold">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Saved
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ── Overview tab ──────────────────────────────────────────────────────────────
 
@@ -81,6 +231,9 @@ function ServiceCard({
 }
 
 function OverviewTab() {
+  const { userTier } = useAppContext();
+  const isAdmin = userTier === 'admin' || userTier === 'superadmin';
+
   const { data: slackData, isLoading: slackLoading }    = useQuery<SlackValidation>({ queryKey: ['/api/slack/validate'],    staleTime: 60_000 });
   const { data: gmailData, isLoading: gmailLoading }    = useQuery<GmailThread[]>({ queryKey: ['/api/gmail/threads'],     staleTime: 30_000 });
   const { data: calData,   isLoading: calLoading }      = useQuery<CalendarEvent[]>({ queryKey: ['/api/calendar/events'],   staleTime: 30_000 });
@@ -206,6 +359,14 @@ function OverviewTab() {
             ))}
           </div>
         </div>
+
+        {/* Error alert settings — admin only */}
+        {isAdmin && (
+          <div>
+            <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-wider mb-3">Alert settings</p>
+            <AlertSettingsCard />
+          </div>
+        )}
 
       </div>
     </ScrollArea>

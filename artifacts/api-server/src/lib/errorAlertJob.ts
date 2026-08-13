@@ -10,8 +10,8 @@
  */
 
 import { db } from '@workspace/db';
-import { trailOsAuditLogTable } from '@workspace/db/schema';
-import { eq, gte, sql, and } from 'drizzle-orm';
+import { trailOsAuditLogTable, alertSettingsTable } from '@workspace/db/schema';
+import { eq, gte, and } from 'drizzle-orm';
 import { logger } from './logger.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -19,10 +19,10 @@ import { logger } from './logger.js';
 /** How often the job polls (ms). Default: every 60 seconds. */
 const POLL_INTERVAL_MS = 60_000;
 
-/** Window over which errors are counted. */
-const WINDOW_MINUTES = 15;
+/** Default window (minutes) — overridden by DB alert_settings row. */
+const DEFAULT_WINDOW_MINUTES = 15;
 
-/** Default spike threshold — overridden by ERROR_ALERT_THRESHOLD env var. */
+/** Default spike threshold — overridden by DB alert_settings, then ERROR_ALERT_THRESHOLD env var. */
 const DEFAULT_THRESHOLD = 10;
 
 /** Minimum gap between alerts for the same top-failing route. */
@@ -36,11 +36,34 @@ const lastAlertAt = new Map<string, number>();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function getThreshold(): number {
+/** Env-var fallback threshold (used when DB is unavailable). */
+function getEnvThreshold(): number {
   const raw = process.env['ERROR_ALERT_THRESHOLD'];
   if (!raw) return DEFAULT_THRESHOLD;
   const n = parseInt(raw, 10);
   return Number.isFinite(n) && n > 0 ? n : DEFAULT_THRESHOLD;
+}
+
+/**
+ * Read alert settings from the DB.
+ * Falls back to env-var / compiled defaults on any DB error so the job
+ * never stops due to a missing row or transient DB failure.
+ */
+async function getAlertSettings(): Promise<{ threshold: number; windowMinutes: number }> {
+  try {
+    const rows = await db
+      .select({ threshold: alertSettingsTable.threshold, windowMinutes: alertSettingsTable.windowMinutes })
+      .from(alertSettingsTable)
+      .where(eq(alertSettingsTable.id, 'default'))
+      .limit(1);
+
+    if (rows.length > 0 && rows[0]) {
+      return { threshold: rows[0].threshold, windowMinutes: rows[0].windowMinutes };
+    }
+  } catch (err) {
+    logger.warn({ err }, 'errorAlertJob: could not read alert_settings from DB — using env/defaults');
+  }
+  return { threshold: getEnvThreshold(), windowMinutes: DEFAULT_WINDOW_MINUTES };
 }
 
 function getAdminChannelId(): string | null {
@@ -156,8 +179,8 @@ export async function checkAndAlert(): Promise<void> {
     return;
   }
 
-  const threshold   = getThreshold();
-  const windowStart = new Date(Date.now() - WINDOW_MINUTES * 60 * 1000);
+  const { threshold, windowMinutes } = await getAlertSettings();
+  const windowStart = new Date(Date.now() - windowMinutes * 60 * 1000);
 
   try {
     // Fetch all error rows in the window so we can count and group by route.
@@ -205,7 +228,7 @@ export async function checkAndAlert(): Promise<void> {
       channelId,
       errorCount,
       topRoute,
-      WINDOW_MINUTES,
+      windowMinutes,
       threshold,
       dashboardUrl,
     );
@@ -235,8 +258,8 @@ export function startErrorAlertJob(): void {
   if (intervalHandle !== null) return;
 
   logger.info(
-    { windowMinutes: WINDOW_MINUTES, threshold: getThreshold(), pollIntervalMs: POLL_INTERVAL_MS },
-    'errorAlertJob: started',
+    { defaultWindowMinutes: DEFAULT_WINDOW_MINUTES, envThreshold: getEnvThreshold(), pollIntervalMs: POLL_INTERVAL_MS },
+    'errorAlertJob: started (runtime settings read from DB each cycle)',
   );
 
   intervalHandle = setInterval(() => {
