@@ -17,12 +17,21 @@
  * P7. PATCH merges rather than replaces — a second patch preserves earlier keys.
  * P8. Unauthenticated PATCH returns 401 (the prefs route sits behind auth).
  * P9. Unauthenticated GET returns 401.
+ *
+ * DB isolation
+ * ────────────
+ * Each call to `authenticatedAgent()` uses a unique email address (via a
+ * monotonically incrementing counter).  This ensures no durable DB state leaks
+ * between tests — each test starts with a fresh user row.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../app.js';
 import * as googleGroupsCache from '../lib/googleGroupsCache.js';
+import { db } from '@workspace/db';
+import { userPreferencesTable } from '@workspace/db/schema';
+import { like } from 'drizzle-orm';
 
 // ── Auth helpers ──────────────────────────────────────────────────────────────
 
@@ -43,15 +52,21 @@ vi.mock('../lib/googleGroupsCache.js', async (importOriginal) => {
 
 const mockGetGroups = vi.mocked(googleGroupsCache.getGroupsForUser);
 
+// Monotonically incrementing counter — gives each `authenticatedAgent()` call
+// a unique email so DB rows never bleed between tests.
+let agentCounter = 0;
+
 /** Returns a supertest agent that is already signed in as an everyday-tier user. */
 async function authenticatedAgent() {
+  const email = `prefs-user-${agentCounter++}@transitiontrails.org`;
+
   global.fetch = vi.fn().mockResolvedValue({
     ok:   true,
     text: () => Promise.resolve(''),
     json: () => Promise.resolve({
       id_token: makeIdToken({
-        sub:            'uid-prefs-test',
-        email:          'prefs-user@transitiontrails.org',
+        sub:            `uid-prefs-test-${agentCounter}`,
+        email,
         name:           'Prefs User',
         hd:             'transitiontrails.org',
         email_verified: true,
@@ -82,6 +97,18 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+// Clean up all test-generated DB rows after the full suite to keep the dev
+// database tidy.  Rows are matched by the test email prefix.
+afterAll(async () => {
+  try {
+    await db
+      .delete(userPreferencesTable)
+      .where(like(userPreferencesTable.userEmail, 'prefs-user-%@transitiontrails.org'));
+  } catch {
+    // Non-fatal — test DB may already be clean or unavailable.
+  }
+});
+
 // ── Test suites ───────────────────────────────────────────────────────────────
 
 describe('GET /api/user/prefs', () => {
@@ -92,7 +119,7 @@ describe('GET /api/user/prefs', () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('prefs');
     expect(typeof res.body.prefs).toBe('object');
-    // lastSeenVersion must not be present on a fresh session
+    // lastSeenVersion must not be present for a brand-new user
     expect(res.body.prefs).not.toHaveProperty('lastSeenVersion');
   });
 
@@ -210,8 +237,8 @@ describe('PATCH /api/user/prefs', () => {
 
 // ── Graceful-degradation scenario ─────────────────────────────────────────────
 //
-// If the PATCH never reaches the server (e.g. network offline), the session
-// must NOT store lastSeenVersion.  A subsequent GET then returns no pref, which
+// If the PATCH never reaches the server (e.g. network offline), the DB must
+// NOT contain lastSeenVersion.  A subsequent GET then returns no pref, which
 // means the front-end hook correctly re-shows the dot on the next page load.
 //
 describe('Graceful degradation — failed PATCH means dot re-appears on reload', () => {

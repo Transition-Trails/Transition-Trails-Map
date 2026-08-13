@@ -36,3 +36,4 @@ export * from "./slackUserTokens";
 export * from "./fathomUserKeys";
 export * from "./submittedCases";
 export * from "./buildErrorLogs";
+export * from "./userPreferences";
