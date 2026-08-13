@@ -47,6 +47,7 @@ import {
   LayoutDashboard,
   CheckSquare,
   Tag,
+  Lock,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import type { HomebaseAudience } from "@/hooks/useHomebaseAuth";
@@ -331,7 +332,7 @@ function PennyBar({ displayName, isTeam }: { displayName: string; isTeam: boolea
   const [query, setQuery]     = useState("");
   const [sending, setSending] = useState(false);
   const { hasUnseenRelease, markSeen } = useSeenVersion();
-  const { helpPanelOpen, setHelpPanelOpen } = useAppContext();
+  const { helpPanelOpen, setHelpPanelOpen, assessmentActive } = useAppContext();
 
   const handleSend = useCallback(async () => {
     if (!query.trim() || sending) return;
@@ -347,6 +348,26 @@ function PennyBar({ displayName, isTeam }: { displayName: string; isTeam: boolea
   };
 
   const greeting = displayName ? displayName.split(" ")[0] : "there";
+
+  // ── Proctor mode — shown while a skill assessment is in progress ───
+  if (assessmentActive) {
+    return (
+      <div
+        className="flex-shrink-0 border-b px-4 py-2.5 flex items-center gap-3"
+        style={{ background: "#F5FAF6", borderColor: "#BBD9C2" }}
+      >
+        <div
+          className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ background: "#2F6B3F" }}
+        >
+          <Lock className="w-3.5 h-3.5 text-white" />
+        </div>
+        <p className="text-sm font-medium flex-1" style={{ color: "#2F6B3F" }}>
+          Proctoring — I'll be back when you finish.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-shrink-0 border-b border-border bg-white px-4 py-2.5 flex items-center gap-3">

@@ -95,6 +95,8 @@ interface AppState {
   closeLogTime:   () => void;
   logTimeSavedAt: number;
   onLogTimeSaved: () => void;
+  assessmentActive: boolean;
+  setAssessmentActive: (v: boolean) => void;
   mobileSidebarOpen: boolean;
   setMobileSidebarOpen: (v: boolean) => void;
   setActivePage: (page: string) => void;
@@ -228,6 +230,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (v) { _setAskPennyOpen(false); _setCalendarPanelOpen(false); _setGmailPanelOpen(false); }
   }
   const [pendingPennyQuery, setPendingPennyQuery]   = useState<string | null>(null);
+  const [assessmentActive, setAssessmentActive] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [logTimeOpen,    setLogTimeOpen]    = useState(false);
   const [logTimePrefill, setLogTimePrefill] = useState<LogTimePrefill>(null);
@@ -376,6 +379,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       gmailPanelOpen, setGmailPanelOpen,
       helpPanelOpen, setHelpPanelOpen,
       pendingPennyQuery, setPendingPennyQuery,
+      assessmentActive, setAssessmentActive,
       mobileSidebarOpen, setMobileSidebarOpen,
       logTimeOpen, logTimePrefill, openLogTime, closeLogTime,
       logTimeSavedAt, onLogTimeSaved,

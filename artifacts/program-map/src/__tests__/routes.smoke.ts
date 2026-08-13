@@ -183,6 +183,8 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/context',        kind: 'active' },
   { path: '/context/:tab',   kind: 'active' },
   { path: '/release-notes',  kind: 'active', note: 'Audience-dispatched: HomebaseShell (learner/coach/volunteer/team) or AppShell (staff)' },
+  { path: '/homebase/assessment',            kind: 'active', note: 'Learner skill assessment intake — redirects unauthenticated to sign-in' },
+  { path: '/homebase/assessment/:sessionId', kind: 'active', note: 'Resume in-progress assessment session' },
 
   // ── Administration ──────────────────────────────────────────────────────────
   { path: '/admin',                       kind: 'redirect', target: '/admin/integrations' },

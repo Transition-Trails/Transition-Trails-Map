@@ -120,6 +120,7 @@ import LearnerDashboard   from "@/pages/learner/LearnerDashboard";
 import LearnerPenny       from "@/pages/learner/LearnerPenny";
 import LearnerQuest       from "@/pages/learner/LearnerQuest";
 import LearnerProgress    from "@/pages/learner/LearnerProgress";
+import LearnerAssessment  from "@/pages/homebase/LearnerAssessment";
 import HomebaseLanding    from "@/pages/homebase/HomebaseLanding";
 import TeamHomebase       from "@/pages/homebase/TeamHomebase";
 import TasksPage          from "@/pages/homebase/TasksPage";
@@ -619,6 +620,16 @@ function InnerApp() {
 
       {/* /release-notes — audience-aware (dispatch handled by ReleaseNotesRouteBody). */}
       <Route path="/release-notes" component={ReleaseNotesRouteBody} />
+
+      {/* /homebase/assessment — learner skill assessment (intake + item shell + debrief).
+           Must be declared BEFORE the /homebase exact route so wouter matches
+           the more-specific path first in the Switch. */}
+      <Route path="/homebase/assessment/:sessionId">
+        {auth.isSignedIn ? <LearnerAssessment /> : <SignInPage />}
+      </Route>
+      <Route path="/homebase/assessment">
+        {auth.isSignedIn ? <LearnerAssessment /> : <SignInPage />}
+      </Route>
 
       {/* /homebase — entry point for team audience, staff, and superadmins.
            All signed-in staff (audience or no audience) land here instead of
