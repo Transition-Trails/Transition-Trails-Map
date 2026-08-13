@@ -5,7 +5,29 @@ Dates are in `MMMM D, YYYY` format. Versions follow semantic versioning conventi
 
 ---
 
-## [1.6] — August 12, 2026
+## [1.8] — August 13, 2026
+
+### Added
+- **Skill Assessment system** — adaptive 8-domain Salesforce Administrator assessment for learners. Items are served via a settling algorithm; the session completes when all 8 domains reach `settled` or `reading` status. Learners see a post-assessment debrief with an overall score badge, per-domain progress bars, and a 4-quadrant confidence calibration grid. Assessment results write to Salesforce `Assessment_Result__c` asynchronously on completion.
+- **Coach & staff assessment views** — Assessments tab on each learner's detail page in `/penny/learners` shows domain scores, calibration mini-grid, and misconception risk per session attempt. The staff Assessments page at `/penny/assessments` shows aggregate pass rate, average score, and per-learner history from live data (replaces hardcoded prototype).
+- **User Activity & Adoption Tracking Dashboard** at `/admin/adoption` — session timeline per user, feature usage heatmap (top 20 routes), 5xx failure log with status codes and timestamps, and a real-time error-spike monitor with configurable Slack alerts and rate-limit cooldown.
+- **SuperAdmin testing mode for skill assessments** — testing panel at the top of `/homebase/assessment` lets superadmins record a full assessment against any learner email without needing to impersonate. Sessions are stored and appear in the coach view for that learner.
+
+### Improved
+- Error-spike alert threshold and rolling window configurable from the Integrations page (`/admin/integrations`) without touching environment secrets or restarting the server.
+- Alert cooldown timer shown in the error-alert settings card — displays minutes remaining until the next alert can fire, so admins know why alerts paused after a spike.
+- Homebase tour is now release-versioned — re-triggers automatically when the release key is bumped, but never re-fires from a plain server restart or mid-session refresh. Both Skip and Complete suppress the tour for the current release.
+
+### Fixed
+- Salesforce rejection reason surfaced when a case status update is refused — staff now see the actual picklist error or validation-rule message in the toast instead of a generic "Try again".
+- Same real-error surfacing applied to follow-up date update failures in `CaseHoverCard` — Salesforce error detail shown instead of swallowed.
+- User preferences (seen-version, tour completion) no longer silently fail across page loads — `user_preferences` and `alert_settings` tables are now created automatically on every clean environment setup.
+- Collaboration Hub crash fixed — `GET /api/gmail/threads` returns `{ threads, fetchedAt }` but the component typed it as `GmailThread[]` and called `.filter()` directly on the wrapper object, crashing the Overview tab.
+- Homebase "Take the tour" button in Release Notes navigates correctly for staff after the Mission Control navigation restructure.
+
+---
+
+## [1.7] — August 12, 2026
 
 ### Added
 - **Homebase tour** — animated 7-step first-visit walkthrough fires automatically for every audience (staff, coach, learner, volunteer); steps are audience-aware and matched to each layout.

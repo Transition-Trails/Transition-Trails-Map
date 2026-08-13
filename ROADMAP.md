@@ -42,7 +42,7 @@ Phase 2 focuses on **replacing hardcoded prototype data with live connections**,
 | `p2-penny-live-llm` | Connect Penny UI to live Gemini LLM endpoint | High | Complete (Phase 1) |
 | `p2-penny-rag` | RAG over knowledge sources — governed by trust review system | High | Complete (Phase 1 · 22-chunk corpus) |
 | `p2-penny-memory` | Multi-turn conversational memory and session continuity | High | Planned |
-| `p2-penny-assessment` | Live assessment and quiz delivery via Penny | Medium | Planned |
+| `p2-penny-assessment` | Live assessment and quiz delivery via Penny | Medium | Complete (v1.8 · adaptive 8-domain skill assessment with coach view + staff overview) |
 | `p2-coaching-flows` | Structured coaching conversation flows with memory | Medium | Planned |
 
 ### Theme 2 — Live Data

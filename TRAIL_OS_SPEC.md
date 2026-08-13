@@ -1,8 +1,8 @@
 # TRAIL_OS_SPEC.md
 
 > **Specification for Trail OS Operating Platform — Transition Trails**  
-> Version: 1.1 · Phase 1 Complete · June 2026  
-> Status: Internal prototype — Clerk v6 + Google Sign-In live · deployed on Replit
+> Version: 1.8 · Phase 1 Complete · August 2026  
+> Status: Internal platform — Google Sign-In + Google Groups live · deployed on Replit
 
 ---
 

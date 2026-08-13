@@ -24,9 +24,27 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: "1.8",
+    date: "August 13, 2026",
+    label: "Current",
+    entries: [
+      { kind: "major", text: "Skill Assessment system launched — adaptive 8-domain Salesforce Administrator assessment for learners; scoring, confidence calibration, and a post-assessment debrief with domain bars and a 4-quadrant calibration grid. Assessment card on Learner Homebase links directly to the flow." },
+      { kind: "major", text: "Coach view for skill assessments — Assessments tab on each learner's detail page shows domain scores, calibration mini-grid, and misconception risk per attempt. Staff Assessments page at /penny/assessments shows aggregate pass rate, avg score, and per-learner history from live data." },
+      { kind: "major", text: "User Activity & Adoption Tracking Dashboard launched at /admin/adoption — session timelines per user, feature usage heatmap, 5xx failure log, and real-time error-spike monitoring with configurable Slack alerts." },
+      { kind: "minor", text: "SuperAdmin testing mode for skill assessments — testing panel on /homebase/assessment lets superadmins record a full assessment against any learner email without impersonation." },
+      { kind: "minor", text: "Error-spike alert threshold and rolling window are now configurable from the Integrations page without touching secrets or restarting the server." },
+      { kind: "minor", text: "Alert cooldown timer visible in the admin error-alert settings card — shows exactly when the next alert can fire after a spike, so admins know why alerts paused." },
+      { kind: "minor", text: "Homebase tour is now release-versioned — re-tours users when a new release bumps the tour key, but never re-fires from a plain server restart. Dismiss (X or scrim) and complete both suppress auto-start for the current release." },
+      { kind: "fix",   text: "Salesforce rejection reason now shown in the UI when a case status update is rejected — staff see the actual picklist or validation-rule message instead of a generic 'Try again' toast." },
+      { kind: "fix",   text: "Same real-error surfacing applied to follow-up date update failures in CaseHoverCard — Salesforce error detail replaces the generic fallback." },
+      { kind: "fix",   text: "User preferences (seen-version, tour completion) no longer silently fail to save across page loads — user_preferences table created automatically on every clean environment setup." },
+      { kind: "fix",   text: "Collaboration Hub crash fixed — Gmail /threads API returns { threads, fetchedAt } but the component typed it as a plain array and called .filter() on the wrapper object, crashing the Overview tab." },
+      { kind: "fix",   text: "Homebase 'Take the tour' button in Release Notes now navigates correctly for staff after the Mission Control navigation changes." },
+    ],
+  },
+  {
     version: "1.7",
     date: "August 12, 2026",
-    label: "Current",
     entries: [
       { kind: "major", text: "Mission Control role-aware walkthrough tour — fires automatically on first visit; 4–8 steps tailored to Everyday, Power, Admin, and Super Admin tiers; shared steps auto-skipped on replay.", action: { label: "Take the Mission Control tour", tourKey: "missionControl" } },
       { kind: "major", text: "Onboarding audit & dead-link fixes — broken /knowledge/procedures link corrected; GovernanceHub article link corrected; stale placeholder comments cleaned up; Intake demand queue and Standards Studio both start empty instead of showing prototype seed data." },
