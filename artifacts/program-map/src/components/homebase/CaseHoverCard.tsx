@@ -253,7 +253,16 @@ export function CaseHoverCard({
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ followUpDate: value || null }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        let reason = "Try again.";
+        try {
+          const body = await res.json() as { error?: string };
+          if (body.error) reason = body.error;
+        } catch { /* ignore parse errors */ }
+        setFollowUpDate(prev);
+        toast({ variant: "destructive", title: "Couldn't update date", description: reason });
+        return;
+      }
       const data = await res.json() as { fieldUnsupported?: boolean };
       if (data.fieldUnsupported) {
         toast({ title: "Follow-up date not available", description: "This field isn't enabled in Salesforce." });
