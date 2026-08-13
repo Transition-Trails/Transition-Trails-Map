@@ -33,6 +33,7 @@ import { eq, and, count, sql, not, inArray } from "drizzle-orm";
 import { requireHomebaseAuth, requireStaff } from "../middlewares/requireAuth.js";
 import { logger }                            from "../lib/logger.js";
 import { seedAssessmentItems }               from "../scripts/seedAssessmentItems.js";
+import { scoreScenarioResponse }             from "../lib/assessmentScoring.js";
 
 const router = Router();
 
@@ -291,13 +292,19 @@ router.post("/assessments/sessions/:id/respond", requireHomebaseAuth, async (req
     keystrokeCount,
     pasteCount,
     focusTimeMs,
+    longestInsertion,
+    pasteRatio,
+    screenShared,
   } = (req.body ?? {}) as {
-    itemId?:         number;
-    answer?:         string;
-    confidence?:     string;
-    keystrokeCount?: number;
-    pasteCount?:     number;
-    focusTimeMs?:    number;
+    itemId?:           number;
+    answer?:           string;
+    confidence?:       string;
+    keystrokeCount?:   number;
+    pasteCount?:       number;
+    focusTimeMs?:      number;
+    longestInsertion?: number;
+    pasteRatio?:       number;
+    screenShared?:     boolean;
   };
 
   if (typeof itemId !== "number") {
@@ -335,7 +342,7 @@ router.post("/assessments/sessions/:id/respond", requireHomebaseAuth, async (req
 
   if (dupe) return res.status(409).json({ error: "Item already answered in this session" });
 
-  // Score MC items; scenario/build-check scored externally (score = null for now)
+  // Score MC items; scenario items are scored asynchronously by Penny
   let isCorrect: boolean | null = null;
   let score: string | null      = null;
 
@@ -349,15 +356,27 @@ router.post("/assessments/sessions/:id/respond", requireHomebaseAuth, async (req
     .values({
       sessionId,
       itemId,
-      answer:         answer.trim(),
-      confidence:     confidence ?? null,
-      score:          score,
-      isCorrect:      isCorrect,
-      keystrokeCount: keystrokeCount ?? null,
-      pasteCount:     pasteCount     ?? null,
-      focusTimeMs:    focusTimeMs    ?? null,
+      answer:           answer.trim(),
+      confidence:       confidence       ?? null,
+      score:            score,
+      isCorrect:        isCorrect,
+      keystrokeCount:   keystrokeCount   ?? null,
+      pasteCount:       pasteCount       ?? null,
+      focusTimeMs:      focusTimeMs      ?? null,
+      longestInsertion: longestInsertion ?? null,
+      pasteRatio:       pasteRatio != null ? String(pasteRatio) : null,
+      screenShared:     screenShared     ?? null,
     })
     .returning();
+
+  // ── Penny async rubric scoring for scenario items ──────────────────────────
+  // Fire-and-forget — the shell advances immediately; scores persist to the
+  // rubric_scores column in the background and surface at debrief time.
+  if (item.itemType === "scenario" && item.rubric && response) {
+    scoreScenarioResponse(response.id, item.question, answer.trim(), item.rubric).catch(
+      (err: unknown) => logger.warn({ err, responseId: response?.id }, "Penny scenario scoring failed"),
+    );
+  }
 
   const domainReads = await computeDomainReads(sessionId);
 
@@ -434,18 +453,24 @@ router.get("/assessments/sessions/:id/results", requireStaff as import("express"
       confidence:    assessmentResponsesTable.confidence,
       score:         assessmentResponsesTable.score,
       isCorrect:     assessmentResponsesTable.isCorrect,
-      keystrokeCount: assessmentResponsesTable.keystrokeCount,
-      pasteCount:    assessmentResponsesTable.pasteCount,
-      focusTimeMs:   assessmentResponsesTable.focusTimeMs,
-      respondedAt:   assessmentResponsesTable.respondedAt,
+      keystrokeCount:   assessmentResponsesTable.keystrokeCount,
+      pasteCount:       assessmentResponsesTable.pasteCount,
+      focusTimeMs:      assessmentResponsesTable.focusTimeMs,
+      // Extended coach-signal and Penny-scoring fields (added in 0013 migration)
+      longestInsertion: assessmentResponsesTable.longestInsertion,
+      pasteRatio:       assessmentResponsesTable.pasteRatio,
+      screenShared:     assessmentResponsesTable.screenShared,
+      rubricScores:     assessmentResponsesTable.rubricScores,
+      respondedAt:      assessmentResponsesTable.respondedAt,
       // Item detail
-      question:      assessmentItemsTable.question,
-      domain:        assessmentItemsTable.domain,
-      domainLabel:   assessmentItemsTable.domainLabel,
-      itemType:      assessmentItemsTable.itemType,
-      correctOption: assessmentItemsTable.correctOption,
-      explanation:   assessmentItemsTable.explanation,
-      options:       assessmentItemsTable.options,
+      question:         assessmentItemsTable.question,
+      domain:           assessmentItemsTable.domain,
+      domainLabel:      assessmentItemsTable.domainLabel,
+      itemType:         assessmentItemsTable.itemType,
+      correctOption:    assessmentItemsTable.correctOption,
+      explanation:      assessmentItemsTable.explanation,
+      options:          assessmentItemsTable.options,
+      rubric:           assessmentItemsTable.rubric,
     })
     .from(assessmentResponsesTable)
     .innerJoin(assessmentItemsTable, eq(assessmentResponsesTable.itemId, assessmentItemsTable.id))

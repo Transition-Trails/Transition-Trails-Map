@@ -585,22 +585,151 @@ const ITEMS: Omit<InsertAssessmentItem, "id">[] = [
     correctOption: "a",
     explanation: "Session Timeout (under Session Settings) defines the inactivity period before a user is automatically logged out. Salesforce Health Check flags orgs with very long or unlimited timeout settings as security risks.",
   },
+  // ── Scenario items (one per domain — Penny scores free-text responses) ────────
+
+  // Each rubric has exactly three criteria shown to the learner before they write.
+  // Penny scores each criterion pass/fail + rationale in the background.
+
+  {
+    domain: "config-setup", domainLabel: "Configuration and Setup", domainWeight: "0.18",
+    itemType: "scenario",
+    question: "A new Salesforce org needs to be configured for a company with three departments that should not see each other's records. Describe how you would set up the sharing model and security layers to enforce this isolation.",
+    rubric: {
+      criteria: [
+        { id: "accuracy",     label: "Technical Accuracy",  description: "Correctly identifies org-wide defaults, role hierarchy, or sharing rules as the relevant mechanisms." },
+        { id: "reasoning",    label: "Clear Reasoning",     description: "Explains why each configuration choice achieves the intended isolation." },
+        { id: "completeness", label: "Completeness",        description: "Covers at least two of the three tiers: OWD, role hierarchy, and manual sharing or sharing rules." },
+      ],
+    },
+    explanation: "Set org-wide defaults to Private for the relevant objects, design a role hierarchy that keeps departments separate, and use sharing rules or manual sharing only where cross-department access is intentional.",
+  },
+  {
+    domain: "object-manager-builder", domainLabel: "Object Manager and Lightning App Builder", domainWeight: "0.18",
+    itemType: "scenario",
+    question: "A sales team needs to track 'Partner Deals' differently from standard Opportunities — with different fields, stages, and page layouts. Describe how you would configure Salesforce to support this without creating a separate object.",
+    rubric: {
+      criteria: [
+        { id: "accuracy",     label: "Technical Accuracy",  description: "Identifies Record Types as the correct mechanism for differentiating process within the same object." },
+        { id: "reasoning",    label: "Clear Reasoning",     description: "Explains how record types connect to page layouts, picklist values, and business processes." },
+        { id: "completeness", label: "Completeness",        description: "Mentions both the record type configuration AND the assignment to relevant profiles or permission sets." },
+      ],
+    },
+    explanation: "Create a 'Partner Deal' Record Type on the Opportunity object, assign a dedicated sales process and page layout to it, and assign the record type to the relevant user profiles.",
+  },
+  {
+    domain: "sales-marketing", domainLabel: "Sales and Marketing Applications", domainWeight: "0.12",
+    itemType: "scenario",
+    question: "A marketing manager wants to automatically assign new Leads from a specific country to a regional team and send them a welcome email. Describe the Salesforce features you would use to automate this.",
+    rubric: {
+      criteria: [
+        { id: "accuracy",     label: "Technical Accuracy",  description: "Correctly names Lead Assignment Rules and an email automation tool (workflow rule, flow, or marketing tool)." },
+        { id: "reasoning",    label: "Clear Reasoning",     description: "Explains the trigger condition (country field) and how assignment + email are connected." },
+        { id: "completeness", label: "Completeness",        description: "Addresses both the assignment logic and the email notification as separate, configured steps." },
+      ],
+    },
+    explanation: "Use Lead Assignment Rules to route leads by Country to the regional queue, then use a Flow (or workflow rule) with an email alert action to send the welcome message when the assignment fires.",
+  },
+  {
+    domain: "service-support", domainLabel: "Service and Support Applications", domainWeight: "0.11",
+    itemType: "scenario",
+    question: "A support team wants cases escalated to a manager when they remain open for more than 8 business hours. Describe how you would implement this in Salesforce Service Cloud.",
+    rubric: {
+      criteria: [
+        { id: "accuracy",     label: "Technical Accuracy",  description: "Correctly identifies Escalation Rules (within Entitlements or standalone) as the primary feature." },
+        { id: "reasoning",    label: "Clear Reasoning",     description: "Explains how the time-based trigger and action (reassign or notify) are configured." },
+        { id: "completeness", label: "Completeness",        description: "Mentions that business hours must be defined and associated with the escalation rule for time to be business-hours-aware." },
+      ],
+    },
+    explanation: "Define your business hours in Setup, create a Case Escalation Rule entry that triggers after 8 business hours, and configure the escalation action to reassign the case or send a notification to the manager.",
+  },
+  {
+    domain: "productivity", domainLabel: "Productivity and Collaboration", domainWeight: "0.07",
+    itemType: "scenario",
+    question: "A team of 20 sales reps needs a shared calendar view of all customer meetings, plus the ability to log call notes directly from the Salesforce mobile app. Describe how you would configure this.",
+    rubric: {
+      criteria: [
+        { id: "accuracy",     label: "Technical Accuracy",  description: "Identifies Shared Activities, Salesforce Calendar, or List View calendars as the relevant feature." },
+        { id: "reasoning",    label: "Clear Reasoning",     description: "Explains how reps would access the shared view and log calls on mobile." },
+        { id: "completeness", label: "Completeness",        description: "Addresses both the shared calendar requirement and the mobile call logging requirement as distinct steps." },
+      ],
+    },
+    explanation: "Enable Shared Activities so reps can relate multiple contacts to one activity, configure a List View Calendar on Events filtered by owner, and confirm the Salesforce Mobile App is set up with the Log a Call quick action on the relevant layouts.",
+  },
+  {
+    domain: "data-analytics", domainLabel: "Data and Analytics Management", domainWeight: "0.13",
+    itemType: "scenario",
+    question: "A sales director wants a dashboard that shows current quarter pipeline by stage, updated in real time, visible only to managers. Describe how you would build and secure this in Salesforce.",
+    rubric: {
+      criteria: [
+        { id: "accuracy",     label: "Technical Accuracy",  description: "Correctly describes building an Opportunity report filtered by current quarter, grouped by stage, then adding it to a dashboard." },
+        { id: "reasoning",    label: "Clear Reasoning",     description: "Explains how dashboard folder sharing restricts visibility to managers only." },
+        { id: "completeness", label: "Completeness",        description: "Mentions both the underlying report configuration AND the folder-level sharing setting." },
+      ],
+    },
+    explanation: "Create a summary Opportunity report grouped by Stage, filtered to Current FQ. Add it as a component on a new dashboard. Store the dashboard in a folder shared only with the Manager role (or a permission-based group).",
+  },
+  {
+    domain: "workflow-automation", domainLabel: "Workflow and Process Automation", domainWeight: "0.15",
+    itemType: "scenario",
+    question: "When an Opportunity is marked Closed Won, the sales rep's manager should receive a Chatter notification and a related Task should be created for the rep to schedule an onboarding call within 5 days. Describe how you would automate this.",
+    rubric: {
+      criteria: [
+        { id: "accuracy",     label: "Technical Accuracy",  description: "Correctly identifies a Flow (or Process Builder + Workflow) as the automation tool and names the correct actions (Post to Chatter, Create Task)." },
+        { id: "reasoning",    label: "Clear Reasoning",     description: "Explains the trigger (Stage = Closed Won) and how the manager is identified as the Chatter target." },
+        { id: "completeness", label: "Completeness",        description: "Covers both actions (Chatter post AND Task creation) and specifies the 5-day due date on the Task." },
+      ],
+    },
+    explanation: "Build a Record-Triggered Flow on Opportunity that fires when Stage changes to Closed Won. Add a Post to Chatter action targeting the rep's manager and a Create Records action for a Task due 5 days from today assigned to the rep.",
+  },
+  {
+    domain: "security-access", domainLabel: "Security and Access Management", domainWeight: "0.06",
+    itemType: "scenario",
+    question: "A contractor needs temporary access to a specific set of Salesforce records for 30 days but must not see any other data or configuration. Describe how you would grant and then revoke this access safely.",
+    rubric: {
+      criteria: [
+        { id: "accuracy",     label: "Technical Accuracy",  description: "Identifies a restrictive Profile or Permission Set combined with sharing rules or manual sharing to grant scoped access." },
+        { id: "reasoning",    label: "Clear Reasoning",     description: "Explains why a narrowly scoped permission set is preferable to a broad profile for temporary, limited access." },
+        { id: "completeness", label: "Completeness",        description: "Describes both the grant step (profile/PS + sharing) AND the revocation step (deactivate user or remove permission set after 30 days)." },
+      ],
+    },
+    explanation: "Create a minimal Permission Set that grants only the object and field access needed. Assign it to the contractor's user. Use manual sharing or sharing rules to expose the specific records. After 30 days, remove the permission set assignment and deactivate the user if access is no longer needed.",
+  },
 ];
 
 // ── Seeder function ────────────────────────────────────────────────────────────
+//
+// Idempotent per item-type: each type is seeded independently so that running
+// the seeder against an existing MC-populated database still inserts scenario
+// items added in later releases.  Safe to call on every server start.
+
+const MC_ITEMS       = ITEMS.filter(i => !i.itemType || i.itemType === "mc");
+const SCENARIO_ITEMS = ITEMS.filter(i => i.itemType === "scenario");
 
 export async function seedAssessmentItems(): Promise<void> {
-  // Check if any items already exist
-  const [{ value: existing }] = await db
-    .select({ value: count() })
-    .from(assessmentItemsTable);
+  // ── MC items ────────────────────────────────────────────────────────────────
+  const [{ mcCount }] = await db
+    .select({ mcCount: count() })
+    .from(assessmentItemsTable)
+    .where(eq(assessmentItemsTable.itemType, "mc"));
 
-  if (Number(existing) > 0) {
-    console.log(`[seed] assessment_items already seeded (${existing} rows) — skipping`);
-    return;
+  if (Number(mcCount) === 0) {
+    await db.insert(assessmentItemsTable).values(MC_ITEMS);
+    console.log(`[seed] Inserted ${MC_ITEMS.length} MC assessment items`);
+  } else {
+    console.log(`[seed] MC items already present (${mcCount} rows) — skipping`);
   }
 
-  await db.insert(assessmentItemsTable).values(ITEMS);
-  console.log(`[seed] Inserted ${ITEMS.length} assessment items across 8 SF Admin domains`);
+  // ── Scenario items ──────────────────────────────────────────────────────────
+  const [{ scenarioCount }] = await db
+    .select({ scenarioCount: count() })
+    .from(assessmentItemsTable)
+    .where(eq(assessmentItemsTable.itemType, "scenario"));
+
+  if (Number(scenarioCount) === 0) {
+    await db.insert(assessmentItemsTable).values(SCENARIO_ITEMS);
+    console.log(`[seed] Inserted ${SCENARIO_ITEMS.length} scenario assessment items`);
+  } else {
+    console.log(`[seed] Scenario items already present (${scenarioCount} rows) — skipping`);
+  }
 }
 

@@ -1,4 +1,4 @@
-import { pgTable, serial, integer, text, numeric, boolean, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, serial, integer, text, numeric, boolean, timestamp, jsonb, index } from "drizzle-orm/pg-core";
 import { skillAssessmentSessionsTable } from "./skillAssessmentSessions";
 import { assessmentItemsTable }          from "./assessmentItems";
 
@@ -33,8 +33,16 @@ export const assessmentResponsesTable = pgTable(
     isCorrect:      boolean("is_correct"),
     keystrokeCount: integer("keystroke_count"),
     pasteCount:     integer("paste_count"),
-    focusTimeMs:    integer("focus_time_ms"),
-    respondedAt:    timestamp("responded_at").defaultNow().notNull(),
+    focusTimeMs:      integer("focus_time_ms"),
+    /** Length of the longest single paste event (chars) */
+    longestInsertion: integer("longest_insertion"),
+    /** Share of submitted text that was pasted (0.000–1.000) */
+    pasteRatio:       numeric("paste_ratio", { precision: 4, scale: 3 }),
+    /** Whether the learner granted screen capture for this item */
+    screenShared:     boolean("screen_shared"),
+    /** Penny per-criterion rubric scores — [{ id, pass, rationale }] */
+    rubricScores:     jsonb("rubric_scores"),
+    respondedAt:      timestamp("responded_at").defaultNow().notNull(),
   },
   (t) => [
     index("idx_ar_session").on(t.sessionId),

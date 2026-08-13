@@ -22,6 +22,7 @@ import { Lock, Clock, ChevronRight, CheckCircle } from "lucide-react";
 import { HomebaseShell } from "@/components/layout/HomebaseShell";
 import { DomainReadsSidebar } from "@/components/homebase/DomainReadsSidebar";
 import { MCItemRenderer, type ConfidenceLevel } from "@/components/homebase/MCItemRenderer";
+import { ScenarioItemRenderer, type CoachSignals, type ScenarioItem } from "@/components/homebase/ScenarioItemRenderer";
 import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
 import { useAppContext } from "@/context/AppContext";
 
@@ -91,7 +92,9 @@ interface AssessmentItem {
   domainLabel: string;
   itemType:    string;
   question:    string;
-  options?:    string[];
+  options?:    unknown[];
+  /** Raw JSONB from API — parsed by ScenarioItemRenderer */
+  rubric?:     unknown;
   weight:      number;
 }
 
@@ -278,7 +281,7 @@ function ItemShell({
   currentItem: AssessmentItem | null;
   domainReads: DomainState[];
   totalItems:  number;
-  onRespond:   (answer: string, confidence: ConfidenceLevel) => Promise<void>;
+  onRespond:   (answer: string, confidence: ConfidenceLevel, signals?: CoachSignals) => Promise<void>;
   submitting:  boolean;
 }) {
   const domain    = currentItem?.domain ?? "";
@@ -330,20 +333,30 @@ function ItemShell({
 
           {currentItem?.itemType === "mc" && (
             <MCItemRenderer
-              item={currentItem}
+              item={currentItem as unknown as import("@/components/homebase/MCItemRenderer").MCItem}
               onSubmit={onRespond}
               submitting={submitting}
             />
           )}
 
-          {currentItem && currentItem.itemType !== "mc" && (
+          {currentItem?.itemType === "scenario" && (
+            <ScenarioItemRenderer
+              item={currentItem as unknown as ScenarioItem}
+              onSubmit={onRespond}
+              submitting={submitting}
+            />
+          )}
+
+          {currentItem &&
+            currentItem.itemType !== "mc" &&
+            currentItem.itemType !== "scenario" && (
             <div
               className="rounded-xl border p-4 min-h-[160px] flex items-center justify-center"
               style={{ borderColor: "#E2E4E1", borderStyle: "dashed", color: "#9CA3AF" }}
             >
               <div className="text-center">
                 <p className="text-[13px] font-medium">{typeLabel} renderer</p>
-                <p className="text-[11px] mt-1">Coming in Tasks 4 &amp; 5</p>
+                <p className="text-[11px] mt-1">Coming in Task 5</p>
               </div>
             </div>
           )}
@@ -506,7 +519,11 @@ export default function LearnerAssessment() {
     }
   }
 
-  async function handleRespond(answer: string, confidence: ConfidenceLevel) {
+  async function handleRespond(
+    answer:     string,
+    confidence: ConfidenceLevel,
+    signals?:   CoachSignals,
+  ) {
     if (!session) return;
     setSubmitting(true);
     try {
@@ -517,7 +534,12 @@ export default function LearnerAssessment() {
         `/api/assessments/sessions/${session.id}/respond`,
         {
           method: "POST",
-          body:   JSON.stringify({ itemId: currentItem?.id, answer, confidence }),
+          body:   JSON.stringify({
+            itemId: currentItem?.id,
+            answer,
+            confidence,
+            ...(signals ?? {}),
+          }),
         },
       );
       if (data.domainReads) setDomainReads(data.domainReads);
