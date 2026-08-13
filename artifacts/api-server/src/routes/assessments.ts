@@ -31,7 +31,7 @@ import {
   assessmentResponsesTable,
 }                          from "@workspace/db/schema";
 import { eq, and, count, sql, not, inArray, desc } from "drizzle-orm";
-import { requireHomebaseAuth, requireStaff } from "../middlewares/requireAuth.js";
+import { requireHomebaseAuth, requireStaff, isSuperAdmin } from "../middlewares/requireAuth.js";
 import { logger }                            from "../lib/logger.js";
 import { seedAssessmentItems }               from "../scripts/seedAssessmentItems.js";
 import { scoreScenarioResponse }             from "../lib/assessmentScoring.js";
@@ -147,7 +147,14 @@ async function computeDomainReads(sessionId: number): Promise<DomainState[]> {
 // Start a new session or return the existing active one for this learner + instance.
 
 router.post("/assessments/sessions", requireHomebaseAuth, async (req, res) => {
-  const learnerEmail = res.locals["effectiveEmail"] as string;
+  const callerEmail  = req.session.googleEmail ?? "";
+  // Superadmins may pass a `testAs` email to record the session against a
+  // specific learner — useful for accuracy testing without impersonation.
+  const testAs = typeof req.body?.testAs === "string" ? req.body.testAs.trim() : null;
+  const learnerEmail: string =
+    testAs && isSuperAdmin(callerEmail)
+      ? testAs
+      : (res.locals["effectiveEmail"] as string);
   const { instance = "now" } = (req.body ?? {}) as { instance?: string };
 
   const validInstances = ["now", "week-6", "end"];

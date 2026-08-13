@@ -27,6 +27,8 @@ import BuildCheckItemRenderer from "@/components/homebase/BuildCheckItemRenderer
 import AssessmentDebrief from "@/components/homebase/AssessmentDebrief";
 import { useHomebaseAuth } from "@/hooks/useHomebaseAuth";
 import { useAppContext } from "@/context/AppContext";
+import { useTierFlags } from "@/hooks/useTierFlags";
+import { FlaskConical, UserCheck } from "lucide-react";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -416,7 +418,17 @@ export default function LearnerAssessment() {
   const { sessionId: routeSessionId } = useParams<{ sessionId?: string }>();
   const { email, displayName, audience, isLoading: authLoading } = useHomebaseAuth();
   const { setAssessmentActive } = useAppContext();
+  const { isSuperAdmin } = useTierFlags();
   const [, navigate] = useLocation();
+
+  // SuperAdmin testing mode — records session against a specific learner email
+  const [testAsEmail,      setTestAsEmail]      = useState("");
+  const [testAsConfirmed,  setTestAsConfirmed]  = useState(false);
+
+  // Effective email: superadmin uses their chosen testAs target; learners use their own
+  const effectiveEmail = isSuperAdmin && testAsConfirmed && testAsEmail
+    ? testAsEmail
+    : email;
 
   const [view,        setView]        = useState<View>("loading");
   const [session,     setSession]     = useState<Session | null>(null);
@@ -434,14 +446,21 @@ export default function LearnerAssessment() {
   // ── Session bootstrap ────────────────────────────────────────────
   useEffect(() => {
     if (authLoading) return;
-    if (audience !== "learner") return; // auth guard handled at route level
+    // Superadmins are allowed through without a homebase audience.
+    // They reach intake immediately; the testAs panel lets them pick a target email.
+    if (!isSuperAdmin && audience !== "learner") return;
+    // Superadmins must confirm a target email before resuming a deep-linked session
+    if (isSuperAdmin && !testAsConfirmed && routeSessionId) {
+      setView("intake"); // show testing panel first
+      return;
+    }
     if (routeSessionId) {
       void resumeSession(Number(routeSessionId));
     } else {
       setView("intake");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, audience, routeSessionId]);
+  }, [authLoading, audience, routeSessionId, isSuperAdmin, testAsConfirmed]);
 
   // ── Elapsed timer — only runs while in item view ─────────────────
   useEffect(() => {
@@ -488,14 +507,20 @@ export default function LearnerAssessment() {
   }
 
   async function beginSession() {
-    if (!email) return;
+    if (!effectiveEmail) return;
     setStarting(true);
     try {
+      const body: Record<string, string> = { learnerEmail: effectiveEmail, instance: "now" };
+      // For superadmin testing, pass testAs so the backend records the session
+      // against the target learner rather than the superadmin's own email.
+      if (isSuperAdmin && testAsConfirmed && testAsEmail) {
+        body["testAs"] = testAsEmail;
+      }
       const data = await apiJson<{ session: Session; domainReads: DomainState[]; resumed: boolean }>(
         "/api/assessments/sessions",
         {
           method: "POST",
-          body:   JSON.stringify({ learnerEmail: email, instance: "now" }),
+          body:   JSON.stringify(body),
         },
       );
       setSession(data.session);
@@ -582,6 +607,78 @@ export default function LearnerAssessment() {
   return (
     <HomebaseShell audience={audience ?? "learner"} displayName={displayName ?? ""}>
 
+      {/* ── SuperAdmin Testing Panel ─────────────────────────────────── */}
+      {isSuperAdmin && (
+        <div
+          className="mx-4 mt-4 rounded-xl border-2 p-4 space-y-3"
+          style={{ borderColor: "#7C3AED", background: "#F5F3FF" }}
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "#EDE9FE" }}>
+              <FlaskConical className="w-3.5 h-3.5" style={{ color: "#7C3AED" }} />
+            </div>
+            <div>
+              <p className="text-[13px] font-bold" style={{ color: "#5B21B6" }}>SuperAdmin Testing Mode</p>
+              <p className="text-[11px]" style={{ color: "#7C3AED" }}>
+                Session will be recorded in the local DB against the learner email below.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2 items-center">
+            <div className="relative flex-1">
+              <UserCheck className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none" style={{ color: "#7C3AED" }} />
+              <input
+                type="email"
+                value={testAsEmail}
+                onChange={e => { setTestAsEmail(e.target.value); setTestAsConfirmed(false); }}
+                placeholder="learner@transitiontrails.org"
+                className="w-full pl-8 pr-3 py-1.5 text-[13px] rounded-lg border outline-none focus:ring-2"
+                style={{
+                  borderColor: testAsConfirmed ? "#7C3AED" : "#D8B4FE",
+                  background: "white",
+                  color: "#1F2937",
+                  // @ts-expect-error custom focus ring via style
+                  "--tw-ring-color": "#7C3AED",
+                }}
+                disabled={testAsConfirmed && view !== "intake"}
+              />
+            </div>
+            {!testAsConfirmed ? (
+              <button
+                type="button"
+                onClick={() => { if (testAsEmail.includes("@")) setTestAsConfirmed(true); }}
+                disabled={!testAsEmail.includes("@")}
+                className="px-3 py-1.5 rounded-lg text-[13px] font-semibold text-white disabled:opacity-40 transition-opacity shrink-0"
+                style={{ background: "#7C3AED" }}
+              >
+                Confirm
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => { setTestAsConfirmed(false); setSession(null); setView("intake"); }}
+                className="px-3 py-1.5 rounded-lg text-[13px] font-medium shrink-0"
+                style={{ background: "#EDE9FE", color: "#5B21B6" }}
+              >
+                Change
+              </button>
+            )}
+          </div>
+
+          {testAsConfirmed && (
+            <p className="text-[11px] font-medium" style={{ color: "#5B21B6" }}>
+              ✓ Recording as <strong>{testAsEmail}</strong> — proceed through the assessment normally.
+            </p>
+          )}
+          {!testAsConfirmed && (
+            <p className="text-[11px]" style={{ color: "#9333EA" }}>
+              Enter a learner email and confirm to enable recording. Leave blank to use your own email ({email ?? "—"}).
+            </p>
+          )}
+        </div>
+      )}
+
       {error && (
         <div
           className="mx-4 mt-4 rounded-lg border p-3 text-[13px]"
@@ -601,7 +698,7 @@ export default function LearnerAssessment() {
         <IntakeView
           instance={session?.instance ?? "now"}
           onBegin={() => void beginSession()}
-          starting={starting}
+          starting={starting || (isSuperAdmin && !testAsConfirmed && !email)}
         />
       )}
 

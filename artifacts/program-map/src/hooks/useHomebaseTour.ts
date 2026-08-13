@@ -1,40 +1,56 @@
 /**
  * useHomebaseTour
  *
- * Tracks whether the current user has completed the Homebase walkthrough tour,
- * and provides controls to start or skip it.
+ * Tracks whether the current user has dismissed the Homebase walkthrough tour
+ * for the current release, and provides controls to start or skip it.
  *
- * State lives in a MODULE-LEVEL store so every mounted consumer shares the
- * same value — calling startTour() from Release Notes immediately affects
- * HomebaseShell without needing prop-drilling or a context provider.
+ * ── Release versioning ──────────────────────────────────────────────────────
+ * TOUR_RELEASE is the single value to bump when new tour content ships.
+ * Dismissal is stored as the release string that was active when the user
+ * dismissed, so changing TOUR_RELEASE automatically re-triggers the tour for
+ * everyone — even users who previously skipped or completed it.
  *
- * Persistence:
- *   - Tour-complete flag: /api/user/prefs (server-side, cross-device)
- *   - Seen step keys:     localStorage (lightweight, per-browser)
- *     Key: "homebaseTourSeenSteps" → JSON array of step title strings
+ * ── Persistence (two layers) ───────────────────────────────────────────────
+ * 1. localStorage (fast-path, per-browser):
+ *    Checked synchronously at module init — prevents the tour from flashing
+ *    before the server responds, and ensures dismiss is honoured even when the
+ *    server-side PATCH fails (e.g. DB not yet migrated in dev).
+ *    Key: "homebaseTourRelease" → the TOUR_RELEASE string the user last dismissed.
  *
- * Skipping logic:
- *   When startTour() is called the current seen-step set is snapshotted into
- *   _seenStepKeysAtOpen. HomebaseTour uses that snapshot (not the live set)
- *   for filtering, so the step list stays stable for the whole session.
- *   markStepSeen() persists to localStorage WITHOUT notifying subscribers,
- *   ensuring no mid-tour re-renders or index resets.
+ * 2. /api/user/prefs (server-side, cross-device):
+ *    PATCH-ed after every dismiss/complete.  Key: "homebaseTourLastRelease".
+ *    On load, if the stored value matches TOUR_RELEASE the tour is suppressed
+ *    cross-device (works once user_preferences table exists in the DB).
  *
- *   showAllSteps() clears the seen set and snapshots an empty set, forcing
- *   every step to be shown on the next open.
+ * ── Skip = dismissed ───────────────────────────────────────────────────────
+ * Clicking X, clicking the scrim, or finishing the last step all call
+ * completeTour().  All three are treated as "dismissed for this release" and
+ * suppress auto-start until TOUR_RELEASE next changes.
+ *
+ * ── Seen-step tracking ─────────────────────────────────────────────────────
+ * Individual step titles are stored in localStorage under "homebaseTourSeenSteps"
+ * so shared steps aren't repeated within a release even across multiple openings.
+ * showAllSteps() snapshots an empty set, forcing every step to render once.
  */
 
 import { useEffect, useState, useCallback } from "react";
 
-const PREF_KEY          = "hasSeenHomebaseTour";
+// ── Release version ───────────────────────────────────────────────────────────
+// Bump this string whenever a new release ships tour content that all users
+// should see again.  Format: "YYYY-MM" or any string that changes per release.
+export const TOUR_RELEASE = "2026-08";
+
+// ── Storage keys ──────────────────────────────────────────────────────────────
+const LS_RELEASE_KEY    = "homebaseTourRelease";   // localStorage: last-dismissed release
+const LS_SEEN_STEPS_KEY = "homebaseTourSeenSteps"; // localStorage: seen step titles
 const PREFS_URL         = "/api/user/prefs";
-const SEEN_STEPS_LS_KEY = "homebaseTourSeenSteps";
+const PREF_RELEASE_KEY  = "homebaseTourLastRelease"; // server prefs key
 
 // ── Seen-step helpers (localStorage) ─────────────────────────────────────────
 
 function _loadSeenSteps(): Set<string> {
   try {
-    const raw = localStorage.getItem(SEEN_STEPS_LS_KEY);
+    const raw = localStorage.getItem(LS_SEEN_STEPS_KEY);
     if (raw) return new Set(JSON.parse(raw) as string[]);
   } catch { /* ignore parse / quota errors */ }
   return new Set();
@@ -42,15 +58,37 @@ function _loadSeenSteps(): Set<string> {
 
 function _persistSeenSteps(keys: Set<string>): void {
   try {
-    localStorage.setItem(SEEN_STEPS_LS_KEY, JSON.stringify([...keys]));
+    localStorage.setItem(LS_SEEN_STEPS_KEY, JSON.stringify([...keys]));
+  } catch { /* non-critical */ }
+}
+
+// ── Release dismiss helpers (localStorage) ────────────────────────────────────
+
+/** Returns true if the user has already dismissed the current release's tour. */
+function _lsIsDismissed(): boolean {
+  try {
+    return localStorage.getItem(LS_RELEASE_KEY) === TOUR_RELEASE;
+  } catch {
+    return false;
+  }
+}
+
+function _lsPersistDismiss(): void {
+  try {
+    localStorage.setItem(LS_RELEASE_KEY, TOUR_RELEASE);
   } catch { /* non-critical */ }
 }
 
 // ── Module-level shared store ─────────────────────────────────────────────────
 
-let _completed:    boolean       = false; // true once pref is confirmed or user finishes
-let _isReady:      boolean       = false; // true once the prefs fetch resolves
-let _tourActive:   boolean       = false; // true while tour overlay is open
+/**
+ * True if the user has dismissed the tour for the current TOUR_RELEASE.
+ * Pre-populated synchronously from localStorage so there's no flash before the
+ * server prefs fetch resolves.
+ */
+let _dismissed:    boolean       = _lsIsDismissed();
+let _isReady:      boolean       = _dismissed; // ready immediately if already dismissed
+let _tourActive:   boolean       = false;
 let _fetchPromise: Promise<void> | null = null;
 
 /** Full live set of seen step titles — updated by markStepSeen, persisted to localStorage. */
@@ -67,7 +105,7 @@ const _subscribers = new Set<() => void>();
 
 function _notify() { _subscribers.forEach(fn => fn()); }
 
-function _setCompleted(v: boolean)  { _completed  = v; _notify(); }
+function _setDismissed(v: boolean) { _dismissed  = v; _notify(); }
 function _setTourActive(v: boolean) { _tourActive = v; _notify(); }
 function _markReady()               { _isReady    = true; _notify(); }
 
@@ -77,7 +115,11 @@ function _ensureLoaded(): void {
     .then(r => (r.ok ? r.json() : { prefs: {} }))
     .then((data: unknown) => {
       const prefs = (data as { prefs?: Record<string, unknown> }).prefs ?? {};
-      _setCompleted(prefs[PREF_KEY] === true);
+      // Dismissed if the stored release string matches the current release.
+      if (prefs[PREF_RELEASE_KEY] === TOUR_RELEASE) {
+        _setDismissed(true);
+        _lsPersistDismiss(); // keep LS in sync
+      }
       _markReady();
     })
     .catch(() => { _markReady(); });
@@ -99,11 +141,11 @@ function _markStepSeen(title: string): void {
 // ── Public hook ───────────────────────────────────────────────────────────────
 
 export interface HomebaseTourResult {
-  /** True once the prefs fetch has resolved. */
+  /** True once the prefs fetch has resolved (or LS fast-path resolved it). */
   isReady:              boolean;
   /** True when the tour overlay should be visible. */
   tourActive:           boolean;
-  /** True when the user hasn't seen the tour yet (auto-start signal). */
+  /** True when the user hasn't dismissed the tour for the current release. */
   shouldAutoStart:      boolean;
   /**
    * Snapshot of the seen-step set taken when the tour last opened.
@@ -123,7 +165,11 @@ export interface HomebaseTourResult {
   showAllSteps:         () => void;
   /** Persist a step as seen (silent — no re-render). */
   markStepSeen:         (title: string) => void;
-  /** Mark the tour as complete and persist the pref. */
+  /**
+   * Dismiss the tour for the current release.
+   * Called both when the user skips (X / scrim) and when they reach the last
+   * step.  Either action suppresses auto-start until TOUR_RELEASE next changes.
+   */
   completeTour:         () => void;
 }
 
@@ -157,20 +203,27 @@ export function useHomebaseTour(): HomebaseTourResult {
 
   const completeTour = useCallback(() => {
     _setTourActive(false);
-    if (_completed) return;
-    _setCompleted(true);
+
+    // Persist dismiss to localStorage immediately — this is the reliable
+    // fast-path that works even when the server PATCH fails.
+    _lsPersistDismiss();
+
+    if (_dismissed) return; // already recorded for this release
+    _setDismissed(true);
+
+    // Best-effort server persist for cross-device suppression.
     fetch(PREFS_URL, {
       method:      "PATCH",
       credentials: "include",
       headers:     { "Content-Type": "application/json" },
-      body:        JSON.stringify({ prefs: { [PREF_KEY]: true } }),
-    }).catch(() => { /* non-critical — tour just re-fires next session */ });
+      body:        JSON.stringify({ prefs: { [PREF_RELEASE_KEY]: TOUR_RELEASE } }),
+    }).catch(() => { /* non-critical — LS fallback already saved dismiss */ });
   }, []);
 
   return {
     isReady:            _isReady,
     tourActive:         _tourActive,
-    shouldAutoStart:    _isReady && !_completed && !_tourActive,
+    shouldAutoStart:    _isReady && !_dismissed && !_tourActive,
     seenStepKeysAtOpen: _seenStepKeysAtOpen,
     startTour,
     showAllSteps,

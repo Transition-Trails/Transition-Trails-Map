@@ -263,6 +263,15 @@ export const requireHomebaseAuth: RequestHandler = (req, res, next) => {
     return;
   }
 
+  // Superadmins bypass the audience check — they can access assessment routes
+  // directly for testing purposes (no impersonation required).
+  // effectiveEmail is their own googleEmail when not impersonating, which is
+  // what gets recorded as learnerEmail on assessment sessions.
+  if (isSuperAdmin(req.session.googleEmail)) {
+    next();
+    return;
+  }
+
   // Authorization: use effective audience so impersonation works
   const audience = res.locals['effectiveAudience'] as string | null | undefined;
   const HOMEBASE_AUDIENCES = ['learner', 'coach', 'volunteer'] as const;
