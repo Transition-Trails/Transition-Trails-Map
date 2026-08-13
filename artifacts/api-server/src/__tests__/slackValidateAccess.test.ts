@@ -11,6 +11,8 @@
  *  3. POST /api/slack/validate/test-message — unauthenticated caller receives 401
  *  4. POST /api/slack/validate/test-message — everyday-tier staff user receives 400
  *     (no_token or no_channel, not 401/403)
+ *  5. POST /api/slack/validate/test-message — happy path: correct payload sent to Slack
+ *  6. POST /api/slack/validate/test-message — channel routing by target value
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -154,30 +156,59 @@ describe('POST /api/slack/validate/test-message — authenticated staff (non-adm
   });
 });
 
-// ── 5. Target → channel ID routing ───────────────────────────────────────────
+// ── 5. POST /slack/validate/test-message — happy path with bot token ───────────
+//
+// When SLACK_BOT_TOKEN and SLACK_PENNY_CHANNEL_ID are both present, the handler
+// should call Slack's chat.postMessage with the correct channel and a non-empty
+// text body, then return 200 { ok: true, messageTs }.
+
+describe('POST /api/slack/validate/test-message — happy path', () => {
+  it('calls chat.postMessage with the correct channel and text, returns 200 ok:true with messageTs', async () => {
+    const agent = await signInWithGroups([GROUPS.everyday]);
+
+    process.env['SLACK_BOT_TOKEN']        = 'xoxb-test-token';
+    process.env['SLACK_PENNY_CHANNEL_ID'] = 'C12345';
+
+    let capturedBody: Record<string, unknown> | undefined;
+
+    global.fetch = vi.fn().mockImplementation(async (url: unknown, init?: RequestInit) => {
+      if (typeof url === 'string' && url.includes('chat.postMessage')) {
+        capturedBody = JSON.parse(init?.body as string) as Record<string, unknown>;
+        return {
+          ok:   true,
+          json: () => Promise.resolve({ ok: true, ts: '123', channel: 'C12345' }),
+        };
+      }
+      return { ok: true, json: () => Promise.resolve({}) };
+    });
+
+    const res = await agent
+      .post('/api/slack/validate/test-message')
+      .send({ target: 'penny' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+    expect(res.body.messageTs).toBe('123');
+
+    // The Slack API must have been called with the right payload
+    expect(capturedBody).toBeDefined();
+    expect(capturedBody!['channel']).toBe('C12345');
+    expect(typeof capturedBody!['text']).toBe('string');
+    expect((capturedBody!['text'] as string).length).toBeGreaterThan(0);
+  });
+});
+
+// ── 6. Target → channel ID routing ───────────────────────────────────────────
 //
 // Confirms that each target value resolves to the correct env var and sends
 // that channel ID to chat.postMessage. Uses a real bot token so the no_token
 // guard does not fire, then mocks fetch to capture the payload.
 
 describe('POST /api/slack/validate/test-message — channel routing by target', () => {
-  const BOT_TOKEN        = 'xoxb-test-token';
-  const PENNY_CHANNEL_ID = 'C111PENNY';
-  const ADMIN_CHANNEL_ID = 'C222ADMIN';
+  const BOT_TOKEN          = 'xoxb-test-token';
+  const PENNY_CHANNEL_ID   = 'C111PENNY';
+  const ADMIN_CHANNEL_ID   = 'C222ADMIN';
   const DEFAULT_CHANNEL_ID = 'C333DEFAULT';
-
-  /** Returns the channel value that was sent to chat.postMessage, or null. */
-  function capturedChannel(fetchMock: ReturnType<typeof vi.fn>): string | null {
-    for (const [, init] of fetchMock.mock.calls as [string, RequestInit][]) {
-      const url = fetchMock.mock.calls.find(
-        ([u]: [string]) => u === 'https://slack.com/api/chat.postMessage'
-      )?.[0];
-      if (!url) continue;
-      const body = JSON.parse(init?.body as string ?? '{}') as { channel?: string };
-      return body.channel ?? null;
-    }
-    return null;
-  }
 
   beforeEach(() => {
     process.env['SLACK_BOT_TOKEN']        = BOT_TOKEN;
@@ -187,13 +218,11 @@ describe('POST /api/slack/validate/test-message — channel routing by target', 
   });
 
   it("routes target='penny' to SLACK_PENNY_CHANNEL_ID", async () => {
-    // Sign in first so the Google auth fetch mock is no longer in play.
     const agent = await signInWithGroups([GROUPS.everyday]);
 
-    // Now replace global.fetch with the Slack mock for the actual API call.
     const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ ok: true, ts: '111.222', channel: PENNY_CHANNEL_ID }),
+      ok:   true,
+      json: () => Promise.resolve({ ok: true, ts: '111.001', channel: PENNY_CHANNEL_ID }),
     });
     global.fetch = fetchMock as unknown as typeof fetch;
 
@@ -216,8 +245,8 @@ describe('POST /api/slack/validate/test-message — channel routing by target', 
     const agent = await signInWithGroups([GROUPS.everyday]);
 
     const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ ok: true, ts: '111.333', channel: ADMIN_CHANNEL_ID }),
+      ok:   true,
+      json: () => Promise.resolve({ ok: true, ts: '111.002', channel: ADMIN_CHANNEL_ID }),
     });
     global.fetch = fetchMock as unknown as typeof fetch;
 
@@ -240,8 +269,8 @@ describe('POST /api/slack/validate/test-message — channel routing by target', 
     const agent = await signInWithGroups([GROUPS.everyday]);
 
     const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ ok: true, ts: '111.444', channel: DEFAULT_CHANNEL_ID }),
+      ok:   true,
+      json: () => Promise.resolve({ ok: true, ts: '111.003', channel: DEFAULT_CHANNEL_ID }),
     });
     global.fetch = fetchMock as unknown as typeof fetch;
 
