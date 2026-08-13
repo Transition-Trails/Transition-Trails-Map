@@ -3,10 +3,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 import {
   Search, FileText, Loader2, AlertCircle,
   RefreshCw, Calendar, Globe, Eye, EyeOff, BookOpen, CheckCircle, Clock,
-  Pencil, ExternalLink, X, Download,
+  Pencil, ExternalLink, X, Download, CloudDownload, ArrowRight,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -372,12 +373,45 @@ function ArticlePopover({
 
 // ── Main page ──────────────────────────────────────────────────────────────────
 
+interface SyncResult {
+  total: number; created: number; updated: number; skipped: number; errors: number; syncedAt: string;
+}
+
 export default function SfKnowledgeArticles() {
+  const { toast } = useToast();
   const [searchInput, setSearchInput]   = useState('');
   const [search, setSearch]             = useState('');
   const [statusFilter, setStatusFilter] = useState<'online' | 'draft' | 'all'>('online');
   const [typeFilter, setTypeFilter]     = useState('');
   const [openArticleId, setOpenArticleId] = useState<string | null>(null);
+  const [lastSync, setLastSync]         = useState<SyncResult | null>(null);
+
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      const r = await fetch('/api/knowledge/sf-articles/sync', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!r.ok) {
+        const body = await r.json().catch(() => ({})) as { error?: string };
+        throw new Error(body.error ?? `HTTP ${r.status}`);
+      }
+      return r.json() as Promise<SyncResult>;
+    },
+    onSuccess: (data) => {
+      setLastSync(data);
+      const parts: string[] = [];
+      if (data.created)  parts.push(`${data.created} imported`);
+      if (data.updated)  parts.push(`${data.updated} refreshed`);
+      if (data.skipped)  parts.push(`${data.skipped} preserved`);
+      if (data.errors)   parts.push(`${data.errors} errors`);
+      toast({ title: `Sync complete — ${data.total} articles`, description: parts.join(' · ') || 'No changes' });
+    },
+    onError: (err: Error) => {
+      toast({ variant: 'destructive', title: 'Sync failed', description: err.message });
+    },
+  });
 
   // Debounce search
   useEffect(() => {
@@ -473,13 +507,24 @@ export default function SfKnowledgeArticles() {
           <span className="text-[12px] text-muted-foreground">{totalCount} article{totalCount !== 1 ? 's' : ''}</span>
         )}
         <button
+          onClick={() => syncMutation.mutate()}
+          disabled={syncMutation.isPending}
+          title="Import all articles into Trail OS Article Builder for editing and publishing"
+          className="h-8 px-3 flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/5 text-[12px] font-medium text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+        >
+          {syncMutation.isPending
+            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            : <CloudDownload className="w-3.5 h-3.5" />}
+          {syncMutation.isPending ? 'Syncing…' : 'Sync to Trail OS'}
+        </button>
+        <button
           onClick={downloadCsv}
           disabled={articles.length === 0}
           title="Download CSV"
           className="h-8 px-3 flex items-center gap-1.5 rounded-md border text-[12px] text-muted-foreground hover:bg-muted transition-colors disabled:opacity-40"
         >
           <Download className="w-3.5 h-3.5" />
-          Download CSV
+          CSV
         </button>
         <button
           onClick={() => void refetch()}
@@ -490,6 +535,29 @@ export default function SfKnowledgeArticles() {
           <RefreshCw className={`w-3.5 h-3.5 text-muted-foreground ${isFetching ? 'animate-spin' : ''}`} />
         </button>
       </div>
+
+      {/* ── Sync result banner ── */}
+      {lastSync && (
+        <div className="shrink-0 px-5 py-2.5 border-b bg-emerald-50 border-emerald-200 flex items-center gap-3 flex-wrap">
+          <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <span className="text-[12px] text-emerald-800 font-medium">
+            Sync complete — {lastSync.total} articles processed:
+            {lastSync.created > 0  && <> <strong>{lastSync.created}</strong> imported</>}
+            {lastSync.updated > 0  && <>,&nbsp;<strong>{lastSync.updated}</strong> refreshed</>}
+            {lastSync.skipped > 0  && <>,&nbsp;<strong>{lastSync.skipped}</strong> in review (body preserved)</>}
+            {lastSync.errors  > 0  && <>,&nbsp;<strong className="text-rose-700">{lastSync.errors}</strong> errors</>}
+          </span>
+          <a
+            href="/knowledge/builder"
+            className="ml-auto shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-700 hover:underline"
+          >
+            Open Article Builder <ArrowRight className="w-3.5 h-3.5" />
+          </a>
+          <button onClick={() => setLastSync(null)} className="p-0.5 text-emerald-600 hover:text-emerald-800">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* ── Table ── */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden">

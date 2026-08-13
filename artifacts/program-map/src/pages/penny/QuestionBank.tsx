@@ -572,9 +572,26 @@ export default function QuestionBank() {
   const [search,        setSearch]        = useState("");
   const [domainFilter,  setDomainFilter]  = useState<string>("all");
   const [typeFilter,    setTypeFilter]    = useState<string>("all");
-  const [drawerOpen,    setDrawerOpen]    = useState(false);
-  const [editing,       setEditing]       = useState<AssessmentItem | null>(null);
-  const [deleting,      setDeleting]      = useState<AssessmentItem | null>(null);
+  const [drawerOpen,       setDrawerOpen]       = useState(false);
+  const [editing,          setEditing]          = useState<AssessmentItem | null>(null);
+  const [deleting,         setDeleting]         = useState<AssessmentItem | null>(null);
+  const [collapsedDomains, setCollapsedDomains] = useState<Set<string>>(new Set());
+
+  function toggleDomain(domain: string) {
+    setCollapsedDomains(prev => {
+      const next = new Set(prev);
+      if (next.has(domain)) next.delete(domain); else next.add(domain);
+      return next;
+    });
+  }
+
+  function collapseAll() {
+    setCollapsedDomains(new Set([...grouped.keys()]));
+  }
+
+  function expandAll() {
+    setCollapsedDomains(new Set());
+  }
 
   const { data, isLoading, error } = useQuery<{ items: AssessmentItem[] }>({
     queryKey: ["/api/assessments/items"],
@@ -705,6 +722,27 @@ export default function QuestionBank() {
         {filtered.length !== items.length && (
           <span className="text-[11px] text-muted-foreground">{filtered.length} shown</span>
         )}
+
+        {/* Collapse / expand all */}
+        {grouped.size > 1 && (
+          <div className="flex gap-1 border-l pl-3 ml-1">
+            <button
+              type="button"
+              onClick={expandAll}
+              className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Expand all
+            </button>
+            <span className="text-muted-foreground/40 text-[11px]">·</span>
+            <button
+              type="button"
+              onClick={collapseAll}
+              className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Collapse all
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -730,48 +768,67 @@ export default function QuestionBank() {
           </div>
         ) : (
           <div className="p-6 space-y-8">
-            {[...grouped.entries()].map(([domain, group]) => (
-              <div key={domain}>
-                {/* Domain header */}
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-[14px] font-semibold text-foreground">{group.label}</h2>
-                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted border text-muted-foreground">
-                        {(Number(group.weight) * 100).toFixed(1)}%
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">
-                        {group.items.length} question{group.items.length !== 1 ? "s" : ""}
-                      </span>
+            {[...grouped.entries()].map(([domain, group]) => {
+              const isCollapsed = collapsedDomains.has(domain);
+              return (
+                <div key={domain}>
+                  {/* Domain header — clickable to collapse/expand */}
+                  <button
+                    type="button"
+                    onClick={() => toggleDomain(domain)}
+                    className="w-full flex items-center gap-3 mb-3 group text-left"
+                  >
+                    <div className="shrink-0 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors">
+                      {isCollapsed
+                        ? <ChevronRight className="w-4 h-4" />
+                        : <ChevronDown  className="w-4 h-4" />}
                     </div>
-                    <p className="text-[10px] text-muted-foreground/60 font-mono">{domain}</p>
-                  </div>
-                </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors">
+                          {group.label}
+                        </h2>
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-muted border text-muted-foreground">
+                          {(Number(group.weight) * 100).toFixed(1)}%
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {group.items.length} question{group.items.length !== 1 ? "s" : ""}
+                          {isCollapsed && <span className="ml-1 text-muted-foreground/50">· collapsed</span>}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground/60 font-mono">{domain}</p>
+                    </div>
+                  </button>
 
-                {/* Delete confirm */}
-                {deleting && deleting.domain === domain && (
-                  <div className="mb-2">
-                    <DeleteConfirm
-                      item={deleting}
-                      onCancel={() => setDeleting(null)}
-                      onDeleted={handleDeleted}
-                    />
-                  </div>
-                )}
+                  {!isCollapsed && (
+                    <>
+                      {/* Delete confirm */}
+                      {deleting && deleting.domain === domain && (
+                        <div className="mb-2">
+                          <DeleteConfirm
+                            item={deleting}
+                            onCancel={() => setDeleting(null)}
+                            onDeleted={handleDeleted}
+                          />
+                        </div>
+                      )}
 
-                {/* Items */}
-                <div className="space-y-2">
-                  {group.items.map(item => (
-                    <ItemRow
-                      key={item.id}
-                      item={item}
-                      onEdit={openEdit}
-                      onDelete={i => setDeleting(deleting?.id === i.id ? null : i)}
-                    />
-                  ))}
+                      {/* Items */}
+                      <div className="space-y-2">
+                        {group.items.map(item => (
+                          <ItemRow
+                            key={item.id}
+                            item={item}
+                            onEdit={openEdit}
+                            onDelete={i => setDeleting(deleting?.id === i.id ? null : i)}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </ScrollArea>

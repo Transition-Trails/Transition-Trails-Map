@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
 import { knowledgeDocumentsTable, knowledgeSourcesTable, articleReviewsTable, knowledgeArticlesTable } from "@workspace/db/schema";
-import { eq, desc, asc } from "drizzle-orm";
+import { eq, desc, asc, inArray } from "drizzle-orm";
 import {
   fetchSfLiveMetrics,
   buildIntegrationStatus,
@@ -1528,6 +1528,186 @@ router.get("/knowledge/sf-article-reviews", async (req, res): Promise<void> => {
   } catch (err) {
     req.log.error(err, "Failed to fetch article reviews");
     res.status(500).json({ error: "Failed to fetch article reviews" });
+  }
+});
+
+// POST /api/knowledge/sf-articles/sync
+// ─────────────────────────────────────────────────────────────────────────────
+// Pulls all Salesforce Knowledge articles (Online + Draft) into the local
+// knowledge_articles table so staff can edit and manage them through the
+// Trail OS publish workflow.
+//
+// Deduplication:  KnowledgeArticleId is used as the local record id.
+//                 Online version is preferred over Draft for the same article.
+// Conflict rules: Articles in 'pending-review' or 'approved' state have their
+//                 body and status preserved — only SF metadata is refreshed.
+// Returns:        { total, created, updated, skipped, errors, syncedAt }
+//
+router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promise<void> => {
+  const log = req.log;
+  try {
+    const client = new ConnectorSalesforceClient();
+    const fields  = await getKavFieldSet(client, { warn: (m) => log.warn(m) });
+
+    // ── 1. Fetch all KAV records ─────────────────────────────────────────────
+    const soql = `SELECT ${fields.selectList}
+                  FROM KnowledgeArticleVersion
+                  WHERE PublishStatus IN ('online', 'draft')
+                  ORDER BY PublishStatus ASC, LastModifiedDate DESC
+                  LIMIT 200`;
+
+    type KavRow = {
+      Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
+      ArticleType?: string; PublishStatus: string; VersionNumber?: number;
+      CreatedDate: string; LastModifiedDate: string;
+      IsVisibleInApp?: boolean; Language?: string; UrlName?: string;
+    };
+    const result = await client.query<KavRow>(soql);
+    const kavRecords = result.records;
+
+    if (!kavRecords.length) {
+      res.json({ total: 0, created: 0, updated: 0, skipped: 0, errors: 0 });
+      return;
+    }
+
+    // Deduplicate by KnowledgeArticleId — prefer Online over Draft.
+    const deduped = new Map<string, KavRow>();
+    for (const r of kavRecords) {
+      const existing = deduped.get(r.KnowledgeArticleId);
+      if (!existing || r.PublishStatus.toLowerCase() === "online") {
+        deduped.set(r.KnowledgeArticleId, r);
+      }
+    }
+
+    // ── 2. Batch-fetch body content ──────────────────────────────────────────
+    const bodyByKaId = new Map<string, string>();
+    const bodyInfo = await getKavAllBodyFields(client, { warn: (m) => log.warn(m), info: (m) => log.info(m) });
+
+    if (bodyInfo && bodyInfo.fields.length > 0) {
+      try {
+        const uniqueKaIds = [...deduped.keys()];
+        const idList    = uniqueKaIds.map(id => `'${id}'`).join(", ");
+        const fieldList = bodyInfo.fields.map(f => f.name).join(", ");
+
+        const bodySoql = `SELECT KnowledgeArticleId, PublishStatus, ${fieldList}
+                          FROM ${bodyInfo.objectName}
+                          WHERE KnowledgeArticleId IN (${idList})
+                          AND PublishStatus IN ('online', 'draft')
+                          ORDER BY PublishStatus ASC
+                          LIMIT 400`;
+
+        const bodyResult = await client.query<{ KnowledgeArticleId: string; PublishStatus: string; [k: string]: string | undefined }>(bodySoql);
+
+        let orgBaseUrl: string | null = null;
+        try { orgBaseUrl = await client.getOrgBaseUrl(); } catch { /* ok */ }
+
+        // Process in reverse so Online overwrites Draft for the same article.
+        for (const row of [...bodyResult.records].reverse()) {
+          const kaId = row["KnowledgeArticleId"] ?? "";
+          const parts: string[] = [];
+          for (const field of bodyInfo.fields) {
+            const raw = row[field.name];
+            if (!raw) continue;
+            const html = orgBaseUrl && raw.includes("<img")
+              ? rewriteSfImageUrls(raw, orgBaseUrl)
+              : raw;
+            parts.push(html);
+          }
+          if (parts.length > 0) bodyByKaId.set(kaId, parts.join("\n"));
+        }
+      } catch (bodyErr) {
+        log.warn({ err: String(bodyErr) }, "Sync: body batch-fetch failed — bodies will be empty");
+      }
+    }
+
+    // ── 3. Check which articles already exist locally ─────────────────────────
+    const sfArticleIds = [...deduped.keys()];
+    const existingRows = await db
+      .select({ id: knowledgeArticlesTable.id, status: knowledgeArticlesTable.status })
+      .from(knowledgeArticlesTable)
+      .where(inArray(knowledgeArticlesTable.id, sfArticleIds));
+
+    const existingStatus = new Map(existingRows.map(r => [r.id, r.status]));
+
+    // ── 4. Upsert ─────────────────────────────────────────────────────────────
+    let created = 0, updated = 0, skipped = 0, errors = 0;
+    const now = new Date();
+
+    function localSlug(title: string): string {
+      return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
+    }
+
+    for (const [kaId, r] of deduped) {
+      try {
+        const body      = bodyByKaId.get(kaId) ?? "";
+        const localSt   = existingStatus.get(kaId);           // undefined = new
+        const sfStatus  = r.PublishStatus.toLowerCase() === "online" ? "published" : "draft";
+
+        if (localSt === undefined) {
+          // New article — insert
+          await db.insert(knowledgeArticlesTable).values({
+            id:              kaId,
+            title:           r.Title,
+            summary:         r.Summary ?? "",
+            body,
+            category:        "",
+            urlName:         r.UrlName ?? localSlug(r.Title),
+            articleType:     r.ArticleType ?? "",
+            status:          sfStatus,
+            sfArticleId:     r.KnowledgeArticleId,
+            sfVersionId:     r.Id,
+            sfPublishStatus: r.PublishStatus,
+            publishedAt:     sfStatus === "published" ? now : null,
+            createdAt:       new Date(r.CreatedDate),
+            updatedAt:       new Date(r.LastModifiedDate),
+          });
+          created++;
+
+        } else if (localSt === "pending-review" || localSt === "approved") {
+          // In active review — refresh metadata only, leave body + status alone
+          await db.update(knowledgeArticlesTable)
+            .set({
+              title:           r.Title,
+              summary:         r.Summary ?? "",
+              sfVersionId:     r.Id,
+              sfPublishStatus: r.PublishStatus,
+              updatedAt:       now,
+            })
+            .where(eq(knowledgeArticlesTable.id, kaId));
+          skipped++;
+
+        } else {
+          // Exists but not in active review — full refresh
+          await db.update(knowledgeArticlesTable)
+            .set({
+              title:           r.Title,
+              summary:         r.Summary ?? "",
+              body,
+              urlName:         r.UrlName ?? localSlug(r.Title),
+              articleType:     r.ArticleType ?? "",
+              status:          sfStatus,
+              sfArticleId:     r.KnowledgeArticleId,
+              sfVersionId:     r.Id,
+              sfPublishStatus: r.PublishStatus,
+              publishedAt:     sfStatus === "published" ? now : null,
+              updatedAt:       now,
+            })
+            .where(eq(knowledgeArticlesTable.id, kaId));
+          updated++;
+        }
+      } catch (itemErr) {
+        log.warn({ kaId, err: String(itemErr) }, "Sync: failed to upsert article");
+        errors++;
+      }
+    }
+
+    log.info({ total: deduped.size, created, updated, skipped, errors }, "SF articles sync complete");
+    res.json({ total: deduped.size, created, updated, skipped, errors, syncedAt: now.toISOString() });
+
+  } catch (err) {
+    log.error(err, "SF articles sync failed");
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    res.status(502).json({ error: `Sync failed: ${msg}` });
   }
 });
 
