@@ -296,12 +296,13 @@ type VoiceChoice = null | 'penny' | 'learner';
 
 const LEGACY_KEY = (videoId: string) => `narrator-voice-${videoId}`;
 
-const LEGACY_KEY = (videoId: string) => `narrator-voice-${videoId}`;
 function NarrationSelector({ voice, setVoice }: NarrationSelectorProps) {
   const videoId = BUILD_WITH_ME_VIDEO.id;
 
-  // `undefined` = still loading; null/penny/learner = settled
-  const [voice, setVoice] = useState<VoiceChoice | undefined>(undefined);
+  // voice / setVoice are lifted to BuildWithMeTab parent.
+  // isLoading blocks interaction while the initial API read (+ optional migration) settles.
+  // saving tracks in-flight explicit PATCH requests.
+  const [isLoading, setIsLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
 
@@ -357,6 +358,11 @@ function NarrationSelector({ voice, setVoice }: NarrationSelectorProps) {
       } catch {
         // Offline / API unavailable — show no selection; legacy key untouched
         if (!cancelled) setVoice(null);
+      } finally {
+        // Always unblock interaction once the read + optional migration settles,
+        // whether it succeeded, failed, or was short-circuited by migration.
+        // The `cancelled` guard prevents a stale setState on effect cleanup.
+        if (!cancelled) setIsLoading(false);
       }
     })();
     return () => { cancelled = true; };
@@ -399,9 +405,8 @@ function NarrationSelector({ voice, setVoice }: NarrationSelectorProps) {
   const selected = 'border-[#2F6B3F] bg-[#E6F0EA]';
   const unselected = 'border-[#E2E4E1] bg-white hover:border-[#9FC3AE]';
 
-  // While loading or saving, block interaction to prevent overlapping writes.
+  // Block interaction while the initial read is in flight or a PATCH is pending.
   const displayVoice: VoiceChoice = voice ?? null;
-  const isLoading = voice === undefined;
   const isBlocked = isLoading || saving;
 
   return (
@@ -759,10 +764,10 @@ export function BuildWithMeTab() {
     BUILD_WITH_ME_VIDEO.stages.map(s => ({ ...s }))
   );
 
-  // Lift narrator voice state so StageRail and NarrationSelector stay in sync (task #660)
-  const [voice, setVoice] = useState<VoiceChoice>(
-    () => readStoredVoice(BUILD_WITH_ME_VIDEO.id),
-  );
+  // Lift narrator voice state so StageRail and NarrationSelector stay in sync.
+  // Initial value is null; NarrationSelector loads the persisted value from the API on mount
+  // and calls setVoice to reconcile (one-time localStorage migration happens there too).
+  const [voice, setVoice] = useState<VoiceChoice>(null);
 
   // All stages complete → published (voice counts for stage 2)
   const isPublished = stages.every((s, i) =>

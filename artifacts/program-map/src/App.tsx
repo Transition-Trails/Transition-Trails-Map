@@ -130,6 +130,7 @@ import KnowledgeSourcesAdmin  from "@/pages/knowledge/KnowledgeSourcesAdmin";
 import SfKnowledgeArticles    from "@/pages/knowledge/SfKnowledgeArticles";
 import KnowledgeReviewQueue   from "@/pages/knowledge/KnowledgeReviewQueue";
 import ArticleStudio          from "@/pages/knowledge/ArticleStudio";
+import KnowledgeStudio        from "@/pages/knowledge/KnowledgeStudio";
 import LibraryDocuments   from "@/pages/library/LibraryDocuments";
 import OrgMemory          from "@/pages/knowledge/OrgMemory";
 import PeopleRolesStudio  from "@/pages/people/PeopleRolesStudio";
@@ -390,9 +391,18 @@ function Router() {
       <Route path="/penny/content-studio"     component={ContentStudio} />
       <Route path="/penny">                    <PennyPageShell><PennyCommandCenter /></PennyPageShell></Route>
 
+      {/* Knowledge Studio — new seven-tab hub at /knowledge/studio */}
+      <Route path="/knowledge/studio/article"      component={KnowledgeStudio} />
+      <Route path="/knowledge/studio/penny-review" component={KnowledgeStudio} />
+      <Route path="/knowledge/studio/approval"     component={KnowledgeStudio} />
+      <Route path="/knowledge/studio/freshness"    component={KnowledgeStudio} />
+      <Route path="/knowledge/studio/in-app-help"  component={KnowledgeStudio} />
+      <Route path="/knowledge/studio/pennys-read"  component={KnowledgeStudio} />
+      <Route path="/knowledge/studio"              component={KnowledgeStudio} />
+
       {/* Knowledge hub — old sub-pages fold into builder or governance */}
       <Route path="/knowledge/governance" component={KnowledgeHub} />
-      <Route path="/knowledge/article-studio"> <Redirect to="/knowledge" /></Route>
+      <Route path="/knowledge/article-studio"> <Redirect to="/knowledge/studio" /></Route>
       <Route path="/knowledge/sources">        <Redirect to="/knowledge/governance" /></Route>
       {/* /knowledge/sf-articles is a live redirect alias — kept intentionally so external
           bookmarks and old links continue to work. Destination: /knowledge/governance. */}

@@ -17,6 +17,7 @@ export function HubShell({
   badge,
   tabs,
   actions,
+  separatorAfter,
 }: {
   title: string;
   icon: ComponentType<{ className?: string }>;
@@ -24,6 +25,8 @@ export function HubShell({
   badge?: string;
   tabs: HubTab[];
   actions?: ActionItem[];
+  /** Insert a visual separator after the tab with this id. */
+  separatorAfter?: string;
 }) {
   const [location, setLocation] = useLocation();
 
@@ -47,23 +50,27 @@ export function HubShell({
           {description && <span className="text-[14px] text-muted-foreground line-clamp-1 hidden sm:block">{description}</span>}
         </div>
         {tabs.length > 1 && (
-          <div className="flex gap-0.5 overflow-x-auto pb-0.5 mt-1.5">
+          <div className="flex items-center gap-0.5 overflow-x-auto pb-0.5 mt-1.5">
             {tabs.map(tab => {
               const TabIcon = tab.icon;
               const isActive = activeTab.id === tab.id;
               return (
-                <button
-                  key={tab.id}
-                  onClick={() => setLocation(tab.path)}
-                  className={`flex items-center gap-1.5 px-3 py-2 text-[14px] font-semibold rounded-t-md whitespace-nowrap border-b-2 transition-colors ${
-                    isActive
-                      ? 'border-primary text-primary bg-primary/5'
-                      : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40'
-                  }`}
-                >
-                  {TabIcon && <TabIcon className="w-3 h-3 shrink-0" />}
-                  {tab.label}
-                </button>
+                <div key={tab.id} className="flex items-center">
+                  <button
+                    onClick={() => setLocation(tab.path)}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-[14px] font-semibold rounded-t-md whitespace-nowrap border-b-2 transition-colors ${
+                      isActive
+                        ? 'border-primary text-primary bg-primary/5'
+                        : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/40'
+                    }`}
+                  >
+                    {TabIcon && <TabIcon className="w-3 h-3 shrink-0" />}
+                    {tab.label}
+                  </button>
+                  {separatorAfter === tab.id && (
+                    <span className="w-px h-4 bg-border mx-1 shrink-0" aria-hidden="true" />
+                  )}
+                </div>
               );
             })}
           </div>

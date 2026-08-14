@@ -95,7 +95,7 @@ const navGroups: NavGroup[] = [
     pathPrefix: '/knowledge',
     extraPrefixes: ['/knowledge/governance'],
     items: [
-      { id: 'know-builder',    path: '/knowledge',            label: 'Builder',    minTier: 'admin' },
+      { id: 'know-studio',     path: '/knowledge/studio',     label: 'Studio',     minTier: 'admin' },
       { id: 'know-governance', path: '/knowledge/governance', label: 'Governance', minTier: 'admin' },
     ],
   },
