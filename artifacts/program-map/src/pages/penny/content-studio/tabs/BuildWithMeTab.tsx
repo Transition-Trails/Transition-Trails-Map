@@ -241,8 +241,45 @@ function ScriptApprovalCard() {
 
 type VoiceChoice = null | 'penny' | 'learner';
 
+/**
+ * localStorage key format: `narrator-voice-<videoId>`
+ *
+ * This is an interim persistence layer. The correct long-term home is a
+ * `selected_voice` column on the video item record in the database (e.g. on
+ * the `content_items` table or a dedicated `video_items` table), surfaced via
+ * GET/PATCH /api/content-items/:id so the choice is durable across devices and
+ * shared with the rest of the production pipeline.  Until that column exists,
+ * localStorage gives us per-browser durability with zero API changes.
+ */
+const VOICE_STORAGE_KEY = (videoId: string) => `narrator-voice-${videoId}`;
+
+function readStoredVoice(videoId: string): VoiceChoice {
+  try {
+    const raw = localStorage.getItem(VOICE_STORAGE_KEY(videoId));
+    if (raw === 'penny' || raw === 'learner') return raw;
+  } catch {
+    // localStorage unavailable (e.g. private browsing with strict settings)
+  }
+  return null;
+}
+
+function writeStoredVoice(videoId: string, choice: VoiceChoice): void {
+  try {
+    if (choice === null) {
+      localStorage.removeItem(VOICE_STORAGE_KEY(videoId));
+    } else {
+      localStorage.setItem(VOICE_STORAGE_KEY(videoId), choice);
+    }
+  } catch {
+    // ignore write failures — UI still works, just won't persist
+  }
+}
+
 function NarrationSelector() {
-  const [voice, setVoice] = useState<VoiceChoice>(null);
+  const videoId = BUILD_WITH_ME_VIDEO.id;
+  // Lazy initializer reads the persisted choice so the consequence band
+  // renders immediately on load without a flicker.
+  const [voice, setVoice] = useState<VoiceChoice>(() => readStoredVoice(videoId));
 
   const cardBase =
     'cursor-pointer rounded-[8px] p-4 border-[1.5px] transition-all space-y-2 select-none';
@@ -259,10 +296,10 @@ function NarrationSelector() {
         {/* Card 1 — Penny */}
         <div
           className={`${cardBase} ${voice === 'penny' ? selected : unselected}`}
-          onClick={() => setVoice(v => (v === 'penny' ? null : 'penny'))}
+          onClick={() => setVoice(v => { const next = v === 'penny' ? null : 'penny'; writeStoredVoice(videoId, next); return next; })}
           role="button"
           tabIndex={0}
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setVoice(v => (v === 'penny' ? null : 'penny')); }}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setVoice(v => { const next = v === 'penny' ? null : 'penny'; writeStoredVoice(videoId, next); return next; }); }}
         >
           <div className="flex items-center gap-2">
             <Headphones className="w-4 h-4 text-[#2F6F7E]" />
@@ -285,10 +322,10 @@ function NarrationSelector() {
         {/* Card 2 — Learner */}
         <div
           className={`${cardBase} ${voice === 'learner' ? selected : unselected}`}
-          onClick={() => setVoice(v => (v === 'learner' ? null : 'learner'))}
+          onClick={() => setVoice(v => { const next = v === 'learner' ? null : 'learner'; writeStoredVoice(videoId, next); return next; })}
           role="button"
           tabIndex={0}
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setVoice(v => (v === 'learner' ? null : 'learner')); }}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setVoice(v => { const next = v === 'learner' ? null : 'learner'; writeStoredVoice(videoId, next); return next; }); }}
         >
           <div className="flex items-center gap-2">
             <User className="w-4 h-4 text-[#2F6B3F]" />
