@@ -66,6 +66,24 @@ export class ConnectorSalesforceClient implements ISalesforceClient {
     );
   }
 
+  /**
+   * Execute a SOQL query and automatically follow nextRecordsUrl pages until
+   * done === true. Returns a flat array of all records across all pages.
+   *
+   * Use this instead of query() wherever the result set may exceed SF's default
+   * page size (2 000 rows) to avoid silently truncating results.
+   */
+  async queryAll<T>(soql: string): Promise<T[]> {
+    const first = await this.query<T>(soql);
+    const records: T[] = [...first.records];
+    let page = first;
+    while (!page.done && page.nextRecordsUrl) {
+      page = await this.request<SoqlQueryResult<T>>("GET", page.nextRecordsUrl);
+      records.push(...page.records);
+    }
+    return records;
+  }
+
   getRecord<T>(
     objectApiName: string,
     recordId: string,

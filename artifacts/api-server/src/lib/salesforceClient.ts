@@ -6,6 +6,7 @@ export interface SoqlQueryResult<T> {
   records: T[];
   totalSize: number;
   done: boolean;
+  nextRecordsUrl?: string;
 }
 
 export interface SalesforceCreateResult {

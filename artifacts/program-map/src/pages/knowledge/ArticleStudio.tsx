@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   PenLine, Send, CheckCircle2, CloudUpload, RotateCcw,
-  Trash2, Plus, ChevronRight, AlertCircle, Loader2, ExternalLink,
-  FileText, Clock, Eye, RefreshCw, Timer,
+  Trash2, Plus, AlertCircle, Loader2, ExternalLink,
+  FileText, Clock, Eye, RefreshCw, ChevronRight, Timer,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RichTextEditor } from '@/components/knowledge/RichTextEditor';
@@ -458,11 +458,28 @@ function ReviewPane({ article, onApprove, onRequestChanges, saving }: ReviewPane
 interface PublishPaneProps {
   article:   KnowledgeArticle;
   onPublish: () => Promise<void>;
+  onRecall:  () => Promise<void>;
   saving:    boolean;
 }
 
-function PublishPane({ article, onPublish, saving }: PublishPaneProps) {
-  const isPublished = article.status === 'published';
+function PublishPane({ article, onPublish, onRecall, saving }: PublishPaneProps) {
+  const isPublished    = article.status === 'published';
+  const isSfOriginated = Boolean(article.sfArticleId);
+
+  // What this publish action will do depends on whether the article came from SF
+  const publishBullets = isSfOriginated
+    ? [
+        `Publishes an updated version of the existing Salesforce Knowledge article (same KnowledgeArticle record — no duplicate).`,
+        'Sends the edited title, summary, and body back to Salesforce as a new draft version.',
+        'If your org allows it, the version is published Online immediately. Otherwise it stays as a Draft for you to publish from Salesforce.',
+        'The existing Salesforce article ID is preserved.',
+      ]
+    : [
+        `Creates a new ${article.articleType || 'Knowledge'} article record in Salesforce.`,
+        'Sends the title, summary, category, and formatted body to Salesforce.',
+        'If your org allows it, the article is published Online immediately. Otherwise it stays as a Draft for you to publish from Salesforce.',
+        'The Salesforce article ID is stored here so you can track it.',
+      ];
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -485,9 +502,15 @@ function PublishPane({ article, onPublish, saving }: PublishPaneProps) {
             )}
             <p className="text-base font-semibold text-foreground">{article.title}</p>
             {article.summary && <p className="text-[13px] text-muted-foreground">{article.summary}</p>}
-            <p className="text-[12px] text-muted-foreground/70">
-              Approved {fmt(article.reviewedAt)}{article.reviewedBy ? ` by ${article.reviewedBy}` : ''}
-            </p>
+            {isPublished ? (
+              <p className="text-[12px] text-muted-foreground/70">
+                Published {fmt(article.publishedAt)}{article.reviewedBy ? ` · approved by ${article.reviewedBy}` : ''}
+              </p>
+            ) : (
+              <p className="text-[12px] text-muted-foreground/70">
+                Approved {fmt(article.reviewedAt)}{article.reviewedBy ? ` by ${article.reviewedBy}` : ''}
+              </p>
+            )}
           </div>
 
           {isPublished ? (
@@ -506,28 +529,46 @@ function PublishPane({ article, onPublish, saving }: PublishPaneProps) {
                   </p>
                 )}
               </div>
+
               {(article.sfArticleId || article.sfVersionId) && (
                 <div className="rounded-lg border border-border bg-background p-3 space-y-1">
                   <p className="text-[11px] font-semibold text-muted-foreground tracking-wide uppercase">Salesforce IDs</p>
-                  {article.sfArticleId   && <p className="text-[12px] text-foreground font-mono">Article: {article.sfArticleId}</p>}
-                  {article.sfVersionId   && <p className="text-[12px] text-foreground font-mono">Version: {article.sfVersionId}</p>}
+                  {article.sfArticleId && <p className="text-[12px] text-foreground font-mono">Article: {article.sfArticleId}</p>}
+                  {article.sfVersionId && <p className="text-[12px] text-foreground font-mono">Version: {article.sfVersionId}</p>}
                 </div>
               )}
+
               <p className="text-[12px] text-muted-foreground/70 flex items-center gap-1">
                 <ExternalLink className="w-3 h-3" /> Manage this article in Salesforce Knowledge.
               </p>
+
+              {/* SF-originated articles can be recalled for editing */}
+              {isSfOriginated && (
+                <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-2">
+                  <p className="text-[13px] font-semibold text-foreground">Edit this article</p>
+                  <p className="text-[13px] text-muted-foreground">
+                    Recall this article to make edits. It will go through the normal review workflow before being published back to the same Salesforce record.
+                  </p>
+                  <button
+                    onClick={onRecall}
+                    disabled={saving}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-[12px] font-medium text-foreground hover:bg-muted disabled:opacity-50 transition-colors"
+                  >
+                    {saving
+                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      : <RotateCcw className="w-3.5 h-3.5" />
+                    }
+                    Recall for Editing
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-3">
               <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-2">
                 <p className="text-[13px] font-semibold text-foreground">What happens when you publish</p>
                 <ul className="space-y-1.5">
-                  {[
-                    `Creates a new ${article.articleType || 'Knowledge'} article record in Salesforce.`,
-                    'Sends the title, summary, category, and formatted body to Salesforce.',
-                    'If your org allows it, the article is published Online immediately. Otherwise it stays as a Draft for you to publish from Salesforce.',
-                    'The Salesforce article ID is stored here so you can track it.',
-                  ].map((s, i) => (
+                  {publishBullets.map((s, i) => (
                     <li key={i} className="flex items-start gap-2 text-[13px] text-muted-foreground">
                       <span className="mt-1 w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
                       {s}
@@ -536,6 +577,14 @@ function PublishPane({ article, onPublish, saving }: PublishPaneProps) {
                 </ul>
               </div>
 
+              {isSfOriginated && (article.sfArticleId || article.sfVersionId) && (
+                <div className="rounded-lg border border-sky-100 bg-sky-50 p-3 space-y-1">
+                  <p className="text-[11px] font-semibold text-sky-700 tracking-wide uppercase">Existing Salesforce Link</p>
+                  {article.sfArticleId && <p className="text-[12px] text-sky-800 font-mono">Article: {article.sfArticleId}</p>}
+                  {article.sfVersionId && <p className="text-[12px] text-sky-800/70 font-mono">Previous version: {article.sfVersionId}</p>}
+                </div>
+              )}
+
               <button
                 onClick={onPublish}
                 disabled={saving}
@@ -543,7 +592,7 @@ function PublishPane({ article, onPublish, saving }: PublishPaneProps) {
               >
                 {saving
                   ? <><Loader2 className="w-4 h-4 animate-spin" /> Publishing…</>
-                  : <><CloudUpload className="w-4 h-4" /> Publish to Salesforce</>
+                  : <><CloudUpload className="w-4 h-4" /> {isSfOriginated ? 'Publish Updated Version' : 'Publish to Salesforce'}</>
                 }
               </button>
             </div>
@@ -579,7 +628,7 @@ export default function ArticleStudio() {
     articles, loading, error, reload,
     createArticle, updateArticle,
     submitForReview, approveArticle, requestChanges,
-    publishToSf, deleteArticle,
+    publishToSf, recallFromSf, deleteArticle,
   } = useKnowledgeArticles();
 
   const [selectedId,   setSelectedId]   = useState<string | null>(null);
@@ -623,6 +672,7 @@ export default function ArticleStudio() {
   const handleSubmit      = useCallback(async () => { if (!selectedId) return; await wrap(async () => { await submitForReview(selectedId); showToast('Submitted for review'); }); }, [selectedId]);
   const handleApprove     = useCallback(async () => { if (!selectedId) return; await wrap(async () => { await approveArticle(selectedId);  showToast('Article approved');      }); }, [selectedId]);
   const handlePublish     = useCallback(async () => { if (!selectedId) return; await wrap(async () => { await publishToSf(selectedId);      showToast('Published to Salesforce'); }); }, [selectedId]);
+  const handleRecall      = useCallback(async () => { if (!selectedId) return; await wrap(async () => { await recallFromSf(selectedId);     showToast('Article recalled — ready to edit'); }); }, [selectedId]);
 
   const handleRequestChanges = useCallback(async (note: string) => {
     if (!selectedId) return;
@@ -779,6 +829,7 @@ export default function ArticleStudio() {
           <PublishPane
             article={selected!}
             onPublish={handlePublish}
+            onRecall={handleRecall}
             saving={saving}
           />
         ) : (

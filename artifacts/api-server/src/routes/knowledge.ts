@@ -9,7 +9,7 @@ import {
   filterStaleHealthIssues,
 } from "../lib/integrationHealth.js";
 import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
-import { requireAdmin } from "../middlewares/requireAuth.js";
+import { requireAdmin, requireStaff } from "../middlewares/requireAuth.js";
 
 const router = Router();
 
@@ -1177,6 +1177,16 @@ interface KavAllBodyInfo {
 let kavAllBodyInfoCache: KavAllBodyInfo | null | undefined = undefined;
 let kavAllBodyInfoInflight: Promise<KavAllBodyInfo | null> | null = null;
 
+/** Exported for test isolation only — resets all module-level KAV discovery caches. */
+export function resetKavBodyInfoCachesForTest(): void {
+  kavFieldSetCache       = null;
+  kavFieldSetInflight    = null;
+  kavBodyInfoCache       = undefined;
+  kavBodyInfoInflight    = null;
+  kavAllBodyInfoCache    = undefined;
+  kavAllBodyInfoInflight = null;
+}
+
 async function getKavAllBodyFields(
   client: ConnectorSalesforceClient,
   log: { warn: (msg: string) => void; info: (msg: string) => void }
@@ -1533,6 +1543,69 @@ router.get("/knowledge/sf-article-reviews", async (req, res): Promise<void> => {
 
 // POST /api/knowledge/sf-articles/sync
 // ─────────────────────────────────────────────────────────────────────────────
+// buildSfSyncExistingMap — exported for unit testing
+//
+// Builds a unified map from SF KnowledgeArticleId (kaId) → { localId, status }
+// by combining two query result sets:
+//
+//   byPkRows:   rows where knowledge_articles.id IN (sfArticleIds)
+//               → articles originally synced FROM Salesforce (their local pk IS the kaId)
+//
+//   bySfIdRows: rows where knowledge_articles.sf_article_id IN (sfArticleIds)
+//               → articles AUTHORED in Trail OS, published to SF, so their local pk
+//                 differs from the kaId but sfArticleId matches.
+//
+// bySfIdRows entries overwrite byPkRows entries for the same kaId so that
+// Trail OS-authored articles are always updated in-place rather than duplicated.
+// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// normalizeArticleType — exported for unit testing
+//
+// When Salesforce returns an ArticleType that matches the discovered __kav object
+// via its base name (e.g. "Knowledge" instead of "Knowledge__kav"), we must
+// normalize it to the full canonical sObject API name before persisting. The
+// publish endpoint uses the stored articleType directly as the Salesforce sObject
+// name for the POST; an un-normalized base name like "Knowledge" would cause a
+// POST to /sobjects/Knowledge which does not exist.
+//
+// Rules:
+//   - If rawType matches the full canonicalKavObj name (case-insensitive) → canonical
+//   - If rawType matches the base name (canonicalKavObj stripped of __kav) → canonical
+//   - Otherwise → preserve rawType as-is (unknown type, handled by isMatchingType elsewhere)
+//   - If canonicalKavObj is null (body discovery unavailable) → preserve rawType
+// ─────────────────────────────────────────────────────────────────────────────
+export function normalizeArticleType(
+  rawType: string | undefined | null,
+  canonicalKavObj: string | null,
+): string {
+  const raw = rawType ?? "";
+  if (!canonicalKavObj) return raw;
+  const t    = raw.toLowerCase();
+  const full = canonicalKavObj.toLowerCase();
+  const base = canonicalKavObj.replace(/__kav$/i, "").toLowerCase();
+  return (t === full || t === base) ? canonicalKavObj : raw;
+}
+
+export function buildSfSyncExistingMap(
+  byPkRows:   Array<{ id: string; status: string }>,
+  bySfIdRows: Array<{ id: string; status: string; sfArticleId: string | null }>,
+): Map<string, { localId: string; status: string }> {
+  const map = new Map<string, { localId: string; status: string }>();
+  // Primary-key lookup first (directly-synced articles whose id IS the kaId)
+  for (const r of byPkRows) {
+    map.set(r.id, { localId: r.id, status: r.status });
+  }
+  // sfArticleId lookup second — Trail OS-authored articles preserve their local id.
+  // These entries take precedence over any byPkRows entry for the same kaId.
+  for (const r of bySfIdRows) {
+    if (r.sfArticleId) {
+      map.set(r.sfArticleId, { localId: r.id, status: r.status });
+    }
+  }
+  return map;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Pulls all Salesforce Knowledge articles (Online + Draft) into the local
 // knowledge_articles table so staff can edit and manage them through the
 // Trail OS publish workflow.
@@ -1549,12 +1622,13 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
     const client = new ConnectorSalesforceClient();
     const fields  = await getKavFieldSet(client, { warn: (m) => log.warn(m) });
 
-    // ── 1. Fetch all KAV records ─────────────────────────────────────────────
+    // ── 1. Fetch all KAV records (paginated — no LIMIT cap) ──────────────────
+    // Sort Draft before Online so the deduplication loop below lets Online win
+    // by simply overwriting Draft entries as they appear later in the array.
     const soql = `SELECT ${fields.selectList}
                   FROM KnowledgeArticleVersion
                   WHERE PublishStatus IN ('online', 'draft')
-                  ORDER BY PublishStatus ASC, LastModifiedDate DESC
-                  LIMIT 200`;
+                  ORDER BY PublishStatus ASC, LastModifiedDate DESC`;
 
     type KavRow = {
       Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
@@ -1562,74 +1636,198 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
       CreatedDate: string; LastModifiedDate: string;
       IsVisibleInApp?: boolean; Language?: string; UrlName?: string;
     };
-    const result = await client.query<KavRow>(soql);
-    const kavRecords = result.records;
+    // queryAll follows SF nextRecordsUrl pages until done, so the full article
+    // catalogue is synced regardless of org size.
+    const kavRecords = await client.queryAll<KavRow>(soql);
 
     if (!kavRecords.length) {
       res.json({ total: 0, created: 0, updated: 0, skipped: 0, errors: 0 });
       return;
     }
 
-    // Deduplicate by KnowledgeArticleId — prefer Online over Draft.
-    const deduped = new Map<string, KavRow>();
-    for (const r of kavRecords) {
-      const existing = deduped.get(r.KnowledgeArticleId);
-      if (!existing || r.PublishStatus.toLowerCase() === "online") {
-        deduped.set(r.KnowledgeArticleId, r);
-      }
-    }
-
-    // ── 2. Batch-fetch body content ──────────────────────────────────────────
-    const bodyByKaId = new Map<string, string>();
+    // ── 2. Discover body fields for the supported __kav type ─────────────────
+    // getKavAllBodyFields returns the first __kav object that has body fields.
+    // Articles of other __kav types cannot have their body fetched, so we
+    // constrain the sync to only the supported type to avoid silently importing
+    // articles with empty bodies.
     const bodyInfo = await getKavAllBodyFields(client, { warn: (m) => log.warn(m), info: (m) => log.info(m) });
 
-    if (bodyInfo && bodyInfo.fields.length > 0) {
-      try {
-        const uniqueKaIds = [...deduped.keys()];
-        const idList    = uniqueKaIds.map(id => `'${id}'`).join(", ");
-        const fieldList = bodyInfo.fields.map(f => f.name).join(", ");
+    // Normalise the discovered object name for comparison with ArticleType values.
+    // SF returns ArticleType on KnowledgeArticleVersion as the __kav object name
+    // (e.g. "Knowledge__kav"). Strip __kav suffix for a case-insensitive match so
+    // both "Knowledge__kav" and "Knowledge" in ArticleType are accepted.
+    const supportedKavObj  = bodyInfo?.objectName ?? null;               // e.g. "Knowledge__kav"
+    const supportedKavBase = supportedKavObj?.replace(/__kav$/i, "") ?? null; // e.g. "Knowledge"
 
-        const bodySoql = `SELECT KnowledgeArticleId, PublishStatus, ${fieldList}
-                          FROM ${bodyInfo.objectName}
-                          WHERE KnowledgeArticleId IN (${idList})
-                          AND PublishStatus IN ('online', 'draft')
-                          ORDER BY PublishStatus ASC
-                          LIMIT 400`;
-
-        const bodyResult = await client.query<{ KnowledgeArticleId: string; PublishStatus: string; [k: string]: string | undefined }>(bodySoql);
-
-        let orgBaseUrl: string | null = null;
-        try { orgBaseUrl = await client.getOrgBaseUrl(); } catch { /* ok */ }
-
-        // Process in reverse so Online overwrites Draft for the same article.
-        for (const row of [...bodyResult.records].reverse()) {
-          const kaId = row["KnowledgeArticleId"] ?? "";
-          const parts: string[] = [];
-          for (const field of bodyInfo.fields) {
-            const raw = row[field.name];
-            if (!raw) continue;
-            const html = orgBaseUrl && raw.includes("<img")
-              ? rewriteSfImageUrls(raw, orgBaseUrl)
-              : raw;
-            parts.push(html);
-          }
-          if (parts.length > 0) bodyByKaId.set(kaId, parts.join("\n"));
-        }
-      } catch (bodyErr) {
-        log.warn({ err: String(bodyErr) }, "Sync: body batch-fetch failed — bodies will be empty");
-      }
+    function isMatchingType(articleType: string | undefined): boolean {
+      if (!supportedKavObj) return true; // no body info — include everything (body will be empty anyway)
+      if (!articleType) return false;
+      const t = articleType.toLowerCase();
+      return t === supportedKavObj.toLowerCase() || t === (supportedKavBase ?? "").toLowerCase();
     }
 
-    // ── 3. Check which articles already exist locally ─────────────────────────
+    // Deduplicate by KnowledgeArticleId — prefer the single Online version over any Draft.
+    // Selection rules (applied in order to each row as kavRecords is iterated):
+    //   1. Skip rows whose ArticleType doesn't match the body-discoverable __kav object.
+    //   2. No entry yet → always store.
+    //   3. Existing entry is Draft, current is Online → Online wins (overwrite).
+    //   4. Both entries are Online (e.g. multiple published versions exist) →
+    //      keep the one with the larger LastModifiedDate (newest). The SOQL sorted DESC
+    //      so the first Online row encountered is normally the newest; this guard
+    //      protects against any page-boundary reordering.
+    //   5. Current is Draft, existing is already any version → skip.
+    const deduped = new Map<string, KavRow>();
+    let typeSkipped = 0;
+    for (const r of kavRecords) {
+      if (!isMatchingType(r.ArticleType)) {
+        typeSkipped++;
+        continue;
+      }
+      const existing = deduped.get(r.KnowledgeArticleId);
+      const curOnline = r.PublishStatus.toLowerCase() === "online";
+      const exOnline  = existing?.PublishStatus.toLowerCase() === "online";
+
+      if (!existing) {
+        deduped.set(r.KnowledgeArticleId, r);
+      } else if (curOnline && !exOnline) {
+        // Online beats Draft
+        deduped.set(r.KnowledgeArticleId, r);
+      } else if (curOnline && exOnline) {
+        // Both Online — keep the one with the newer LastModifiedDate
+        if (new Date(r.LastModifiedDate) > new Date(existing.LastModifiedDate)) {
+          deduped.set(r.KnowledgeArticleId, r);
+        }
+      }
+      // Draft never overwrites any existing entry
+    }
+    if (typeSkipped > 0) {
+      log.warn(
+        { typeSkipped, supportedKavObj },
+        "Sync: skipped articles whose ArticleType does not match the discovered __kav object"
+      );
+    }
+
+    // ── 3. Batch-fetch body content aligned to selected __kav version Ids ─────
+    //
+    // Query bodies by the specific __kav record Id (r.Id from deduped) rather than
+    // by KnowledgeArticleId. This guarantees that the body fetched is from the exact
+    // same version that was selected during deduplication, even when an article has
+    // multiple published versions.
+    //
+    // Chunking: SOQL IN clauses are capped at ≤200 Ids per query to stay well inside
+    // Salesforce SOQL and request-URL length limits.
+    //
+    // Failure handling: a failed body batch does NOT update the local body to empty.
+    // The KaIds in the failed batch are tracked in `bodyFetchFailedKaIds`; the upsert
+    // loop skips overwriting the body field for those articles so existing local content
+    // is preserved. New articles (not yet in the DB) are inserted with empty body since
+    // there is no prior content to preserve.
+    const BODY_BATCH_SIZE = 200;
+    const bodyByKaId = new Map<string, string>();        // kaId → body HTML
+    const bodyFetchFailedKaIds = new Set<string>();      // kaIds whose body fetch failed
+    let bodyFetchErrors = 0;
+
+    if (bodyInfo && bodyInfo.fields.length > 0) {
+      const fieldList = bodyInfo.fields.map(f => f.name).join(", ");
+      let orgBaseUrl: string | null = null;
+      try { orgBaseUrl = await client.getOrgBaseUrl(); } catch { /* non-fatal */ }
+
+      // Build a reverse map from __kav version Id → KnowledgeArticleId so we can
+      // store the body keyed by kaId after querying by version Id.
+      const kavVersionIdToKaId = new Map<string, string>();
+      for (const [kaId, r] of deduped) {
+        kavVersionIdToKaId.set(r.Id, kaId);
+      }
+
+      const allVersionIds = [...kavVersionIdToKaId.keys()];
+      for (let batchStart = 0; batchStart < allVersionIds.length; batchStart += BODY_BATCH_SIZE) {
+        const batchVersionIds = allVersionIds.slice(batchStart, batchStart + BODY_BATCH_SIZE);
+        const batchKaIds      = batchVersionIds.map(vid => kavVersionIdToKaId.get(vid)!);
+        const idList          = batchVersionIds.map(vid => `'${vid}'`).join(", ");
+
+        // Query by __kav version Id — each Id matches exactly one record, so there
+        // is no ambiguity about which body version is returned.
+        const bodySoql = `SELECT Id, ${fieldList}
+                          FROM ${bodyInfo.objectName}
+                          WHERE Id IN (${idList})`;
+
+        try {
+          const bodyRows = await client.queryAll<{ Id: string; [k: string]: string | undefined }>(bodySoql);
+
+          for (const row of bodyRows) {
+            const kaId = kavVersionIdToKaId.get(row["Id"] ?? "") ?? "";
+            if (!kaId) continue;
+            const parts: string[] = [];
+            for (const field of bodyInfo.fields) {
+              const raw = row[field.name];
+              if (!raw) continue;
+              const html = orgBaseUrl && raw.includes("<img")
+                ? rewriteSfImageUrls(raw, orgBaseUrl)
+                : raw;
+              parts.push(html);
+            }
+            if (parts.length > 0) bodyByKaId.set(kaId, parts.join("\n"));
+          }
+        } catch (bodyBatchErr) {
+          bodyFetchErrors++;
+          for (const kaId of batchKaIds) bodyFetchFailedKaIds.add(kaId);
+          log.warn(
+            { batchStart, batchSize: batchVersionIds.length, err: String(bodyBatchErr) },
+            "Sync: body batch-fetch failed — existing bodies preserved, new articles will have empty bodies"
+          );
+        }
+      }
+    } else if (!bodyInfo) {
+      // Body-field discovery returned null — Salesforce's EntityDefinition query
+      // failed or the org has no __kav objects. Mark all selected articles as
+      // body-fetch-failed so the upsert loop preserves existing local bodies
+      // rather than overwriting them with empty strings.
+      // New articles (not yet in the DB) still import with empty bodies because
+      // there is no prior content to preserve.
+      for (const kaId of deduped.keys()) bodyFetchFailedKaIds.add(kaId);
+      bodyFetchErrors += 1;
+      log.warn(
+        { articlesAffected: bodyFetchFailedKaIds.size },
+        "Sync: body-field discovery unavailable — existing article bodies preserved, new articles import with empty body"
+      );
+    }
+
+    // ── 5. Check which articles already exist locally ─────────────────────────
+    //
+    // Two lookup strategies are needed to avoid creating duplicates:
+    //
+    // a) id IN (sfArticleIds) — catches articles that were originally synced FROM
+    //    Salesforce (their local primary key IS the KnowledgeArticleId).
+    //
+    // b) sfArticleId IN (sfArticleIds) — catches articles that were AUTHORED in
+    //    Trail OS, published to Salesforce (which stored KnowledgeArticleId in
+    //    sfArticleId), and are now seen in a subsequent sync. Without this lookup,
+    //    the sync would treat these as new and insert a second record under the
+    //    Salesforce KnowledgeArticleId, creating a duplicate.
+    //
+    // The unified map keys are the Salesforce KnowledgeArticleIds (kaId).
+    // The values carry the existing local primary key (localId) used for UPDATE.
     const sfArticleIds = [...deduped.keys()];
-    const existingRows = await db
-      .select({ id: knowledgeArticlesTable.id, status: knowledgeArticlesTable.status })
-      .from(knowledgeArticlesTable)
-      .where(inArray(knowledgeArticlesTable.id, sfArticleIds));
 
-    const existingStatus = new Map(existingRows.map(r => [r.id, r.status]));
+    const [byPkRows, bySfIdRows] = await Promise.all([
+      db
+        .select({ id: knowledgeArticlesTable.id, status: knowledgeArticlesTable.status })
+        .from(knowledgeArticlesTable)
+        .where(inArray(knowledgeArticlesTable.id, sfArticleIds)),
+      db
+        .select({
+          id:          knowledgeArticlesTable.id,
+          status:      knowledgeArticlesTable.status,
+          sfArticleId: knowledgeArticlesTable.sfArticleId,
+        })
+        .from(knowledgeArticlesTable)
+        .where(inArray(knowledgeArticlesTable.sfArticleId, sfArticleIds)),
+    ]);
 
-    // ── 4. Upsert ─────────────────────────────────────────────────────────────
+    // buildSfSyncExistingMap is exported for unit tests — see __tests__/sfSyncReconcile.test.ts
+    const existingByKaId = buildSfSyncExistingMap(byPkRows, bySfIdRows);
+
+    // ── 6. Upsert ─────────────────────────────────────────────────────────────
     let created = 0, updated = 0, skipped = 0, errors = 0;
     const now = new Date();
 
@@ -1639,12 +1837,17 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
 
     for (const [kaId, r] of deduped) {
       try {
-        const body      = bodyByKaId.get(kaId) ?? "";
-        const localSt   = existingStatus.get(kaId);           // undefined = new
-        const sfStatus  = r.PublishStatus.toLowerCase() === "online" ? "published" : "draft";
+        const existing   = existingByKaId.get(kaId);
+        const localId    = existing?.localId;          // undefined = new article
+        const localSt    = existing?.status;
+        const body       = bodyByKaId.get(kaId) ?? "";
+        const bodyFailed = bodyFetchFailedKaIds.has(kaId);
+        const sfStatus   = r.PublishStatus.toLowerCase() === "online" ? "published" : "draft";
 
-        if (localSt === undefined) {
-          // New article — insert
+        if (!localId) {
+          // New article — insert. Use kaId (the SF KnowledgeArticleId) as the
+          // local primary key so future syncs find it via the id lookup.
+          // Body is empty when the fetch failed; no prior local content to preserve.
           await db.insert(knowledgeArticlesTable).values({
             id:              kaId,
             title:           r.Title,
@@ -1652,7 +1855,7 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
             body,
             category:        "",
             urlName:         r.UrlName ?? localSlug(r.Title),
-            articleType:     r.ArticleType ?? "",
+            articleType:     normalizeArticleType(r.ArticleType, supportedKavObj),
             status:          sfStatus,
             sfArticleId:     r.KnowledgeArticleId,
             sfVersionId:     r.Id,
@@ -1664,7 +1867,9 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
           created++;
 
         } else if (localSt === "pending-review" || localSt === "approved") {
-          // In active review — refresh metadata only, leave body + status alone
+          // In active review — refresh metadata only, leave body + status alone.
+          // Use localId (the existing primary key) in the WHERE clause to correctly
+          // target Trail OS-authored articles whose id ≠ kaId.
           await db.update(knowledgeArticlesTable)
             .set({
               title:           r.Title,
@@ -1673,18 +1878,21 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
               sfPublishStatus: r.PublishStatus,
               updatedAt:       now,
             })
-            .where(eq(knowledgeArticlesTable.id, kaId));
+            .where(eq(knowledgeArticlesTable.id, localId));
           skipped++;
 
         } else {
-          // Exists but not in active review — full refresh
+          // Exists but not in active review — full refresh.
+          // Use localId so Trail OS-authored articles are updated in-place rather
+          // than creating a new record under the SF KnowledgeArticleId.
+          // When the body batch failed, omit the body field to preserve existing content.
           await db.update(knowledgeArticlesTable)
             .set({
               title:           r.Title,
               summary:         r.Summary ?? "",
-              body,
+              ...(bodyFailed ? {} : { body }),
               urlName:         r.UrlName ?? localSlug(r.Title),
-              articleType:     r.ArticleType ?? "",
+              articleType:     normalizeArticleType(r.ArticleType, supportedKavObj),
               status:          sfStatus,
               sfArticleId:     r.KnowledgeArticleId,
               sfVersionId:     r.Id,
@@ -1692,7 +1900,7 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
               publishedAt:     sfStatus === "published" ? now : null,
               updatedAt:       now,
             })
-            .where(eq(knowledgeArticlesTable.id, kaId));
+            .where(eq(knowledgeArticlesTable.id, localId));
           updated++;
         }
       } catch (itemErr) {
@@ -1701,8 +1909,26 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
       }
     }
 
-    log.info({ total: deduped.size, created, updated, skipped, errors }, "SF articles sync complete");
-    res.json({ total: deduped.size, created, updated, skipped, errors, syncedAt: now.toISOString() });
+    log.info(
+      { total: deduped.size, created, updated, skipped, errors, bodyFetchErrors, typeSkipped },
+      "SF articles sync complete"
+    );
+    res.json({
+      total: deduped.size,
+      created,
+      updated,
+      skipped,
+      errors,
+      ...(bodyFetchErrors > 0 && {
+        bodyFetchErrors,
+        bodyFetchWarning: `${bodyFetchErrors} body batch(es) failed; affected articles were imported with empty bodies. Retry sync to attempt recovery.`,
+      }),
+      ...(typeSkipped > 0 && {
+        typeSkipped,
+        typeSkipNote: `${typeSkipped} article versions skipped — their ArticleType does not match the supported __kav object (${supportedKavObj}). Only articles of the supported type are synced.`,
+      }),
+      syncedAt: now.toISOString(),
+    });
 
   } catch (err) {
     log.error(err, "SF articles sync failed");
@@ -2065,7 +2291,39 @@ router.post("/knowledge/articles/:id/request-changes", requireAdmin, async (req,
   }
 });
 
-// POST /api/knowledge/articles/:id/publish-to-sf  — approved → published (creates SF Knowledge record)
+// POST /api/knowledge/articles/:id/recall  — published (SF-originated) → draft
+// Allows staff to reopen a published SF-synced article for editing without touching SF.
+router.post("/knowledge/articles/:id/recall", requireStaff, async (req, res): Promise<void> => {
+  const id = req.params['id'] as string;
+  try {
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, id));
+    if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
+    const article = rows[0]!;
+    if (article.status !== "published") {
+      res.status(409).json({ error: `Cannot recall: article must be 'published' (currently '${article.status}')` });
+      return;
+    }
+    if (!article.sfArticleId) {
+      res.status(409).json({ error: "Cannot recall: article has no Salesforce link. Only SF-originated articles can be recalled." });
+      return;
+    }
+    const [updated] = await db.update(knowledgeArticlesTable)
+      .set({ status: "draft", updatedAt: new Date() })
+      .where(eq(knowledgeArticlesTable.id, id))
+      .returning();
+    req.log.info({ id, sfArticleId: article.sfArticleId }, "Article recalled for editing");
+    res.json({ article: updated });
+  } catch (err) {
+    req.log.error(err, "Failed to recall article");
+    res.status(500).json({ error: "Failed to recall article" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/publish-to-sf
+//   approved → published
+//   For Trail OS-authored articles: creates a new SF Knowledge record.
+//   For SF-originated articles (sfArticleId set): creates a new __kav version linked to
+//   the existing KnowledgeArticle, avoiding duplicate article records in Salesforce.
 router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<void> => {
   const { id } = req.params;
   try {
@@ -2101,13 +2359,27 @@ router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<v
     // Use the article's chosen type, falling back to the discovered object or a safe default.
     const objectName = article.articleType || bodyInfo?.objectName || "Knowledge__kav";
 
-    req.log.info({ objectName, payload: Object.keys(payload) }, "Publishing article to SF Knowledge");
+    // SF-originated articles: link the new __kav version to the existing KnowledgeArticle
+    // so Salesforce does not create a duplicate top-level article record.
+    const isSfOriginated = Boolean(article.sfArticleId);
+    if (isSfOriginated) {
+      payload["KnowledgeArticleId"] = article.sfArticleId;
+      req.log.info(
+        { objectName, sfArticleId: article.sfArticleId, payload: Object.keys(payload) },
+        "Publishing updated version of existing SF Knowledge article"
+      );
+    } else {
+      req.log.info({ objectName, payload: Object.keys(payload) }, "Publishing new article to SF Knowledge");
+    }
 
     let sfVersionId: string | null = null;
-    let sfArticleId: string | null = null;
+    let sfArticleId: string | null = article.sfArticleId; // preserve for SF-originated articles
     let sfPublishStatus = "Draft";
 
-    // Step 1: Create the article record in Salesforce.
+    // Step 1: Create the __kav record in Salesforce.
+    //   - For SF-originated articles, KnowledgeArticleId in the payload ensures this is a
+    //     new version of the existing article rather than a brand-new article.
+    //   - For Trail OS-authored articles, no KnowledgeArticleId is set so SF creates a fresh one.
     const createResult = await client.createRecord(objectName, payload);
     if (!createResult.success) {
       const errMsg = (createResult as unknown as { errors?: { message: string }[] }).errors?.[0]?.message ?? "Unknown Salesforce error";
@@ -2115,7 +2387,7 @@ router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<v
       return;
     }
     sfVersionId = createResult.id;
-    req.log.info({ sfVersionId }, "SF Knowledge article version created");
+    req.log.info({ sfVersionId, isSfOriginated }, "SF Knowledge article version created");
 
     // Step 1.5: Assign data category selection if the author chose one.
     // The selection object follows the pattern {ArticleType}__DataCategorySelection.
@@ -2137,14 +2409,17 @@ router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<v
       }
     }
 
-    // Step 2: Retrieve the KnowledgeArticleId from the created record so we can link to it.
-    try {
-      const versionRecord = await client.getRecord<{ Id: string; KnowledgeArticleId?: string }>(
-        objectName, sfVersionId, ["Id", "KnowledgeArticleId"]
-      );
-      sfArticleId = versionRecord.KnowledgeArticleId ?? null;
-    } catch (lookupErr) {
-      req.log.warn(`Could not retrieve KnowledgeArticleId: ${String(lookupErr)}`);
+    // Step 2: Retrieve (or confirm) the KnowledgeArticleId from the created record.
+    //   For SF-originated articles we already know sfArticleId; this just confirms the link.
+    if (!sfArticleId) {
+      try {
+        const versionRecord = await client.getRecord<{ Id: string; KnowledgeArticleId?: string }>(
+          objectName, sfVersionId, ["Id", "KnowledgeArticleId"]
+        );
+        sfArticleId = versionRecord.KnowledgeArticleId ?? null;
+      } catch (lookupErr) {
+        req.log.warn(`Could not retrieve KnowledgeArticleId: ${String(lookupErr)}`);
+      }
     }
 
     // Step 3: Attempt to publish the article (set PublishStatus = Online).

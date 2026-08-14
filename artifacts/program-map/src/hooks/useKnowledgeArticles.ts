@@ -160,6 +160,20 @@ export function useKnowledgeArticles() {
     return data.article;
   }, []);
 
+  /** Reset a published SF-originated article back to draft so it can be edited and re-published. */
+  const recallFromSf = useCallback(async (id: string): Promise<KnowledgeArticle> => {
+    const res = await fetch(`${API}/${id}/recall`, {
+      method: 'POST', credentials: 'include',
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Unknown error' })) as { error: string };
+      throw new Error(err.error ?? `HTTP ${res.status}`);
+    }
+    const data = await res.json() as { article: KnowledgeArticle };
+    setArticles(prev => prev.map(a => a.id === id ? data.article : a));
+    return data.article;
+  }, []);
+
   const deleteArticle = useCallback(async (id: string): Promise<void> => {
     const res = await fetch(`${API}/${id}`, {
       method: 'DELETE', credentials: 'include',
@@ -175,6 +189,6 @@ export function useKnowledgeArticles() {
     articles, loading, error, reload: load,
     createArticle, updateArticle,
     submitForReview, approveArticle, requestChanges,
-    publishToSf, deleteArticle,
+    publishToSf, recallFromSf, deleteArticle,
   };
 }
