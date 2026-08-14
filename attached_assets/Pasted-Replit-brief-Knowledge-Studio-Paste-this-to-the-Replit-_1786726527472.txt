@@ -1,0 +1,72 @@
+Replit brief — Knowledge Studio
+Paste this to the Replit agent as the opening instruction, then point it at `README.md` and `DECISIONS.md` in the same folder.
+---
+The task
+Rework the existing Knowledge area in `artifacts/program-map/` so articles are structured enough for Penny to answer from and pleasant enough that people keep writing them. This is not a greenfield build — `ArticleStudio.tsx`, `useKnowledgeArticles.ts`, `HelpPanel.tsx` and the Knowledge sidebar group already exist and work. Keep the parts that work; change the data shape underneath them.
+Full specification in `README.md`; the reasoning and what must not change in `DECISIONS.md`. Screenshots in `screenshots/`. The interactive design is `designs/Knowledge Studio.dc.html` — open it in a browser.
+`reference/live-sop-article-000001002.png` is a screenshot of a real published SOP article in the org. Most of the findings below come from reading it. Look at it before you start.
+The design file is a reference, not code to port. Its inline styles exist only because the prototype format requires them.
+What is wrong today, from the real records
+`Procedure` is one rich-text field carrying eleven steps with screenshots pasted inline. Roughly 640 words. A reader cannot find step 6 and Penny gets the whole wall or nothing. Every other problem is downstream of this.
+`Categories (0)` on published articles. In-app help filters on data category, so nothing can reach the panel.
+The article names a person and hedges about it — "reach out to Hugh Richardson (or whoever the current system administrator is)". The parenthesis is the author knowing it will go stale.
+Steps describe destinations instead of linking to them — "Select Manage members, and it will open a web page". Those pages have stable URLs.
+No step carries a verify line. The Trail Kits have required one for a year.
+`Validation Status: Not Validated`, `Last Tested Version` empty, `Next Review Date` empty on eight of nine.
+`Related Articles` is empty and the Knowledge Map panel has one node, so there is no graph to traverse.
+`helpPanel.panelExclusion.test.tsx` confirms coach, learner and volunteer audiences have no access to `/api/knowledge/sf-articles`. In-app help is a staff feature wearing a question-mark icon.
+Reuse, do not rebuild
+Piece	Source
+Shell, topbar, sidebar, hub tabs	`src/components/layout/` — `AppShell`, `Topbar`, `Sidebar`, `HubShell`
+Action bar + tier gating	`components/workspace/ActionBar.tsx`, `hooks/useTierFlags.ts`, `config/accessTiers.ts`
+Slide-over for create/edit	`components/workspace/RailActionPanel.tsx`, `types/actionPanel.ts`
+Article CRUD and lifecycle	`hooks/useKnowledgeArticles.ts` — keep the hook's shape; add steps, abstract, relationships
+Body editor	`components/knowledge/RichTextEditor.tsx` — now edits one step's instruction, not the whole procedure
+In-app help panel	`components/layout/HelpPanel.tsx`, `hooks/useHelpArticles.ts`
+Status colors	`config/statusColors.ts` — five roles, never a new Tailwind family
+Tokens	`src/index.css` Section 1 — never raw hex outside it
+Density	`.agents/memory/admin-ux-standards.md`
+Routes
+Seven tabs under the existing Knowledge group, replacing Builder:
+```
+/knowledge/studio                 Overview        (default)
+/knowledge/studio/article/:id     Article
+/knowledge/studio/review/:id      Penny review
+/knowledge/studio/approval        Approval
+/knowledge/studio/freshness       Freshness
+/knowledge/studio/help-map        In-app help
+/knowledge/studio/penny           Penny's read
+```
+Keep `/knowledge`, `/knowledge/governance`, `/knowledge/library` and `/knowledge/memory` as they are. Redirect `/knowledge/article-studio` → `/knowledge/studio`. Add every route to `__tests__/routes.smoke.ts`.
+The model change
+One new child object. Confirm API names against the org before building.
+Object	Role
+`Knowledge__kav`	Existing. SOP record type. `Procedure` rich-text is deprecated — migrate and stop writing to it.
+`Procedure_Step__c`	New. One per step: sequence, instruction, `Verify_Line__c`, `Direct_URL__c`, capture attachment, `Captured_Against__c` (the tool version).
+`Retrieval_Abstract__c`	New field or child. Questions answered, what it does not cover, audience, `Describes_Version__c`. Regenerated at publish, never hand-edited.
+Relationship object	The API name is unconfirmed — nothing in the app builds relationships and I did not want to guess. Check the org. Needs a type picklist (Prerequisite / Next step / Reverses / Other side / Escalates to / Supersedes) and an inverse-writing rule.
+`Step_Report__c`	New. A reader flagging "this does not match what I see" — points at the step, not the article.
+Migration: the nine existing articles need `Procedure` split into steps by hand. It is nine records, and doing it by hand is how someone notices what is already stale.
+Build order
+#	Build	Done means
+1	`Procedure_Step__c` + the Article tab's step editor	A step has an instruction, a verify line, a direct link and a capture. Migrate the nine.
+2	Capture attachment with `Captured_Against__c`	Every frame records the tool version it was taken against
+3	Categories and relationships committed at publish, under the Knowledge Manager license	An article cannot reach in-app help uncategorized or unlinked
+4	Retrieval abstract, regenerated on publish	Penny retrieves questions and exclusions, not a précis
+5	Penny review, split required / suggested, before the human gate	Required blocks approval; suggested does not
+6	Fix audience access to the articles endpoint	Coaches and learners can open an article at all
+7	`Step_Report__c` + the Freshness tab	A reader can flag a step in one tap, and reports cluster by session
+8	Step-level retrieval and typed traversal for Penny	She cites step 6, not the article
+Item 6 is late in the list only because the earlier items decide what those audiences would see. It is the largest change in reach.
+Hard rules
+Required actions block approval; suggestions never do. Required means: it will be wrong soon, it stops the reader, or it breaks a rule already written down. Everything else is a suggestion. Keeping that line honest is what stops the review being ignored.
+The retrieval abstract regenerates at publish, never at creation, and is never hand-editable. An abstract written at creation describes a draft. A stale retrieval index is worse than stale prose because it fails silently and confidently.
+Every relationship is directional and writes its inverse. A link to an unpublished article holds as Pending and resolves when the target publishes. Penny never traverses into a draft.
+Categorizing, linking and publishing are one act by one person — the Knowledge Manager license holder. Show "Assign categories" elsewhere as disabled with that reason, never hidden.
+Penny never approves, never publishes, and never edits a body without showing the change first. She does not invent a verify line and leave it untested.
+When a step is stale she degrades rather than guesses — answers from the steps around it and says which one she is skipping.
+Do not add a human-facing AI summary. `Overview` is the author saying why the article exists. A generated summary above it goes stale, disagrees with it, and teaches readers to skip the top of every article.
+US spelling everywhere, including code comments and file names. No emoji. Sentence case. One amber CTA per screen. Never color alone for meaning.
+Two prerequisites outside this build
+Audience access to the articles endpoint (item 6). Until then, in-app help serves staff only.
+A Knowledge Manager license on whoever publishes. Today that is Hugh or Angela, which makes publishing a scheduling constraint, not just a permission.

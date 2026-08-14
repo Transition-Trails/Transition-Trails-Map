@@ -5,7 +5,7 @@
  * of Trail Kits.  No user session required to read kit data; the token itself
  * is the credential.
  *
- * GET  /buyer/page/:token   — public; validate token, return mock page data
+ * GET  /buyer/page/:token   — public; validate token, return SF Asset page data
  * POST /buyer/asset/:assetId/link — staff-only; generate a magic link
  *
  * Token validity rules (all invalid states return 404, never 400, so callers
@@ -14,6 +14,10 @@
  *   • Token found but revokedAt is non-null        → 404
  *   • Token found but expiresAt is in the past     → 404
  *   • Token format is obviously wrong (< 8 chars)  → 404
+ *
+ * Salesforce errors:
+ *   • Asset record not found in SF (removed after token was issued) → 404
+ *   • SF unavailable (network / rate-limit / auth)                  → 503
  */
 
 import { Router } from "express";
@@ -25,6 +29,7 @@ import { eq } from "drizzle-orm";
 import { requireStaff } from "../middlewares/requireAuth.js";
 import type { RequestHandler } from "express";
 import { logger } from "../lib/logger.js";
+import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
 
 const router = Router();
 
@@ -36,11 +41,10 @@ const INVALID_TOKEN_RESPONSE = {
   message: "This link is invalid or has been removed.  Please check your receipt email for the correct link.",
 } as const;
 
-// ── Mock data shape ────────────────────────────────────────────────────────────
+// ── KitPageData shape ──────────────────────────────────────────────────────────
 //
-// In Phase 1 the Salesforce Asset fetch is not yet wired.  The route returns
-// a mock payload that matches the real schema so the frontend can be built
-// against it without waiting for the Salesforce integration task.
+// The canonical shape returned by GET /buyer/page/:token.
+// Fields map to Salesforce Asset fields; see mapAssetToKitPageData() below.
 
 interface ChangeEntry {
   date:        string;
@@ -93,93 +97,162 @@ interface KitPageData {
   licenseTerms:  string[];
 }
 
-function buildMockKitData(assetId: string): KitPageData {
+// ── Salesforce Asset shape ─────────────────────────────────────────────────────
+
+interface SfAssetRecord {
+  Id:                       string;
+  Name:                     string;
+  PurchaseDate:             string | null;
+  Status:                   string | null;
+  Description:              string | null;
+  Product2?:                { Name: string; Family?: string | null } | null;
+  // Custom fields — null when the field exists but is empty.
+  // May be absent from the response if the org has no such field.
+  Kit_Edition__c?:          string | null;
+  Series_Label__c?:         string | null;
+  Content_Types__c?:        string | null;
+  Audience_Type__c?:        string | null;
+  License_Terms__c?:        string | null;
+  Change_Log_JSON__c?:      string | null;
+  Bundle_JSON__c?:          string | null;
+  Beats_JSON__c?:           string | null;
+  QR_Codes_JSON__c?:        string | null;
+  Shared_Inserts_JSON__c?:  string | null;
+  Test_Data_JSON__c?:       string | null;
+}
+
+// Full SOQL SELECT clause — includes custom fields.  Falls back to
+// STANDARD_FIELDS if the org returns INVALID_FIELD.
+const FULL_ASSET_SELECT =
+  "Id, Name, PurchaseDate, Status, Description, " +
+  "Product2.Name, Product2.Family, " +
+  "Kit_Edition__c, Series_Label__c, Content_Types__c, Audience_Type__c, " +
+  "License_Terms__c, Change_Log_JSON__c, Bundle_JSON__c, Beats_JSON__c, " +
+  "QR_Codes_JSON__c, Shared_Inserts_JSON__c, Test_Data_JSON__c";
+
+const STANDARD_ASSET_SELECT =
+  "Id, Name, PurchaseDate, Status, Description, Product2.Name, Product2.Family";
+
+// ── Field-parsing helpers ──────────────────────────────────────────────────────
+
+function parseJsonField<T>(raw: string | null | undefined, fallback: T): T {
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Parse a multi-value text field into a string array.
+ * Tries JSON first, then newline-delimited, then semicolon-delimited.
+ */
+function parseStringList(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) as string[];
+  } catch {
+    // ignore — not JSON
+  }
+  if (raw.includes("\n")) return raw.split("\n").map((s) => s.trim()).filter(Boolean);
+  return raw.split(";").map((s) => s.trim()).filter(Boolean);
+}
+
+// ── Salesforce fetch ───────────────────────────────────────────────────────────
+
+/**
+ * Fetch the Salesforce Asset record for the given ID and map it to KitPageData.
+ *
+ * Tries a query with custom fields first.  If the org returns INVALID_FIELD
+ * (custom fields not installed), retries with only standard Asset fields so
+ * the page still loads — just with fewer richly-typed sections.
+ *
+ * Throws on network/auth/rate-limit failures — let the caller decide the HTTP
+ * response.  Throws with code "ASSET_NOT_FOUND" when the record doesn't exist.
+ */
+export async function fetchKitDataFromSalesforce(assetId: string): Promise<KitPageData> {
+  const sf = new ConnectorSalesforceClient();
+
+  let asset: SfAssetRecord | null = null;
+
+  for (const select of [FULL_ASSET_SELECT, STANDARD_ASSET_SELECT]) {
+    try {
+      const result = await sf.query<SfAssetRecord>(
+        `SELECT ${select} FROM Asset WHERE Id = '${assetId}' LIMIT 1`
+      );
+      asset = result.records[0] ?? null;
+      break; // query succeeded — exit the retry loop
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+
+      // If this was already the fallback (standard fields) query, re-throw.
+      if (select === STANDARD_ASSET_SELECT) throw err;
+
+      // If SF rejected a field name, retry with only standard fields.
+      if (msg.includes("INVALID_FIELD") || msg.includes("No such column")) {
+        logger.warn(
+          { assetId },
+          "buyer: custom Asset fields not found in SF org — retrying with standard fields only"
+        );
+        continue;
+      }
+
+      // Any other SF error (network, auth, rate-limit) — re-throw immediately.
+      throw err;
+    }
+  }
+
+  if (!asset) {
+    const err = new Error(`Asset record not found in Salesforce: ${assetId}`);
+    (err as Error & { code: string }).code = "ASSET_NOT_FOUND";
+    throw err;
+  }
+
+  return mapAssetToKitPageData(asset);
+}
+
+function mapAssetToKitPageData(asset: SfAssetRecord): KitPageData {
+  const seriesLabel =
+    asset.Series_Label__c ??
+    asset.Product2?.Family ??
+    asset.Product2?.Name ??
+    "Transition Trails Series";
+
+  const editionName = asset.Kit_Edition__c ?? asset.Status ?? "";
+
+  const contentTypes = parseStringList(asset.Content_Types__c);
+
+  const purchaseDate =
+    asset.PurchaseDate ?? new Date().toISOString().slice(0, 10);
+
+  const rawAudience = (asset.Audience_Type__c ?? "").toLowerCase();
+  const audienceType: "nonprofit" | "learner" =
+    rawAudience === "learner" ? "learner" : "nonprofit";
+
+  const licenseTerms  = parseStringList(asset.License_Terms__c);
+  const changeLog     = parseJsonField<ChangeEntry[]>(asset.Change_Log_JSON__c, []);
+  const bundle        = parseJsonField<BundleKit[] | null>(asset.Bundle_JSON__c, null);
+  const beats         = parseJsonField<Beat[]>(asset.Beats_JSON__c, []);
+  const qrCodes       = parseJsonField<QREntry[]>(asset.QR_Codes_JSON__c, []);
+  const sharedInserts = parseJsonField<SharedInsert[]>(asset.Shared_Inserts_JSON__c, []);
+  const testDataFiles = parseJsonField<TestDataFile[]>(asset.Test_Data_JSON__c, []);
+
   return {
-    assetId,
-    seriesLabel:  "Transition Trails Series",
-    kitTitle:     "Nonprofit Leadership Transition Trail Kit",
-    editionName:  "Spring 2025 Edition",
-    contentTypes: ["Workbook", "Video Scripts", "Facilitator Guide", "Build With Me Sessions"],
-    purchaseDate: "2025-02-14",
-    audienceType: "nonprofit",
-    changeLog: [
-      {
-        date:        "2025-04-10",
-        reason:      "Corrected worksheet exercise numbering that caused confusion in group sessions",
-        description: "Exercises 4 and 5 in the Decide section were out of order.  The content itself was not changed — only the numbering and the cross-references on pages 38 and 42.",
-      },
-      {
-        date:        "2025-03-22",
-        reason:      "Added a missing note about board approval timelines to the Launch section",
-        description: "Several facilitated sessions surfaced a common question about how long board sign-off typically takes.  A one-page reference note has been added as a shared insert.",
-      },
-      {
-        date:        "2025-03-05",
-        reason:      "Replaced two broken Build With Me video links",
-        description: "The QR codes for sessions 2 and 4 now point to the correct short links.  The videos themselves have not changed.",
-      },
-    ],
-    bundle: [
-      {
-        assetId:     assetId,
-        title:       "Nonprofit Leadership Transition Trail Kit",
-        downloadUrl: "#",
-        status:      "available",
-      },
-      {
-        assetId:     "asset-companion-001",
-        title:       "Board Readiness Companion Kit",
-        downloadUrl: "#",
-        status:      "available",
-      },
-      {
-        assetId:     "asset-future-001",
-        title:       "Digital Compass Workbook",
-        downloadUrl: "#",
-        status:      "pending",
-        expectedMonth: "September 2025",
-      },
-    ],
-    beats: [
-      { name: "Why",       pageCount: 12 },
-      { name: "Decide",    pageCount: 24 },
-      { name: "Build",     pageCount: 38 },
-      { name: "Verify",    pageCount: 16 },
-      { name: "Next Step", pageCount: 10 },
-    ],
-    sharedInserts: [
-      { title: "Board Approval Timeline Reference" },
-      { title: "Stakeholder Communication Templates" },
-      { title: "Legal Checklist for Nonprofit Transitions" },
-      { title: "Glossary of Transition Terms" },
-    ],
-    qrCodes: [
-      { title: "Build With Me — Session 1: Framing Your Why",     code: "bwm-nlt-s1", scanStatus: "passed" },
-      { title: "Build With Me — Session 2: Mapping Stakeholders", code: "bwm-nlt-s2", scanStatus: "passed" },
-      { title: "Build With Me — Session 3: Building the Plan",    code: "bwm-nlt-s3", scanStatus: "pending" },
-      { title: "Build With Me — Session 4: Verifying Readiness",  code: "bwm-nlt-s4", scanStatus: "pending" },
-    ],
-    testDataFiles: [
-      {
-        filename: "test-small-org.csv",
-        edgeCase: "Organisation with fewer than 5 staff — exercises that assume a full leadership team are flagged for adaptation",
-      },
-      {
-        filename: "test-board-led.csv",
-        edgeCase: "Board-led transition where no executive director is involved — decision authority rows are remapped to committee chairs",
-      },
-      {
-        filename: "test-multi-site.csv",
-        edgeCase: "Multi-site nonprofit where each location follows a different timeline — the shared Verify section is duplicated per site",
-      },
-    ],
-    licenseTerms: [
-      "Use this kit for one organisation's transition process",
-      "Print and distribute copies to your board, staff, and facilitation team",
-      "Use the workbook exercises in facilitated sessions you lead",
-      "Adapt the templates with your organization's name and context",
-      "Store digital copies on your organisation's internal systems",
-    ],
+    assetId:   asset.Id,
+    seriesLabel,
+    kitTitle:  asset.Name,
+    editionName,
+    contentTypes,
+    purchaseDate,
+    audienceType,
+    changeLog,
+    bundle,
+    beats,
+    sharedInserts,
+    qrCodes,
+    testDataFiles,
+    licenseTerms,
   };
 }
 
@@ -197,6 +270,10 @@ router.get("/buyer/page/:token", async (req: Request, res: Response): Promise<vo
     res.status(404).json(INVALID_TOKEN_RESPONSE);
     return;
   }
+
+  // ── Step 1: validate the token against the database ────────────────────────
+
+  let assetId: string;
 
   try {
     const [row] = await db
@@ -223,11 +300,35 @@ router.get("/buyer/page/:token", async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    const pageData = buildMockKitData(row.assetId);
-    res.json({ ok: true, data: pageData });
+    assetId = row.assetId;
   } catch (err) {
     logger.error({ err }, "buyer: failed to look up token");
     res.status(500).json({ error: "internal_error", message: "Something went wrong.  Please try again later." });
+    return;
+  }
+
+  // ── Step 2: fetch the Salesforce Asset record ──────────────────────────────
+
+  try {
+    const pageData = await fetchKitDataFromSalesforce(assetId);
+    res.json({ ok: true, data: pageData });
+  } catch (sfErr) {
+    logger.error({ err: sfErr, assetId }, "buyer: Salesforce Asset fetch failed");
+
+    // Asset record removed from SF after the token was issued.
+    if ((sfErr as { code?: string }).code === "ASSET_NOT_FOUND") {
+      res.status(404).json({
+        error:   "asset_not_found",
+        message: "The content for this link is no longer available.  Please contact support.",
+      });
+      return;
+    }
+
+    // SF connectivity / rate-limit / auth failure.
+    res.status(503).json({
+      error:   "sf_unavailable",
+      message: "We were unable to load your kit details.  Please try again in a moment.",
+    });
   }
 });
 
