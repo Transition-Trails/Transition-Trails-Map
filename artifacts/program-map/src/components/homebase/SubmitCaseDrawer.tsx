@@ -67,9 +67,16 @@ type OwnerMode = "self" | "queue";
 
 function LookupField({
   label, types, placeholder, value, onChange,
+  searchEndpoint, required, hasError,
 }: {
   label: string; types: string; placeholder: string;
   value: SearchHit | null; onChange: (hit: SearchHit | null) => void;
+  /** When provided, overrides the generic /api/sf/records/search endpoint. */
+  searchEndpoint?: string;
+  /** Show an asterisk on the label. */
+  required?: boolean;
+  /** Highlight the input border in red. */
+  hasError?: boolean;
 }) {
   const [query,      setQuery]      = useState("");
   const [results,    setResults]    = useState<SearchHit[]>([]);
@@ -94,9 +101,10 @@ function LookupField({
     setLoading(true);
     timerRef.current = setTimeout(async () => {
       try {
-        const r = await fetch(
-          `/api/sf/records/search?q=${encodeURIComponent(query)}&types=${encodeURIComponent(types)}`
-        );
+        const url = searchEndpoint
+          ? `${searchEndpoint}?q=${encodeURIComponent(query)}`
+          : `/api/sf/records/search?q=${encodeURIComponent(query)}&types=${encodeURIComponent(types)}`;
+        const r = await fetch(url);
         if (r.ok) {
           const d = await r.json() as { results: SearchHit[] };
           setResults(d.results ?? []);
@@ -110,12 +118,14 @@ function LookupField({
       } finally { setLoading(false); }
     }, 320);
     return undefined;
-  }, [query, types]);
+  }, [query, types, searchEndpoint]);
 
   if (value) {
     return (
       <div className="space-y-1.5">
-        <label className="text-[13px] font-medium text-foreground">{label}</label>
+        <label className="text-[13px] font-medium text-foreground">
+          {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
+        </label>
         <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
           <span className="text-sm flex-1 truncate">{value.label}</span>
@@ -130,7 +140,9 @@ function LookupField({
 
   return (
     <div className="space-y-1.5">
-      <label className="text-[13px] font-medium text-foreground">{label}</label>
+      <label className="text-[13px] font-medium text-foreground">
+        {label}{required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
       <div className="relative" ref={wrapRef}>
         <Search className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
         {loading && (
@@ -142,7 +154,9 @@ function LookupField({
           onChange={e => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder={placeholder}
-          className="w-full rounded-lg border border-border bg-background pl-8 pr-8 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className={`w-full rounded-lg border bg-background pl-8 pr-8 py-2 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 ${
+            hasError ? "border-rose-400 focus:ring-rose-300" : "border-border"
+          }`}
         />
         {open && results.length > 0 && (
           <div className={`absolute z-10 left-0 right-0 rounded-lg border border-border bg-white shadow-lg overflow-hidden ${openUpward ? "bottom-full mb-1" : "top-full mt-1"}`}>
@@ -234,8 +248,9 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, init
   const [queues,        setQueues]        = useState<Queue[]>([]);
   const [queuesLoading, setQueuesLoading] = useState(false);
   const [selectedQueue, setSelectedQueue] = useState<Queue | null>(null);
-  const [contact,       setContact]       = useState<SearchHit | null>(null);
-  const [account,       setAccount]       = useState<SearchHit | null>(null);
+  const [contact,          setContact]          = useState<SearchHit | null>(null);
+  const [account,          setAccount]          = useState<SearchHit | null>(null);
+  const [serviceContract,  setServiceContract]  = useState<SearchHit | null>(null);
   const [attachments,   setAttachments]   = useState<File[]>([]);
   const [submitting,    setSubmitting]    = useState(false);
   const [formError,     setFormError]     = useState<string | null>(null);
@@ -347,6 +362,7 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, init
     setSelectedQueue(null);
     setContact(null);
     setAccount(null);
+    setServiceContract(null);
     setAttachments([]);
     setFormError(null);
     setResult(null);
@@ -377,11 +393,16 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, init
 
   // ── Submit ───────────────────────────────────────────────────────────────────
 
+  // True when the selected record type requires Contact + Service Contract.
+  const isGSC = selectedType?.name?.includes("General Service Contract") ?? false;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (submittingRef.current) return;          // double-submit guard
     if (!subject.trim()) { setFormError("Subject is required."); return; }
     if (ownerMode === "queue" && !selectedQueue) { setFormError("Please select a queue."); return; }
+    if (isGSC && !contact)         { setFormError("Contact is required for this case type."); return; }
+    if (isGSC && !serviceContract) { setFormError("Service Contract is required for this case type."); return; }
 
     submittingRef.current = true;
     setFormError(null);
@@ -391,15 +412,17 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, init
       const plainDesc = htmlToPlainText(descHtml);
 
       const body: Record<string, unknown> = {
-        subject:        subject.trim(),
-        description:    plainDesc || undefined,
+        subject:             subject.trim(),
+        description:         plainDesc || undefined,
         priority,
-        recordTypeId:   selectedType?.id   || undefined,
-        recordTypeName: selectedType?.name || undefined,
-        contactId:      contact?.id        || undefined,
-        contactName:    contact?.label     || undefined,
-        accountId:      account?.id        || undefined,
-        accountName:    account?.label     || undefined,
+        recordTypeId:        selectedType?.id   || undefined,
+        recordTypeName:      selectedType?.name || undefined,
+        contactId:           contact?.id        || undefined,
+        contactName:         contact?.label     || undefined,
+        accountId:           account?.id        || undefined,
+        accountName:         account?.label     || undefined,
+        serviceContractId:   isGSC ? serviceContract?.id    : undefined,
+        serviceContractName: isGSC ? serviceContract?.label : undefined,
       };
 
       if (ownerMode === "queue" && selectedQueue) {
@@ -649,14 +672,30 @@ export function SubmitCaseDrawer({ open, onClose, onSubmitted, initialType, init
                 )}
               </div>
 
-              {/* Contact */}
+              {/* Contact — required for General Service Contract */}
               <LookupField
                 label="Contact"
                 types="Contact"
                 placeholder="Search contacts…"
                 value={contact}
                 onChange={setContact}
+                required={isGSC}
+                hasError={isGSC && !contact && !!formError}
               />
+
+              {/* Service Contract — shown and required only for General Service Contract */}
+              {isGSC && (
+                <LookupField
+                  label="Service Contract"
+                  types="ServiceContract"
+                  placeholder="Search service contracts…"
+                  value={serviceContract}
+                  onChange={setServiceContract}
+                  searchEndpoint="/api/cases/search/service-contracts"
+                  required
+                  hasError={!serviceContract && !!formError}
+                />
+              )}
 
               {/* Account */}
               <LookupField

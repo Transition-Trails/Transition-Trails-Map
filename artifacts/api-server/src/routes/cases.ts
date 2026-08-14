@@ -468,6 +468,37 @@ router.post("/sf/cases/:caseId/attachments", async (req, res) => {
   return res.json({ uploaded, failed, results });
 });
 
+// ── GET /api/cases/search/service-contracts ───────────────────────────────────
+// Returns ServiceContract records whose Name matches the query string.
+// Used by the SubmitCaseDrawer's Service Contract lookup field.
+
+router.get("/cases/search/service-contracts", async (req, res) => {
+  const q = ((req.query["q"] as string) ?? "").trim();
+  if (q.length < 2) return res.json({ results: [] });
+
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
+  try { client = getSalesforceClient(req); } catch { /* no SF session */ }
+  if (!client) return res.status(503).json({ results: [] });
+
+  // Strip single quotes to avoid SOQL injection; LIKE wildcards are safe.
+  const safe = q.replace(/'/g, "");
+  try {
+    const result = await client.query<{ Id: string; Name: string }>(
+      `SELECT Id, Name FROM ServiceContract WHERE Name LIKE '%${safe}%' ORDER BY Name LIMIT 10`
+    );
+    return res.json({
+      results: result.records.map(r => ({
+        id:    r.Id,
+        type:  "ServiceContract",
+        label: r.Name,
+      })),
+    });
+  } catch (e) {
+    logger.warn({ err: e }, "ServiceContract search failed");
+    return res.json({ results: [] });
+  }
+});
+
 // ── POST /api/cases/submit ────────────────────────────────────────────────────
 // Local-first case creation: writes to DB first, then syncs to Salesforce.
 
@@ -480,17 +511,75 @@ router.post("/cases/submit", async (req, res) => {
   const {
     recordTypeId, recordTypeName, subject, description, priority,
     ownerId, ownerName, ownerType,
-    contactId, contactName, accountId, accountName, customFields,
+    contactId, contactName, accountId, accountName,
+    serviceContractId,
+    customFields,
   } = req.body as {
-    recordTypeId?:  string; recordTypeName?: string;
-    subject?:       string; description?:    string; priority?: string;
-    ownerId?:       string; ownerName?:      string; ownerType?: string;
-    contactId?:     string; contactName?:    string;
-    accountId?:     string; accountName?:    string;
-    customFields?:  Record<string, unknown>;
+    recordTypeId?:      string; recordTypeName?: string;
+    subject?:           string; description?:    string; priority?: string;
+    ownerId?:           string; ownerName?:      string; ownerType?: string;
+    contactId?:         string; contactName?:    string;
+    accountId?:         string; accountName?:    string;
+    serviceContractId?: string;
+    customFields?:      Record<string, unknown>;
   };
 
   if (!subject?.trim()) return res.status(400).json({ error: "subject is required." });
+
+  // ── Obtain SF client early for authoritative record-type lookup ─────────────
+  // Initialise here (before the local DB write) so we can verify the record
+  // type name from Salesforce rather than trusting the client-supplied string.
+  // This prevents a forged/omitted recordTypeName from bypassing GSC checks.
+  let client: ReturnType<typeof getSalesforceClient> | null = null;
+  try { client = getSalesforceClient(req); } catch { /* no SF session */ }
+
+  // Resolve the authoritative record type name: query SF when a client and ID
+  // are both present; fall back to the client-supplied name only when we have
+  // no session (the case will be stored locally and cannot sync until the user
+  // connects, at which point SF itself enforces required fields).
+  // When connected to Salesforce, resolve the record type name authoritatively.
+  // Fail closed: if the lookup errors or returns no row we refuse the request
+  // rather than falling back to the client-supplied name (which could be forged).
+  let resolvedRtName: string | null = null;
+  if (client && recordTypeId) {
+    // Strip non-alphanumeric chars from the ID to prevent SOQL injection.
+    const safeId = recordTypeId.replace(/[^a-zA-Z0-9]/g, "");
+    let rtRes: { records: Array<{ Name: string }> } | null = null;
+    try {
+      rtRes = await client.query<{ Name: string }>(
+        `SELECT Name FROM RecordType WHERE Id = '${safeId}' LIMIT 1`
+      );
+    } catch (e) {
+      logger.warn({ err: e }, "RecordType lookup failed during case submit");
+      return res.status(503).json({ error: "Unable to verify record type. Please try again." });
+    }
+    if (!rtRes.records[0]) {
+      return res.status(400).json({ error: "The selected record type was not found in Salesforce." });
+    }
+    resolvedRtName = rtRes.records[0].Name;
+  } else if (!client && recordTypeName) {
+    // No SF session — case will be saved locally only. Use the client-supplied
+    // name for display purposes; SF itself enforces field requirements on sync.
+    resolvedRtName = recordTypeName;
+  }
+
+  const isGscType = resolvedRtName?.includes("General Service Contract") ?? false;
+  if (isGscType && !contactId) {
+    return res.status(400).json({ error: "Contact is required for General Service Contract cases." });
+  }
+  if (isGscType && !serviceContractId) {
+    return res.status(400).json({ error: "Service Contract is required for General Service Contract cases." });
+  }
+
+  // Build merged customFields, filtering underscore-prefixed helper keys at
+  // construction time so they are never stored in the DB or sent to Salesforce.
+  const mergedCustomFields: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(customFields ?? {})) {
+    if (!k.startsWith("_")) mergedCustomFields[k] = v;
+  }
+  if (serviceContractId) {
+    mergedCustomFields["ServiceContractId"] = serviceContractId;
+  }
 
   // 1. Insert local record (pending sync)
   const [local] = await db
@@ -501,7 +590,7 @@ router.post("/cases/submit", async (req, res) => {
       priority:       priority ?? "Medium",
       status:         "New",
       recordTypeId:   recordTypeId   || null,
-      recordTypeName: recordTypeName || null,
+      recordTypeName: resolvedRtName || null,   // store the server-resolved name
       ownerId:        ownerId        || null,
       ownerName:      ownerName      || null,
       ownerType:      ownerType      || null,
@@ -509,7 +598,7 @@ router.post("/cases/submit", async (req, res) => {
       contactName:    contactName    || null,
       accountId:      accountId      || null,
       accountName:    accountName    || null,
-      customFields:   customFields   ?? null,
+      customFields:   Object.keys(mergedCustomFields).length > 0 ? mergedCustomFields : null,
       createdByEmail: userEmail,
       syncStatus:     "pending",
     })
@@ -517,10 +606,7 @@ router.post("/cases/submit", async (req, res) => {
 
   if (!local) return res.status(500).json({ error: "Failed to create local case record." });
 
-  // 2. Attempt Salesforce sync
-  let client: ReturnType<typeof getSalesforceClient> | null = null;
-  try { client = getSalesforceClient(req); } catch { /* no SF session */ }
-
+  // 2. Attempt Salesforce sync (client already obtained above)
   if (!client) {
     return res.status(201).json({
       case: local, synced: false,
@@ -538,13 +624,16 @@ router.post("/cases/submit", async (req, res) => {
       Priority: priority ?? "Medium",
       Origin:   "Web",
     };
-    if (description?.trim())  sfData["Description"]  = description.trim();
-    if (recordTypeId)         sfData["RecordTypeId"]  = recordTypeId;
-    if (contactId)            sfData["ContactId"]     = contactId;
-    if (accountId)            sfData["AccountId"]     = accountId;
+    if (description?.trim())   sfData["Description"]      = description.trim();
+    if (recordTypeId)          sfData["RecordTypeId"]      = recordTypeId;
+    if (contactId)             sfData["ContactId"]         = contactId;
+    if (accountId)             sfData["AccountId"]         = accountId;
+    if (serviceContractId)     sfData["ServiceContractId"] = serviceContractId;
     sfData["OwnerId"] = ownerId || sfUserId || undefined;
-    if (customFields) {
-      for (const [k, v] of Object.entries(customFields)) sfData[k] = v;
+    // Spread extra custom fields — underscore-prefixed keys are already absent
+    // from mergedCustomFields (filtered at construction).
+    for (const [k, v] of Object.entries(mergedCustomFields)) {
+      sfData[k] = v;
     }
     for (const k of Object.keys(sfData)) {
       if (sfData[k] === undefined) delete sfData[k];
@@ -699,7 +788,9 @@ router.post("/cases/:id/retry", async (req, res) => {
     sfData["OwnerId"] = claimed.ownerId || sfUserId || undefined;
     if (claimed.customFields && typeof claimed.customFields === "object") {
       for (const [k, v] of Object.entries(claimed.customFields as Record<string, unknown>)) {
-        sfData[k] = v;
+        // Skip underscore-prefixed helper keys — they are Trail OS internals and
+        // are not valid Salesforce field names (Salesforce would reject them).
+        if (!k.startsWith("_")) sfData[k] = v;
       }
     }
     for (const k of Object.keys(sfData)) {
