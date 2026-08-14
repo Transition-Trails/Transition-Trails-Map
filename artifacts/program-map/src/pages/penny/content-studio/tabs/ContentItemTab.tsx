@@ -19,6 +19,8 @@ import type { ContentItemStatus, ContentItemPublication, ProductNode } from '../
 
 // ── Status → role mapping ─────────────────────────────────────────────────────
 
+import type { ContentItem } from '../types';
+
 function statusToRole(status: ContentItemStatus): StatusRole {
   switch (status) {
     case 'In Progress':       return 'information';
@@ -37,21 +39,21 @@ function statusToRole(status: ContentItemStatus): StatusRole {
 
 const MOCK_PUBLICATIONS: ContentItemPublication[] = [
   {
-    platform: 'Salesforce Knowledge',
+    platform: 'YouTube',
     planned:  '2026-08-18T00:00:00Z',
     actual:   undefined,
     status:   'planned',
     url:      undefined,
   },
   {
-    platform: 'Slack',
+    platform: 'LinkedIn',
     planned:  '2026-08-19T00:00:00Z',
     actual:   undefined,
     status:   'planned',
     url:      undefined,
   },
   {
-    platform: 'Email Newsletter',
+    platform: 'Substack',
     planned:  '2026-08-22T00:00:00Z',
     actual:   undefined,
     status:   'planned',
@@ -178,11 +180,14 @@ function StatusDot({ color }: { color: DotColor }) {
 // Main component
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function ContentItemTab() {
-  const item = MOCK_FEATURED_ITEM;
+export function ContentItemTab({ selectedItem }: { selectedItem?: ContentItem | null }) {
+  // Fall back to the featured mock item when no item is passed (e.g. direct URL visit)
+  const item = selectedItem ?? MOCK_FEATURED_ITEM;
 
-  // Demo: start as 'In Progress' so the amber Submit CTA is visible
-  const [localStatus, setLocalStatus] = useState<ContentItemStatus>('In Progress');
+  // Initialize from the actual item status so the badge and CTA match the kanban column.
+  // The `key` prop on this component (set in ContentStudio) ensures a remount when a
+  // different item is selected, so this initializer always runs fresh.
+  const [localStatus, setLocalStatus] = useState<ContentItemStatus>(item.status);
 
   const role      = statusToRole(localStatus);
   const badgeCls  = STATUS_CLASSES[role].badge;
@@ -486,7 +491,7 @@ export function ContentItemTab() {
               {/* Footer note */}
               <div className="px-3 py-2 border-t border-border border-l-2 border-l-[#E2E4E1]">
                 <p className="text-[11px] text-muted-foreground/60 leading-snug">
-                  Buffer handles scheduling for social channels. Salesforce Knowledge publishes directly on approval. Planned dates are targets; actual dates are set on publish.
+                  Buffer handles scheduling for social channels. Planned dates are targets; actual dates are set on publish.
                 </p>
               </div>
             </div>

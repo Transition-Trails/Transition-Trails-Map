@@ -7,6 +7,7 @@
 // Note: replace with viewerRole === 'crew' when that field is added to AppContext.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { useState } from 'react';
 import { PenTool } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { HubShell } from '@/components/layout/HubShell';
@@ -26,11 +27,13 @@ const BASE = '/penny/content-studio';
 export default function ContentStudio() {
   const { userTier } = useAppContext();
   const [, setLocation] = useLocation();
+  const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
 
   // 'everyday' maps to the crew audience role; show only Trail Crew tab for crew members.
   const isCrew = userTier === 'everyday';
 
-  function handleSelectItem(_item: ContentItem) {
+  function handleSelectItem(item: ContentItem) {
+    setSelectedItem(item);
     setLocation(`${BASE}/content-item`);
   }
 
@@ -39,7 +42,7 @@ export default function ContentStudio() {
       id: 'pipeline',
       label: 'Pipeline',
       path: BASE,
-      content: <PipelineTab />,
+      content: <PipelineTab onSelectItem={handleSelectItem} />,
     },
     {
       id: 'topic',
@@ -51,7 +54,7 @@ export default function ContentStudio() {
       id: 'content-item',
       label: 'Content item',
       path: `${BASE}/content-item`,
-      content: <ContentItemTab />,
+      content: <ContentItemTab key={selectedItem?.id ?? 'default'} selectedItem={selectedItem} />,
     },
     {
       id: 'build-with-me',

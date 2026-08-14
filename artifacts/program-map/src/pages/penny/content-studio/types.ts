@@ -33,11 +33,11 @@ export type ContentFormat =
   | 'Template';
 
 export type PublicationPlatform =
-  | 'Salesforce Knowledge'
-  | 'Slack'
-  | 'Email Newsletter'
+  | 'YouTube'
   | 'LinkedIn'
-  | 'Website Blog';
+  | 'Substack'
+  | 'Website'
+  | 'Instagram';
 
 export type ProductKind = 'collection' | 'bundle' | 'variation' | 'standalone';
 

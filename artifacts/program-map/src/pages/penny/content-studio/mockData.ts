@@ -303,11 +303,11 @@ export const MOCK_TOPIC: ContentTopic = {
 // ── 12-week × 5-platform publication gap matrix ──────────────────────────────
 
 const PLATFORMS: PublicationPlatform[] = [
-  'Salesforce Knowledge',
-  'Slack',
-  'Email Newsletter',
+  'YouTube',
   'LinkedIn',
-  'Website Blog',
+  'Substack',
+  'Website',
+  'Instagram',
 ];
 
 const WEEK_STARTS = [
@@ -317,12 +317,13 @@ const WEEK_STARTS = [
 ];
 
 const GAP_STATUS_MAP: Array<Array<'planned' | 'published' | 'gap' | 'overdue'>> = [
-  // week:  1           2           3           4           5           6           7           8           9           10          11          12
-  ['published', 'published', 'published', 'gap',       'published', 'published', 'planned',  'planned',  'planned',  'planned',  'planned',  'planned'],  // SF Knowledge
-  ['published', 'gap',       'published', 'published', 'gap',       'published', 'planned',  'gap',      'planned',  'planned',  'planned',  'planned'],  // Slack
-  ['published', 'published', 'gap',       'published', 'overdue',   'published', 'planned',  'planned',  'planned',  'planned',  'planned',  'planned'],  // Email
-  ['gap',       'published', 'published', 'gap',       'published', 'overdue',   'planned',  'planned',  'planned',  'planned',  'planned',  'planned'],  // LinkedIn
-  ['published', 'gap',       'gap',       'published', 'published', 'gap',       'planned',  'planned',  'planned',  'planned',  'planned',  'planned'],  // Website
+  // week:  1           2           3           4           5           6           7           8(Aug 25)   9           10          11          12
+  ['published', 'published', 'published', 'gap',       'published', 'published', 'planned',  'gap',      'planned',  'planned',  'planned',  'planned'],  // YouTube
+  ['gap',       'published', 'published', 'gap',       'published', 'overdue',   'planned',  'gap',      'planned',  'planned',  'planned',  'planned'],  // LinkedIn
+  ['published', 'published', 'gap',       'published', 'overdue',   'published', 'planned',  'gap',      'planned',  'planned',  'planned',  'planned'],  // Substack
+  ['published', 'gap',       'published', 'published', 'gap',       'published', 'planned',  'gap',      'planned',  'planned',  'planned',  'planned'],  // Website
+  ['published', 'gap',       'gap',       'published', 'published', 'gap',       'planned',  'gap',      'planned',  'planned',  'planned',  'planned'],  // Instagram
+  // ↑ Week 8 (Aug 25) is intentionally all-gap across every platform.
 ];
 
 export const MOCK_GAP_MATRIX: GapCell[] = PLATFORMS.flatMap((platform, pi) =>
