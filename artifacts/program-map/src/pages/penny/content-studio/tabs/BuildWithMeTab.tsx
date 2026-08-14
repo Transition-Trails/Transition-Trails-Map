@@ -10,6 +10,7 @@ import {
   Info,
   FolderOpen,
   Check,
+  CheckCircle2,
   Headphones,
   User,
   OctagonMinus,
@@ -28,6 +29,11 @@ import { ContentStudioPennyCard } from '../components/PennyCard';
 
 type StageState = 'complete' | 'current' | 'future';
 
+interface RailStage {
+  name: string;
+  sublabel: string;
+  state: StageState;
+}
 interface StageCircleProps {
   state: StageState;
   index: number;
@@ -81,9 +87,11 @@ function lineColor(state: StageState, next: StageState | null): string {
   return '#E2E4E1';
 }
 
-function StageRail() {
-  const stages = BUILD_WITH_ME_VIDEO.stages;
-
+interface StageRailProps {
+  stages: RailStage[];
+  onMarkDone: (index: number) => void;
+}
+function StageRail({ stages, onMarkDone }: StageRailProps) {
   return (
     <div className="grid grid-cols-6 gap-0 w-full">
       {stages.map((stage, i) => {
@@ -92,9 +100,10 @@ function StageRail() {
         const nextState = stages[i + 1]?.state ?? null;
         const leftColor = i === 0 ? 'transparent' : lineColor(stages[i - 1].state, stage.state);
         const rightColor = isLast ? 'transparent' : lineColor(stage.state, nextState);
+        const isCurrent = stage.state === 'current';
 
         return (
-          <div key={stage.name} className="flex flex-col items-center">
+          <div key={stage.name} className="group flex flex-col items-center">
             {/* Line + circle row */}
             <div className="flex items-center w-full">
               {/* Left half-line */}
@@ -111,8 +120,8 @@ function StageRail() {
               />
             </div>
 
-            {/* Label + sublabel */}
-            <div className="mt-1.5 text-center px-1">
+            {/* Label + sublabel + Mark done button */}
+            <div className="mt-1.5 text-center px-1 w-full">
               <p
                 className="text-[12px] font-semibold leading-tight"
                 style={{
@@ -135,6 +144,18 @@ function StageRail() {
                   &mdash;
                 </p>
               )}
+
+              {/* Mark done affordance — only for the current stage */}
+              {isCurrent && (
+                <button
+                  onClick={() => onMarkDone(i)}
+                  className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded border border-[#F5A623] text-[#CC8400] bg-[#FFF8EC] hover:bg-[#FFF3E0] opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 whitespace-nowrap"
+                  aria-label={`Mark ${stage.name} done`}
+                >
+                  <Check className="w-2.5 h-2.5" strokeWidth={2.5} />
+                  Mark done
+                </button>
+              )}
             </div>
           </div>
         );
@@ -143,8 +164,22 @@ function StageRail() {
   );
 }
 
-// ── Script approval card ──────────────────────────────────────────────────────
-
+function PublishedBanner() {
+  return (
+    <div
+      className="flex items-center gap-3 rounded-[8px] px-4 py-3 text-[13px] text-[#2F6B3F]"
+      style={{ backgroundColor: '#E6F0EA', border: '1.5px solid #9FC3AE' }}
+    >
+      <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+      <div>
+        <p className="font-semibold leading-snug">Video published</p>
+        <p className="text-[12px] text-[#2F6B3F]/80 leading-snug mt-0.5">
+          All production stages are complete. The publications table has been updated.
+        </p>
+      </div>
+    </div>
+  );
+}
 function ScriptApprovalCard() {
   const { script } = BUILD_WITH_ME_VIDEO;
 
@@ -499,10 +534,11 @@ function QrCard() {
   );
 }
 
-// ── Publications table ────────────────────────────────────────────────────────
-
-function PublicationsTable() {
-  const { publications } = BUILD_WITH_ME_VIDEO;
+type PubEntry = (typeof BUILD_WITH_ME_VIDEO.publications)[number];
+function PublicationsTable({ publications, isPublished }: PublicationsTableProps) {
+  const rows = isPublished
+    ? publications.map(p => ({ ...p, status: 'published' as const }))
+    : publications;
 
   return (
     <div className="space-y-2">
@@ -528,34 +564,43 @@ function PublicationsTable() {
             </tr>
           </thead>
           <tbody>
-            {publications.map((pub, i) => (
-              <tr
-                key={pub.platform}
-                className={i < publications.length - 1 ? 'border-b border-border' : ''}
-              >
-                <td className="px-3 py-2 font-medium text-foreground">{pub.platform}</td>
-                <td className="px-3 py-2 text-muted-foreground">{pub.planned}</td>
-                <td className="px-3 py-2">
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#EDF5F8] text-[#2F6F7E] border border-[#7FAFC6]">
-                    {pub.status}
-                  </span>
-                </td>
-                <td className="px-3 py-2 text-muted-foreground text-[12px]">
-                  {pub.url ? (
-                    <a
-                      href={pub.url}
-                      className="text-[#2F6F7E] hover:underline"
-                      target="_blank"
-                      rel="noopener noreferrer"
+            {rows.map((pub, i) => {
+              const isPublishedRow = pub.status === 'published';
+              return (
+                <tr
+                  key={pub.platform}
+                  className={i < rows.length - 1 ? 'border-b border-border' : ''}
+                >
+                  <td className="px-3 py-2 font-medium text-foreground">{pub.platform}</td>
+                  <td className="px-3 py-2 text-muted-foreground">{pub.planned}</td>
+                  <td className="px-3 py-2">
+                    <span
+                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
+                        isPublishedRow
+                          ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]'
+                          : 'bg-[#EDF5F8] text-[#2F6F7E] border-[#7FAFC6]'
+                      }`}
                     >
-                      {pub.url}
-                    </a>
-                  ) : (
-                    pub.note
-                  )}
-                </td>
-              </tr>
-            ))}
+                      {pub.status}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 text-muted-foreground text-[12px]">
+                    {pub.url ? (
+                      <a
+                        href={pub.url}
+                        className="text-[#2F6F7E] hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {pub.url}
+                      </a>
+                    ) : (
+                      pub.note
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -611,8 +656,30 @@ function SeriesCard() {
 // ── Main tab ──────────────────────────────────────────────────────────────────
 
 export function BuildWithMeTab() {
-  const { title, eyebrow, status, format, length, kit, driveUrl } =
+  const { title, eyebrow, format, length, kit, driveUrl, publications } =
     BUILD_WITH_ME_VIDEO;
+
+  // Lift stage state so StageRail and PublicationsTable share it
+  const [stages, setStages] = useState<RailStage[]>(
+    BUILD_WITH_ME_VIDEO.stages.map(s => ({ ...s }))
+  );
+
+  const isPublished = stages.every(s => s.state === 'complete');
+
+  const derivedStatus = isPublished ? 'Published' : 'In Progress';
+
+  function handleMarkDone(index: number) {
+    setStages(prev => {
+      const next = prev.map((s, i) => ({ ...s }));
+      // Mark this stage complete
+      next[index] = { ...next[index], state: 'complete' };
+      // Advance the next stage to current (if there is one)
+      if (index + 1 < next.length) {
+        next[index + 1] = { ...next[index + 1], state: 'current' };
+      }
+      return next;
+    });
+  }
 
   return (
     <div className="flex flex-col gap-5 p-4 text-[14px] min-h-0 overflow-y-auto">
@@ -644,9 +711,15 @@ export function BuildWithMeTab() {
             {title}
           </h2>
           <div className="flex flex-wrap items-center gap-2 mt-1">
-            {/* Status pill */}
-            <span className="text-[12px] font-semibold px-2 py-0.5 rounded-full bg-[#FFF3E0] text-[#CC8400] border border-[#FFD08A]">
-              {status}
+            {/* Status pill — updates when fully published */}
+            <span
+              className={`text-[12px] font-semibold px-2 py-0.5 rounded-full border ${
+                isPublished
+                  ? 'bg-[#E6F0EA] text-[#2F6B3F] border-[#9FC3AE]'
+                  : 'bg-[#FFF3E0] text-[#CC8400] border-[#FFD08A]'
+              }`}
+            >
+              {derivedStatus}
             </span>
             {/* Format chip */}
             <span className="text-[12px] font-medium px-2 py-0.5 rounded-full bg-[#F2F3F1] text-[#687069] border border-[#E2E4E1]">
@@ -674,8 +747,9 @@ export function BuildWithMeTab() {
       </div>
 
       {/* ── Stage rail ──────────────────────────────────────────────────────── */}
-      <div className="rounded-[8px] border border-border bg-card px-6 py-4">
-        <StageRail />
+      <div className="rounded-[8px] border border-border bg-card px-6 py-4 space-y-3">
+        <StageRail stages={stages} onMarkDone={handleMarkDone} />
+        {isPublished && <PublishedBanner />}
       </div>
 
       {/* ── Two-column layout ────────────────────────────────────────────────── */}
@@ -687,7 +761,7 @@ export function BuildWithMeTab() {
           <NarrationSelector />
           <PostProductionTiles />
           <QrCard />
-          <PublicationsTable />
+          <PublicationsTable publications={publications} isPublished={isPublished} />
         </div>
 
         {/* Right rail */}
@@ -714,4 +788,9 @@ export function BuildWithMeTab() {
       </div>
     </div>
   );
+}
+
+interface PublicationsTableProps {
+  publications: PubEntry[];
+  isPublished: boolean;
 }
