@@ -87,6 +87,8 @@ interface AppState {
   setGmailPanelOpen: (v: boolean) => void;
   helpPanelOpen: boolean;
   setHelpPanelOpen: (v: boolean) => void;
+  slackDrawerOpen: boolean;
+  setSlackDrawerOpen: (v: boolean) => void;
   pendingPennyQuery: string | null;
   setPendingPennyQuery: (q: string | null) => void;
   logTimeOpen:    boolean;
@@ -209,25 +211,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [calendarPanelOpen, _setCalendarPanelOpen]   = useState(false);
   const [gmailPanelOpen,    _setGmailPanelOpen]      = useState(false);
   const [helpPanelOpen,     _setHelpPanelOpen]       = useState(false);
+  const [slackDrawerOpen,   _setSlackDrawerOpen]     = useState(false);
 
   // Smart setters — opening any slide-over panel closes all others.
   // Centralising here means every call site (ContextPanel, RailActionPanel, etc.)
   // benefits without needing individual updates.
   function setAskPennyOpen(v: boolean) {
     _setAskPennyOpen(v);
-    if (v) { _setCalendarPanelOpen(false); _setGmailPanelOpen(false); _setHelpPanelOpen(false); }
+    if (v) { _setCalendarPanelOpen(false); _setGmailPanelOpen(false); _setHelpPanelOpen(false); _setSlackDrawerOpen(false); }
   }
   function setCalendarPanelOpen(v: boolean) {
     _setCalendarPanelOpen(v);
-    if (v) { _setAskPennyOpen(false); _setGmailPanelOpen(false); _setHelpPanelOpen(false); }
+    if (v) { _setAskPennyOpen(false); _setGmailPanelOpen(false); _setHelpPanelOpen(false); _setSlackDrawerOpen(false); }
   }
   function setGmailPanelOpen(v: boolean) {
     _setGmailPanelOpen(v);
-    if (v) { _setAskPennyOpen(false); _setCalendarPanelOpen(false); _setHelpPanelOpen(false); }
+    if (v) { _setAskPennyOpen(false); _setCalendarPanelOpen(false); _setHelpPanelOpen(false); _setSlackDrawerOpen(false); }
   }
   function setHelpPanelOpen(v: boolean) {
     _setHelpPanelOpen(v);
-    if (v) { _setAskPennyOpen(false); _setCalendarPanelOpen(false); _setGmailPanelOpen(false); }
+    if (v) { _setAskPennyOpen(false); _setCalendarPanelOpen(false); _setGmailPanelOpen(false); _setSlackDrawerOpen(false); }
+  }
+  function setSlackDrawerOpen(v: boolean) {
+    _setSlackDrawerOpen(v);
+    if (v) { _setAskPennyOpen(false); _setCalendarPanelOpen(false); _setGmailPanelOpen(false); _setHelpPanelOpen(false); }
   }
   const [pendingPennyQuery, setPendingPennyQuery]   = useState<string | null>(null);
   const [assessmentActive, setAssessmentActive] = useState(false);
@@ -378,6 +385,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       calendarPanelOpen, setCalendarPanelOpen,
       gmailPanelOpen, setGmailPanelOpen,
       helpPanelOpen, setHelpPanelOpen,
+      slackDrawerOpen, setSlackDrawerOpen,
       pendingPennyQuery, setPendingPennyQuery,
       assessmentActive, setAssessmentActive,
       mobileSidebarOpen, setMobileSidebarOpen,

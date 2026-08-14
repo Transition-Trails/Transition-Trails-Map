@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useGoogleAuth, useSignOut } from '@/hooks/useGoogleAuth';
-import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity, Mail, BookOpen } from 'lucide-react';
+import { Map, Search as SearchIcon, ChevronDown, Bell, Monitor, User, Layers, Chrome, ChevronRight, LogOut, Menu, Sparkles, CalendarDays, Activity, Mail, BookOpen, MessageSquare } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -399,6 +399,7 @@ export function Topbar() {
     calendarPanelOpen, setCalendarPanelOpen,
     gmailPanelOpen, setGmailPanelOpen,
     helpPanelOpen, setHelpPanelOpen,
+    slackDrawerOpen, setSlackDrawerOpen,
     mobileSidebarOpen, setMobileSidebarOpen,
   } = useAppContext();
 
@@ -452,67 +453,34 @@ export function Topbar() {
           <span className="hidden sm:inline">{askPennyOpen ? 'Close' : TERMS.aiAssistant}</span>
         </button>
 
-        {/* Calendar action panel toggle */}
+        {/* Slack drawer toggle — unified Slack entry point for Mission Control */}
         <button
           className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-colors whitespace-nowrap ${
-            calendarPanelOpen
-              ? 'bg-[#E6F0EA] border-[#9FC3AE] text-[#2F6B3F] hover:bg-[#E6F0EA]'
-              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#E6F0EA] hover:border-[#9FC3AE] hover:text-[#2F6B3F]'
+            slackDrawerOpen
+              ? 'bg-[#4A154B]/10 border-[#4A154B]/25 text-[#4A154B]/80 hover:bg-[#4A154B]/15'
+              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#4A154B]/5 hover:border-[#4A154B]/20 hover:text-[#4A154B]/70'
           }`}
-          onClick={() => {
-            if (calendarPanelOpen) {
-              setCalendarPanelOpen(false);
-            } else {
-              setCalendarPanelOpen(true);
-              setAskPennyOpen(false);
-              setGmailPanelOpen(false);
-              setHelpPanelOpen(false);
-            }
-          }}
-          title={`Calendar — upcoming events & ${TERMS.aiAssistant} prep briefs`}
+          onClick={() => setSlackDrawerOpen(!slackDrawerOpen)}
+          title="Slack"
         >
-          <CalendarDays className="w-3 h-3 flex-shrink-0" />
-          <span className="hidden sm:inline">{calendarPanelOpen ? 'Close' : 'Calendar'}</span>
+          <MessageSquare className="w-3 h-3 flex-shrink-0" />
+          <span className="hidden sm:inline">{slackDrawerOpen ? 'Close' : 'Slack'}</span>
         </button>
 
-        {/* Gmail action panel toggle */}
-        <button
-          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-colors whitespace-nowrap ${
-            gmailPanelOpen
-              ? 'bg-[#FBEAE6] border-[#E8B9B4] text-[#A93F2F] hover:bg-[#FBEAE6]'
-              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-[#FBEAE6] hover:border-[#E8B9B4] hover:text-[#A93F2F]'
-          }`}
-          onClick={() => {
-            if (gmailPanelOpen) {
-              setGmailPanelOpen(false);
-            } else {
-              setGmailPanelOpen(true);
-              setAskPennyOpen(false);
-              setCalendarPanelOpen(false);
-              setHelpPanelOpen(false);
-            }
-          }}
-          title={`Mail — inbox & ${TERMS.aiAssistant} draft assist`}
-        >
-          <Mail className="w-3 h-3 flex-shrink-0" />
-          <span className="hidden sm:inline">{gmailPanelOpen ? 'Close' : 'Mail'}</span>
-        </button>
+        {/* Hidden — being reworked into Homebase */}
+        {/* Calendar action panel toggle
+        <button ... calendarPanelOpen ... CalendarDays /> */}
 
-        <SignalsIndicator />
+        {/* Hidden — being reworked into Homebase */}
+        {/* Gmail action panel toggle
+        <button ... gmailPanelOpen ... Mail /> */}
 
-        {/* Trail Insights panel toggle — always visible, mirrors Penny/Calendar/Mail pattern */}
-        <button
-          className={`flex items-center gap-1.5 h-[26px] px-2.5 rounded-full text-[14px] font-semibold border transition-colors whitespace-nowrap ${
-            rightPanelOpen
-              ? 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/15'
-              : 'bg-muted/40 border-border/70 text-muted-foreground hover:bg-primary/5 hover:border-primary/25 hover:text-primary'
-          }`}
-          onClick={() => setRightPanelOpen(!rightPanelOpen)}
-          title={rightPanelOpen ? 'Collapse Trail Insights panel' : 'Open Trail Insights panel'}
-        >
-          <Layers className="w-3 h-3 flex-shrink-0" />
-          <span className="hidden sm:inline">Insights</span>
-        </button>
+        {/* Hidden — being reworked into Homebase */}
+        {/* <SignalsIndicator /> */}
+
+        {/* Hidden — being reworked into Homebase */}
+        {/* Trail Insights panel toggle
+        <button ... rightPanelOpen ... Layers>Insights</button> */}
 
         {/* Help guide panel toggle */}
         <button
