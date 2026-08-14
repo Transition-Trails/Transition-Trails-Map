@@ -33,6 +33,7 @@ interface SubmittedCase {
   ownerName:      string | null;
   contactName:    string | null;
   accountName:    string | null;
+  customFields:   Record<string, unknown> | null;
   sfCaseId:       string | null;
   sfCaseNumber:   string | null;
   syncStatus:     string;  // "pending" | "synced" | "failed"
@@ -471,6 +472,11 @@ export default function CasesPage() {
                               </span>
                             )}
                           </div>
+                          {typeof c.customFields?.["_serviceContractName"] === "string" && (
+                            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                              Contract: {c.customFields["_serviceContractName"]}
+                            </p>
+                          )}
                           <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                             <span className={`text-[11px] font-medium ${
                               isSynced        ? "text-emerald-600"

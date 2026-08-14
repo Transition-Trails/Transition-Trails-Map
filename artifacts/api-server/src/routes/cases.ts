@@ -512,16 +512,16 @@ router.post("/cases/submit", async (req, res) => {
     recordTypeId, recordTypeName, subject, description, priority,
     ownerId, ownerName, ownerType,
     contactId, contactName, accountId, accountName,
-    serviceContractId,
+    serviceContractId, serviceContractName,
     customFields,
   } = req.body as {
-    recordTypeId?:      string; recordTypeName?: string;
-    subject?:           string; description?:    string; priority?: string;
-    ownerId?:           string; ownerName?:      string; ownerType?: string;
-    contactId?:         string; contactName?:    string;
-    accountId?:         string; accountName?:    string;
-    serviceContractId?: string;
-    customFields?:      Record<string, unknown>;
+    recordTypeId?:       string; recordTypeName?: string;
+    subject?:            string; description?:    string; priority?: string;
+    ownerId?:            string; ownerName?:      string; ownerType?: string;
+    contactId?:          string; contactName?:    string;
+    accountId?:          string; accountName?:    string;
+    serviceContractId?:  string; serviceContractName?: string;
+    customFields?:       Record<string, unknown>;
   };
 
   if (!subject?.trim()) return res.status(400).json({ error: "subject is required." });
@@ -581,6 +581,14 @@ router.post("/cases/submit", async (req, res) => {
     mergedCustomFields["ServiceContractId"] = serviceContractId;
   }
 
+  // Build the fields to persist in the DB.  Underscore-prefixed keys are
+  // Trail OS internals — they are stored for display purposes but never sent
+  // to Salesforce (the SF sync loop skips them).
+  const dbCustomFields: Record<string, unknown> = { ...mergedCustomFields };
+  if (serviceContractName) {
+    dbCustomFields["_serviceContractName"] = serviceContractName;
+  }
+
   // 1. Insert local record (pending sync)
   const [local] = await db
     .insert(submittedCasesTable)
@@ -598,7 +606,7 @@ router.post("/cases/submit", async (req, res) => {
       contactName:    contactName    || null,
       accountId:      accountId      || null,
       accountName:    accountName    || null,
-      customFields:   Object.keys(mergedCustomFields).length > 0 ? mergedCustomFields : null,
+      customFields:   Object.keys(dbCustomFields).length > 0 ? dbCustomFields : null,
       createdByEmail: userEmail,
       syncStatus:     "pending",
     })
@@ -631,9 +639,10 @@ router.post("/cases/submit", async (req, res) => {
     if (serviceContractId)     sfData["ServiceContractId"] = serviceContractId;
     sfData["OwnerId"] = ownerId || sfUserId || undefined;
     // Spread extra custom fields — underscore-prefixed keys are already absent
-    // from mergedCustomFields (filtered at construction).
+    // from mergedCustomFields (filtered at construction) and must not be sent
+    // to Salesforce.
     for (const [k, v] of Object.entries(mergedCustomFields)) {
-      sfData[k] = v;
+      if (!k.startsWith("_")) sfData[k] = v;
     }
     for (const k of Object.keys(sfData)) {
       if (sfData[k] === undefined) delete sfData[k];
