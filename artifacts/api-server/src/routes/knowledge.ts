@@ -2474,16 +2474,43 @@ router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<v
     }
 
     // Step 2: Retrieve (or confirm) the KnowledgeArticleId from the created record.
-    //   For SF-originated articles we already know sfArticleId; this just confirms the link.
-    if (!sfArticleId) {
-      try {
-        const versionRecord = await client.getRecord<{ Id: string; KnowledgeArticleId?: string }>(
-          objectName, sfVersionId, ["Id", "KnowledgeArticleId"]
-        );
-        sfArticleId = versionRecord.KnowledgeArticleId ?? null;
-      } catch (lookupErr) {
-        req.log.warn(`Could not retrieve KnowledgeArticleId: ${String(lookupErr)}`);
+    //   For SF-originated articles we verify the org actually linked the new version to the
+    //   existing KnowledgeArticle. Some org configurations may silently ignore the
+    //   KnowledgeArticleId field on create and produce an independent new article instead.
+    //   Detecting a mismatch here lets us return a clear 409 rather than silently duplicate.
+    try {
+      const versionRecord = await client.getRecord<{ Id: string; KnowledgeArticleId?: string }>(
+        objectName, sfVersionId!, ["Id", "KnowledgeArticleId"]
+      );
+      const returnedKaId = versionRecord.KnowledgeArticleId ?? null;
+
+      if (isSfOriginated) {
+        // Compare the returned KnowledgeArticleId to the one we supplied.
+        // A mismatch means the org rejected the link and created a brand-new article instead.
+        if (returnedKaId && returnedKaId !== article.sfArticleId) {
+          req.log.warn(
+            { expectedKaId: article.sfArticleId, actualKaId: returnedKaId, sfVersionId },
+            "Duplicate SF article detected: org rejected KnowledgeArticleId linking — " +
+            "returned record belongs to a different KnowledgeArticle"
+          );
+          res.status(409).json({
+            error:
+              `Salesforce did not link this version to the existing article ` +
+              `(KnowledgeArticleId mismatch). A duplicate article was created in Salesforce ` +
+              `(version ID: ${sfVersionId!}). Please delete the duplicate from Salesforce ` +
+              `Knowledge and try again, or contact your Salesforce admin if the API does not ` +
+              `allow KnowledgeArticleId assignment on create.`,
+          });
+          return;
+        }
+        // Link confirmed — sfArticleId remains article.sfArticleId (set above).
+      } else {
+        sfArticleId = returnedKaId;
       }
+    } catch (lookupErr) {
+      req.log.warn(`Could not retrieve KnowledgeArticleId: ${String(lookupErr)}`);
+      // Non-fatal: new articles will have sfArticleId = null; SF-originated articles retain
+      // the known sfArticleId and skip the mismatch check.
     }
 
     // Step 3: Attempt to publish the article (set PublishStatus = Online).
