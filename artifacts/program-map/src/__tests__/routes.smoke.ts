@@ -100,6 +100,10 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/penny/capabilities',       kind: 'active', note: 'Configure Penny > Capabilities' },
   { path: '/penny/penny-sandbox',      kind: 'active', note: 'Admin > Penny Sandbox' },
   { path: '/penny/penny-logs',         kind: 'active', note: 'Admin > Penny Logs' },
+  { path: '/penny/content-studio',              kind: 'active', note: 'Create > Content Studio (HubShell with 7 tabs)' },
+  { path: '/penny/content-studio/:tab',         kind: 'active', note: 'Content Studio tab routes' },
+  // Video Production → Content Studio
+  { path: '/penny/video-production',            kind: 'redirect', target: '/penny/content-studio' },
   { path: '/penny/intelligence',       kind: 'active', note: 'Retired from nav; route intact' },
   { path: '/penny/assessments',        kind: 'active', note: 'Retired from nav; route intact' },
   { path: '/penny/agentforce',         kind: 'active', note: 'Retired from nav; route intact' },

@@ -119,6 +119,7 @@ import PennyHealth             from "@/pages/operations/PennyHealth";
 import PennyAssetLibrary       from "@/pages/penny/PennyAssetLibrary";
 import PennyLogs               from "@/pages/penny/PennyLogs";
 import VideoProduction         from "@/pages/penny/VideoProduction";
+import ContentStudio           from "@/pages/penny/content-studio/ContentStudio";
 import TestPenny               from "@/pages/penny/TestPenny";
 import LearnerDetail           from "@/pages/penny/LearnerDetail";
 import TrailConfigs            from "@/pages/penny/TrailConfigs";
@@ -384,7 +385,9 @@ function Router() {
       <Route path="/penny/quest-library">      <PennyPageShell><TrailQuests /></PennyPageShell></Route>
       <Route path="/penny/penny-logs">         <PennyPageShell><PennyLogs /></PennyPageShell></Route>
       <Route path="/penny/penny-sandbox">      <PennyPageShell><TestPenny /></PennyPageShell></Route>
-      <Route path="/penny/video-production">   <PennyPageShell><VideoProduction /></PennyPageShell></Route>
+      <Route path="/penny/video-production">   <Redirect to="/penny/content-studio" /></Route>
+      <Route path="/penny/content-studio/:tab" component={ContentStudio} />
+      <Route path="/penny/content-studio"     component={ContentStudio} />
       <Route path="/penny">                    <PennyPageShell><PennyCommandCenter /></PennyPageShell></Route>
 
       {/* Knowledge hub — old sub-pages fold into builder or governance */}
