@@ -785,6 +785,11 @@ export default function ArticleStudio() {
                       <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                         <StatusBadge status={a.status} />
                         <ReviewCycleChip cycle={a.reviewCycle} />
+                        {a.sfArticleId && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded border border-blue-200 bg-blue-50 text-blue-600 text-[10px] font-semibold tracking-wide" title={`Salesforce article: ${a.sfArticleId}`}>
+                            SF
+                          </span>
+                        )}
                         {overdue && (
                           <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-orange-200 bg-orange-50 text-orange-600 text-[10px] font-semibold">
                             <Timer className="w-2.5 h-2.5" />Due
