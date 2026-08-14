@@ -1,0 +1,64 @@
+Replit brief — Content Studio
+Paste this to the Replit agent as the opening instruction, then point it at `README.md` and `DECISIONS.md` in the same folder.
+---
+The task
+Build the Content Studio in `artifacts/program-map/` — a new area under Penny › Create that runs marketing and content production end to end. Full specification in `README.md`; the reasoning behind each decision, and what must not change, in `DECISIONS.md`. Screenshots in `screenshots/`, and the interactive prototypes in `designs/` (open the `.dc.html` files in a browser).
+The prototypes are design references, not code to port. Their inline styles exist only because the prototype format requires them; every value came from this codebase and should map back to its token or component.
+Reuse, do not rebuild
+Piece	Source
+Shell	`src/components/layout/AppShell.tsx`
+Topbar, ContextBar	`layout/Topbar.tsx`, `components/context/ContextBar.tsx`
+Sidebar	`layout/Sidebar.tsx`
+Hub header and tabs	`layout/HubShell.tsx`
+Action bar	`components/workspace/ActionBar.tsx`
+Create / edit slide-over	`components/workspace/RailActionPanel.tsx`, `types/actionPanel.ts`
+Tier gating	`hooks/useTierFlags.ts`, `config/accessTiers.ts`
+Status colors	`config/statusColors.ts` — five roles, never a new Tailwind family
+Tokens	`src/index.css` Section 1 — never raw hex outside it
+Labels	`config/terminology.ts` — never hardcode brand strings
+Density	`.agents/memory/admin-ux-standards.md`
+Routes
+```
+/penny/content-studio                 Overview          (default)
+/penny/content-studio/pipeline        Pipeline
+/penny/content-studio/topics          Topic
+/penny/content-studio/items           Content item
+/penny/content-studio/video           Build With Me
+/penny/content-studio/desk            Penny desk
+/penny/content-studio/crew            Trail Crew
+/penny/content-studio/products        Products
+/penny/content-studio/kits            Kit build
+/penny/content-studio/campaigns       Campaigns
+```
+Use `HubShell` with these as tabs. Add every route to `__tests__/routes.smoke.ts` — `App.tsx` changes require it.
+Navigation changes
+Add Content Studio under the Penny group's Create label, `minTier: 'power'`.
+Remove Video Production from that group. A video is a Content Item with Format Video; Build With Me is a stage of the same process, not a parallel tool. Redirect `/penny/video-production` → `/penny/content-studio/video`.
+Topbar: keep Penny, Help, Search and the avatar. Calendar, Mail, Trail Signals and Insights come out. Slack moves into the sidebar, above Collaboration, per the Homebase unification.
+Insights becomes record-level — see the insight pattern in `README.md`. Do not keep a global panel.
+Build order
+Each row is a change request through the demand process. Stop when the next one stops paying for itself.
+#	Build	Done means
+1	Shell, routes, ten tabs, action bar with tier gating	You can move between every tab; blocked actions are visible, disabled, and explain why
+2	Content item record + the Insight block	A writer can work a piece end to end, and Penny reads the same block the screen shows
+3	Approval on Content Item, wired to Send for review	The one gate exists
+4	Pipeline and Topic, reading real records	The quarter is plannable and runway is a real number
+5	Build With Me + Procedure Builder handoff	One capture session feeds video, kit pages and the how-to
+6	Trail Crew on external licenses	A volunteer can do a week of work without seeing Setup
+7	Products, Kit build, Campaigns as readers	A content person can see where their work lands
+8	Join 2 — the engagement connector	Engagement and Reach stop reading "not measured"
+9	Agent surfaces on the Penny desk	Intake, then recycle suggester, then monthly read
+Items 8 and 9 are in this order deliberately: the recycle suggester has nothing to rank on until the connector exists.
+Hard rules
+No price, coupon or tier amount in any screen, template or document. Prices live on the price book entry.
+Four things no agent may do: set a product active, set or change a price, activate an order, publish anything. Enforce in permissions, not prompts.
+Do not invent a number. Where a metric is unavailable, render it as unavailable — dashed border, em-dash, a caption naming the missing join. This appears on the Overview cards and in the record Insight, and it is deliberate.
+Commerce is out of scope. Products reads Product2, the junction and Asset. It never writes a price, activates a product, or touches the storefront.
+US spelling everywhere, including code comments and file names. No emoji. Sentence case. One amber CTA per screen.
+Never rely on color alone — every status carries an icon and text.
+Objects
+Existing: `ContentTopics__c`, `ContentItem__c`, `Content_Item_Publication__c`, `Campaign`, `CampaignMember`, `Campaign_Member_Communication__c`, `Product2`, `Order`, `Asset`, Change Request / Work / Work Item.
+To build: `Product_Content__c` — master-detail to Product2, lookup to Content Item, with sequence, role and included. The only new object in the plan.
+Four joins, in order: content to campaign · engagement on the publication · who is writing it (Tasks) · diagnostic answers to Campaign Member.
+Second design in this bundle
+`Buyer Kit Page.dc.html` is a public page outside Trail OS — magic-link, no password, scoped by the Asset record. It is a separate build and should not be routed inside the app. See the Buyer Kit Page section of `README.md`.
