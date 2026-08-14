@@ -5,7 +5,7 @@
 // QR card, publications table, and right-rail cards.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import qrcode from 'qrcode-generator';
 import {
   Info,
@@ -276,72 +276,147 @@ function ScriptApprovalCard() {
 
 type VoiceChoice = null | 'penny' | 'learner';
 
-/**
- * localStorage key format: `narrator-voice-<videoId>`
- *
- * This is an interim persistence layer. The correct long-term home is a
- * `selected_voice` column on the video item record in the database (e.g. on
- * the `content_items` table or a dedicated `video_items` table), surfaced via
- * GET/PATCH /api/content-items/:id so the choice is durable across devices and
- * shared with the rest of the production pipeline.  Until that column exists,
- * localStorage gives us per-browser durability with zero API changes.
- */
-const VOICE_STORAGE_KEY = (videoId: string) => `narrator-voice-${videoId}`;
-
-function readStoredVoice(videoId: string): VoiceChoice {
-  try {
-    const raw = localStorage.getItem(VOICE_STORAGE_KEY(videoId));
-    if (raw === 'penny' || raw === 'learner') return raw;
-  } catch {
-    // localStorage unavailable (e.g. private browsing with strict settings)
-  }
-  return null;
-}
-
-function writeStoredVoice(videoId: string, choice: VoiceChoice): void {
-  try {
-    if (choice === null) {
-      localStorage.removeItem(VOICE_STORAGE_KEY(videoId));
-    } else {
-      localStorage.setItem(VOICE_STORAGE_KEY(videoId), choice);
-    }
-  } catch {
-    // ignore write failures — UI still works, just won't persist
-  }
-}
-
+const LEGACY_KEY = (videoId: string) => `narrator-voice-${videoId}`;
 function NarrationSelector() {
   const videoId = BUILD_WITH_ME_VIDEO.id;
-  // Lazy initializer reads the persisted choice so the consequence band
-  // renders immediately on load without a flicker.
-  const [voice, setVoice] = useState<VoiceChoice>(() => readStoredVoice(videoId));
+
+  // `undefined` = still loading; null/penny/learner = settled
+  const [voice, setVoice] = useState<VoiceChoice | undefined>(undefined);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+
+  // ── Load from API on mount (includes one-time localStorage migration) ───────
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/content-items/${encodeURIComponent(videoId)}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as {
+          contentItem: { selectedVoice: VoiceChoice; rowExists: boolean };
+        };
+        if (cancelled) return;
+
+        const { selectedVoice: serverVoice, rowExists } = data.contentItem;
+
+        // One-time migration: only attempt when the server has NO row yet
+        // (rowExists === false). If another staff member already saved a value
+        // the row exists and we must not overwrite it.
+        if (!rowExists) {
+          const legacy = peekLegacyVoice(videoId);
+          if (legacy !== null) {
+            // ?migrateOnly=true → INSERT ... ON CONFLICT DO NOTHING on the
+            // backend, so a concurrent explicit write always wins.
+            const patchRes = await fetch(
+              `/api/content-items/${encodeURIComponent(videoId)}?migrateOnly=true`,
+              {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ selectedVoice: legacy }),
+              },
+            );
+            if (patchRes.ok) {
+              // Use the authoritative value the server returns — it may differ
+              // from `legacy` if a concurrent write beat us.
+              const migData = (await patchRes.json()) as {
+                contentItem: { selectedVoice: VoiceChoice };
+              };
+              // Remove the legacy key only after a confirmed 2xx.
+              clearLegacyVoice(videoId);
+              if (!cancelled) setVoice(migData.contentItem.selectedVoice ?? null);
+            } else {
+              // PATCH failed — retain legacy key for retry; show local value so
+              // the UI remains usable.
+              if (!cancelled) setVoice(legacy);
+            }
+            return;
+          }
+        }
+
+        if (!cancelled) setVoice(serverVoice ?? null);
+      } catch {
+        // Offline / API unavailable — show no selection; legacy key untouched
+        if (!cancelled) setVoice(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [videoId]);
+
+  // ── Write to API on selection ───────────────────────────────────────────────
+  const handleSelect = useCallback(async (picked: 'penny' | 'learner') => {
+    const next: VoiceChoice = voice === picked ? null : picked;
+    const previous = voice;
+    setVoice(next);    // optimistic update
+    setSaving(true);
+    setSaveError(false);
+    try {
+      const res = await fetch(`/api/content-items/${encodeURIComponent(videoId)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ selectedVoice: next }),
+      });
+      if (res.ok) {
+        // Explicit user write confirmed — always safe to clear any retained
+        // legacy key, including when the user deselects (next === null).
+        clearLegacyVoice(videoId);
+        // Reconcile UI to the authoritative server value.
+        const data = (await res.json()) as { contentItem: { selectedVoice: VoiceChoice } };
+        setVoice(data.contentItem.selectedVoice ?? null);
+      } else {
+        setVoice(previous);
+        setSaveError(true);
+      }
+    } catch {
+      setVoice(previous);
+      setSaveError(true);
+    } finally {
+      setSaving(false);
+    }
+  }, [videoId, voice]);
 
   const cardBase =
     'cursor-pointer rounded-[8px] p-4 border-[1.5px] transition-all space-y-2 select-none';
   const selected = 'border-[#2F6B3F] bg-[#E6F0EA]';
   const unselected = 'border-[#E2E4E1] bg-white hover:border-[#9FC3AE]';
 
+  // While loading or saving, block interaction to prevent overlapping writes.
+  const displayVoice: VoiceChoice = voice ?? null;
+  const isLoading = voice === undefined;
+  const isBlocked = isLoading || saving;
+
   return (
     <div className="space-y-3">
-      <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide">
-        Who narrates this one
-      </p>
+      <div className="flex items-center gap-2">
+        <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide">
+          Who narrates this one
+        </p>
+        {(isLoading || saving) && (
+          <span className="text-[11px] text-muted-foreground/60">
+            {isLoading ? 'Loading…' : 'Saving…'}
+          </span>
+        )}
+        {saveError && !saving && (
+          <span className="text-[11px] text-red-500">
+            Could not save — try again
+          </span>
+        )}
+      </div>
 
       <div className="grid grid-cols-2 gap-3">
         {/* Card 1 — Penny */}
         <div
-          className={`${cardBase} ${voice === 'penny' ? selected : unselected}`}
-          onClick={() => setVoice(v => { const next = v === 'penny' ? null : 'penny'; writeStoredVoice(videoId, next); return next; })}
+          className={`${cardBase} ${displayVoice === 'penny' ? selected : unselected} ${isBlocked ? 'pointer-events-none opacity-60' : ''}`}
+          onClick={() => !isBlocked && void handleSelect('penny')}
           role="button"
           tabIndex={0}
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setVoice(v => { const next = v === 'penny' ? null : 'penny'; writeStoredVoice(videoId, next); return next; }); }}
+          onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !isBlocked) void handleSelect('penny'); }}
         >
           <div className="flex items-center gap-2">
             <Headphones className="w-4 h-4 text-[#2F6F7E]" />
             <p className="text-[13px] font-semibold text-foreground">
               Penny, on ElevenLabs
             </p>
-            {voice === 'penny' && (
+            {displayVoice === 'penny' && (
               <span className="ml-auto text-[11px] font-semibold text-[#2F6B3F]">Selected</span>
             )}
           </div>
@@ -356,18 +431,18 @@ function NarrationSelector() {
 
         {/* Card 2 — Learner */}
         <div
-          className={`${cardBase} ${voice === 'learner' ? selected : unselected}`}
-          onClick={() => setVoice(v => { const next = v === 'learner' ? null : 'learner'; writeStoredVoice(videoId, next); return next; })}
+          className={`${cardBase} ${displayVoice === 'learner' ? selected : unselected} ${isBlocked ? 'pointer-events-none opacity-60' : ''}`}
+          onClick={() => !isBlocked && void handleSelect('learner')}
           role="button"
           tabIndex={0}
-          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setVoice(v => { const next = v === 'learner' ? null : 'learner'; writeStoredVoice(videoId, next); return next; }); }}
+          onKeyDown={e => { if ((e.key === 'Enter' || e.key === ' ') && !isBlocked) void handleSelect('learner'); }}
         >
           <div className="flex items-center gap-2">
             <User className="w-4 h-4 text-[#2F6B3F]" />
             <p className="text-[13px] font-semibold text-foreground">
               The learner's own voice
             </p>
-            {voice === 'learner' && (
+            {displayVoice === 'learner' && (
               <span className="ml-auto text-[11px] font-semibold text-[#2F6B3F]">Selected</span>
             )}
           </div>
@@ -382,7 +457,7 @@ function NarrationSelector() {
       </div>
 
       {/* Consequence band */}
-      {voice === 'penny' && (
+      {displayVoice === 'penny' && (
         <div className="rounded-[8px] px-4 py-3 bg-[#EDF5F8] border border-[#7FAFC6] text-[13px] text-[#2F6F7E] leading-snug">
           <span className="font-semibold">Disclosure required:</span> Videos narrated by
           Penny must include an on-screen caption and a description note reading
@@ -391,7 +466,7 @@ function NarrationSelector() {
           identified as a specific person.
         </div>
       )}
-      {voice === 'learner' && (
+      {displayVoice === 'learner' && (
         <div className="rounded-[8px] px-4 py-3 bg-[#E6F0EA] border border-[#9FC3AE] text-[13px] text-[#2F6B3F] leading-snug space-y-1">
           <p>
             <span className="font-semibold">Name credit:</span> The learner's first name
@@ -793,4 +868,24 @@ export function BuildWithMeTab() {
 interface PublicationsTableProps {
   publications: PubEntry[];
   isPublished: boolean;
+}
+
+/** Read a legacy localStorage voice value without removing it yet. */
+function peekLegacyVoice(videoId: string): VoiceChoice {
+  try {
+    const raw = localStorage.getItem(LEGACY_KEY(videoId));
+    if (raw === 'penny' || raw === 'learner') return raw;
+  } catch {
+    // private-browsing — ignore
+  }
+  return null;
+}
+
+/** Remove the legacy key — only called after a confirmed 2xx PATCH. */
+function clearLegacyVoice(videoId: string): void {
+  try {
+    localStorage.removeItem(LEGACY_KEY(videoId));
+  } catch {
+    // ignore
+  }
 }

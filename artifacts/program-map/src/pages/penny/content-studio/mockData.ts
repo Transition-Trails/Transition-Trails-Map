@@ -340,13 +340,6 @@ export const MOCK_GAP_MATRIX: GapCell[] = PLATFORMS.flatMap((platform, pi) =>
 
 export const BUILD_WITH_ME_VIDEO = {
   id: 'bwm-07',
-  // TODO (DB migration): replace this field with a real DB column once the
-  // video item record has a `selected_voice` field.  The correct shape is:
-  //   selected_voice: 'penny' | 'learner' | null
-  // surfaced via GET/PATCH /api/content-items/:id.  Until then, localStorage
-  // keyed by `narrator-voice-<id>` is the authoritative store and this field
-  // is only a documentation placeholder (it is not read at runtime).
-  selectedVoice: null as 'penny' | 'learner' | null,
   title: 'Build With Me — Moving changes to production',
   eyebrow: 'Content Topic · Nonprofit tech stack',
   status: 'In Progress',

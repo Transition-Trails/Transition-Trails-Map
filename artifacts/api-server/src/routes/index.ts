@@ -43,6 +43,7 @@ import sfSearchRouter           from "./sfSearch";
 import buildErrorsRouter        from "./buildErrors";
 import assessmentsRouter        from "./assessments";
 import trackRouter              from "./track";
+import contentItemsRouter       from "./contentItems";
 import { requireStaff, requireAdmin, requireSuperAdmin, effectiveIdentityMiddleware } from "../middlewares/requireAuth";
 import { insertAuditEvent } from "../lib/auditLog";
 import { logger } from "../lib/logger";
@@ -265,5 +266,6 @@ router.use(sfSearchRouter);
 router.use(buildErrorsRouter);
 router.use(assessmentsRouter);
 router.use(trackRouter);
+router.use(contentItemsRouter);
 
 export default router;
