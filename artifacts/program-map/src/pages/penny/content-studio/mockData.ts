@@ -446,6 +446,14 @@ export const MOCK_PRODUCT_TREE: ProductNode = {
   ],
 };
 
+export interface TopicFamilyDerivative {
+  id: string;
+  description: string;
+  date?: string;          // display string e.g. "Aug 20"
+  status?: string;        // pill label
+  noDate?: boolean;       // true = render Add button instead
+}
+
 // ── This-month produced items & points ───────────────────────────────────────
 
 export const MOCK_THIS_MONTH_ITEMS = [
@@ -606,3 +614,61 @@ export const MOCK_CREW_TASKS: CrewTask[] = [
     tab: 'review-queue',
   },
 ];
+
+export interface TopicFamilyData {
+  sourceTitle: string;
+  sourceWordCount: number;
+  sourceProductCount: number;
+  sourceStatus: string;
+  derivatives: TopicFamilyDerivative[];
+}
+
+export const MOCK_TOPIC_ITEMS: TopicTabItem[] = [
+  { id: 'ci-011',    title: 'Who Can See What: Data Access in Salesforce',     format: 'Article',   objective: 'Explain Salesforce sharing rules to non-technical staff',        status: 'Ready for Review', pubs: 4 },
+  { id: 'ci-009',    title: 'How Salesforce Powers the Trail OS Org',           format: 'Video',     objective: 'Short explainer video for new staff onboarding',                status: 'In Progress',      pubs: 0 },
+  { id: 'ci-005',    title: 'Nonprofit Tech Stack 101: What Every Team Should Know', format: 'Article', objective: 'Orient new staff to the org tech landscape',               status: 'Idea',             pubs: 0 },
+  { id: 'ci-pub-005', title: 'Trail OS Quick Start for New Staff',              format: 'Guide',     objective: 'Help new staff navigate the Trail OS platform quickly',         status: 'Published',        pubs: 6 },
+  { id: 'ci-pub-016', title: 'Salesforce for Coaches: The Basics',             format: 'Guide',     objective: 'Intro to Salesforce navigation for coaching staff',             status: 'Published',        pubs: 3 },
+  { id: 'ci-pub-017', title: 'Zoom Meeting Etiquette for Learners',            format: 'Article',   objective: 'Set communication norms for virtual meetings',                  status: 'Published',        pubs: 2 },
+  { id: 'tti-007',   title: 'Integrating Slack With Salesforce: Step by Step', format: 'Guide',     objective: 'Help admins wire the Slack–Salesforce integration',             status: 'Draft',            pubs: 0 },
+  { id: 'tti-008',   title: 'Google Drive for Nonprofit Teams',                format: 'Article',   objective: 'Best-practice file organization for distributed teams',         status: 'Published',        pubs: 3 },
+  { id: 'tti-009',   title: 'Setting Up MFA on Your Nonprofit Accounts',       format: 'Checklist', objective: 'Protect accounts with multi-factor authentication',             status: 'Published',        pubs: 2 },
+  { id: 'tti-010',   title: 'Digital Tools Glossary for New Staff',            format: 'Guide',     objective: 'Shared vocabulary for tech concepts across the org',            status: 'Published',        pubs: 2 },
+  { id: 'tti-011',   title: 'AI Tools Policy: What We Use and Why',            format: 'Article',   objective: 'Document approved AI tools and responsible-use principles',     status: 'Draft',            pubs: 2 },
+];
+
+export const MOCK_TOPIC_WEEK_COVERAGE: number[] = [5, 3, 4, 1, 0, 5, 2, 4, 0, 3, 5, 2];
+
+export const MOCK_RECYCLE_CANDIDATES: RecycleCandidate[] = [
+  { id: 'ci-pub-005', title: 'Trail OS Quick Start for New Staff',  ageDays: 107 },
+  { id: 'ci-pub-016', title: 'Salesforce for Coaches: The Basics',  ageDays: 93  },
+];
+
+export interface RecycleCandidate {
+  id: string;
+  title: string;
+  ageDays: number;
+}
+
+export interface TopicTabItem {
+  id: string;
+  title: string;
+  format: string;
+  objective: string;
+  status: string;
+  pubs: number;
+}
+
+export const MOCK_TOPIC_FAMILY: TopicFamilyData = {
+  sourceTitle: 'Who Can See What',
+  sourceWordCount: 1400,
+  sourceProductCount: 4,
+  sourceStatus: 'In Progress',
+  derivatives: [
+    { id: 'd-1', description: 'Slack summary post — #nonprofit-tech channel', date: 'Aug 20', status: 'Planned' },
+    { id: 'd-2', description: 'LinkedIn carousel — 6-slide breakdown', date: 'Aug 25', status: 'Draft' },
+    { id: 'd-3', description: 'Email newsletter section — 200-word excerpt', date: 'Sep 2', status: 'Planned' },
+    { id: 'd-4', description: 'Knowledge Brief — condensed staff reference card', date: 'Sep 8', status: 'Planned' },
+    { id: 'd-5', description: 'Build With Me video — not proposed yet', noDate: true },
+  ],
+};

@@ -8,8 +8,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { PenTool } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { HubShell } from '@/components/layout/HubShell';
 import { useAppContext } from '@/context/AppContext';
+import type { ContentItem } from './types';
 
 import { PipelineTab }     from './tabs/PipelineTab';
 import { TopicTab }        from './tabs/TopicTab';
@@ -23,9 +25,14 @@ const BASE = '/penny/content-studio';
 
 export default function ContentStudio() {
   const { userTier } = useAppContext();
+  const [, setLocation] = useLocation();
 
   // 'everyday' maps to the crew audience role; show only Trail Crew tab for crew members.
   const isCrew = userTier === 'everyday';
+
+  function handleSelectItem(_item: ContentItem) {
+    setLocation(`${BASE}/content-item`);
+  }
 
   const allTabs = [
     {
@@ -38,7 +45,7 @@ export default function ContentStudio() {
       id: 'topic',
       label: 'Topic',
       path: `${BASE}/topic`,
-      content: <TopicTab />,
+      content: <TopicTab onSelectItem={handleSelectItem} />,
     },
     {
       id: 'content-item',
