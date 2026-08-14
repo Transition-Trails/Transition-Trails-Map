@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, BookOpen, Search, Loader2, AlertCircle, ArrowLeft,
-  FileText, ExternalLink, ChevronRight, Eye,
+  FileText, ExternalLink, ChevronRight, Eye, Flag,
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useAppContext } from '@/context/AppContext';
@@ -18,6 +18,7 @@ import {
   getVisitedArticles,
   markArticleVisited,
 } from '@/hooks/useHelpArticles';
+import { useToast } from '@/hooks/use-toast';
 
 // ── Prose style for article body ─────────────────────────────────────────────
 
@@ -41,7 +42,41 @@ function ArticleDetail({
   onBack: () => void;
 }) {
   const { data, isLoading, isError } = useHelpArticleDetail(articleId);
+  const { toast } = useToast();
   const a = data?.article;
+  const [reported, setReported] = useState(false);
+  const [reporting, setReporting] = useState(false);
+
+  async function sendReport() {
+    if (reported || reporting) return;
+    setReporting(true);
+    try {
+      const res = await fetch(`/api/knowledge/sf-articles/${articleId}/report`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quote: `Reported from ${window.location.pathname}` }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as Record<string, unknown>;
+        throw new Error((body['message'] as string | undefined) ?? `HTTP ${res.status}`);
+      }
+      setReported(true);
+      toast({
+        title: 'Report sent',
+        description: 'Thanks — the content team will review this step.',
+      });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      toast({
+        title: 'Could not send report',
+        description: msg.startsWith('HTTP') ? 'Please try again or contact the content team directly.' : msg,
+        variant: 'destructive',
+      });
+    } finally {
+      setReporting(false);
+    }
+  }
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -114,13 +149,32 @@ function ArticleDetail({
               </div>
             )}
 
+            {/* One-tap step-mismatch report */}
+            <div className="mt-5 rounded-lg border border-border/60 bg-muted/10 px-3 py-2.5 flex items-center gap-2.5">
+              <Flag className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
+              <p className="text-[12px] text-muted-foreground flex-1">
+                Step not matching your screen?
+              </p>
+              {reported ? (
+                <span className="text-[11px] font-medium text-[#2F6B3F]">Reported ✓</span>
+              ) : (
+                <button
+                  onClick={() => void sendReport()}
+                  disabled={reporting}
+                  className="text-[11px] font-semibold text-primary hover:text-primary/80 disabled:opacity-50 transition-colors"
+                >
+                  {reporting ? 'Sending…' : 'Tell us'}
+                </button>
+              )}
+            </div>
+
             {/* SF link */}
             {a.sfUrl && (
               <a
                 href={a.sfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-5 inline-flex items-center gap-1.5 text-[12px] text-primary hover:text-primary/80 transition-colors"
+                className="mt-3 inline-flex items-center gap-1.5 text-[12px] text-primary hover:text-primary/80 transition-colors"
               >
                 <ExternalLink className="w-3 h-3" />
                 View in Salesforce

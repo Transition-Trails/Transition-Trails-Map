@@ -119,6 +119,24 @@ const staffAuthGate: RequestHandler = (req, res, next) => {
   // The staff-only results sub-route has an explicit requireStaff guard in the router.
   if (path.startsWith('/assessments')) return next();
 
+  // SF Knowledge articles — three routes are accessible to homebase audiences
+  // (coach / learner / volunteer) with per-audience SOQL filtering.
+  // Each of these route handlers enforces its own auth internally.
+  // All OTHER /knowledge/sf-articles/* routes remain staff-gated.
+  //
+  //   GET  /knowledge/sf-articles              — list (homebase + staff)
+  //   GET  /knowledge/sf-articles/:id          — detail (homebase + staff)
+  //   POST /knowledge/sf-articles/:id/report   — reader report (homebase + staff)
+  //
+  // Note: routes that start with /knowledge/sf-articles but are NOT listed
+  // above (e.g. /sync, /mark-reviewed, /step-reports) are protected by their
+  // own explicit requireStaff / requireAdmin middleware AND remain under the
+  // staff gate because they do not match any of the three narrow patterns.
+  const KA_LIST   = /^\/knowledge\/sf-articles$/;
+  const KA_DETAIL = /^\/knowledge\/sf-articles\/[A-Za-z0-9_-]+$/;
+  const KA_REPORT = /^\/knowledge\/sf-articles\/[A-Za-z0-9_-]+\/report$/;
+  if (KA_LIST.test(path) || KA_DETAIL.test(path) || KA_REPORT.test(path)) return next();
+
   // Slack homebase routes — OAuth flow and user data endpoints.
   // requireSlackAuth on each individual route is the effective access control;
   // the staff gate must not pre-empt it for Homebase audiences.

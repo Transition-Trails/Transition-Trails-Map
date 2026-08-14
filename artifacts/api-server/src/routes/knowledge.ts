@@ -11,7 +11,7 @@ import {
   filterStaleHealthIssues,
 } from "../lib/integrationHealth.js";
 import { ConnectorSalesforceClient } from "../lib/connectorSalesforceClient.js";
-import { requireAdmin, requireStaff } from "../middlewares/requireAuth.js";
+import { requireAdmin, requireStaff, isStaff } from "../middlewares/requireAuth.js";
 
 const router = Router();
 
@@ -1023,6 +1023,7 @@ const ALWAYS_REQUIRED_KAV_FIELDS = [
 
 const OPTIONAL_KAV_FIELDS = [
   "Summary", "ArticleType", "VersionNumber", "IsVisibleInApp", "Language", "UrlName",
+  "Audience__c",
 ] as const;
 
 type OptionalKavField = typeof OPTIONAL_KAV_FIELDS[number];
@@ -1034,6 +1035,14 @@ interface KavFieldSet {
 
 let kavFieldSetCache: KavFieldSet | null = null;
 let kavFieldSetInflight: Promise<KavFieldSet> | null = null;
+
+/** Exported only for test isolation — never call in production code. */
+export function _test_clearKavCaches(): void {
+  kavFieldSetCache = null;
+  kavFieldSetInflight = null;
+  kavBodyInfoCache = null;
+  kavBodyInfoInflight = null;
+}
 
 async function getKavFieldSet(client: ConnectorSalesforceClient, log: { warn: (msg: string) => void }): Promise<KavFieldSet> {
   if (kavFieldSetCache) return kavFieldSetCache;
@@ -1312,6 +1321,261 @@ function extractSnippet(query: string, text: string | null): string | null {
   return snippet;
 }
 
+// ── In-memory step-report store (Phase 1 — survives until server restart) ─────
+// Key: stepId → array of { id, stepId, articleId, stepSequence, stepInstruction, quote, createdAt }
+interface StepReportEntry {
+  id: string;
+  stepId: string;
+  articleId: string;
+  stepSequence: number;
+  stepInstruction: string;
+  quote: string;
+  createdAt: string;
+}
+const STEP_REPORT_STORE = new Map<string, StepReportEntry[]>();
+
+// POST /api/knowledge/steps/:stepId/report
+// Creates a reader report for a specific step. Staff-only.
+// Body: { quote: string } — verbatim text the reader was looking at when the step didn't match
+router.post("/knowledge/steps/:stepId/report", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const stepId = req.params["stepId"] as string;
+    const { quote = "" } = req.body as Partial<{ quote: string }>;
+
+    // Load the step to get its article ID and sequence
+    const stepRows = await db.select()
+      .from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.id, stepId))
+      .limit(1);
+
+    if (!stepRows[0]) {
+      res.status(404).json({ error: "Step not found" });
+      return;
+    }
+
+    const step = stepRows[0];
+    const entry: StepReportEntry = {
+      id:               randomUUID(),
+      stepId,
+      articleId:        step.articleId,
+      stepSequence:     step.sequence,
+      stepInstruction:  step.instruction,
+      quote:            quote.slice(0, 2000), // cap verbatim text length
+      createdAt:        new Date().toISOString(),
+    };
+
+    const existing = STEP_REPORT_STORE.get(stepId) ?? [];
+    STEP_REPORT_STORE.set(stepId, [...existing, entry]);
+
+    // Best-effort: create Step_Report__c in Salesforce if the object exists
+    try {
+      const client = new ConnectorSalesforceClient();
+      await client.createRecord("Step_Report__c", {
+        Procedure_Step__c: step.sfStepId ?? stepId,
+        Verbatim_Quote__c: entry.quote,
+      });
+    } catch {
+      // Step_Report__c may not exist in this org — safe to ignore
+    }
+
+    res.status(201).json({ ok: true, report: entry });
+  } catch (err) {
+    req.log.error(err, "Failed to create step report");
+    res.status(500).json({ error: "Failed to create step report" });
+  }
+});
+
+// GET /api/knowledge/articles/:id/step-reports
+// Returns reader reports grouped by step ID, ordered by step sequence. Staff-only.
+router.get("/knowledge/articles/:id/step-reports", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+
+    // Load all steps for the article so we can group reports by step
+    const steps = await db.select()
+      .from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, articleId))
+      .orderBy(asc(articleProcedureStepsTable.sequence));
+
+    const groups = steps
+      .map(step => {
+        const reports = (STEP_REPORT_STORE.get(step.id) ?? [])
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+        if (reports.length === 0) return null;
+
+        const mostRecent = reports[0]!;
+        return {
+          stepId:           step.id,
+          stepSequence:     step.sequence,
+          stepInstruction:  step.instruction,
+          count:            reports.length,
+          mostRecentQuote:  mostRecent.quote,
+          mostRecentAt:     mostRecent.createdAt,
+          reports,
+        };
+      })
+      .filter((g): g is NonNullable<typeof g> => g !== null);
+
+    res.json({ groups, totalReports: groups.reduce((n, g) => n + g.count, 0) });
+  } catch (err) {
+    req.log.error(err, "Failed to fetch step reports");
+    res.status(500).json({ error: "Failed to fetch step reports" });
+  }
+});
+
+// GET /knowledge/sf-articles/:sfArticleId/step-reports
+// Returns reader reports grouped for a specific SF article version.
+// Reports are stored by HelpPanel taps (POST /knowledge/sf-articles/:id/report).
+// Staff-only — the Freshness tab is a staff page.
+router.get("/knowledge/sf-articles/:sfArticleId/step-reports", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const sfArticleId = req.params["sfArticleId"] as string;
+    const key = `sf:${sfArticleId}`;
+    const reports = (STEP_REPORT_STORE.get(key) ?? [])
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    if (reports.length === 0) {
+      res.json({ groups: [], totalReports: 0 });
+      return;
+    }
+
+    // Wrap in a single group (article-level reports have no step sequence)
+    const group = {
+      stepId:           key,
+      stepSequence:     0,
+      stepInstruction:  "(Article-level — exact step not reported)",
+      count:            reports.length,
+      mostRecentQuote:  reports[0]!.quote,
+      mostRecentAt:     reports[0]!.createdAt,
+      reports,
+    };
+    res.json({ groups: [group], totalReports: reports.length });
+  } catch (err) {
+    req.log.error(err, "Failed to fetch SF article step reports");
+    res.status(500).json({ error: "Failed to fetch SF article step reports" });
+  }
+});
+
+// POST /knowledge/sf-articles/:sfArticleId/report
+// Article-level "step didn't match" signal from the HelpPanel.
+// Accepted from staff or homebase sessions.
+// Body: { quote?: string } — verbatim text or context the reader typed (optional)
+//
+// Security: homebase callers must be able to see the article before filing a report.
+// We run the same audience check as GET /knowledge/sf-articles/:id — verifying the
+// article is online and Audience__c matches — to prevent arbitrary report injection
+// via guessed or foreign-audience article IDs.
+router.post("/knowledge/sf-articles/:sfArticleId/report", async (req, res): Promise<void> => {
+  const access = resolveKnowledgeAccess(req);
+  if (!access.ok) {
+    res.status(access.status).json({ error: access.error, message: access.message });
+    return;
+  }
+
+  const sfArticleId = req.params["sfArticleId"] as string;
+  const { quote = "" } = req.body as Partial<{ quote: string }>;
+
+  // ── Homebase caller visibility check ──────────────────────────────────────
+  // Staff can report against any article ID. For homebase callers we must verify
+  // the article is online and belongs to their audience before persisting.
+  if (access.audience) {
+    try {
+      const client = new ConnectorSalesforceClient();
+      const fields  = await getKavFieldSet(client, { warn: (m) => req.log.warn(m) });
+
+      if (!fields.has("Audience__c")) {
+        res.status(403).json({
+          error: "audience_filter_unavailable",
+          message: "Audience__c not configured — reports cannot be validated for homebase callers.",
+        });
+        return;
+      }
+
+      const metaSoql = `SELECT Id, PublishStatus, Audience__c
+                        FROM KnowledgeArticleVersion
+                        WHERE Id = '${sfArticleId}'
+                        LIMIT 1`;
+      const metaResult = await client.query<{ Id: string; PublishStatus: string; Audience__c?: string }>(metaSoql);
+
+      if (!metaResult.records.length) {
+        res.status(404).json({ error: "Article not found" });
+        return;
+      }
+
+      const meta = metaResult.records[0]!;
+      if (meta.PublishStatus !== 'online') {
+        res.status(403).json({ error: "not_authorized", message: "Cannot report on a draft article." });
+        return;
+      }
+
+      const AUDIENCE_MAP: Record<string, string> = { learner: 'Learner', coach: 'Coach', volunteer: 'Volunteer' };
+      if (meta.Audience__c !== AUDIENCE_MAP[access.audience]) {
+        // Return 404 to avoid confirming the article exists
+        res.status(404).json({ error: "Article not found" });
+        return;
+      }
+    } catch (err) {
+      req.log.error(err, "Report visibility check failed");
+      res.status(502).json({ error: "Could not validate article visibility before accepting report." });
+      return;
+    }
+  }
+
+  try {
+    const key = `sf:${sfArticleId}`;
+    const entry: StepReportEntry = {
+      id:              randomUUID(),
+      stepId:          key,
+      articleId:       sfArticleId,
+      stepSequence:    0,
+      stepInstruction: "(Article-level report — specific step unknown)",
+      quote:           quote.slice(0, 2000),
+      createdAt:       new Date().toISOString(),
+    };
+    const existing = STEP_REPORT_STORE.get(key) ?? [];
+    STEP_REPORT_STORE.set(key, [...existing, entry]);
+
+    res.status(201).json({ ok: true, report: entry });
+  } catch (err) {
+    req.log.error(err, "Failed to create article report");
+    res.status(500).json({ error: "Failed to create article report" });
+  }
+});
+
+// ── Audience access helper ────────────────────────────────────────────────────
+// Returns { ok: true, audience } when the caller is staff or has a homebase
+// audience session. Returns { ok: false } when the caller has no session at all.
+// The caller is responsible for sending 401/403 when ok is false.
+const HOMEBASE_AUDIENCES = ['learner', 'coach', 'volunteer'] as const;
+type HomebaseAudience = typeof HOMEBASE_AUDIENCES[number];
+
+function resolveKnowledgeAccess(req: import("express").Request): {
+  ok: true;
+  isStaffUser: boolean;
+  audience: HomebaseAudience | null;
+} | { ok: false; status: 401 | 403; error: string; message: string } {
+  const email = req.session.googleEmail;
+  if (!email) {
+    return { ok: false, status: 401, error: "not_authenticated", message: "Sign in required." };
+  }
+  const groups = req.session.googleGroups ?? [];
+  const isStaffUser = isStaff(groups, email);
+  const rawAudience = req.session.googleAudience;
+  const audience = HOMEBASE_AUDIENCES.includes(rawAudience as HomebaseAudience)
+    ? (rawAudience as HomebaseAudience)
+    : null;
+
+  if (!isStaffUser && !audience) {
+    return {
+      ok: false, status: 403,
+      error: "not_authorized",
+      message: "Access requires a staff account or a Homebase session (coach, learner, or volunteer).",
+    };
+  }
+  return { ok: true, isStaffUser, audience: isStaffUser ? null : audience };
+}
+
 // GET /api/knowledge/sf-articles
 // Lists Salesforce Knowledge articles. Optional query params:
 //   status  — 'online' (default) | 'draft' | 'all'
@@ -1319,7 +1583,17 @@ function extractSnippet(query: string, text: string | null): string | null {
 //   q       — full-text search (≥3 chars: uses SOSL IN ALL FIELDS; <3 chars: ignored)
 //   cat     — data category filter as 'GroupApiName:CategoryApiName'
 //             e.g. 'Topics:Products' → WITH DATA CATEGORY Topics BELOW Products
+//
+// Access: staff sessions see all published articles.
+//         Homebase sessions (coach / learner / volunteer) see only articles where
+//         Audience__c matches their audience (if the field exists in this SF org).
 router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
+  const access = resolveKnowledgeAccess(req);
+  if (!access.ok) {
+    res.status(access.status).json({ error: access.error, message: access.message });
+    return;
+  }
+
   try {
     const client = new ConnectorSalesforceClient();
     const fields = await getKavFieldSet(client, { warn: (m) => req.log.warn(m) });
@@ -1343,11 +1617,41 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       }
     }
 
+    // Audience filter map — shared between list and detail.
+    const AUDIENCE_SF_MAP: Record<string, string> = {
+      learner: 'Learner', coach: 'Coach', volunteer: 'Volunteer',
+    };
+
+    // Security: homebase callers may only read published (online) articles.
+    // Ignore the status query param for them to prevent draft disclosure.
+    const effectiveStatus = access.audience ? 'online' : statusParam;
+
     // Build publish-status condition (reused in both SOQL and SOSL WHERE).
     const statusClause =
-      statusParam === "all"   ? "PublishStatus IN ('online', 'draft')" :
-      statusParam === "draft" ? "PublishStatus = 'draft'"              :
-                                "PublishStatus = 'online'";
+      effectiveStatus === "all"   ? "PublishStatus IN ('online', 'draft')" :
+      effectiveStatus === "draft" ? "PublishStatus = 'draft'"              :
+                                   "PublishStatus = 'online'";
+
+    // Security: fail CLOSED when Audience__c is absent and the caller is a
+    // homebase audience. Without the field we cannot enforce per-audience
+    // isolation, so we must deny rather than return all articles.
+    if (access.audience && !fields.has("Audience__c")) {
+      res.status(403).json({
+        error: "audience_filter_unavailable",
+        message:
+          "Audience__c is not present in this Salesforce org. " +
+          "Per-audience access cannot be enforced — access is restricted until the field is configured.",
+        articles: [],
+      });
+      return;
+    }
+
+    // Audience filter: applied when the caller is a homebase user (coach/learner/volunteer).
+    // Audience__c presence is guaranteed above for homebase callers.
+    const audienceClause =
+      access.audience && AUDIENCE_SF_MAP[access.audience]
+        ? `Audience__c = '${AUDIENCE_SF_MAP[access.audience]}'`
+        : null;
 
     type KavRow = {
       Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
@@ -1366,6 +1670,7 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       if (typeParam && fields.has("ArticleType")) {
         returningWhereClauses.push(`ArticleType = '${typeParam.replace(/'/g, "\\'")}'`);
       }
+      if (audienceClause) returningWhereClauses.push(audienceClause);
       const returningWhere = returningWhereClauses.join(" AND ");
 
       // SOSL: FIND {term} IN ALL FIELDS RETURNING KnowledgeArticleVersion(fields WHERE ... ORDER BY ... LIMIT ...)
@@ -1390,6 +1695,7 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
       if (typeParam && fields.has("ArticleType")) {
         whereClauses.push(`ArticleType = '${typeParam.replace(/'/g, "\\'")}'`);
       }
+      if (audienceClause) whereClauses.push(audienceClause);
       const where = `WHERE ${whereClauses.join(" AND ")}`;
 
       // WITH DATA CATEGORY must come between WHERE and ORDER BY in SOQL.
@@ -1454,8 +1760,14 @@ router.get("/knowledge/sf-articles", async (req, res): Promise<void> => {
 // GET /api/knowledge/sf-articles/:id
 // Returns full detail for a single article version, including body content.
 // :id is the KnowledgeArticleVersion Id.
+// Access: same policy as the list endpoint (staff OR homebase audience session).
 router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
-  const { id } = req.params;
+  const access = resolveKnowledgeAccess(req);
+  if (!access.ok) {
+    res.status(access.status).json({ error: access.error, message: access.message });
+    return;
+  }
+  const id = req.params["id"] as string;
   try {
     const client = new ConnectorSalesforceClient();
 
@@ -1477,7 +1789,29 @@ router.get("/knowledge/sf-articles/:id", async (req, res): Promise<void> => {
       res.status(404).json({ error: "Article not found" });
       return;
     }
-    const meta = metaResult.records[0]!;
+    const meta = metaResult.records[0]! as typeof metaResult.records[0] & { Audience__c?: string };
+
+    // Security: homebase callers may only read published online articles.
+    // Also verify Audience__c match to prevent cross-audience ID guessing.
+    if (access.audience) {
+      if (meta.PublishStatus !== 'online') {
+        res.status(403).json({ error: "not_authorized", message: "Draft articles are not accessible to homebase sessions." });
+        return;
+      }
+      if (!fields.has("Audience__c")) {
+        res.status(403).json({
+          error: "audience_filter_unavailable",
+          message: "Audience__c is not configured in this org — access restricted.",
+        });
+        return;
+      }
+      const expected = { learner: 'Learner', coach: 'Coach', volunteer: 'Volunteer' }[access.audience];
+      if (meta.Audience__c !== expected) {
+        // Return 404 rather than 403 to avoid leaking that the article exists.
+        res.status(404).json({ error: "Article not found" });
+        return;
+      }
+    }
 
     // Fetch ALL content fields from the article-type __kav object.
     const sections: ArticleSection[] = [];
@@ -2010,7 +2344,7 @@ router.patch("/knowledge/sf-sync-settings", requireAdmin, async (req, res): Prom
 // Governance Ownership Matrix. next_review_due is set to 6 months from now.
 const KNOWLEDGE_ARTICLE_REVIEW_MONTHS = 6;
 
-router.post("/knowledge/sf-articles/:id/mark-reviewed", async (req, res): Promise<void> => {
+router.post("/knowledge/sf-articles/:id/mark-reviewed", requireStaff, async (req, res): Promise<void> => {
   const { id } = req.params;
   if (!id || typeof id !== "string" || id.length === 0) {
     res.status(400).json({ error: "Invalid article id" });

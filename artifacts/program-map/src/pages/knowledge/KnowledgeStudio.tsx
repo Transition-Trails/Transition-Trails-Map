@@ -5,25 +5,8 @@ import { KnowledgeStudioPennyRead } from './KnowledgeStudioPennyRead';
 import KnowledgeStudioArticle from './KnowledgeStudioArticle';
 import KnowledgeStudioReview from './KnowledgeStudioReview';
 import KnowledgeStudioApproval from './KnowledgeStudioApproval';
-
-// ── Placeholder panel for tabs not yet built ─────────────────────────────────
-
-function ComingSoonPanel({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center h-full text-center gap-4 p-8">
-      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-        <BookOpen className="w-5 h-5 text-muted-foreground/50" />
-      </div>
-      <div>
-        <p className="text-[13px] font-semibold text-foreground">{title}</p>
-        <p className="text-[11px] text-muted-foreground mt-1 max-w-[320px] leading-relaxed">{description}</p>
-      </div>
-      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 border border-dashed border-border px-3 py-1 rounded-full">
-        Coming in next sprint
-      </span>
-    </div>
-  );
-}
+import KnowledgeStudioFreshness from './KnowledgeStudioFreshness';
+import KnowledgeStudioHelpMap from './KnowledgeStudioHelpMap';
 
 // ── Knowledge Studio hub ─────────────────────────────────────────────────────
 
@@ -64,24 +47,14 @@ const TABS = [
     label: 'Freshness',
     path: '/knowledge/studio/freshness',
     icon: Thermometer,
-    content: (
-      <ComingSoonPanel
-        title="Freshness Tracker"
-        description="Track validation stamps, overdue review cycles, and step-level stale signals. Penny degrades on stale steps — this tab shows exactly which articles and steps are at risk."
-      />
-    ),
+    content: <KnowledgeStudioFreshness />,
   },
   {
     id: 'in-app-help',
     label: 'In-app Help',
     path: '/knowledge/studio/in-app-help',
     icon: HelpCircle,
-    content: (
-      <ComingSoonPanel
-        title="In-app Help"
-        description="Map knowledge articles to the pages and panels where they surface as contextual help. Controls which article HelpPanel shows when staff click the ? icon on any screen."
-      />
-    ),
+    content: <KnowledgeStudioHelpMap />,
   },
   {
     id: 'pennys-read',
