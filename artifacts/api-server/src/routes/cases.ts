@@ -30,6 +30,32 @@ const router = Router();
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
+/**
+ * If the Salesforce error contains one or more FIELD_CUSTOM_VALIDATION_EXCEPTION
+ * entries, extract and join the human-readable message text they carry.
+ * The org admin wrote those messages for end users; surface them directly.
+ * Returns null for all other error types so the caller can fall through.
+ */
+function extractSfValidationMessage(errMsg: string): string | null {
+  if (!errMsg.includes("FIELD_CUSTOM_VALIDATION_EXCEPTION")) return null;
+  // SF embeds a JSON error array at the end of the thrown message string.
+  // Find the first "[{" and parse from there.
+  const bracketIdx = errMsg.indexOf("[{");
+  if (bracketIdx === -1) return null;
+  try {
+    const errors = JSON.parse(errMsg.slice(bracketIdx)) as Array<{
+      message?: string;
+      errorCode?: string;
+    }>;
+    const messages = errors
+      .filter(e => e.errorCode === "FIELD_CUSTOM_VALIDATION_EXCEPTION" && e.message)
+      .map(e => e.message!.trim());
+    return messages.length > 0 ? messages.join(" ") : null;
+  } catch {
+    return null;
+  }
+}
+
 async function getOrgBaseUrl(proxyFetch: (url: string, init?: RequestInit) => Promise<Response>): Promise<string> {
   try {
     const res  = await proxyFetch("/services/oauth2/userinfo", { headers: { Accept: "application/json" } });
@@ -187,6 +213,10 @@ router.patch("/sf/cases/:id/status", async (req, res) => {
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     logger.warn({ caseId: id, status, sfUserId, err: msg }, "sf/cases status update failed");
+    const validationMsg = extractSfValidationMessage(msg);
+    if (validationMsg) {
+      return res.status(422).json({ error: validationMsg });
+    }
     return res.status(500).json({ error: msg });
   }
 });
@@ -231,8 +261,16 @@ router.patch("/sf/cases/:id", async (req, res) => {
     await client.updateRecord("Case", id, { FollowUpDate: dateVal });
     return res.json({ success: true, FollowUpDate: dateVal });
   } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-    if (/FollowUpDate|No such column/i.test(msg)) {
+    const msg = e instanceof Error ? e.message : String(e);
+    // Validation rules take priority — extract the org-admin message first so a
+    // rule whose text happens to mention "FollowUpDate" isn't mistaken for a
+    // missing-field error.
+    const validationMsg = extractSfValidationMessage(msg);
+    if (validationMsg) {
+      return res.status(422).json({ error: validationMsg });
+    }
+    // Distinguish a genuinely unsupported / missing field from other errors.
+    if (/No such column|INVALID_FIELD|field integrity exception/i.test(msg)) {
       return res.json({ success: false, fieldUnsupported: true });
     }
     return res.status(500).json({ error: msg });
