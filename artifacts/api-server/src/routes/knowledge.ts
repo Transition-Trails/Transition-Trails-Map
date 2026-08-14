@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { knowledgeDocumentsTable, knowledgeSourcesTable, articleReviewsTable, knowledgeArticlesTable } from "@workspace/db/schema";
-import { eq, desc, asc, inArray } from "drizzle-orm";
+import { knowledgeDocumentsTable, knowledgeSourcesTable, articleReviewsTable, knowledgeArticlesTable, sfSyncSettingsTable } from "@workspace/db/schema";
+import { eq, desc, asc, inArray, or } from "drizzle-orm";
+import { getSyncJobStatus, recordManualSync } from "../lib/sfArticleSyncJob.js";
 import {
   fetchSfLiveMetrics,
   buildIntegrationStatus,
@@ -923,9 +924,26 @@ function rewriteSfImageUrls(html: string, orgBaseUrl: string): string {
   );
 }
 
+// Allowed hostname suffixes for the SF image proxy.
+// Only *.salesforce.com and *.force.com are valid SF org hosts.
+const SF_ALLOWED_HOSTS = [".salesforce.com", ".force.com"];
+
+// Allowed path prefixes for the SF image proxy.
+// SF rich-text images are always served under /servlet/rtaImage.
+const SF_ALLOWED_PATH_PREFIXES = ["/servlet/rtaImage", "/servlet/imageserver"];
+
+function isSfImageUrlAllowed(parsed: URL): boolean {
+  const host = parsed.hostname.toLowerCase();
+  const pathOk = SF_ALLOWED_PATH_PREFIXES.some(p => parsed.pathname.startsWith(p));
+  const hostOk = SF_ALLOWED_HOSTS.some(suffix => host.endsWith(suffix));
+  return hostOk && pathOk;
+}
+
 // GET /api/knowledge/sf-image  — authenticated image proxy for SF rich-text content
+// Requires staff authentication. Only proxies *.salesforce.com / *.force.com
+// image paths (e.g. /servlet/rtaImage); all other paths are rejected.
 // Query params: url=<encoded absolute SF image URL>
-router.get("/knowledge/sf-image", async (req, res): Promise<void> => {
+router.get("/knowledge/sf-image", requireStaff, async (req, res): Promise<void> => {
   const rawUrl = req.query["url"] as string | undefined;
   if (!rawUrl) {
     res.status(400).json({ error: "Missing url param" });
@@ -938,6 +956,13 @@ router.get("/knowledge/sf-image", async (req, res): Promise<void> => {
     res.status(400).json({ error: "Invalid url param" });
     return;
   }
+  // Strict allowlist: host must be *.salesforce.com or *.force.com AND path must
+  // match a known SF image prefix. This prevents the connector proxy from being
+  // used to reach arbitrary SF REST endpoints.
+  if (!isSfImageUrlAllowed(parsedUrl)) {
+    res.status(400).json({ error: "URL is not an allowed Salesforce image host/path" });
+    return;
+  }
   // Build just the path+query portion to pass through the connector proxy
   const sfPath = `${parsedUrl.pathname}${parsedUrl.search}`;
   try {
@@ -947,7 +972,12 @@ router.get("/knowledge/sf-image", async (req, res): Promise<void> => {
       res.status(imgResp.status).json({ error: `SF image fetch failed: ${imgResp.status}` });
       return;
     }
-    const contentType = imgResp.headers.get("content-type") ?? "image/png";
+    // Only forward image/* content types; reject unexpected responses.
+    const contentType = imgResp.headers.get("content-type") ?? "";
+    if (!contentType.startsWith("image/")) {
+      res.status(502).json({ error: "Unexpected content type from Salesforce" });
+      return;
+    }
     res.setHeader("Content-Type", contentType);
     res.setHeader("Cache-Control", "public, max-age=86400");
     const buf = await imgResp.arrayBuffer();
@@ -1616,244 +1646,231 @@ export function buildSfSyncExistingMap(
 //                 body and status preserved — only SF metadata is refreshed.
 // Returns:        { total, created, updated, skipped, errors, syncedAt }
 //
-router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promise<void> => {
-  const log = req.log;
-  try {
-    const client = new ConnectorSalesforceClient();
-    const fields  = await getKavFieldSet(client, { warn: (m) => log.warn(m) });
+// The core logic lives in runSfArticleSync() below so the background job can
+// call it directly without making an HTTP round-trip.
 
-    // ── 1. Fetch all KAV records (paginated — no LIMIT cap) ──────────────────
-    // Sort Draft before Online so the deduplication loop below lets Online win
-    // by simply overwriting Draft entries as they appear later in the array.
-    const soql = `SELECT ${fields.selectList}
-                  FROM KnowledgeArticleVersion
-                  WHERE PublishStatus IN ('online', 'draft')
-                  ORDER BY PublishStatus ASC, LastModifiedDate DESC`;
+interface SyncLog {
+  warn:  (obj: object | string, msg?: string) => void;
+  info:  (obj: object | string, msg?: string) => void;
+  error: (obj: object | string, msg?: string) => void;
+}
 
-    type KavRow = {
-      Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
-      ArticleType?: string; PublishStatus: string; VersionNumber?: number;
-      CreatedDate: string; LastModifiedDate: string;
-      IsVisibleInApp?: boolean; Language?: string; UrlName?: string;
-    };
-    // queryAll follows SF nextRecordsUrl pages until done, so the full article
-    // catalogue is synced regardless of org size.
-    const kavRecords = await client.queryAll<KavRow>(soql);
+export interface SfSyncResult {
+  total:             number;
+  created:           number;
+  updated:           number;
+  skipped:           number;
+  errors:            number;
+  syncedAt:          string;
+  bodyFetchErrors?:  number;
+  bodyFetchWarning?: string;
+  typeSkipped?:      number;
+  typeSkipNote?:     string;
+}
 
-    if (!kavRecords.length) {
-      res.json({ total: 0, created: 0, updated: 0, skipped: 0, errors: 0 });
-      return;
+/**
+ * Paginate through all records for a SOQL query, following nextRecordsUrl.
+ * Removes the need for a LIMIT clause and avoids silently truncating results.
+ */
+async function queryAll<T>(client: ConnectorSalesforceClient, soql: string): Promise<T[]> {
+  type Page = { done: boolean; records: T[]; nextRecordsUrl?: string };
+  const all: T[] = [];
+  let page = await client.query<T>(soql) as Page;
+  all.push(...page.records);
+  while (!page.done && page.nextRecordsUrl) {
+    page = await client.rest<Page>(page.nextRecordsUrl);
+    all.push(...page.records);
+  }
+  return all;
+}
+
+/**
+ * Core SF article sync logic.
+ * Exported so the background job can call it without an HTTP round-trip.
+ *
+ * Row identity: articles are looked up by sfArticleId (the canonical SF ID) so
+ * that locally-authored articles which were published to SF are refreshed rather
+ * than duplicated. Backward compat: rows where id === KaId (older sync-imported
+ * rows) are also matched via the id column through buildSfSyncExistingMap.
+ */
+export async function runSfArticleSync(log: SyncLog): Promise<SfSyncResult> {
+  const client = new ConnectorSalesforceClient();
+  const fields  = await getKavFieldSet(client, { warn: (m) => log.warn(m) });
+
+  // ── 1. Fetch ALL KAV records (paginated — no LIMIT cap) ────────────────────
+  // Sort Draft before Online so the deduplication loop lets Online win by
+  // overwriting Draft entries as they appear later in the array.
+  const soql = `SELECT ${fields.selectList}
+                FROM KnowledgeArticleVersion
+                WHERE PublishStatus IN ('online', 'draft')
+                ORDER BY PublishStatus ASC, LastModifiedDate DESC`;
+
+  type KavRow = {
+    Id: string; KnowledgeArticleId: string; Title: string; Summary?: string;
+    ArticleType?: string; PublishStatus: string; VersionNumber?: number;
+    CreatedDate: string; LastModifiedDate: string;
+    IsVisibleInApp?: boolean; Language?: string; UrlName?: string;
+  };
+  // queryAll follows SF nextRecordsUrl pages until done, so the full article
+  // catalogue is synced regardless of org size.
+  const kavRecords = await client.queryAll<KavRow>(soql);
+
+  if (!kavRecords.length) {
+    return { total: 0, created: 0, updated: 0, skipped: 0, errors: 0, syncedAt: new Date().toISOString() };
+  }
+
+  // ── 2. Discover body fields for the supported __kav type ───────────────────
+  const bodyInfo = await getKavAllBodyFields(client, { warn: (m) => log.warn(m), info: (m) => log.info(m) });
+  const supportedKavObj  = bodyInfo?.objectName ?? null;
+  const supportedKavBase = supportedKavObj?.replace(/__kav$/i, "") ?? null;
+
+  function isMatchingType(articleType: string | undefined): boolean {
+    if (!supportedKavObj) return true;
+    if (!articleType) return false;
+    const t = articleType.toLowerCase();
+    return t === supportedKavObj.toLowerCase() || t === (supportedKavBase ?? "").toLowerCase();
+  }
+
+  // Deduplicate by KnowledgeArticleId — prefer Online over Draft.
+  // Draft never overwrites any existing entry; between two Online versions keep
+  // the newer LastModifiedDate (page-boundary safety).
+  const deduped = new Map<string, KavRow>();
+  let typeSkipped = 0;
+  for (const r of kavRecords) {
+    if (!isMatchingType(r.ArticleType)) { typeSkipped++; continue; }
+    const existing  = deduped.get(r.KnowledgeArticleId);
+    const curOnline = r.PublishStatus.toLowerCase() === "online";
+    const exOnline  = existing?.PublishStatus.toLowerCase() === "online";
+    if (!existing) {
+      deduped.set(r.KnowledgeArticleId, r);
+    } else if (curOnline && !exOnline) {
+      deduped.set(r.KnowledgeArticleId, r);
+    } else if (curOnline && exOnline && new Date(r.LastModifiedDate) > new Date(existing.LastModifiedDate)) {
+      deduped.set(r.KnowledgeArticleId, r);
     }
+  }
+  if (typeSkipped > 0) {
+    log.warn({ typeSkipped, supportedKavObj }, "Sync: skipped articles whose ArticleType does not match the discovered __kav object");
+  }
 
-    // ── 2. Discover body fields for the supported __kav type ─────────────────
-    // getKavAllBodyFields returns the first __kav object that has body fields.
-    // Articles of other __kav types cannot have their body fetched, so we
-    // constrain the sync to only the supported type to avoid silently importing
-    // articles with empty bodies.
-    const bodyInfo = await getKavAllBodyFields(client, { warn: (m) => log.warn(m), info: (m) => log.info(m) });
+  // ── 3. Batch-fetch body content aligned to selected __kav version Ids ──────
+  // Query bodies by the specific __kav record Id (r.Id from deduped) so the
+  // body is always from the exact version chosen by deduplication.
+  // Chunking: ≤200 Ids per query keeps IN-clause length inside SF SOQL limits.
+  // Failure: a failed body batch does NOT update the local body to empty;
+  // bodyFetchFailedKaIds tracks affected articles so the upsert loop preserves
+  // existing local content. New articles import with empty body (no prior content).
+  const BODY_BATCH_SIZE = 200;
+  const bodyByKaId           = new Map<string, string>();
+  const bodyFetchFailedKaIds = new Set<string>();
+  let bodyFetchErrors = 0;
 
-    // Normalise the discovered object name for comparison with ArticleType values.
-    // SF returns ArticleType on KnowledgeArticleVersion as the __kav object name
-    // (e.g. "Knowledge__kav"). Strip __kav suffix for a case-insensitive match so
-    // both "Knowledge__kav" and "Knowledge" in ArticleType are accepted.
-    const supportedKavObj  = bodyInfo?.objectName ?? null;               // e.g. "Knowledge__kav"
-    const supportedKavBase = supportedKavObj?.replace(/__kav$/i, "") ?? null; // e.g. "Knowledge"
+  if (bodyInfo && bodyInfo.fields.length > 0) {
+    const fieldList = bodyInfo.fields.map(f => f.name).join(", ");
+    let orgBaseUrl: string | null = null;
+    try { orgBaseUrl = await client.getOrgBaseUrl(); } catch { /* non-fatal */ }
 
-    function isMatchingType(articleType: string | undefined): boolean {
-      if (!supportedKavObj) return true; // no body info — include everything (body will be empty anyway)
-      if (!articleType) return false;
-      const t = articleType.toLowerCase();
-      return t === supportedKavObj.toLowerCase() || t === (supportedKavBase ?? "").toLowerCase();
-    }
+    const kavVersionIdToKaId = new Map<string, string>();
+    for (const [kaId, r] of deduped) kavVersionIdToKaId.set(r.Id, kaId);
 
-    // Deduplicate by KnowledgeArticleId — prefer the single Online version over any Draft.
-    // Selection rules (applied in order to each row as kavRecords is iterated):
-    //   1. Skip rows whose ArticleType doesn't match the body-discoverable __kav object.
-    //   2. No entry yet → always store.
-    //   3. Existing entry is Draft, current is Online → Online wins (overwrite).
-    //   4. Both entries are Online (e.g. multiple published versions exist) →
-    //      keep the one with the larger LastModifiedDate (newest). The SOQL sorted DESC
-    //      so the first Online row encountered is normally the newest; this guard
-    //      protects against any page-boundary reordering.
-    //   5. Current is Draft, existing is already any version → skip.
-    const deduped = new Map<string, KavRow>();
-    let typeSkipped = 0;
-    for (const r of kavRecords) {
-      if (!isMatchingType(r.ArticleType)) {
-        typeSkipped++;
-        continue;
-      }
-      const existing = deduped.get(r.KnowledgeArticleId);
-      const curOnline = r.PublishStatus.toLowerCase() === "online";
-      const exOnline  = existing?.PublishStatus.toLowerCase() === "online";
-
-      if (!existing) {
-        deduped.set(r.KnowledgeArticleId, r);
-      } else if (curOnline && !exOnline) {
-        // Online beats Draft
-        deduped.set(r.KnowledgeArticleId, r);
-      } else if (curOnline && exOnline) {
-        // Both Online — keep the one with the newer LastModifiedDate
-        if (new Date(r.LastModifiedDate) > new Date(existing.LastModifiedDate)) {
-          deduped.set(r.KnowledgeArticleId, r);
-        }
-      }
-      // Draft never overwrites any existing entry
-    }
-    if (typeSkipped > 0) {
-      log.warn(
-        { typeSkipped, supportedKavObj },
-        "Sync: skipped articles whose ArticleType does not match the discovered __kav object"
-      );
-    }
-
-    // ── 3. Batch-fetch body content aligned to selected __kav version Ids ─────
-    //
-    // Query bodies by the specific __kav record Id (r.Id from deduped) rather than
-    // by KnowledgeArticleId. This guarantees that the body fetched is from the exact
-    // same version that was selected during deduplication, even when an article has
-    // multiple published versions.
-    //
-    // Chunking: SOQL IN clauses are capped at ≤200 Ids per query to stay well inside
-    // Salesforce SOQL and request-URL length limits.
-    //
-    // Failure handling: a failed body batch does NOT update the local body to empty.
-    // The KaIds in the failed batch are tracked in `bodyFetchFailedKaIds`; the upsert
-    // loop skips overwriting the body field for those articles so existing local content
-    // is preserved. New articles (not yet in the DB) are inserted with empty body since
-    // there is no prior content to preserve.
-    const BODY_BATCH_SIZE = 200;
-    const bodyByKaId = new Map<string, string>();        // kaId → body HTML
-    const bodyFetchFailedKaIds = new Set<string>();      // kaIds whose body fetch failed
-    let bodyFetchErrors = 0;
-
-    if (bodyInfo && bodyInfo.fields.length > 0) {
-      const fieldList = bodyInfo.fields.map(f => f.name).join(", ");
-      let orgBaseUrl: string | null = null;
-      try { orgBaseUrl = await client.getOrgBaseUrl(); } catch { /* non-fatal */ }
-
-      // Build a reverse map from __kav version Id → KnowledgeArticleId so we can
-      // store the body keyed by kaId after querying by version Id.
-      const kavVersionIdToKaId = new Map<string, string>();
-      for (const [kaId, r] of deduped) {
-        kavVersionIdToKaId.set(r.Id, kaId);
-      }
-
-      const allVersionIds = [...kavVersionIdToKaId.keys()];
-      for (let batchStart = 0; batchStart < allVersionIds.length; batchStart += BODY_BATCH_SIZE) {
-        const batchVersionIds = allVersionIds.slice(batchStart, batchStart + BODY_BATCH_SIZE);
-        const batchKaIds      = batchVersionIds.map(vid => kavVersionIdToKaId.get(vid)!);
-        const idList          = batchVersionIds.map(vid => `'${vid}'`).join(", ");
-
-        // Query by __kav version Id — each Id matches exactly one record, so there
-        // is no ambiguity about which body version is returned.
-        const bodySoql = `SELECT Id, ${fieldList}
-                          FROM ${bodyInfo.objectName}
-                          WHERE Id IN (${idList})`;
-
-        try {
-          const bodyRows = await client.queryAll<{ Id: string; [k: string]: string | undefined }>(bodySoql);
-
-          for (const row of bodyRows) {
-            const kaId = kavVersionIdToKaId.get(row["Id"] ?? "") ?? "";
-            if (!kaId) continue;
-            const parts: string[] = [];
-            for (const field of bodyInfo.fields) {
-              const raw = row[field.name];
-              if (!raw) continue;
-              const html = orgBaseUrl && raw.includes("<img")
-                ? rewriteSfImageUrls(raw, orgBaseUrl)
-                : raw;
-              parts.push(html);
-            }
-            if (parts.length > 0) bodyByKaId.set(kaId, parts.join("\n"));
-          }
-        } catch (bodyBatchErr) {
-          bodyFetchErrors++;
-          for (const kaId of batchKaIds) bodyFetchFailedKaIds.add(kaId);
-          log.warn(
-            { batchStart, batchSize: batchVersionIds.length, err: String(bodyBatchErr) },
-            "Sync: body batch-fetch failed — existing bodies preserved, new articles will have empty bodies"
-          );
-        }
-      }
-    } else if (!bodyInfo) {
-      // Body-field discovery returned null — Salesforce's EntityDefinition query
-      // failed or the org has no __kav objects. Mark all selected articles as
-      // body-fetch-failed so the upsert loop preserves existing local bodies
-      // rather than overwriting them with empty strings.
-      // New articles (not yet in the DB) still import with empty bodies because
-      // there is no prior content to preserve.
-      for (const kaId of deduped.keys()) bodyFetchFailedKaIds.add(kaId);
-      bodyFetchErrors += 1;
-      log.warn(
-        { articlesAffected: bodyFetchFailedKaIds.size },
-        "Sync: body-field discovery unavailable — existing article bodies preserved, new articles import with empty body"
-      );
-    }
-
-    // ── 5. Check which articles already exist locally ─────────────────────────
-    //
-    // Two lookup strategies are needed to avoid creating duplicates:
-    //
-    // a) id IN (sfArticleIds) — catches articles that were originally synced FROM
-    //    Salesforce (their local primary key IS the KnowledgeArticleId).
-    //
-    // b) sfArticleId IN (sfArticleIds) — catches articles that were AUTHORED in
-    //    Trail OS, published to Salesforce (which stored KnowledgeArticleId in
-    //    sfArticleId), and are now seen in a subsequent sync. Without this lookup,
-    //    the sync would treat these as new and insert a second record under the
-    //    Salesforce KnowledgeArticleId, creating a duplicate.
-    //
-    // The unified map keys are the Salesforce KnowledgeArticleIds (kaId).
-    // The values carry the existing local primary key (localId) used for UPDATE.
-    const sfArticleIds = [...deduped.keys()];
-
-    const [byPkRows, bySfIdRows] = await Promise.all([
-      db
-        .select({ id: knowledgeArticlesTable.id, status: knowledgeArticlesTable.status })
-        .from(knowledgeArticlesTable)
-        .where(inArray(knowledgeArticlesTable.id, sfArticleIds)),
-      db
-        .select({
-          id:          knowledgeArticlesTable.id,
-          status:      knowledgeArticlesTable.status,
-          sfArticleId: knowledgeArticlesTable.sfArticleId,
-        })
-        .from(knowledgeArticlesTable)
-        .where(inArray(knowledgeArticlesTable.sfArticleId, sfArticleIds)),
-    ]);
-
-    // buildSfSyncExistingMap is exported for unit tests — see __tests__/sfSyncReconcile.test.ts
-    const existingByKaId = buildSfSyncExistingMap(byPkRows, bySfIdRows);
-
-    // ── 6. Upsert ─────────────────────────────────────────────────────────────
-    let created = 0, updated = 0, skipped = 0, errors = 0;
-    const now = new Date();
-
-    function localSlug(title: string): string {
-      return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
-    }
-
-    for (const [kaId, r] of deduped) {
+    const allVersionIds = [...kavVersionIdToKaId.keys()];
+    for (let batchStart = 0; batchStart < allVersionIds.length; batchStart += BODY_BATCH_SIZE) {
+      const batchVersionIds = allVersionIds.slice(batchStart, batchStart + BODY_BATCH_SIZE);
+      const batchKaIds      = batchVersionIds.map(vid => kavVersionIdToKaId.get(vid)!);
+      const idList          = batchVersionIds.map(vid => `'${vid}'`).join(", ");
+      const bodySoql = `SELECT Id, ${fieldList} FROM ${bodyInfo.objectName} WHERE Id IN (${idList})`;
       try {
-        const existing   = existingByKaId.get(kaId);
-        const localId    = existing?.localId;          // undefined = new article
-        const localSt    = existing?.status;
-        const body       = bodyByKaId.get(kaId) ?? "";
-        const bodyFailed = bodyFetchFailedKaIds.has(kaId);
-        const sfStatus   = r.PublishStatus.toLowerCase() === "online" ? "published" : "draft";
+        const bodyRows = await client.queryAll<{ Id: string; [k: string]: string | undefined }>(bodySoql);
+        for (const row of bodyRows) {
+          const kaId = kavVersionIdToKaId.get(row["Id"] ?? "") ?? "";
+          if (!kaId) continue;
+          const parts: string[] = [];
+          for (const field of bodyInfo.fields) {
+            const raw = row[field.name];
+            if (!raw) continue;
+            const html = orgBaseUrl && raw.includes("<img") ? rewriteSfImageUrls(raw, orgBaseUrl) : raw;
+            parts.push(html);
+          }
+          if (parts.length > 0) bodyByKaId.set(kaId, parts.join("\n"));
+        }
+      } catch (bodyBatchErr) {
+        bodyFetchErrors++;
+        for (const kaId of batchKaIds) bodyFetchFailedKaIds.add(kaId);
+        log.warn({ batchStart, batchSize: batchVersionIds.length, err: String(bodyBatchErr) },
+          "Sync: body batch-fetch failed — existing bodies preserved, new articles will have empty bodies");
+      }
+    }
+  } else if (!bodyInfo) {
+    for (const kaId of deduped.keys()) bodyFetchFailedKaIds.add(kaId);
+    bodyFetchErrors += 1;
+    log.warn({ articlesAffected: bodyFetchFailedKaIds.size },
+      "Sync: body-field discovery unavailable — existing article bodies preserved, new articles import with empty body");
+  }
 
-        if (!localId) {
-          // New article — insert. Use kaId (the SF KnowledgeArticleId) as the
-          // local primary key so future syncs find it via the id lookup.
-          // Body is empty when the fetch failed; no prior local content to preserve.
-          await db.insert(knowledgeArticlesTable).values({
-            id:              kaId,
+  // ── 4. Look up existing rows by id OR sfArticleId ──────────────────────────
+  // a) id IN (sfArticleIds)        — originally-synced rows (id IS the KaId)
+  // b) sfArticleId IN (sfArticleIds) — authored-in-Trail-OS, published-to-SF rows
+  const sfArticleIds = [...deduped.keys()];
+  const [byPkRows, bySfIdRows] = await Promise.all([
+    db.select({ id: knowledgeArticlesTable.id, status: knowledgeArticlesTable.status })
+      .from(knowledgeArticlesTable)
+      .where(inArray(knowledgeArticlesTable.id, sfArticleIds)),
+    db.select({ id: knowledgeArticlesTable.id, status: knowledgeArticlesTable.status, sfArticleId: knowledgeArticlesTable.sfArticleId })
+      .from(knowledgeArticlesTable)
+      .where(inArray(knowledgeArticlesTable.sfArticleId, sfArticleIds)),
+  ]);
+  const existingByKaId = buildSfSyncExistingMap(byPkRows, bySfIdRows);
+
+  // ── 5. Upsert ──────────────────────────────────────────────────────────────
+  let created = 0, updated = 0, skipped = 0, errors = 0;
+  const now = new Date();
+
+  function localSlug(title: string): string {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
+  }
+
+  for (const [kaId, r] of deduped) {
+    try {
+      const existing   = existingByKaId.get(kaId);
+      const localId    = existing?.localId;
+      const localSt    = existing?.status;
+      const body       = bodyByKaId.get(kaId) ?? "";
+      const bodyFailed = bodyFetchFailedKaIds.has(kaId);
+      const sfStatus   = r.PublishStatus.toLowerCase() === "online" ? "published" : "draft";
+
+      if (!localId) {
+        // New article — insert with KaId as local PK so future syncs find it via id lookup.
+        await db.insert(knowledgeArticlesTable).values({
+          id:              kaId,
+          title:           r.Title,
+          summary:         r.Summary ?? "",
+          body,
+          category:        "",
+          urlName:         r.UrlName ?? localSlug(r.Title),
+          articleType:     normalizeArticleType(r.ArticleType, supportedKavObj),
+          status:          sfStatus,
+          sfArticleId:     r.KnowledgeArticleId,
+          sfVersionId:     r.Id,
+          sfPublishStatus: r.PublishStatus,
+          publishedAt:     sfStatus === "published" ? now : null,
+          createdAt:       new Date(r.CreatedDate),
+          updatedAt:       new Date(r.LastModifiedDate),
+        });
+        created++;
+      } else if (localSt === "pending-review" || localSt === "approved") {
+        // In active review — refresh metadata only, leave body + status alone.
+        await db.update(knowledgeArticlesTable)
+          .set({ title: r.Title, summary: r.Summary ?? "", sfVersionId: r.Id, sfPublishStatus: r.PublishStatus, updatedAt: now })
+          .where(eq(knowledgeArticlesTable.id, localId));
+        skipped++;
+      } else {
+        // Full refresh — use localId so Trail OS-authored articles update in-place.
+        // When body batch failed, omit body field to preserve existing local content.
+        await db.update(knowledgeArticlesTable)
+          .set({
             title:           r.Title,
             summary:         r.Summary ?? "",
-            body,
-            category:        "",
+            ...(bodyFailed ? {} : { body }),
             urlName:         r.UrlName ?? localSlug(r.Title),
             articleType:     normalizeArticleType(r.ArticleType, supportedKavObj),
             status:          sfStatus,
@@ -1861,79 +1878,126 @@ router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promi
             sfVersionId:     r.Id,
             sfPublishStatus: r.PublishStatus,
             publishedAt:     sfStatus === "published" ? now : null,
-            createdAt:       new Date(r.CreatedDate),
-            updatedAt:       new Date(r.LastModifiedDate),
-          });
-          created++;
-
-        } else if (localSt === "pending-review" || localSt === "approved") {
-          // In active review — refresh metadata only, leave body + status alone.
-          // Use localId (the existing primary key) in the WHERE clause to correctly
-          // target Trail OS-authored articles whose id ≠ kaId.
-          await db.update(knowledgeArticlesTable)
-            .set({
-              title:           r.Title,
-              summary:         r.Summary ?? "",
-              sfVersionId:     r.Id,
-              sfPublishStatus: r.PublishStatus,
-              updatedAt:       now,
-            })
-            .where(eq(knowledgeArticlesTable.id, localId));
-          skipped++;
-
-        } else {
-          // Exists but not in active review — full refresh.
-          // Use localId so Trail OS-authored articles are updated in-place rather
-          // than creating a new record under the SF KnowledgeArticleId.
-          // When the body batch failed, omit the body field to preserve existing content.
-          await db.update(knowledgeArticlesTable)
-            .set({
-              title:           r.Title,
-              summary:         r.Summary ?? "",
-              ...(bodyFailed ? {} : { body }),
-              urlName:         r.UrlName ?? localSlug(r.Title),
-              articleType:     normalizeArticleType(r.ArticleType, supportedKavObj),
-              status:          sfStatus,
-              sfArticleId:     r.KnowledgeArticleId,
-              sfVersionId:     r.Id,
-              sfPublishStatus: r.PublishStatus,
-              publishedAt:     sfStatus === "published" ? now : null,
-              updatedAt:       now,
-            })
-            .where(eq(knowledgeArticlesTable.id, localId));
-          updated++;
-        }
-      } catch (itemErr) {
-        log.warn({ kaId, err: String(itemErr) }, "Sync: failed to upsert article");
-        errors++;
+            updatedAt:       now,
+          })
+          .where(eq(knowledgeArticlesTable.id, localId));
+        updated++;
       }
+    } catch (itemErr) {
+      log.warn({ kaId, err: String(itemErr) }, "Sync: failed to upsert article");
+      errors++;
     }
+  }
 
-    log.info(
-      { total: deduped.size, created, updated, skipped, errors, bodyFetchErrors, typeSkipped },
-      "SF articles sync complete"
-    );
-    res.json({
-      total: deduped.size,
-      created,
-      updated,
-      skipped,
-      errors,
-      ...(bodyFetchErrors > 0 && {
-        bodyFetchErrors,
-        bodyFetchWarning: `${bodyFetchErrors} body batch(es) failed; affected articles were imported with empty bodies. Retry sync to attempt recovery.`,
-      }),
-      ...(typeSkipped > 0 && {
-        typeSkipped,
-        typeSkipNote: `${typeSkipped} article versions skipped — their ArticleType does not match the supported __kav object (${supportedKavObj}). Only articles of the supported type are synced.`,
-      }),
-      syncedAt: now.toISOString(),
-    });
+  log.info({ total: deduped.size, created, updated, skipped, errors, bodyFetchErrors, typeSkipped }, "SF articles sync complete");
+  return {
+    total:    deduped.size,
+    created,
+    updated,
+    skipped,
+    errors,
+    syncedAt: now.toISOString(),
+    ...(bodyFetchErrors > 0 && {
+      bodyFetchErrors,
+      bodyFetchWarning: `${bodyFetchErrors} body batch(es) failed; affected articles were imported with empty bodies. Retry sync to attempt recovery.`,
+    }),
+    ...(typeSkipped > 0 && {
+      typeSkipped,
+      typeSkipNote: `${typeSkipped} article versions skipped — their ArticleType does not match the supported __kav object (${supportedKavObj}). Only articles of the supported type are synced.`,
+    }),
+  };
+}
 
+router.post("/knowledge/sf-articles/sync", requireAdmin, async (req, res): Promise<void> => {
+  try {
+    const result = await runSfArticleSync(req.log);
+    // Keep the in-process job state current so GET /sf-sync-status reflects manual syncs.
+    recordManualSync(result);
+    res.json(result);
   } catch (err) {
-    log.error(err, "SF articles sync failed");
+    req.log.error(err, "SF articles sync failed");
     const msg = err instanceof Error ? err.message : "Unknown error";
     res.status(502).json({ error: `Sync failed: ${msg}` });
+  }
+});
+
+// GET /api/knowledge/sf-sync-status
+// Returns the current auto-sync settings and the last-synced timestamp.
+// Used by the SF Articles toolbar to display freshness.
+router.get("/knowledge/sf-sync-status", async (req, res): Promise<void> => {
+  try {
+    const jobStatus = getSyncJobStatus();
+
+    // Read current settings from DB.
+    const rows = await db
+      .select({ enabled: sfSyncSettingsTable.enabled, intervalHours: sfSyncSettingsTable.intervalHours })
+      .from(sfSyncSettingsTable)
+      .where(eq(sfSyncSettingsTable.id, "default"))
+      .limit(1);
+
+    const settings = rows[0] ?? { enabled: true, intervalHours: 6 };
+
+    res.json({
+      lastSyncAt:     jobStatus.lastSyncAt,
+      lastSyncResult: jobStatus.lastSyncResult,
+      autoSyncEnabled: settings.enabled,
+      intervalHours:  settings.intervalHours,
+    });
+  } catch (err) {
+    req.log.error(err, "Failed to fetch SF sync status");
+    res.status(500).json({ error: "Failed to fetch sync status" });
+  }
+});
+
+// PATCH /api/knowledge/sf-sync-settings
+// Lets admins configure the auto-sync schedule (enabled flag + interval hours).
+router.patch("/knowledge/sf-sync-settings", requireAdmin, async (req, res): Promise<void> => {
+  try {
+    const body = req.body as { enabled?: boolean; intervalHours?: number };
+
+    // Validate intervalHours up-front so an invalid value is never persisted,
+    // even on the initial insert (where no prior row exists to conflict against).
+    const rawHours = body.intervalHours;
+    if (rawHours !== undefined) {
+      if (
+        typeof rawHours !== "number" ||
+        !Number.isFinite(rawHours) ||
+        !Number.isInteger(rawHours) ||
+        rawHours < 1 ||
+        rawHours > 168
+      ) {
+        res.status(400).json({ error: "intervalHours must be an integer between 1 and 168" });
+        return;
+      }
+    }
+    const safeHours = rawHours as number | undefined;
+
+    const updatedBy = (req.user as { email?: string } | undefined)?.email ?? null;
+    const now = new Date();
+
+    // Use the validated values in BOTH the INSERT and the ON CONFLICT UPDATE so
+    // neither path can write an unvalidated value.
+    const insertEnabled    = typeof body.enabled === "boolean" ? body.enabled : true;
+    const insertHours      = safeHours ?? 6;
+    const conflictSet: Record<string, unknown> = { updatedBy, updatedAt: now };
+    if (typeof body.enabled === "boolean")  conflictSet["enabled"]      = body.enabled;
+    if (safeHours !== undefined)            conflictSet["intervalHours"] = safeHours;
+
+    await db
+      .insert(sfSyncSettingsTable)
+      .values({ id: "default", enabled: insertEnabled, intervalHours: insertHours, updatedBy, updatedAt: now })
+      .onConflictDoUpdate({ target: sfSyncSettingsTable.id, set: conflictSet });
+
+    const rows = await db
+      .select({ enabled: sfSyncSettingsTable.enabled, intervalHours: sfSyncSettingsTable.intervalHours })
+      .from(sfSyncSettingsTable)
+      .where(eq(sfSyncSettingsTable.id, "default"))
+      .limit(1);
+
+    res.json({ settings: rows[0] ?? { enabled: true, intervalHours: 6 } });
+  } catch (err) {
+    req.log.error(err, "Failed to update SF sync settings");
+    res.status(500).json({ error: "Failed to update sync settings" });
   }
 });
 

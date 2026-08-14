@@ -7,11 +7,10 @@ import { useToast } from '@/hooks/use-toast';
 import {
   Search, FileText, Loader2, AlertCircle,
   RefreshCw, Calendar, Globe, Eye, EyeOff, BookOpen, CheckCircle, Clock,
-  Pencil, ExternalLink, X, Download, CloudDownload, ArrowRight,
+  Pencil, ExternalLink, X, Download, CloudDownload, ArrowRight, Timer,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-
 interface ArticleReview {
   id:            number;
   articleId:     string;
@@ -377,14 +376,35 @@ interface SyncResult {
   total: number; created: number; updated: number; skipped: number; errors: number; syncedAt: string;
 }
 
+interface SyncStatus {
+  lastSyncAt:      string | null;
+  lastSyncResult:  SyncResult | null;
+  autoSyncEnabled: boolean;
+  intervalHours:   number;
+}
+
 export default function SfKnowledgeArticles() {
   const { toast } = useToast();
+  const qc = useQueryClient();
   const [searchInput, setSearchInput]   = useState('');
   const [search, setSearch]             = useState('');
   const [statusFilter, setStatusFilter] = useState<'online' | 'draft' | 'all'>('online');
   const [typeFilter, setTypeFilter]     = useState('');
   const [openArticleId, setOpenArticleId] = useState<string | null>(null);
   const [lastSync, setLastSync]         = useState<SyncResult | null>(null);
+
+  // Poll sync status every 30 s so the "last synced" timestamp stays fresh.
+  const { data: syncStatus } = useQuery<SyncStatus>({
+    queryKey: ['sf-sync-status'],
+    queryFn: async () => {
+      const r = await fetch('/api/knowledge/sf-sync-status');
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json() as Promise<SyncStatus>;
+    },
+    staleTime:     30_000,
+    refetchInterval: 30_000,
+    retry: 1,
+  });
 
   const syncMutation = useMutation({
     mutationFn: async () => {
@@ -401,6 +421,7 @@ export default function SfKnowledgeArticles() {
     },
     onSuccess: (data) => {
       setLastSync(data);
+      void qc.invalidateQueries({ queryKey: ['sf-sync-status'] });
       const parts: string[] = [];
       if (data.created)  parts.push(`${data.created} imported`);
       if (data.updated)  parts.push(`${data.updated} refreshed`);
@@ -501,6 +522,21 @@ export default function SfKnowledgeArticles() {
 
         {/* Spacer */}
         <div className="flex-1" />
+
+        {/* Auto-sync status chip */}
+        {syncStatus && (
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Timer className="w-3 h-3 shrink-0" />
+            {syncStatus.autoSyncEnabled
+              ? <span>Auto-sync every {syncStatus.intervalHours}h</span>
+              : <span>Auto-sync off</span>}
+            {syncStatus.lastSyncAt && (
+              <span className="text-muted-foreground/60">
+                · last {relativeTime(syncStatus.lastSyncAt)}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Count + actions */}
         {totalCount > 0 && (
@@ -726,4 +762,15 @@ function ArticleRow({
       </td>
     </tr>
   );
+}
+
+/** Human-readable relative time string (e.g. "3 hours ago"). */
+function relativeTime(iso: string): string {
+  const diffMs  = Date.now() - new Date(iso).getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+  if (diffMin < 1)  return 'just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr  = Math.floor(diffMin / 60);
+  if (diffHr < 24)  return `${diffHr}h ago`;
+  return `${Math.floor(diffHr / 24)}d ago`;
 }

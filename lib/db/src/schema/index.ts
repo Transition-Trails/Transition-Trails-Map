@@ -41,3 +41,4 @@ export * from "./skillAssessmentSessions";
 export * from "./assessmentItems";
 export * from "./assessmentResponses";
 export * from "./alertSettings";
+export * from "./sfSyncSettings";

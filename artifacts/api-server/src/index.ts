@@ -2,6 +2,8 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { patchLoggerForBuildErrors } from "./lib/buildErrorReporter.js";
 import { startErrorAlertJob } from "./lib/errorAlertJob.js";
+import { startSfArticleSyncJob } from "./lib/sfArticleSyncJob.js";
+import { runSfArticleSync } from "./routes/knowledge.js";
 import { pool } from "@workspace/db";
 
 // Patch logger.error BEFORE any routes or background tasks run.
@@ -57,6 +59,18 @@ async function ensureBuildErrorLogsTable(): Promise<void> {
   `);
 }
 
+async function ensureSfSyncSettingsTable(): Promise<void> {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS "sf_sync_settings" (
+      "id"             text        PRIMARY KEY DEFAULT 'default',
+      "enabled"        boolean     NOT NULL DEFAULT true,
+      "interval_hours" integer     NOT NULL DEFAULT 6,
+      "updated_by"     text,
+      "updated_at"     timestamp   NOT NULL DEFAULT NOW()
+    );
+  `);
+}
+
 async function ensureSessionTable(): Promise<void> {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS "session" (
@@ -95,7 +109,7 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-Promise.all([ensureSessionTable(), ensureBuildErrorLogsTable()])
+Promise.all([ensureSessionTable(), ensureBuildErrorLogsTable(), ensureSfSyncSettingsTable()])
   .then(() => {
     app.listen(port, (err) => {
       if (err) {
@@ -104,6 +118,7 @@ Promise.all([ensureSessionTable(), ensureBuildErrorLogsTable()])
       }
       logger.info({ port }, "Server listening");
       startErrorAlertJob();
+      startSfArticleSyncJob(runSfArticleSync);
     });
   })
   .catch((err) => {
