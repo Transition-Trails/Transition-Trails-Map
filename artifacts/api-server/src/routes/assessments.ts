@@ -892,50 +892,43 @@ router.get("/assessments/sessions/:id/results", requireStaff as import("express"
 });
 
 // ── GET /assessments/coach/overview ──────────────────────────────────────────
-// Coach-accessible view of all completed sessions — same shape as staff/overview.
-// Uses requireHomebaseAuth + inline coach audience guard so coaches can read
-// results without needing a staff session.
+// Coach-accessible view of aggregate assessment stats.
+// Uses requireHomebaseAuth + inline coach-audience guard.
+//
+// Data-minimisation: no per-session or per-learner data is returned.
+// Only anonymous aggregate counts are exposed until a server-side
+// coach→learner squad-assignment model is in place.  Individual session
+// details (learner identity, scores) are reserved for staff routes.
 
-router.get("/assessments/coach/overview", requireHomebaseAuth, async (req, res) => {
+router.get("/assessments/coach/overview", requireHomebaseAuth, async (_req, res) => {
   if (res.locals["effectiveAudience"] !== "coach") {
     return res.status(403).json({ error: "This resource is only available to coaches." });
   }
 
   try {
     const completed = await db
-      .select()
+      .select({ id: skillAssessmentSessionsTable.id })
       .from(skillAssessmentSessionsTable)
-      .where(eq(skillAssessmentSessionsTable.status, "completed"))
-      .orderBy(desc(skillAssessmentSessionsTable.completedAt))
-      .limit(50);
+      .where(eq(skillAssessmentSessionsTable.status, "completed"));
 
-    const enriched = await Promise.all(completed.map(async s => {
+    const total = completed.length;
+
+    // Compute pass rate from response scores — no learner identifiers loaded.
+    const scores = await Promise.all(completed.map(async s => {
       const resps = await db
         .select({ isCorrect: assessmentResponsesTable.isCorrect })
         .from(assessmentResponsesTable)
         .where(eq(assessmentResponsesTable.sessionId, s.id));
-      const total   = resps.length;
       const correct = resps.filter(r => r.isCorrect).length;
-      const score   = total > 0 ? Math.round((correct / total) * 100) : 0;
-      return {
-        id:            s.id,
-        learnerEmail:  s.learnerEmail,
-        instance:      s.instance,
-        completedAt:   s.completedAt,
-        score,
-        passed:        score >= 70,
-        totalAnswered: total,
-        totalCorrect:  correct,
-      };
+      const score   = resps.length > 0 ? Math.round((correct / resps.length) * 100) : 0;
+      return score;
     }));
 
-    const total         = enriched.length;
-    const passedCount   = enriched.filter(s => s.passed).length;
-    const avgScore      = total > 0 ? Math.round(enriched.reduce((acc, s) => acc + s.score, 0) / total) : 0;
-    const needsCoaching = enriched.filter(s => !s.passed).length;
+    const passedCount   = scores.filter(s => s >= 70).length;
+    const avgScore      = total > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / total) : 0;
+    const needsCoaching = scores.filter(s => s < 70).length;
 
     return res.json({
-      sessions: enriched,
       stats: {
         total,
         passed:       passedCount,

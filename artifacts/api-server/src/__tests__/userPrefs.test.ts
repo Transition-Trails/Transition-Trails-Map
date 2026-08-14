@@ -23,6 +23,12 @@
  * Each call to `authenticatedAgent()` uses a unique email address (via a
  * monotonically incrementing counter).  This ensures no durable DB state leaks
  * between tests — each test starts with a fresh user row.
+ *
+ * Migration dependency
+ * ────────────────────
+ * These tests require the `user_preferences` table created by migration
+ * 0011_create_user_preferences.sql.  All 4 PATCH scenarios (P2–P4, P7) were
+ * confirmed passing against the live dev DB after that migration was applied.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest';
