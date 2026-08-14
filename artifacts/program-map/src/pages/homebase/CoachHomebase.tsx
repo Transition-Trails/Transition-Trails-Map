@@ -26,6 +26,7 @@ import {
   BookOpen,
   CalendarDays,
   UserCheck,
+  ClipboardCheck,
   Shield,
   MessageSquare,
   Hash,
@@ -56,9 +57,10 @@ import { SquadGrid }          from "@/components/homebase/SquadGrid";
 import { CoachCasesCard }     from "@/components/homebase/CoachCasesCard";
 import { CoachWeekCard }      from "@/components/homebase/CoachWeekCard";
 import { TodayTasksCard }     from "@/components/homebase/TodayTasksCard";
-import { SubmitCaseDrawer }   from "@/components/homebase/SubmitCaseDrawer";
-import { SortableCard }       from "@/components/homebase/SortableCard";
-import { useHomebaseLayout }  from "@/hooks/useHomebaseLayout";
+import { SubmitCaseDrawer }      from "@/components/homebase/SubmitCaseDrawer";
+import { SortableCard }          from "@/components/homebase/SortableCard";
+import { CoachAssessmentCard }   from "@/components/homebase/CoachAssessmentCard";
+import { useHomebaseLayout }     from "@/hooks/useHomebaseLayout";
 import {
   useCoachPennyPrepared,
   useCoachArtifacts,
@@ -76,6 +78,7 @@ export const COACH_DEFAULT_CARD_ORDER = [
   "artifacts",
   "squad",
   "today-tasks",
+  "assessment-results",
   "coach-cases",
   "coach-week",
   "lead-team",
@@ -84,12 +87,13 @@ export const COACH_DEFAULT_CARD_ORDER = [
 export type CoachCardId = typeof COACH_DEFAULT_CARD_ORDER[number];
 
 const COACH_CARD_META: Record<string, { title: string; icon: LucideIcon }> = {
-  "artifacts":   { title: "Artifacts",      icon: Folder       },
-  "squad":       { title: "My Squad",       icon: Users        },
-  "today-tasks": { title: "Today's Tasks",  icon: CheckSquare  },
-  "coach-cases": { title: "My Cases",       icon: BookOpen     },
-  "coach-week":  { title: "This Week",      icon: CalendarDays },
-  "lead-team":   { title: "Your Team",      icon: UserCheck    },
+  "artifacts":          { title: "Artifacts",           icon: Folder          },
+  "squad":              { title: "My Squad",            icon: Users           },
+  "today-tasks":        { title: "Today's Tasks",       icon: CheckSquare     },
+  "assessment-results": { title: "Assessment Results",  icon: ClipboardCheck  },
+  "coach-cases":        { title: "My Cases",            icon: BookOpen        },
+  "coach-week":         { title: "This Week",           icon: CalendarDays    },
+  "lead-team":          { title: "Your Team",           icon: UserCheck       },
 };
 
 // ── Inline lead team card ─────────────────────────────────────────────────────
@@ -264,6 +268,8 @@ export default function CoachHomebase({
         );
       case "today-tasks":
         return <TodayTasksCard />;
+      case "assessment-results":
+        return <CoachAssessmentCard />;
       case "coach-cases":
         return (
           <CoachCasesCard

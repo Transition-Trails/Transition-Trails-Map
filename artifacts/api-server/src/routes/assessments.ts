@@ -891,6 +891,66 @@ router.get("/assessments/sessions/:id/results", requireStaff as import("express"
   });
 });
 
+// ── GET /assessments/coach/overview ──────────────────────────────────────────
+// Coach-accessible view of all completed sessions — same shape as staff/overview.
+// Uses requireHomebaseAuth + inline coach audience guard so coaches can read
+// results without needing a staff session.
+
+router.get("/assessments/coach/overview", requireHomebaseAuth, async (req, res) => {
+  if (res.locals["effectiveAudience"] !== "coach") {
+    return res.status(403).json({ error: "This resource is only available to coaches." });
+  }
+
+  try {
+    const completed = await db
+      .select()
+      .from(skillAssessmentSessionsTable)
+      .where(eq(skillAssessmentSessionsTable.status, "completed"))
+      .orderBy(desc(skillAssessmentSessionsTable.completedAt))
+      .limit(50);
+
+    const enriched = await Promise.all(completed.map(async s => {
+      const resps = await db
+        .select({ isCorrect: assessmentResponsesTable.isCorrect })
+        .from(assessmentResponsesTable)
+        .where(eq(assessmentResponsesTable.sessionId, s.id));
+      const total   = resps.length;
+      const correct = resps.filter(r => r.isCorrect).length;
+      const score   = total > 0 ? Math.round((correct / total) * 100) : 0;
+      return {
+        id:            s.id,
+        learnerEmail:  s.learnerEmail,
+        instance:      s.instance,
+        completedAt:   s.completedAt,
+        score,
+        passed:        score >= 70,
+        totalAnswered: total,
+        totalCorrect:  correct,
+      };
+    }));
+
+    const total         = enriched.length;
+    const passedCount   = enriched.filter(s => s.passed).length;
+    const avgScore      = total > 0 ? Math.round(enriched.reduce((acc, s) => acc + s.score, 0) / total) : 0;
+    const needsCoaching = enriched.filter(s => !s.passed).length;
+
+    return res.json({
+      sessions: enriched,
+      stats: {
+        total,
+        passed:       passedCount,
+        passRate:     total > 0 ? Math.round((passedCount / total) * 100) : 0,
+        avgScore,
+        needsCoaching,
+      },
+    });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.warn({ err: msg }, "assessments/coach/overview failed");
+    return res.status(500).json({ error: msg });
+  }
+});
+
 // ── Question Bank CRUD (admin) ────────────────────────────────────────────────
 // GET  /assessments/items            — list all items (staff)
 // POST /assessments/items            — create item (staff)

@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { curriculumAssessments, CONTENT_STATUS_CONFIG } from '@/data/curriculumData';
 import { useAppContext } from '@/context/AppContext';
 import {
   ClipboardCheck, Sparkles, AlertTriangle, CheckCircle2,
   ChevronRight, Brain, BarChart2, Bot, RefreshCw,
-  TrendingUp, Zap, X,
+  TrendingUp, X, ExternalLink,
 } from 'lucide-react';
 
 // ── Live session data from the DB ─────────────────────────────────────────────
@@ -51,17 +50,41 @@ interface AgentCoaching {
   error?: string;
 }
 
+// ── Catalogue types (live from question bank) ────────────────────────────────
+
+interface BankItem {
+  id:          number;
+  domain:      string;
+  domainLabel: string;
+  domainWeight: string;
+  itemType:    string;
+}
+
+interface DomainSummary {
+  domain:      string;
+  label:       string;
+  weight:      number;
+  total:       number;
+  mc:          number;
+  scenario:    number;
+  buildCheck:  number;
+}
+
 export default function Assessments() {
   const { setAskPennyOpen, setPendingPennyQuery } = useAppContext();
   const [, setLocation] = useLocation();
   const [filterStatus,   setFilterStatus]   = useState<'all' | 'needs-coaching' | 'failed'>('all');
   const [activeCoaching, setActiveCoaching] = useState<AgentCoaching | null>(null);
 
-  // ── Live data from DB ────────────────────────────────────────────────────────
+  // ── Live session data from DB ─────────────────────────────────────────────────
   const [sessions,  setSessions]  = useState<LiveSession[]>([]);
   const [stats,     setStats]     = useState<OverviewStats | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
   const [dataError,   setDataError]   = useState<string | null>(null);
+
+  // ── Live question bank catalogue ──────────────────────────────────────────────
+  const [catalogue,        setCatalogue]        = useState<DomainSummary[]>([]);
+  const [catalogueLoading, setCatalogueLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/assessments/staff/overview')
@@ -70,26 +93,51 @@ export default function Assessments() {
       .catch((err: unknown) => { setDataError(err instanceof Error ? err.message : 'Failed to load assessment data'); setDataLoading(false); });
   }, []);
 
+  useEffect(() => {
+    fetch('/api/assessments/items')
+      .then(r => r.ok ? r.json() as Promise<{ items: BankItem[] }> : Promise.reject(r.status))
+      .then(({ items }) => {
+        const map = new Map<string, DomainSummary>();
+        for (const item of items) {
+          if (!map.has(item.domain)) {
+            map.set(item.domain, {
+              domain: item.domain,
+              label:  item.domainLabel,
+              weight: Number(item.domainWeight),
+              total:  0, mc: 0, scenario: 0, buildCheck: 0,
+            });
+          }
+          const d = map.get(item.domain)!;
+          d.total++;
+          if (item.itemType === 'mc')           d.mc++;
+          else if (item.itemType === 'scenario') d.scenario++;
+          else if (item.itemType === 'build-check') d.buildCheck++;
+        }
+        setCatalogue([...map.values()].sort((a, b) => b.weight - a.weight));
+        setCatalogueLoading(false);
+      })
+      .catch(() => { setCatalogueLoading(false); });
+  }, []);
+
   const filtered = sessions.filter(s => {
     if (filterStatus === 'needs-coaching') return !s.passed;
     if (filterStatus === 'failed')         return !s.passed;
     return true;
   });
 
-  async function coachWithBothAIs(learner: string, assessmentId: string, score: number, passed: boolean) {
-    const asmnt = curriculumAssessments.find(a => a.id === assessmentId);
-    const assessmentName = (asmnt?.name as string) ?? assessmentId;
+  async function coachWithBothAIs(learner: string, sessionId: string, score: number, passed: boolean) {
+    const assessmentName = 'Salesforce Administrator Skill Assessment';
 
     const query = passed
-      ? `${learner} passed the "${assessmentName}" assessment with a score of ${score}%. What personalised next step should Penny suggest to extend their learning momentum?`
-      : `${learner} scored ${score}% on the "${assessmentName}" assessment. They haven't passed yet. What coaching approach should Penny use to help them prepare for a retake?`;
+      ? `${learner} passed the "${assessmentName}" with a score of ${score}%. What personalised next step should Penny suggest to extend their learning momentum?`
+      : `${learner} scored ${score}% on the "${assessmentName}". They haven't passed yet. What coaching approach should Penny use to help them prepare for a retake?`;
 
     // 1. Open Penny right panel immediately
     setPendingPennyQuery(query);
     setAskPennyOpen(true);
 
     // 2. Fire Agentforce in parallel
-    const key = `${learner}-${assessmentId}`;
+    const key = `${learner}-${sessionId}`;
     setActiveCoaching({ key, learner, assessmentName, query, status: 'loading' });
 
     try {
@@ -98,8 +146,7 @@ export default function Assessments() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: query,
-          learnerId: learner,   // learner name as proxy; real SF Contact ID would replace this
-          programId: asmnt ? String(asmnt.program) : undefined,
+          learnerId: learner,
         }),
       });
       const data = await resp.json() as {
@@ -359,54 +406,74 @@ export default function Assessments() {
           </div>
         )}
 
-        {/* Assessment catalogue summary */}
+        {/* Question Bank — live domain summary */}
         <div>
           <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[14px] font-bold  text-muted-foreground/60">
-              Assessment Catalogue · Foundations Trail
+            <p className="text-[14px] font-bold text-muted-foreground/60">
+              Question Bank · By Domain
             </p>
             <button
-              onClick={() => setLocation('/program/curriculum')}
+              onClick={() => setLocation('/penny/question-bank')}
               className="flex items-center gap-1 text-[14px] text-primary hover:underline"
             >
-              Edit in Curriculum Studio <ChevronRight className="w-3 h-3" />
+              Manage in Question Bank <ExternalLink className="w-3 h-3" />
             </button>
           </div>
 
           <div className="rounded-xl border border-border overflow-hidden">
-            <div className="grid grid-cols-[1fr_130px_60px_70px_60px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
-              {['Assessment', 'Type', 'Qs', 'Pass %', 'Avg'].map(h => (
-                <p key={h} className="text-[14px] font-bold  text-muted-foreground/60">{h}</p>
+            <div className="grid grid-cols-[1fr_56px_56px_56px_56px] gap-x-3 px-4 py-2.5 border-b border-border/60 bg-muted/30">
+              {['Domain', 'Items', 'MC', 'Scen', 'Build'].map(h => (
+                <p key={h} className="text-[14px] font-bold text-muted-foreground/60">{h}</p>
               ))}
             </div>
             <div className="bg-card divide-y divide-border">
-              {curriculumAssessments.map((a, i) => {
-                const statusCfg = CONTENT_STATUS_CONFIG[a.status];
-                return (
-                  <div
-                    key={a.id}
-                    className={`grid grid-cols-[1fr_130px_60px_70px_60px] gap-x-3 items-center px-4 py-2.5 ${
-                      i < curriculumAssessments.length - 1 ? 'border-b border-border/20' : ''
-                    }`}
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <p className="text-[14px] font-medium text-foreground truncate">{a.name as string}</p>
-                        <span className={`text-[14px] font-semibold border rounded-full px-1.5 py-0.5 ${statusCfg.cls}`}>
-                          {statusCfg.label}
-                        </span>
-                      </div>
-                      <p className="text-[14px] text-muted-foreground truncate">{a.moduleName as string}</p>
-                    </div>
-                    <p className="text-[14px] text-muted-foreground">{a.assessmentType as string}</p>
-                    <p className="text-[14px] text-foreground">{a.questionCount as number}</p>
-                    <p className="text-[14px] text-foreground">{a.passingScore as number}%</p>
-                    <p className="text-[14px] text-foreground font-medium">{(a.avgScore as string) ?? '—'}</p>
+              {catalogueLoading && (
+                <div className="px-4 py-6 flex items-center gap-2 text-muted-foreground">
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                  <span className="text-[14px]">Loading…</span>
+                </div>
+              )}
+              {!catalogueLoading && catalogue.length === 0 && (
+                <div className="px-4 py-6 text-center">
+                  <p className="text-[14px] text-muted-foreground">
+                    No questions yet — add items in the{' '}
+                    <button
+                      onClick={() => setLocation('/penny/question-bank')}
+                      className="text-primary underline underline-offset-2"
+                    >
+                      Question Bank
+                    </button>
+                    .
+                  </p>
+                </div>
+              )}
+              {!catalogueLoading && catalogue.map(d => (
+                <div
+                  key={d.domain}
+                  className="grid grid-cols-[1fr_56px_56px_56px_56px] gap-x-3 items-center px-4 py-2.5"
+                >
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-medium text-foreground truncate">{d.label}</p>
+                    <p className="text-[14px] text-muted-foreground font-mono truncate">{d.domain}</p>
                   </div>
-                );
-              })}
+                  <p className="text-[14px] font-semibold text-foreground">{d.total}</p>
+                  <p className="text-[14px] text-muted-foreground">{d.mc || '—'}</p>
+                  <p className="text-[14px] text-muted-foreground">{d.scenario || '—'}</p>
+                  <p className="text-[14px] text-muted-foreground">{d.buildCheck || '—'}</p>
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* Warn if any domain has zero items */}
+          {!catalogueLoading && catalogue.some(d => d.total === 0) && (
+            <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 flex items-center gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <p className="text-[14px] text-amber-800">
+                Some domains have no questions — learners won't receive items for those domains until questions are added.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Integration note */}
@@ -426,32 +493,10 @@ export default function Assessments() {
             <div>
               <p className="text-[14px] font-medium text-foreground mb-0.5">Penny coaching</p>
               <p className="text-[14px] text-muted-foreground leading-snug">
-                Penny provides personalised feedback on failure and suggests remediation resources.
+                Penny provides personalized feedback on failure and suggests remediation resources.
                 Use the Coach button per learner to generate coaching advice.
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Missing assessment alert */}
-        <div className="rounded-lg border border-[#E8B9B4] bg-[#FBEAE6] px-4 py-3 flex items-start gap-2">
-          <AlertTriangle className="w-3.5 h-3.5 text-[#A93F2F] shrink-0 mt-0.5" />
-          <div>
-            <p className="text-[14px] font-medium text-[#A93F2F]">
-              Missing: Module 4.3 has no linked assessment
-            </p>
-            <p className="text-[14px] text-[#A93F2F] mt-0.5 leading-snug">
-              Portfolio &amp; Career Launch module is missing a knowledge check. Use Penny Content Assistant to generate one.
-            </p>
-            <button
-              onClick={() => {
-                setPendingPennyQuery('Generate an assessment for Module 4.3: Portfolio & Career Launch. It should cover portfolio presentation skills, job search strategy, and interview preparation. Suggest 12–15 questions with a 75% pass threshold.');
-                setAskPennyOpen(true);
-              }}
-              className="flex items-center gap-1 mt-1.5 text-[14px] text-[#A93F2F] border border-[#E8B9B4] rounded-md px-2 py-1 hover:bg-[#FBEAE6] transition-colors"
-            >
-              <Zap className="w-2.5 h-2.5" /> Generate with Penny
-            </button>
           </div>
         </div>
 
