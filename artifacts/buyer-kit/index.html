@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Trail Kit — Transition Trails</title>
+    <meta name="description" content="Access your Transition Trails kit — no account needed." />
+
+    <!--
+      Buyer kit URLs carry magic-link tokens that function as credentials.
+      Block all crawlers to prevent tokenized URLs from appearing in search
+      results or being retained by indexing systems.
+    -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Open Graph (no OG URL set intentionally — avoid canonical token disclosure) -->
+    <meta property="og:title" content="Your Trail Kit — Transition Trails" />
+    <meta property="og:description" content="Access your Transition Trails kit." />
+    <meta property="og:type" content="website" />
+
+    <link rel="icon" type="image/svg+xml" href="/buyer-kit/favicon.svg" />
+
+    <!-- Brand fonts: Poppins (headings) + Open Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Open+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

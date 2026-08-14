@@ -44,6 +44,7 @@ import buildErrorsRouter        from "./buildErrors";
 import assessmentsRouter        from "./assessments";
 import trackRouter              from "./track";
 import contentItemsRouter       from "./contentItems";
+import buyerRouter               from "./buyer";
 import { requireStaff, requireAdmin, requireSuperAdmin, effectiveIdentityMiddleware } from "../middlewares/requireAuth";
 import { insertAuditEvent } from "../lib/auditLog";
 import { logger } from "../lib/logger";
@@ -93,6 +94,9 @@ const PUBLIC_PATHS: readonly string[] = [
   // Slack user OAuth callback (browser redirect from Slack; session cookie is
   // still sent but we identify the user via the in-memory state store instead)
   '/slack/oauth/callback',
+  // Buyer Kit Page — token-authenticated; no Google session required.
+  // The token itself is the credential; /buyer/asset/:id/link is staff-only.
+  '/buyer/page',
 ];
 
 // ── Global staff-auth middleware ──────────────────────────────────────────────
@@ -267,5 +271,6 @@ router.use(buildErrorsRouter);
 router.use(assessmentsRouter);
 router.use(trackRouter);
 router.use(contentItemsRouter);
+router.use(buyerRouter);
 
 export default router;

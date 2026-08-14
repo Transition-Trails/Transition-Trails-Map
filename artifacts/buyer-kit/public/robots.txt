@@ -1,0 +1,7 @@
+# Buyer Kit Page — robots.txt
+#
+# Buyer kit URLs contain magic-link tokens that are credentials.
+# Prevent search engines and crawlers from indexing or retaining them.
+
+User-agent: *
+Disallow: /buyer-kit/

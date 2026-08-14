@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/buyer-kit/"
+title = "Buyer Kit Page"
+description = "A standalone public-facing page for buyers of Trail Kits. Reached via a magic link in the purchase receipt — no login required. Validates a token and displays the buyer's kit content including title, edition, series, and included content types."
+version = "1.0.0"
+id = "artifacts/buyer-kit"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/buyer-kit/" ]
+localPort = 23517
+
+[services.development]
+run = "pnpm --filter @workspace/buyer-kit run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/buyer-kit", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/buyer-kit/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23517"
+BASE_PATH = "/buyer-kit/"
