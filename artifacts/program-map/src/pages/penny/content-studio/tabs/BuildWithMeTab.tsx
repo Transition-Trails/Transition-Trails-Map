@@ -5,7 +5,8 @@
 // QR card, publications table, and right-rail cards.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import qrcode from 'qrcode-generator';
 import {
   Info,
   FolderOpen,
@@ -19,7 +20,6 @@ import {
   Image,
   Captions,
   ExternalLink,
-  ScanLine,
 } from 'lucide-react';
 import { BUILD_WITH_ME_VIDEO } from '../mockData';
 import { InsightCard } from '../components/InsightCard';
@@ -481,23 +481,23 @@ function PostProductionTiles() {
 function QrCard() {
   const { shortCode, shortUrl } = BUILD_WITH_ME_VIDEO;
 
+  const svgMarkup = useMemo(() => {
+    const qr = qrcode(0, 'M');
+    qr.addData(shortUrl);
+    qr.make();
+    return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+  }, [shortUrl]);
+
   return (
     <div className="rounded-[14px] border border-border bg-card p-4">
       <div className="grid gap-4" style={{ gridTemplateColumns: '120px 1fr' }}>
-        {/* QR placeholder */}
+        {/* QR code */}
         <div
-          className="rounded-[8px] flex flex-col items-center justify-center gap-1 text-center"
-          style={{
-            width: 120,
-            height: 120,
-            backgroundColor: '#F2F3F1',
-          }}
-        >
-          <ScanLine className="w-8 h-8 text-[#687069]" />
-          <span className="text-[9px] text-[#687069] leading-tight px-1 break-all">
-            {shortUrl}
-          </span>
-        </div>
+          className="rounded-[8px] overflow-hidden flex items-center justify-center"
+          style={{ width: 120, height: 120, backgroundColor: '#ffffff' }}
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: svgMarkup }}
+        />
 
         {/* Right column */}
         <div className="space-y-2">
