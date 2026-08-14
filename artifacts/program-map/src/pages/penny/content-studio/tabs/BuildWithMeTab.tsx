@@ -5,7 +5,7 @@
 // QR card, publications table, and right-rail cards.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, type Dispatch, type SetStateAction } from 'react';
 import qrcode from 'qrcode-generator';
 import {
   Info,
@@ -26,7 +26,6 @@ import { InsightCard } from '../components/InsightCard';
 import { ContentStudioPennyCard } from '../components/PennyCard';
 
 // ── Stage rail ────────────────────────────────────────────────────────────────
-
 type StageState = 'complete' | 'current' | 'future';
 
 interface RailStage {
@@ -90,8 +89,26 @@ function lineColor(state: StageState, next: StageState | null): string {
 interface StageRailProps {
   stages: RailStage[];
   onMarkDone: (index: number) => void;
+  voice: VoiceChoice;
 }
-function StageRail({ stages, onMarkDone }: StageRailProps) {
+
+function voiceSublabel(voice: VoiceChoice): string {
+  if (voice === 'penny') return 'Penny · ElevenLabs';
+  if (voice === 'learner') return 'Learner · own voice';
+  return 'Awaiting voice selection';
+}
+function StageRail({ stages: rawStages, onMarkDone, voice }: StageRailProps) {
+  // Override the Narrate stage (index 2) based on the current voice selection
+  // so the sublabel and completion state reflect the narrator choice.
+  const stages = rawStages.map((stage, i) => {
+    if (i !== 2) return stage;
+    return {
+      ...stage,
+      sublabel: voiceSublabel(voice),
+      state: (voice !== null ? 'complete' : stage.state) as typeof stage.state,
+    };
+  });
+
   return (
     <div className="grid grid-cols-6 gap-0 w-full">
       {stages.map((stage, i) => {
@@ -100,7 +117,8 @@ function StageRail({ stages, onMarkDone }: StageRailProps) {
         const nextState = stages[i + 1]?.state ?? null;
         const leftColor = i === 0 ? 'transparent' : lineColor(stages[i - 1].state, stage.state);
         const rightColor = isLast ? 'transparent' : lineColor(stage.state, nextState);
-        const isCurrent = stage.state === 'current';
+        // Voice selection drives stage 2 completion; hide mark-done button there
+        const isCurrent = stage.state === 'current' && i !== 2;
 
         return (
           <div key={stage.name} className="group flex flex-col items-center">
@@ -145,7 +163,7 @@ function StageRail({ stages, onMarkDone }: StageRailProps) {
                 </p>
               )}
 
-              {/* Mark done affordance — only for the current stage */}
+              {/* Mark done affordance — only for the current stage (not Narrate, which uses voice selection) */}
               {isCurrent && (
                 <button
                   onClick={() => onMarkDone(i)}
@@ -277,7 +295,9 @@ function ScriptApprovalCard() {
 type VoiceChoice = null | 'penny' | 'learner';
 
 const LEGACY_KEY = (videoId: string) => `narrator-voice-${videoId}`;
-function NarrationSelector() {
+
+const LEGACY_KEY = (videoId: string) => `narrator-voice-${videoId}`;
+function NarrationSelector({ voice, setVoice }: NarrationSelectorProps) {
   const videoId = BUILD_WITH_ME_VIDEO.id;
 
   // `undefined` = still loading; null/penny/learner = settled
@@ -734,21 +754,27 @@ export function BuildWithMeTab() {
   const { title, eyebrow, format, length, kit, driveUrl, publications } =
     BUILD_WITH_ME_VIDEO;
 
-  // Lift stage state so StageRail and PublicationsTable share it
+  // Lift stage state so StageRail and PublicationsTable share it (task #658)
   const [stages, setStages] = useState<RailStage[]>(
     BUILD_WITH_ME_VIDEO.stages.map(s => ({ ...s }))
   );
 
-  const isPublished = stages.every(s => s.state === 'complete');
+  // Lift narrator voice state so StageRail and NarrationSelector stay in sync (task #660)
+  const [voice, setVoice] = useState<VoiceChoice>(
+    () => readStoredVoice(BUILD_WITH_ME_VIDEO.id),
+  );
+
+  // All stages complete → published (voice counts for stage 2)
+  const isPublished = stages.every((s, i) =>
+    i === 2 ? voice !== null : s.state === 'complete'
+  );
 
   const derivedStatus = isPublished ? 'Published' : 'In Progress';
 
   function handleMarkDone(index: number) {
     setStages(prev => {
-      const next = prev.map((s, i) => ({ ...s }));
-      // Mark this stage complete
+      const next = prev.map(s => ({ ...s }));
       next[index] = { ...next[index], state: 'complete' };
-      // Advance the next stage to current (if there is one)
       if (index + 1 < next.length) {
         next[index + 1] = { ...next[index + 1], state: 'current' };
       }
@@ -823,7 +849,7 @@ export function BuildWithMeTab() {
 
       {/* ── Stage rail ──────────────────────────────────────────────────────── */}
       <div className="rounded-[8px] border border-border bg-card px-6 py-4 space-y-3">
-        <StageRail stages={stages} onMarkDone={handleMarkDone} />
+        <StageRail stages={stages} onMarkDone={handleMarkDone} voice={voice} />
         {isPublished && <PublishedBanner />}
       </div>
 
@@ -833,7 +859,7 @@ export function BuildWithMeTab() {
         {/* Main column */}
         <div className="flex flex-col gap-5 min-w-0">
           <ScriptApprovalCard />
-          <NarrationSelector />
+          <NarrationSelector voice={voice} setVoice={setVoice} />
           <PostProductionTiles />
           <QrCard />
           <PublicationsTable publications={publications} isPublished={isPublished} />
@@ -888,4 +914,9 @@ function clearLegacyVoice(videoId: string): void {
   } catch {
     // ignore
   }
+}
+
+interface NarrationSelectorProps {
+  voice: VoiceChoice;
+  setVoice: Dispatch<SetStateAction<VoiceChoice>>;
 }
