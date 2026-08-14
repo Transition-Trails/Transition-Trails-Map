@@ -1,0 +1,307 @@
+# Handoff: Trail OS Content Studio
+
+## Overview
+
+The Content Studio is a marketing and content production surface inside Trail OS, living at **Penny › Create › Content Studio**. It takes a content idea from topic through drafting, production, approval, publication and product inclusion, on the Salesforce objects that already exist in the org.
+
+The problem it solves: content work today is spread across Google Drive, Slack, Canva, Descript, ElevenLabs, Gemini and Salesforce, with no single record that says what a piece of content *is*, who is working on it, where it will appear, and which products it belongs to. The studio does not replace any of those tools — it makes the Salesforce record the spine they all hang from.
+
+Two design commitments run through every screen:
+
+1. **Salesforce is the ledger; Drive is the bytes.** No content file is ever uploaded into Salesforce. Records carry a Drive location and a link. Delivery to a buyer is a scoped Drive link, not an attachment.
+2. **One human gate.** Agents draft; Penny reviews the draft; a person approves. No agent publishes, prices, activates a product or activates an order.
+
+### Scope boundary — read this before building
+
+**Commerce Cloud is not part of this build.** Hugh owns the storefront, checkout, price books and entitlement. The Catalog screen in this design is a *reader* of those objects — it shows Product2, the Product Content junction and the entitlement flow so a content person can see where their work lands. It must never write a price, activate a product, or configure the storefront.
+
+## About the design files
+
+The file in this bundle is a **design reference created in HTML** — a prototype showing intended look and behavior, not production code to copy. `Content Studio.dc.html` is a "Design Component": a single HTML file with an inline template and a small logic class, loaded by `support.js`. It runs by opening it in a browser.
+
+The task is to **recreate these designs in Trail OS's existing environment** — React + TypeScript + Tailwind + shadcn/ui in the Replit app (`artifacts/program-map/`) — using its established patterns: `AppShell`, `Topbar`, `Sidebar`, `HubShell`, the `statusColors` helper, and the existing page conventions under `src/pages/penny/`. Do not port the inline styles; they exist because the prototype tool requires them.
+
+**Reference, do not reuse:** `support.js` is the prototype runtime. It has no place in the app.
+
+## Fidelity
+
+**High fidelity.** Colors, typography, spacing, radii, density and status semantics are final and were taken from the Trail OS codebase itself (`src/index.css`, `.agents/memory/status-color-system.md`, `.agents/memory/admin-ux-standards.md`) rather than invented. Recreate closely, but always prefer the app's real components over matching the prototype's markup — where the prototype and the app's own `Topbar` disagree, the app is right.
+
+Copy is also final. It was written in the organization's voice and follows the design system's content rules: sentence case, US spelling, no emoji, one amber CTA per screen, never color alone for meaning.
+
+## Shell
+
+Recreate using the existing `AppShell`. The prototype reproduces it so the screens read in context; it is not new work.
+
+- **Topbar**, 48px, white, 1px `#E2E4E1` bottom border. Left: 28px rounded-8px tile in `rgba(47,107,63,.1)` with a green `map` icon, "Trail OS" in Poppins 16/600, then a breadcrumb of "Penny / Content Studio" in 14px. Right: pill triggers, 26px tall, `border-radius: 999px`, 12px/600 labels — **Penny** and **Help** only — then a 28px search button and a 28px avatar with a green tier dot.
+  - **Removed deliberately:** Calendar, Mail, Trail Signals and Insights. Slack moves into the sidebar (Replit is unifying Homebase and Mission Control). Insights are being reworked as record-level, which this design implements — see below.
+- **ContextBar**, 40px, `rgba(47,107,63,.08)` with a `rgba(47,107,63,.15)` bottom border: an object-type chip, the record name, a status dot, a status word, and Switch / Open / dismiss controls on the right.
+- **Sidebar**, 220px, `#EDF5F8`, 1px right border. Top-level items are 14px/600 with a 15px icon at 55% opacity, 8px 10px padding, 14px radius. The Penny group is expanded, with sub-labels ("Operate", "Configure Penny", "Create", "Admin") in 14px/600 at 40% opacity, and items at 75% opacity. The active item is `#2F6B3F` filled, white text, radius `0 14px 14px 0`.
+  - The Create group contains **Content Studio only**. The standalone Video Production page is removed — a video is a Content Item, so it belongs on the content model rather than beside it.
+- **Hub header**: 16px Poppins/600 page title with a `pen-tool` icon, a muted "Penny · Create" eyebrow, a one-line description, then a tab row. Tabs are 13px/600, 8px 13px padding, with a 2px bottom border in `#2F6B3F` and a `rgba(47,107,63,.05)` background when active.
+
+## Screens
+
+Six tabs. Five are staff-facing; **Trail Crew** is what an external-license user sees, and when the viewer is a crew member it is the *only* tab.
+
+---
+
+### 1. Pipeline
+
+**Purpose:** the production manager's view — what exists, what is moving, and where the plan has holes.
+
+**Layout:** a full-width amber advisory strip, then 16px padding, a 4-column stat row, the kanban, and the gaps matrix.
+
+- **Advisory strip** (`#FFF3E0` on `#FFD08A`, 12px `#CC8400`): "Twelve weeks of manual use before the joins and the agents. A model nobody has lived in gets automated in the wrong direction."
+- **Stat cards** — 4 columns, 12px gap. White, 1px `#E2E4E1`, 14px radius, 12px padding. Uppercase 10px/700 label at 50% opacity with `.1em` tracking, then Poppins 22/600 value, then an 11px caption. Values: 34 content items / 41 publications planned / **8 of 11** kept the date (caption in `#CC8400`) / **3** awaiting approval (value in `#2F6B3F`).
+- **Kanban** — 5 columns, `minmax(190px, 1fr)`, 10px gap, `align-items: start`. Column header is 11px Poppins/700 with a count at 50% opacity. Cards are white, 1px `#E2E4E1`, 14px radius, 10px padding, `cursor: pointer`, hover border `#9FC3AE`; clicking one opens the Content item tab. Card body: 13px Poppins/600 title, then an 11px format line with a 12px icon at 70% opacity, then optional pills and a due date + 20px owner avatar row.
+  - Columns and counts: **Idea** 6, **In Progress** 4, **Ready for Review** 3, **Ready to Publish** 2, **Published** 19.
+  - Cards in Ready for Review take a `#FFD08A` border and an "Approval with Angela" pill.
+  - A Penny-suggested idea carries a teal "From Penny" pill; a published item can carry a green "Recycle candidate" pill.
+- **Gaps matrix** — a card containing a 6-column grid (`88px repeat(5, 1fr)`), 1px gaps over an `#E2E4E1` background to fake table borders, 8px radius, `overflow: hidden`. Header cells `#F2F3F1`, 11px/700. Rows are weeks; columns are YouTube, LinkedIn, Substack, Website, Instagram. A cell with planned publications is `#E6F0EA` with `#2F6B3F` bold text; an empty one is white with a `#C8CBC6` em dash; **a fully empty week is `#FBEAE6` with `#A93F2F`**.
+- **Board insight** beneath the matrix — see *The insight pattern*.
+
+---
+
+### 2. Topic
+
+**Purpose:** the level above the item. This is the screen that makes a twelve-week rhythm plannable instead of merely measurable, and the one users called out as the biggest time saver. Its argument: *you do not write twelve things — you write three, and each one earns a family.*
+
+**Layout:** header row with a 4-metric cluster right-aligned, then a `1fr 320px` two-column body.
+
+- **Header:** "ContentTopics__c" eyebrow, Poppins 20/600 name ("Nonprofit tech stack"), then pills — green **Active**, amber **Next step · Draft** — and an owner line. Metrics: 11 items / 6 articles live / 3 videos live / **24 publications** (last in `#2F6B3F`).
+- **One piece of work, and its family** — a card whose body is a nested block: a `#F2F3F1` header strip naming the source article ("Who Can See What", 1,400 words, in 4 products) with a status pill, then indented derivative rows (34px left padding) each with a `corner-down-right` icon in `#C8CBC6`, a description, a date, and a status pill:
+  - Substack newsletter — the article, unchanged · 21 Aug · Draft
+  - LinkedIn — the four-things-that-stack opening, on its own · 22 Aug · Scheduled
+  - Substack note — just the profile-versus-permission-set mistake · 25 Aug · Draft
+  - Kit page — Groundwork, sequence 3 · with TK-04 · Validated
+  - Build With Me video — not proposed yet, with an **Add** button
+- **Twelve-week coverage** — 12 equal columns, 5px gap, each a 44px block with its count bottom-centered. Full weeks `#2F6B3F` white; partial `#9FC3AE`; light `#F2F3F1` with a `#C8CBC6` border; **empty `#FBEAE6` with a `#E8B9B4` border and `#A93F2F` text**. Below: a lightbulb note that neither gap needs a new subject, because both sit beside the quarter's best-performing article.
+- **Every item on this topic** — 5-column table (`1.7fr .7fr .8fr .9fr .7fr`): Content Item, Format, Objective, Status, Pubs.
+- **Right rail:** a Penny card (Coordinator), a topic insight, a **Balance** card with 70/20/10 progress bars (Nurturing 7 of 11, Marketing 4 of 11) noting the gap is stories not guides, and a **Recycle candidates** card listing items over 90 days old that are still read.
+
+---
+
+### 3. Content item
+
+**Purpose:** the record a writer works in.
+
+**Layout:** header row with the one amber CTA, then a `232px 1fr 300px` three-column body.
+
+- **Header:** topic eyebrow, Poppins 20/600 title, a status pill, and the record id. Right: a teal outline "Open in Drive" button and — **only when status is In Progress** — the amber **Submit for review** button (`#F5A623`, `#2A2E2C` text, 14px radius, `box-shadow: 0 2px 8px rgba(245,166,35,.35)`). This is the screen's single amber CTA. Clicking it sets status to *Ready for Review*, hides the button, and reveals the approval card in the right rail.
+- **Left column:** *The record* (format, pillars, objective, due date, length, and a Drive Content Location link), *SEO and discoverability* with a "Drafted by Penny, edited by Angela" pill, and *Appears in* listing the four products this item belongs to via the junction.
+- **Center column:**
+  - **Draft** card — a Google Docs preview with a 230px max height and a white gradient fade at the bottom, footed by a teal Penny suggestion band with "Draft a paragraph" / "Not now" actions.
+  - **Production stations** — a 3-column grid of small bordered tiles, each with a name, a 7px status dot (`#2F6B3F` complete, `#CC8400` in progress, `#C8CBC6` not started), a description and a status line. Gemini Notebook (research grounding, 9 sources) · Canva (two diagrams) · Gemini image (header watercolor — *input to Canva, never final*) · ElevenLabs (Penny narration) · Descript (video only, so "Not applicable" here) · **Affinity**, shown on `#F2F3F1` with a lock icon and "Angela only".
+  - **Content Item Publication** — a 5-column table (Platform, Planned, Actual, Status, URL) with a footer explaining that Buffer holds the queue and does the posting while Salesforce holds the plan, the approval and the record of what happened.
+- **Right column:** the record insight, the approval card (only while in review), a Penny card in **Coordinator** mode with three suggested actions and a footer stating the division of labor, and a **Tasks on this item** list. Note the modeling point in that card's footer: Content Item has no owner field, so the **Task is the assignment**.
+
+---
+
+### 4. Build With Me
+
+**Purpose:** the stages only a video has. A video is a Content Item with Format = Video; same statuses, same gate.
+
+- **Stage rail** — 6 equal columns, each a connector row (a 22px circle plus a 2px line) over a label and sub-label. Complete stages are `#2F6B3F` filled with a check; the current stage is `#F5A623` with its number and the amber glow shadow; future stages are white with a 1.5px `#E2E4E1` border. Stages: Script (approved) · Record · **Narrate** (current) · Edit · Thumbnail · Publish.
+- **Script approval card** — the gate moves *before* recording, because a wrong sentence costs a rewrite before and a full re-record after. Three tiles: steps to demonstrate (7, each with a "you should see" line lifted from the kit's Build steps), org to record in (**a sandbox with the kit's test data — never production**), and what may appear on screen (no real names, no donor records, no partner data).
+- **Who narrates this one** — two selectable cards, 1.5px border, 8px radius; selected is `#E6F0EA` on a `#2F6B3F` border. This is a real per-video choice, not a default:
+  - *Penny, on ElevenLabs* — consistent across a series, re-renders free when the script changes, same-day. Best for reference kits and anything you will revise.
+  - *The learner's own voice* — a named person explaining work they did; more persuasive than anything synthesizable, and their portfolio piece. Costs a re-record to change.
+  - Selecting either reveals a consequence band: the Penny choice requires disclosure in the description; the learner choice credits them by name, is worth 25 points on their Campaign Member record, and produces a portfolio link.
+- **Post-production** — three tiles: Descript (cut dead air, remove wrong turns, chapter markers from the seven steps), Thumbnail (Canva template, Poppins over a Gemini image, **never generated lettering**), Captions (from the approved script, not auto-transcribed).
+- **Short code and QR** — renders the design system's `QRLink` component. **The QR never encodes a YouTube URL.** It encodes `transitiontrails.org/go/BWM-07`, and Trail OS redirects that to whatever the publication record currently holds. This is the single most important behavior on the screen:
+  - A printed kit cannot go stale. Re-upload, move off YouTube, swap the learner cut for the Penny cut — kits already in someone's hands still work.
+  - The code can be issued **at script approval**, before the video exists, so printing a kit never waits on production.
+  - Scan-test the redirect before print and again after the video goes public.
+- **Where it lands** — publication rows for YouTube (unlisted first so the QR can be tested), the kit page QR, and a LinkedIn two-minute cut from the same Descript project.
+- **Right rail:** the capture-mismatch insight, a Penny card in **Quest Guide** mode, and a **series** list showing which videos used which voice, footed by the rule: one voice per video, not per series — mixing deliberately is fine, drifting is not.
+
+---
+
+### 5. Trail Crew
+
+**Purpose:** what an external-license contributor sees. Volunteers and learners share this surface — same work, same screens.
+
+A teal strip states the boundary: *External Apps Login. Never sees Setup, donor records, payment data or partner records.* Four sub-tabs as pill buttons (active = `#2F6B3F` filled):
+
+- **My work** — assigned tasks with a status circle, title, description, due date and a launch button (Open folder / Open Canva / Open Descript). Right rail: Penny in **Coach** mode asking one question, and a "Raise a request" card that creates a Change Request in the demand process.
+- **Submit an idea** — a rough sentence, optional topic and format, and a Penny note offering to fill in the rest. Right rail explains it arrives as a Content Item at status Idea with a triage Task, and lists the crew member's own submitted ideas — including one **closed with a reason**, so the loop visibly closes either way.
+- **Submit a draft** — attaches the file, sets status to Ready for Review, fires the approval. That is the whole gate.
+- **Mark published** — date and URL onto the publication record. *Planned is what we meant; actual is what happened.*
+- **This month** — what the crew produced, plus a points card. Points live on Campaign Member, never expire, and are never revoked for inactivity.
+
+---
+
+### 6. Catalog
+
+**Purpose:** show a content person where their work lands commercially. **Read-only with respect to Commerce.**
+
+A teal strip names the boundary: the Commerce build is Hugh's; the studio reads and writes Product2, Product_Content__c and Asset, and never configures the storefront, a price book or checkout.
+
+- **Left:** a Product2 tree — collection, bundle, simple products, a variation parent and its variations. Selecting a node switches the detail pane.
+- **Variation detail:** name, pills for class / SKU / product class / **Inactive**, and four fields (Assetizable, Shipping charge, Selling model, Price). Price is shown with a lock icon reading "On the price book entry". The action is a teal outline **Open in Salesforce**, with a note that activation and pricing sit with the Commerce permission set holder — *not* an activate button.
+- **Product Content · the junction** — the heart of the screen. 5 columns (Seq, Content Item, Role, Included, Also in). The footer makes the argument: the glossary is one content item in four kits, so correcting it once corrects every product; and a row marked *not included* is how a free excerpt exists without a second copy of the file.
+- **On order activation** — four steps: Order (Stripe checkout, retail price book, UTM on the order) → Activated (**a person or a Flow, never an agent**) → Asset (the durable record of what someone owns, surviving an email change) → Delivery (a scoped Drive link; no file is ever uploaded into Salesforce). Footer: no DRM, no watermarking, no per-user file locking.
+- **Bundle detail:** components table, plus the rule that bundle price is set on the bundle product rather than calculated from components — a bundle is a decision about value, and the saving should be describable in one sentence.
+
+---
+
+## The insight pattern
+
+Insights are **record-level, not global**. There is no insights panel; a panel has to guess what you are looking at and guesses wrong. An insight renders on the record, view or board it concerns.
+
+**Card structure**, identical everywhere:
+
+1. Header — `lightbulb` icon (amber `#CC8400` when advisory, teal `#2F6F7E` when informational), "Insight" in 12px Poppins/700, and a right-aligned scope chip ("This record" / "This topic" / "This board").
+2. Observation — 12px `#2A2E2C`, 1.55 line height.
+3. **Read from** — above a hairline, a `git-branch` icon and an 11px line naming *the exact fields queried*. This is load-bearing: it makes an insight falsifiable, so a wrong one is a reportable bug rather than a vague sense that the AI is being weird.
+4. Actions — a green primary and a neutral secondary. The secondary is always a legitimate answer ("Leave it empty on purpose", "Not the gap I see").
+5. Dismissal row — "Not useful — say why" and "Shown once · will not repeat if dismissed".
+6. Penny footer — teal `#EDF5F8` band explaining how Penny uses this same card, so her suggestions are traceable to it.
+
+**The bar an insight must clear** (documented on the Penny desk, and it should be enforced in code, not just in copy):
+
+- It names the fields it read.
+- It proposes something doable today. An observation with no action is a report, and reports do not belong on a record.
+- It could be wrong in a way the user would notice.
+- Dismissed once, with a reason, it does not come back.
+
+**Silence is the default.** A screen with an insight on every card teaches people to skim past all of them; showing nothing is a valid and common outcome. The prototype carries four insights across six screens on purpose.
+
+The four: the empty publication week *and why it got empty* (board) · this item is the only one in four kits that changed since validation (record) · eleven items and no story among them (topic) · step 4 captured twice and neither take matches the script (record).
+
+## Penny and Agentforce
+
+**The division of labor is the whole design.** Build it as three distinct roles, not one assistant:
+
+- **Penny, on Gemini** — holds the conversation and the coaching posture, does all external search (the world outside the org), and **writes nothing**.
+- **Agentforce** — reads and writes records, under permissions, and touches nothing outside Salesforce.
+- **Penny reviews the draft** — reads back what Agentforce wrote, checks it against the source records and the voice rules, revises what it can defend and flags what it cannot.
+- **A person** — approves anything that becomes real.
+
+### The AI-to-AI review
+
+Every Agentforce draft on the Penny desk carries a **"Penny reviewed this on Gemini"** band before a human sees it: a teal `#EDF5F8` block with a revision/flag count pill, then a list where a green `circle-check-big` marks an applied revision and an amber `triangle-alert` marks something Penny will not fix alone.
+
+Worked examples in the prototype — implement the shape, not these strings:
+
+- Intake draft: objective changed from Marketing to Nurturing (green), plus a flag that an existing item already covers most of this and Penny will not merge two records on its own (amber).
+- Recycle draft: objection rewritten in a board member's words; a license figure removed because nothing in the source record supported it.
+
+**Design the review to be visible and reversible.** Two models agreeing is not evidence — the review raises the floor, it does not replace the gate. Every revision must be inspectable and undoable, and the human approval is unchanged.
+
+### Four things no agent may do
+
+Enforce these in permissions, not in prompts: set a product active · set or change a price · activate an order · publish anything. The worst outcome of a bad agent run should be a record someone has to delete — never a wrong price on a live storefront. Autonomous posting is explicitly declined and shown as such.
+
+### Agent surfaces to build, in order
+
+1. **Content intake** — Penny takes a rough idea in Slack, asks two questions, Agentforce creates the Content Item as an Idea with a triage Task.
+2. **Recycle suggester** — finds publications over ninety days old with good engagement and drafts a version with a twist, linked to the original so the recycle is measurable.
+3. **Monthly read** — blocked on the engagement fields arriving on Content Item Publication. A person still writes every conclusion.
+
+Each renders as a draft record preview with **Create as Idea** / **Dismiss**. Dismissal is logged with a reason so the same suggestion does not return next week.
+
+## Interactions and behavior
+
+All navigation is client-side tab state; nothing routes away.
+
+| Trigger | Effect |
+| --- | --- |
+| Tab click | Switches the main panel. `viewerRole = 'crew'` forces the Trail Crew tab and hides the other five. |
+| "Ask Penny" in the topbar | Opens the Penny desk tab. |
+| Kanban card click | Opens the Content item tab. |
+| **Submit for review** | Status In Progress → Ready for Review. Hides the CTA, swaps the status pill from teal to amber, reveals the approval card. |
+| Agent draft **Create as Idea** / **Dismiss** | Replaces the draft preview with a green confirmation or a neutral dismissal note. |
+| Narration choice | Selects one of two cards and reveals the matching consequence band. |
+| Product tree selection | Switches the catalog detail pane between variation and bundle. |
+
+Hover: cards lift or take a `#9FC3AE` border; buttons darken (`#2F6B3F` → `#245531`, `#F5A623` → `#CC8400`); neutral buttons fill `#F2F3F1`. Transitions are short and gentle, ~.15s. No bounces, no decorative animation.
+
+## State
+
+Prototype state, all local:
+
+```
+tab      'pipeline' | 'topic' | 'item' | 'video' | 'penny' | 'crew' | 'catalog'
+crew     'work' | 'idea' | 'submit' | 'publish' | 'month'
+status   'In Progress' | 'Ready for Review'      // the demonstrated approval transition
+d1, d2   'pending' | 'accepted' | 'dismissed'    // the two agent drafts
+product  'kit' | 'bundle'
+voice    null | 'penny' | 'learner'
+```
+
+One prop: `viewerRole: 'staff' | 'crew'`, defaulting to `staff`.
+
+In the real app these become route state plus records. Fetch requirements per screen: Pipeline needs Content Items grouped by status and publication counts by week and platform; Topic needs one topic with its items, their publications, and objective rollups; Content item needs one record with its Tasks, publications, junction rows and Drive metadata; Build With Me adds the capture log, script and narration field; Catalog needs the Product2 tree with junction rows.
+
+## Objects
+
+Existing or assumed; confirm names against the org before building.
+
+| Object | Role |
+| --- | --- |
+| `ContentTopics__c` | The subject we want to be known for. Parent of items; carries rollups. |
+| `ContentItem__c` | One piece of work. Format, pillars, objective, status, due date, length, SEO, Drive location. **No owner field — the Task is the assignment.** |
+| `ContentItemPublication__c` | One row per platform per planned date. Planned vs actual, status, URL, and later the engagement fields. |
+| `Product2` | The sellable thing. Simple, bundle, variation parent, variation. |
+| `Product_Content__c` | Junction: item ↔ product, with sequence, role, and an included flag. |
+| `Asset` | What a buyer owns, created on order activation. |
+| `Task` | Assignment and triage. |
+| `Campaign Member` | Crew points. |
+
+Four joins are prerequisites for the later agent work, chief among them the connector that writes engagement onto `ContentItemPublication__c` from Buffer, Substack and GA4.
+
+## Design tokens
+
+Take these from `src/index.css` in the app rather than hardcoding.
+
+**Color**
+
+| Token | Hex | Use |
+| --- | --- | --- |
+| Trail Green | `#2F6B3F` | Primary actions, active nav, success |
+| Green hover | `#245531` | Primary button hover |
+| Green tint | `#E6F0EA` | Success surfaces |
+| Green border | `#9FC3AE` | Success borders, card hover |
+| Deep Teal | `#2F6F7E` | Penny, informational, secondary text accents |
+| Sky Blue | `#7FAFC6` | Teal borders |
+| Sky tint | `#EDF5F8` | Sidebar, Penny surfaces, informational bands |
+| Sun Amber | `#F5A623` | **One CTA per screen.** Never decorative |
+| Amber text | `#CC8400` | Warning text, in-progress |
+| Amber tint | `#FFF3E0` / border `#FFD08A` | Warning surfaces |
+| Danger | `#A93F2F` on `#FBEAE6`, border `#E8B9B4` | Empty weeks, declined capabilities |
+| Trail Light | `#FAFAF7` | App background |
+| Surface | `#FFFFFF` | Cards |
+| Muted surface | `#F2F3F1` | Table headers, neutral chips |
+| Warm Gray | `#E2E4E1` | Borders, dividers |
+| Slate | `#4A4F4D` | Body text |
+| Muted | `#687069` | Topbar secondary |
+| Charcoal | `#2A2E2C` | Headings |
+| Disabled | `#C8CBC6` | Em dashes, inactive dots |
+
+Never use color alone for meaning — every status pairs a color with a word, and often an icon.
+
+**Type** — Poppins 600 for headings and labels; Open Sans for body and UI. Sizes in this admin context: page title 16, section heading 12–13, body 12, secondary 11, micro 10–10.5, stat 20–22. Uppercase card labels are 10px/700 with `.1em` tracking at 50% opacity. *These are below the design system's public-facing minimums by design — this is a dense internal admin surface, matching the existing Trail OS admin standards. Do not carry these sizes into learner-facing or print work.*
+
+**Spacing** — 8px base. Page padding 16, card gap 14, grid gap 10–12, card padding 12–14, table cell 7–8 × 11.
+
+**Radius** — 8 small (tiles, tables, inner blocks), 14 medium (cards, buttons), 999 pills.
+
+**Shadow** — amber CTA only: `0 2px 8px rgba(245,166,35,.35)`. Avatar ring: `0 0 0 1px #E2E4E1, 0 0 0 2px #fff`. No card shadows in this density.
+
+## Assets
+
+- **Lucide** `0.462.0` from CDN — the app already uses `lucide-react`; use that instead. Icons follow the design system's meaning table: `lightbulb` pro tip, `triangle-alert` watch out, `key-round` access, `circle-check-big` proof it worked, `circle-slash` what it does not do, `rotate-ccw` rollback, `play` video, `headphones` audio, `route` sequence, `calendar-days` time.
+- **qrcode-generator** `1.4.4` from CDN, required by the design system's `QRLink`.
+- **The design system bundle** at `_ds/transition-trails-design-system-.../_ds_bundle.js`, used here for `QRLink`. In the app, use the equivalent component or generate the QR with the same library.
+- No images, photography or logo files. Where a mark would appear, the wordmark is set in Poppins.
+
+## Files
+
+| File | What it is |
+| --- | --- |
+| `Content Studio.dc.html` | The full design — all six tabs, all states. Open it in a browser. |
+| `support.js` | Prototype runtime. Reference only; do not port. |
+
+Source of truth for the shell: `artifacts/program-map/src/components/layout/` (`AppShell`, `Topbar`, `Sidebar`, `HubShell`), `src/components/context/ContextBar.tsx`, `src/index.css`, and `.agents/memory/` (`admin-ux-standards.md`, `status-color-system.md`, `brand-design-system.md`).
