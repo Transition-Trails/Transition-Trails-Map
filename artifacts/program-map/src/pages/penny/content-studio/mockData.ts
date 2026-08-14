@@ -394,6 +394,102 @@ export const MOCK_PRODUCT_TREE: ProductNode = {
   ],
 };
 
+// ── This-month produced items & points ───────────────────────────────────────
+
+export const MOCK_THIS_MONTH_ITEMS = [
+  {
+    id: 'tm-001',
+    title: 'RESOLVE Phase Overview: From Recognize to Evolve',
+    format: 'Article',
+    publishDate: '2026-08-05',
+    platform: 'Salesforce Knowledge',
+    status: 'Published',
+  },
+  {
+    id: 'tm-002',
+    title: 'Build With Me — Moving changes to production',
+    format: 'Video',
+    publishDate: '2026-08-11',
+    platform: 'Website Blog',
+    status: 'Published',
+  },
+  {
+    id: 'tm-003',
+    title: 'LinkedIn Post Series: Transition Milestones',
+    format: 'Social',
+    publishDate: '2026-08-13',
+    platform: 'LinkedIn',
+    status: 'Published',
+  },
+];
+
+export const MOCK_POINTS = {
+  total: 75,
+  label: 'Campaign Member points',
+  events: [
+    { id: 'pt-1', delta: '+25', item: 'Build With Me video', note: 'learner voice' },
+    { id: 'pt-2', delta: '+30', item: 'RESOLVE Phase Overview article', note: 'framework pillar' },
+    { id: 'pt-3', delta: '+20', item: 'LinkedIn post series', note: 'social reach' },
+  ],
+  footer:
+    'Points live on Campaign Member, never expire, and are never revoked for inactivity.',
+};
+
+// ── Submitted ideas (for trail crew "Submit an idea" sub-tab) ─────────────────
+
+export const MOCK_SUBMITTED_IDEAS = [
+  {
+    id: 'idea-001',
+    title: 'Short video: what a coaching session actually looks like',
+    topic: 'Coaching Practice',
+    format: 'Video',
+    status: 'Idea' as const,
+    submittedAt: '2026-08-10',
+  },
+  {
+    id: 'idea-002',
+    title: 'Checklist: questions to bring to your first housing appointment',
+    topic: 'Housing Navigation',
+    format: 'Checklist',
+    status: 'Closed' as const,
+    closedReason: 'Not the right time',
+    submittedAt: '2026-07-22',
+  },
+];
+
+// ── Product junction table rows ───────────────────────────────────────────────
+
+export const MOCK_PRODUCT_CONTENT_ROWS = [
+  {
+    seq: 1,
+    contentItem: 'RESOLVE Overview Guide',
+    role: 'Core material',
+    included: true,
+    alsoIn: 'Staff Onboarding Package',
+  },
+  {
+    seq: 2,
+    contentItem: 'Transition Glossary',
+    role: 'Reference',
+    included: true,
+    alsoIn: '4 kits',
+  },
+  {
+    seq: 3,
+    contentItem: 'Learner Workbook (Coach Ed.)',
+    role: 'Supplemental',
+    included: false,
+    alsoIn: 'Coach Edition only',
+  },
+  {
+    seq: 4,
+    contentItem: 'Housing Navigation Checklist',
+    role: 'Tool',
+    included: true,
+    alsoIn: '—',
+  },
+];
+
 // ── Crew tasks ────────────────────────────────────────────────────────────────
 
 export const MOCK_CREW_TASKS: CrewTask[] = [
