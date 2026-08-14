@@ -3,6 +3,8 @@ import { HubShell } from '@/components/layout/HubShell';
 import { KnowledgeStudioOverview } from './KnowledgeStudioOverview';
 import { KnowledgeStudioPennyRead } from './KnowledgeStudioPennyRead';
 import KnowledgeStudioArticle from './KnowledgeStudioArticle';
+import KnowledgeStudioReview from './KnowledgeStudioReview';
+import KnowledgeStudioApproval from './KnowledgeStudioApproval';
 
 // ── Placeholder panel for tabs not yet built ─────────────────────────────────
 
@@ -46,24 +48,14 @@ const TABS = [
     label: "Penny's Review",
     path: '/knowledge/studio/penny-review',
     icon: Brain,
-    content: (
-      <ComingSoonPanel
-        title="Penny's Review"
-        description="Penny reads the draft and flags required findings — gaps in steps, missing audience fields, or verify lines that don't match the article body. Required findings block approval; suggestions never do."
-      />
-    ),
+    content: <KnowledgeStudioReview />,
   },
   {
     id: 'approval',
     label: 'Approval',
     path: '/knowledge/studio/approval',
     icon: CheckCircle2,
-    content: (
-      <ComingSoonPanel
-        title="Approval"
-        description="Knowledge Managers review Penny's findings, clear required blocks, and publish the article. One person categorizes, links, and publishes in a single act."
-      />
-    ),
+    content: <KnowledgeStudioApproval />,
   },
   // ── Separator inserted after 'approval' ─────────────────────────────────
   // ── Keeping-it-true group (tabs 5–7) ────────────────────────────────────

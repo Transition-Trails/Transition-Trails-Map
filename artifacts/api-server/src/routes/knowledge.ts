@@ -2339,6 +2339,21 @@ router.post("/knowledge/articles/:id/approve", requireAdmin, async (req, res): P
       res.status(409).json({ error: `Cannot approve: article is currently '${rows[0]!.status}'` });
       return;
     }
+
+    // Enforce required-finding gate server-side: Penny must clear all required checks
+    // before an article can advance to approved, regardless of client state.
+    const steps = await db.select().from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, id))
+      .orderBy(asc(articleProcedureStepsTable.sequence));
+    const { required } = runPennyChecks(steps);
+    if (required.length > 0) {
+      res.status(409).json({
+        error: `Cannot approve: ${required.length} required Penny finding${required.length === 1 ? '' : 's'} must be resolved first.`,
+        requiredCount: required.length,
+      });
+      return;
+    }
+
     const reviewedBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
     const [updated] = await db.update(knowledgeArticlesTable)
       .set({ status: "approved", reviewedBy, reviewedAt: new Date(), reviewNote: null, updatedAt: new Date() })
@@ -2408,14 +2423,29 @@ router.post("/knowledge/articles/:id/recall", requireStaff, async (req, res): Pr
 //   For Trail OS-authored articles: creates a new SF Knowledge record.
 //   For SF-originated articles (sfArticleId set): creates a new __kav version linked to
 //   the existing KnowledgeArticle, avoiding duplicate article records in Salesforce.
-router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<void> => {
-  const { id } = req.params;
+router.post("/knowledge/articles/:id/publish-to-sf", requireAdmin, async (req, res): Promise<void> => {
+  const id = req.params['id'] as string;
   try {
     const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, id));
     if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
     const article = rows[0]!;
     if (article.status !== "approved") {
       res.status(409).json({ error: `Cannot publish: article must be 'approved' (currently '${article.status}')` });
+      return;
+    }
+
+    // Enforce the same Penny required-finding gate as the local publish endpoint.
+    // Staff can edit steps after approval; re-running checks prevents newly introduced
+    // required findings from making it into the Salesforce record.
+    const steps = await db.select().from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, id))
+      .orderBy(asc(articleProcedureStepsTable.sequence));
+    const { required: sfRequired } = runPennyChecks(steps);
+    if (sfRequired.length > 0) {
+      res.status(409).json({
+        error: `Cannot publish to Salesforce: ${sfRequired.length} required Penny finding${sfRequired.length === 1 ? '' : 's'} must be resolved first.`,
+        requiredCount: sfRequired.length,
+      });
       return;
     }
 
@@ -2881,6 +2911,390 @@ router.delete("/knowledge/articles/:id", requireStaff, async (req, res): Promise
   } catch (err) {
     req.log.error(err, "Failed to delete knowledge article");
     res.status(500).json({ error: "Failed to delete article" });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PENNY REVIEW — Structural checks (no LLM required)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface PennyFinding {
+  id: string;            // deterministic: "{stepId}|{type}"
+  stepId: string;
+  stepSequence: number;
+  type: 'no-verify-line' | 'named-person' | 'no-url-with-menu-path' | 'parenthetical-hedge';
+  severity: 'required' | 'suggested';
+  description: string;
+  affectedText: string | null;
+  suggestedFix: string | null;   // null = no automated fix; must be resolved manually
+}
+
+interface PennyPassedCheck {
+  type: string;
+  reason: string;
+}
+
+type PennyReviewResult = {
+  required: PennyFinding[];
+  suggested: PennyFinding[];
+  passed: PennyPassedCheck[];
+};
+
+/**
+ * Run structural Penny-review checks against a set of procedure steps.
+ * Returns required findings (block publish), suggestions (never block), and passed checks.
+ * Deterministic — same input always produces the same output; safe to call multiple times.
+ */
+function runPennyChecks(steps: { id: string; sequence: number; instruction: string; verifyLine: string | null; directUrl: string | null }[]): PennyReviewResult {
+  const required: PennyFinding[] = [];
+  const suggested: PennyFinding[] = [];
+
+  // ── Regex patterns ─────────────────────────────────────────────────────────
+  // Named-person: two-stage check.
+  //   Stage 1 (NAMED_VERB_RE): match the action verb case-insensitively so sentence-start
+  //     "Contact John" and mid-sentence "contact John" both resolve.
+  //     Captures the first following word.
+  //   Stage 2: require the captured word to begin with an uppercase letter (ASCII [A-Z]),
+  //     which excludes generic role words like "contact support", "email team", "ping the admin".
+  const NAMED_VERB_RE = /\b(?:reach\s+out\s+to|contact|email|call(?:\s+to)?|ping)\s+([A-Za-z][a-z]*(?:\s+[A-Z][a-z]+)?)\b/i;
+  function namedPersonMatch(text: string): RegExpMatchArray | null {
+    const m = text.match(NAMED_VERB_RE);
+    if (!m) return null;
+    // Ensure the first captured word begins with an uppercase letter
+    const firstWord = m[1]?.split(' ')[0] ?? '';
+    return /^[A-Z]/.test(firstWord) ? m : null;
+  }
+  // Parenthetical hedge: "(this may vary)", "(your org might differ)", "(depending on setup)"
+  const HEDGE_RE          = /\([^)]*\b(?:may|might|could|varies|depending|sometimes|usually)\b[^)]*\)/i;
+  // Menu navigation path: "Setup > Objects", "App Builder > Flows > New", "Quick Find > ..."
+  const MENU_PATH_RE      = /\b\w[\w\s]{1,30}\s+>\s+\w/;
+
+  for (const step of steps) {
+    const instruction = step.instruction ?? '';
+    const seq         = step.sequence;
+    const stepId      = step.id;
+
+    // ── Required: no verification line ────────────────────────────────────────
+    if (!step.verifyLine?.trim()) {
+      required.push({
+        id: `${stepId}|no-verify-line`,
+        stepId,
+        stepSequence: seq,
+        type: 'no-verify-line',
+        severity: 'required',
+        description: `Step ${seq}: No verification line — Penny cannot confirm step completion without a "You should see…" statement.`,
+        affectedText: null,
+        suggestedFix: 'You should see the confirmation before continuing.',
+      });
+    }
+
+    // ── Required: named person reference ──────────────────────────────────────
+    const namedMatch = namedPersonMatch(instruction);
+    if (namedMatch) {
+      // Replace the captured Title-Case name with a generic role label
+      const fixed = instruction.replace(NAMED_VERB_RE, (m) =>
+        m.replace(/[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?$/, 'the appropriate team member'),
+      );
+      required.push({
+        id: `${stepId}|named-person`,
+        stepId,
+        stepSequence: seq,
+        type: 'named-person',
+        severity: 'required',
+        description: `Step ${seq}: Named person reference ("${namedMatch[0]}") — articles must not name specific people; they change roles over time.`,
+        affectedText: namedMatch[0],
+        suggestedFix: fixed !== instruction ? fixed : null,
+      });
+    }
+
+    // ── Suggested: menu path without a direct URL ──────────────────────────────
+    const menuMatch = instruction.match(MENU_PATH_RE);
+    if (menuMatch && !step.directUrl?.trim()) {
+      suggested.push({
+        id: `${stepId}|no-url-with-menu-path`,
+        stepId,
+        stepSequence: seq,
+        type: 'no-url-with-menu-path',
+        severity: 'suggested',
+        description: `Step ${seq}: Menu navigation ("${menuMatch[0].trim()}") with no direct URL — Penny cannot deep-link the user to this screen.`,
+        affectedText: menuMatch[0].trim(),
+        suggestedFix: null,  // a URL cannot be auto-generated
+      });
+    }
+
+    // ── Suggested: parenthetical hedge ────────────────────────────────────────
+    const hedgeMatch = instruction.match(HEDGE_RE);
+    if (hedgeMatch) {
+      const cleaned = instruction.replace(HEDGE_RE, '').replace(/\s{2,}/g, ' ').trim();
+      suggested.push({
+        id: `${stepId}|parenthetical-hedge`,
+        stepId,
+        stepSequence: seq,
+        type: 'parenthetical-hedge',
+        severity: 'suggested',
+        description: `Step ${seq}: Parenthetical hedge ("${hedgeMatch[0]}") — qualifiers weaken Penny's confidence in the instruction.`,
+        affectedText: hedgeMatch[0],
+        suggestedFix: cleaned !== instruction ? cleaned : null,
+      });
+    }
+  }
+
+  // ── Passed checks ──────────────────────────────────────────────────────────
+  const passed: PennyPassedCheck[] = [];
+  const HEDGE_RE2     = /\([^)]*\b(?:may|might|could|varies|depending|sometimes|usually)\b[^)]*\)/i;
+  const MENU_PATH_RE2 = /\b\w[\w\s]{1,30}\s+>\s+\w/;
+
+  if (steps.length === 0 || !steps.some(s => !s.verifyLine?.trim())) {
+    passed.push({ type: 'verify-lines', reason: 'All steps have a verification line — Penny can confirm completion at every step.' });
+  }
+  if (!steps.some(s => namedPersonMatch(s.instruction ?? ''))) {
+    passed.push({ type: 'no-named-people', reason: 'No named individuals — the article stays valid when team members change roles.' });
+  }
+  if (!steps.some(s => MENU_PATH_RE2.test(s.instruction ?? '') && !s.directUrl?.trim())) {
+    passed.push({ type: 'url-coverage', reason: 'All navigable steps have a direct URL — Penny can deep-link users to the right screen.' });
+  }
+  if (!steps.some(s => HEDGE_RE2.test(s.instruction ?? ''))) {
+    passed.push({ type: 'no-hedging', reason: 'No parenthetical hedges — instructions are stated with full confidence.' });
+  }
+
+  return { required, suggested, passed };
+}
+
+// POST /api/knowledge/articles/:id/penny-review
+router.post("/knowledge/articles/:id/penny-review", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const articleRows = await db.select().from(knowledgeArticlesTable)
+      .where(eq(knowledgeArticlesTable.id, articleId)).limit(1);
+    if (!articleRows[0]) { res.status(404).json({ error: "Article not found" }); return; }
+
+    const steps = await db.select().from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, articleId))
+      .orderBy(asc(articleProcedureStepsTable.sequence));
+
+    const review = runPennyChecks(steps);
+    res.json({ review, stepCount: steps.length });
+  } catch (err) {
+    req.log.error(err, "Failed to run Penny review");
+    res.status(500).json({ error: "Failed to run Penny review" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/penny-review/:findingId/apply
+// findingId format: "{stepId}|{checkType}"
+// Applies Penny's suggested fix to the relevant step field and re-runs the check.
+router.post("/knowledge/articles/:id/penny-review/:findingId/apply", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const findingId = req.params["findingId"] as string;
+    const pipeIdx   = findingId.indexOf('|');
+    if (pipeIdx < 0) { res.status(400).json({ error: "Invalid findingId — expected '{stepId}|{type}'" }); return; }
+    const stepId    = findingId.slice(0, pipeIdx);
+    const checkType = findingId.slice(pipeIdx + 1) as PennyFinding['type'];
+
+    // Load all steps for this article (needed for full re-run after fix)
+    const allSteps = await db.select().from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, articleId))
+      .orderBy(asc(articleProcedureStepsTable.sequence));
+
+    const targetStep = allSteps.find(s => s.id === stepId);
+    if (!targetStep) { res.status(404).json({ error: "Step not found or does not belong to this article" }); return; }
+
+    // Re-derive the finding from current step content
+    const currentReview = runPennyChecks(allSteps);
+    const allFindings   = [...currentReview.required, ...currentReview.suggested];
+    const finding       = allFindings.find(f => f.id === findingId);
+
+    if (!finding) {
+      res.status(409).json({ error: "Finding already resolved — re-run Penny review to see current state." }); return;
+    }
+    if (!finding.suggestedFix) {
+      res.status(400).json({ error: "This finding has no automated fix and must be resolved manually." }); return;
+    }
+
+    // Apply the fix to the correct field
+    const patch: { updatedAt: Date; verifyLine?: string; instruction?: string } = { updatedAt: new Date() };
+    if (checkType === 'no-verify-line') {
+      patch.verifyLine = finding.suggestedFix;
+    } else if (checkType === 'named-person' || checkType === 'parenthetical-hedge') {
+      patch.instruction = finding.suggestedFix;
+    } else {
+      res.status(400).json({ error: `Check type '${checkType}' has no automated fix.` }); return;
+    }
+
+    const [updatedStep] = await db.update(articleProcedureStepsTable)
+      .set(patch)
+      .where(and(
+        eq(articleProcedureStepsTable.id, stepId),
+        eq(articleProcedureStepsTable.articleId, articleId),
+      ))
+      .returning();
+
+    if (!updatedStep) { res.status(404).json({ error: "Step not found after update — this should not happen." }); return; }
+
+    // Re-run full check with updated content
+    const updatedAllSteps = allSteps.map(s =>
+      s.id === stepId ? { ...s, ...patch } : s,
+    );
+    const newReview = runPennyChecks(updatedAllSteps);
+
+    res.json({ step: updatedStep, review: newReview });
+  } catch (err) {
+    req.log.error(err, "Failed to apply Penny fix");
+    res.status(500).json({ error: "Failed to apply fix" });
+  }
+});
+
+// PATCH /api/knowledge/articles/:id/categories
+// Assigns data categories. UI-gated by Knowledge Manager role (checked via session groups).
+router.patch("/knowledge/articles/:id/categories", requireAdmin, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const { dataCategoryGroup, dataCategory } = req.body as {
+      dataCategoryGroup: string | null;
+      dataCategory: string | null;
+    };
+
+    // requireAdmin middleware already enforces the Knowledge Manager gate (admin role).
+    // Non-admin staff see the control as disabled in the UI.
+
+    const articleRows = await db.select().from(knowledgeArticlesTable)
+      .where(eq(knowledgeArticlesTable.id, articleId)).limit(1);
+    if (!articleRows[0]) { res.status(404).json({ error: "Article not found" }); return; }
+
+    const [updated] = await db.update(knowledgeArticlesTable)
+      .set({
+        dataCategoryGroup: dataCategoryGroup || null,
+        dataCategory:      dataCategory      || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(knowledgeArticlesTable.id, articleId))
+      .returning();
+
+    res.json({ article: updated });
+  } catch (err) {
+    req.log.error(err, "Failed to assign categories");
+    res.status(500).json({ error: "Failed to assign categories" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/publish
+// Local publish: bumps version metadata, confirms relationships, sets next review date.
+// Distinct from /publish-to-sf (which pushes to Salesforce Knowledge API).
+// Requires zero required Penny findings; blocks with a 409 if any remain.
+router.post("/knowledge/articles/:id/publish", requireAdmin, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const articleRows = await db.select().from(knowledgeArticlesTable)
+      .where(eq(knowledgeArticlesTable.id, articleId)).limit(1);
+    if (!articleRows[0]) { res.status(404).json({ error: "Article not found" }); return; }
+    const article = articleRows[0];
+
+    if (article.status !== 'approved') {
+      res.status(409).json({
+        error: `Cannot publish: article must be 'approved' (currently '${article.status}'). Use the Approval tab to approve it first.`,
+      });
+      return;
+    }
+
+    // SF-originated articles must go through /publish-to-sf to keep Salesforce in sync.
+    // Allowing a local-only publish on an SF article would move it out of 'approved',
+    // permanently blocking the Salesforce publish endpoint (which requires 'approved').
+    if (article.sfArticleId) {
+      res.status(409).json({
+        error: "This article is linked to a Salesforce record. Use 'Publish to Salesforce' to keep it in sync.",
+        code: 'use-publish-to-sf',
+      });
+      return;
+    }
+
+    // Run Penny review — required findings must be zero
+    const steps = await db.select().from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, articleId))
+      .orderBy(asc(articleProcedureStepsTable.sequence));
+    const { required } = runPennyChecks(steps);
+    if (required.length > 0) {
+      res.status(409).json({
+        error: `Cannot publish: ${required.length} required finding${required.length === 1 ? '' : 's'} must be resolved first.`,
+        requiredCount: required.length,
+      });
+      return;
+    }
+
+    // Compute next review date from review cycle
+    const CYCLE_DAYS: Record<string, number> = { Monthly: 30, Quarterly: 90, Yearly: 365 };
+    const cycleDays   = CYCLE_DAYS[article.reviewCycle ?? ''] ?? 90;
+    const now         = new Date();
+    const nextReview  = new Date(now.getTime() + cycleDays * 24 * 60 * 60 * 1000);
+    const nextReviewLabel = nextReview.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    // Count relationship pairs for the publish summary
+    const relRows = await db.select({ id: articleRelationshipsTable.id })
+      .from(articleRelationshipsTable)
+      .where(eq(articleRelationshipsTable.articleId, articleId));
+
+    const reviewedBy: string | null = (req.user as { email?: string } | undefined)?.email ?? null;
+
+    const [updated] = await db.update(knowledgeArticlesTable)
+      .set({
+        status:      'published',
+        publishedAt: now,
+        reviewedBy,
+        reviewedAt:  now,
+        updatedAt:   now,
+      })
+      .where(eq(knowledgeArticlesTable.id, articleId))
+      .returning();
+
+    // Persist the next review date to article_reviews so the queue can show staleness
+    await db.insert(articleReviewsTable).values({
+      articleId,
+      reviewedAt:    now,
+      reviewedBy,
+      nextReviewDue: nextReview,
+    });
+
+    res.json({
+      article: updated,
+      publishSteps: [
+        {
+          step: 'version-bump',
+          label: 'Version bumped',
+          detail: `updatedAt set to ${now.toISOString()}`,
+          done: true,
+        },
+        {
+          step: 'categories',
+          label: article.dataCategoryGroup
+            ? `Category confirmed: ${article.dataCategoryGroup} / ${article.dataCategory ?? '—'}`
+            : 'No category assigned — set one in Approval before publishing to SF',
+          done: true,
+        },
+        {
+          step: 'retrieval-abstract',
+          label: article.retrievalAbstract
+            ? 'Retrieval abstract marked current'
+            : 'No retrieval abstract — add one in the Article editor for best Penny retrieval',
+          done: true,
+        },
+        {
+          step: 'relationships',
+          label: relRows.length > 0
+            ? `${relRows.length} relationship row${relRows.length === 1 ? '' : 's'} confirmed`
+            : 'No relationships — add links in the Article editor if this article has prerequisites',
+          done: true,
+        },
+        {
+          step: 'review-date',
+          label: `Next review: ${nextReviewLabel} (${article.reviewCycle ?? 'Quarterly'})`,
+          detail: `Based on ${cycleDays}-day review cycle`,
+          done: true,
+        },
+      ],
+    });
+  } catch (err) {
+    req.log.error(err, "Failed to publish article");
+    res.status(500).json({ error: "Failed to publish article" });
   }
 });
 

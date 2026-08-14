@@ -43,19 +43,35 @@ interface ArticleRow {
 
 // ── Hoisted refs (accessible inside vi.mock factories) ────────────────────────
 
-const { mockSelectWhere, mockSetFn, mockInsertValues, capturedSfPostBodies } = vi.hoisted(() => {
+const {
+  mockSelectWhere, mockStepsOrderBy, mockSetFn, mockInsertValues, capturedSfPostBodies,
+  ARTICLES_TABLE_SENTINEL, STEPS_TABLE_SENTINEL,
+} = vi.hoisted(() => {
+  // Sentinel symbols used by the db.select().from() mock to identify which table
+  // is being queried and return the appropriate chain.
+  // Must live inside vi.hoisted() so they are accessible in vi.mock() factories.
+  const ARTICLES_TABLE_SENTINEL = Symbol('knowledgeArticlesTable');
+  const STEPS_TABLE_SENTINEL    = Symbol('articleProcedureStepsTable');
+
   // Tracks every body sent to Salesforce via POST so tests can assert the payload.
   const capturedSfPostBodies: Record<string, unknown>[] = [];
 
-  // select().from().where()
+  // select().from(knowledgeArticlesTable).where()
   const mockSelectWhere = vi.fn();
+
+  // select().from(articleProcedureStepsTable).where().orderBy()
+  // Returns empty steps by default → Penny checks produce zero required findings.
+  const mockStepsOrderBy = vi.fn().mockResolvedValue([]);
 
   // update().set(patch) — must be re-implemented per test (see beforeEach)
   const mockSetFn = vi.fn();
 
   const mockInsertValues = vi.fn().mockResolvedValue([]);
 
-  return { mockSelectWhere, mockSetFn, mockInsertValues, capturedSfPostBodies };
+  return {
+    mockSelectWhere, mockStepsOrderBy, mockSetFn, mockInsertValues, capturedSfPostBodies,
+    ARTICLES_TABLE_SENTINEL, STEPS_TABLE_SENTINEL,
+  };
 });
 
 // ── Auth middleware stub ───────────────────────────────────────────────────────
@@ -90,7 +106,14 @@ vi.mock('@workspace/db', () => ({
   pool: { query: vi.fn().mockResolvedValue({ rows: [] }) },
   db: {
     select: vi.fn(() => ({
-      from: vi.fn(() => ({ where: mockSelectWhere })),
+      from: vi.fn((table: { _sentinel?: symbol }) => {
+        if (table?._sentinel === STEPS_TABLE_SENTINEL) {
+          // Procedure-steps query: .where().orderBy() → empty steps by default
+          return { where: vi.fn(() => ({ orderBy: mockStepsOrderBy })) };
+        }
+        // All other tables (including articles): .where() → mockSelectWhere
+        return { where: mockSelectWhere };
+      }),
     })),
     update: vi.fn(() => ({ set: mockSetFn })),
     insert: vi.fn(() => ({ values: mockInsertValues })),
@@ -101,6 +124,7 @@ vi.mock('@workspace/db/schema', () => {
   const col = (name: string) => ({ name });
   return {
     knowledgeArticlesTable: {
+      _sentinel:         ARTICLES_TABLE_SENTINEL,
       id: col('id'), title: col('title'), status: col('status'),
       sfArticleId: col('sf_article_id'), sfVersionId: col('sf_version_id'),
       sfPublishStatus: col('sf_publish_status'), body: col('body'),
@@ -111,9 +135,19 @@ vi.mock('@workspace/db/schema', () => {
       submittedAt: col('submitted_at'), publishedAt: col('published_at'),
       updatedAt: col('updated_at'),
     },
+    articleProcedureStepsTable: {
+      _sentinel:    STEPS_TABLE_SENTINEL,
+      id:           col('id'),
+      articleId:    col('article_id'),
+      sequence:     col('sequence'),
+      instruction:  col('instruction'),
+      verifyLine:   col('verify_line'),
+      directUrl:    col('direct_url'),
+      updatedAt:    col('updated_at'),
+    },
     knowledgeSourcesTable: { id: col('id'), data: col('data'), updatedAt: col('updated_at') },
     knowledgeDocumentsTable: { id: col('id') },
-    articleReviewsTable: { id: col('id'), reviewedAt: col('reviewed_at') },
+    articleReviewsTable: { id: col('id'), reviewedAt: col('reviewed_at'), reviewedBy: col('reviewed_by'), nextReviewDue: col('next_review_due') },
     sfSyncSettingsTable: {
       id: col('id'), enabled: col('enabled'), intervalHours: col('interval_hours'),
     },
@@ -271,6 +305,8 @@ beforeEach(() => {
   resetKavBodyInfoCachesForTest();
   capturedSfPostBodies.length = 0;
   mockSelectWhere.mockReset();
+  mockStepsOrderBy.mockReset();
+  mockStepsOrderBy.mockResolvedValue([]);  // default: no steps → Penny checks pass
   mockSetFn.mockReset();
   mockInsertValues.mockReset();
   mockInsertValues.mockResolvedValue([]);
@@ -392,5 +428,72 @@ describe('SF article recall → re-publish cycle', () => {
     // KnowledgeArticleId links the new version to the existing SF article record.
     // Without this field, Salesforce creates a brand-new, duplicate article.
     expect(sfPayload['KnowledgeArticleId']).toBe(ORIGINAL_SF_ART_ID);
+  });
+
+  // ── Penny gate: approve blocked when required findings exist ──────────────
+  //
+  // Simulates a step with a named-person reference and no verify line.
+  // Approval must return 409 with requiredCount, not advance status.
+
+  test('approve is rejected (409) when the article has required Penny findings', async () => {
+    mockSelectWhere.mockResolvedValue([makeArticle({ status: 'pending-review' })]);
+    // Return one step that has both required findings: no verifyLine + named person
+    mockStepsOrderBy.mockResolvedValue([{
+      id:          'step-001',
+      sequence:    1,
+      instruction: 'Contact John Smith to get access.',
+      verifyLine:  null,   // missing → no-verify-line (required)
+      directUrl:   null,
+    }]);
+
+    const res = await request(app)
+      .post(`/api/knowledge/articles/${ARTICLE_ID}/approve`);
+
+    expect(res.status).toBe(409);
+    expect(res.body.requiredCount).toBeGreaterThan(0);
+    expect(res.body.error).toMatch(/required.*Penny finding/i);
+  });
+
+  // ── Penny gate: approve succeeds when all required findings are cleared ────
+
+  test('approve succeeds (200) when the article has no required Penny findings', async () => {
+    configureStatefulMocks(makeArticle({ status: 'pending-review' }));
+    // Step with a verify line and no named person → no required findings
+    mockStepsOrderBy.mockResolvedValue([{
+      id:          'step-001',
+      sequence:    1,
+      instruction: 'Navigate to Setup > Objects.',
+      verifyLine:  'You should see the Object Manager page.',
+      directUrl:   null,
+    }]);
+
+    const res = await request(app)
+      .post(`/api/knowledge/articles/${ARTICLE_ID}/approve`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.article.status).toBe('approved');
+  });
+
+  // ── Penny gate: publish-to-sf blocked when required findings exist ─────────
+  //
+  // Guards against post-approval step edits reaching Salesforce.
+
+  test('publish-to-sf is rejected (409) when the article has required Penny findings post-approval', async () => {
+    mockSelectWhere.mockResolvedValue([makeArticle({ status: 'approved' })]);
+    // Step edited after approval: missing verify line
+    mockStepsOrderBy.mockResolvedValue([{
+      id:          'step-001',
+      sequence:    1,
+      instruction: 'Click Save.',
+      verifyLine:  null,   // no-verify-line (required)
+      directUrl:   null,
+    }]);
+
+    const res = await request(app)
+      .post(`/api/knowledge/articles/${ARTICLE_ID}/publish-to-sf`);
+
+    expect(res.status).toBe(409);
+    expect(res.body.requiredCount).toBeGreaterThan(0);
+    expect(res.body.error).toMatch(/required.*Penny finding/i);
   });
 });
