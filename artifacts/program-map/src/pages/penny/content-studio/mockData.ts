@@ -335,6 +335,58 @@ export const MOCK_GAP_MATRIX: GapCell[] = PLATFORMS.flatMap((platform, pi) =>
   }))
 );
 
+// ── Build With Me tab mock data ───────────────────────────────────────────────
+
+export const BUILD_WITH_ME_VIDEO = {
+  id: 'bwm-07',
+  title: 'Build With Me — Moving changes to production',
+  eyebrow: 'Content Topic · Nonprofit tech stack',
+  status: 'In Progress',
+  format: 'Video',
+  length: '9 min',
+  kit: 'TK-04-NPC-NP',
+  driveUrl: 'https://drive.google.com/drive/folders/mock-build-with-me-prod',
+  shortCode: 'BWM-07',
+  shortUrl: 'transitiontrails.org/go/BWM-07',
+
+  stages: [
+    { name: 'Script',    sublabel: 'Approved 11 Aug',                      state: 'complete' as const },
+    { name: 'Record',   sublabel: '6 steps captured · script has 7',       state: 'complete' as const },
+    { name: 'Narrate',  sublabel: 'Awaiting voice selection',               state: 'current'  as const },
+    { name: 'Edit',     sublabel: '',                                       state: 'future'   as const },
+    { name: 'Thumbnail',sublabel: '',                                       state: 'future'   as const },
+    { name: 'Publish',  sublabel: '',                                       state: 'future'   as const },
+  ],
+
+  script: {
+    approvedAt: '11 Aug',
+    approvedBy: 'Jordan T.',
+    sandbox: 'TT-NPC-SANDBOX-02',
+    steps: [
+      { label: 'Open the feature branch in VS Code',              youShouldSee: 'A green dot on the branch name in the status bar.' },
+      { label: 'Run pnpm install to pull new dependencies',       youShouldSee: 'No peer-dependency warnings in the terminal.' },
+      { label: 'Create a changeset with pnpm changeset',          youShouldSee: 'A prompt asking which packages changed and the bump type.' },
+      { label: 'Push to the remote branch and open a pull request', youShouldSee: 'GitHub Actions triggers the CI checks automatically.' },
+      { label: 'Review the CI check results',                     youShouldSee: 'All checks green; no failing TypeScript or lint errors.' },
+      { label: 'Merge the PR into main',                          youShouldSee: 'The deploy workflow starts in the Actions tab.' },
+      { label: 'Verify the change is live in the sandbox',        youShouldSee: 'The updated field or flow appears without a page reload prompt.' },
+    ],
+  },
+
+  series: [
+    { id: 's-001', title: 'Build With Me — Setting up Salesforce flows',       voice: 'penny'   as const },
+    { id: 's-002', title: 'Build With Me — Creating a custom object',           voice: 'learner' as const },
+    { id: 's-003', title: 'Build With Me — Bulk data import with Data Loader',  voice: 'penny'   as const },
+    { id: 's-004', title: 'Build With Me — Configuring permission sets',        voice: 'penny'   as const },
+  ],
+
+  publications: [
+    { platform: 'YouTube',       planned: 'Sep 5, 2026',  status: 'planned', note: 'Unlisted until kit launch',            url: '' },
+    { platform: 'Kit page QR',   planned: 'Sep 5, 2026',  status: 'planned', note: 'QR on printed card in TK-04-NPC-NP',   url: '' },
+    { platform: 'LinkedIn',      planned: 'Sep 10, 2026', status: 'planned', note: '2-minute cut, caption-only',            url: '' },
+  ],
+};
+
 // ── Video item: "Build With Me — Moving changes to production" ────────────────
 
 export const MOCK_VIDEO_ITEM: VideoItem = {
