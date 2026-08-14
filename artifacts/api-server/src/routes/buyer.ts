@@ -42,21 +42,144 @@ const INVALID_TOKEN_RESPONSE = {
 // a mock payload that matches the real schema so the frontend can be built
 // against it without waiting for the Salesforce integration task.
 
+interface ChangeEntry {
+  date:        string;
+  reason:      string;
+  description: string;
+}
+
+interface BundleKit {
+  assetId:       string;
+  title:         string;
+  downloadUrl:   string;
+  status:        "available" | "pending";
+  expectedMonth?: string;
+}
+
+interface Beat {
+  name:      string;
+  pageCount: number;
+}
+
+interface SharedInsert {
+  title: string;
+}
+
+interface QREntry {
+  title:      string;
+  code:       string;
+  scanStatus: "pending" | "passed";
+}
+
+interface TestDataFile {
+  filename:  string;
+  edgeCase:  string;
+}
+
 interface KitPageData {
-  assetId:     string;
-  seriesLabel: string;
-  kitTitle:    string;
-  editionName: string;
-  contentTypes: string[];
+  assetId:       string;
+  seriesLabel:   string;
+  kitTitle:      string;
+  editionName:   string;
+  contentTypes:  string[];
+  purchaseDate:  string;
+  audienceType:  "nonprofit" | "learner";
+  changeLog:     ChangeEntry[];
+  bundle:        BundleKit[] | null;
+  beats:         Beat[];
+  sharedInserts: SharedInsert[];
+  qrCodes:       QREntry[];
+  testDataFiles: TestDataFile[];
+  licenseTerms:  string[];
 }
 
 function buildMockKitData(assetId: string): KitPageData {
   return {
     assetId,
     seriesLabel:  "Transition Trails Series",
-    kitTitle:     "Your Transition Trail Kit",
+    kitTitle:     "Nonprofit Leadership Transition Trail Kit",
     editionName:  "Spring 2025 Edition",
-    contentTypes: ["Videos", "Articles", "Worksheets", "Audio Guides"],
+    contentTypes: ["Workbook", "Video Scripts", "Facilitator Guide", "Build With Me Sessions"],
+    purchaseDate: "2025-02-14",
+    audienceType: "nonprofit",
+    changeLog: [
+      {
+        date:        "2025-04-10",
+        reason:      "Corrected worksheet exercise numbering that caused confusion in group sessions",
+        description: "Exercises 4 and 5 in the Decide section were out of order.  The content itself was not changed — only the numbering and the cross-references on pages 38 and 42.",
+      },
+      {
+        date:        "2025-03-22",
+        reason:      "Added a missing note about board approval timelines to the Launch section",
+        description: "Several facilitated sessions surfaced a common question about how long board sign-off typically takes.  A one-page reference note has been added as a shared insert.",
+      },
+      {
+        date:        "2025-03-05",
+        reason:      "Replaced two broken Build With Me video links",
+        description: "The QR codes for sessions 2 and 4 now point to the correct short links.  The videos themselves have not changed.",
+      },
+    ],
+    bundle: [
+      {
+        assetId:     assetId,
+        title:       "Nonprofit Leadership Transition Trail Kit",
+        downloadUrl: "#",
+        status:      "available",
+      },
+      {
+        assetId:     "asset-companion-001",
+        title:       "Board Readiness Companion Kit",
+        downloadUrl: "#",
+        status:      "available",
+      },
+      {
+        assetId:     "asset-future-001",
+        title:       "Digital Compass Workbook",
+        downloadUrl: "#",
+        status:      "pending",
+        expectedMonth: "September 2025",
+      },
+    ],
+    beats: [
+      { name: "Why",       pageCount: 12 },
+      { name: "Decide",    pageCount: 24 },
+      { name: "Build",     pageCount: 38 },
+      { name: "Verify",    pageCount: 16 },
+      { name: "Next Step", pageCount: 10 },
+    ],
+    sharedInserts: [
+      { title: "Board Approval Timeline Reference" },
+      { title: "Stakeholder Communication Templates" },
+      { title: "Legal Checklist for Nonprofit Transitions" },
+      { title: "Glossary of Transition Terms" },
+    ],
+    qrCodes: [
+      { title: "Build With Me — Session 1: Framing Your Why",     code: "bwm-nlt-s1", scanStatus: "passed" },
+      { title: "Build With Me — Session 2: Mapping Stakeholders", code: "bwm-nlt-s2", scanStatus: "passed" },
+      { title: "Build With Me — Session 3: Building the Plan",    code: "bwm-nlt-s3", scanStatus: "pending" },
+      { title: "Build With Me — Session 4: Verifying Readiness",  code: "bwm-nlt-s4", scanStatus: "pending" },
+    ],
+    testDataFiles: [
+      {
+        filename: "test-small-org.csv",
+        edgeCase: "Organisation with fewer than 5 staff — exercises that assume a full leadership team are flagged for adaptation",
+      },
+      {
+        filename: "test-board-led.csv",
+        edgeCase: "Board-led transition where no executive director is involved — decision authority rows are remapped to committee chairs",
+      },
+      {
+        filename: "test-multi-site.csv",
+        edgeCase: "Multi-site nonprofit where each location follows a different timeline — the shared Verify section is duplicated per site",
+      },
+    ],
+    licenseTerms: [
+      "Use this kit for one organisation's transition process",
+      "Print and distribute copies to your board, staff, and facilitation team",
+      "Use the workbook exercises in facilitated sessions you lead",
+      "Adapt the templates with your organization's name and context",
+      "Store digital copies on your organisation's internal systems",
+    ],
   };
 }
 

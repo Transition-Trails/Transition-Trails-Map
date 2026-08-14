@@ -265,6 +265,10 @@ importers:
         version: 3.1.0
 
   artifacts/buyer-kit:
+    dependencies:
+      qrcode-generator:
+        specifier: ^2.0.4
+        version: 2.0.4
     devDependencies:
       '@hookform/resolvers':
         specifier: ^3.10.0
