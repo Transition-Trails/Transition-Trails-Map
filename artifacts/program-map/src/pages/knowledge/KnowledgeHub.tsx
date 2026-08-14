@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAppContext } from '@/context/AppContext';
@@ -175,14 +175,111 @@ const TREE_GROUPS: { status: string; label: string }[] = [
   { status: 'published',      label: 'Published' },
 ];
 
+// ── SF sync strip (shown at the bottom of the article tree) ───────────────────
+
+interface SfSyncStatusData {
+  lastSyncAt: string | null;
+  autoSyncEnabled: boolean;
+  intervalHours: number;
+}
+interface SfSyncResultData {
+  total: number; created: number; updated: number; skipped: number; errors: number;
+}
+
+function useSfSyncStatus() {
+  const [status,    setStatus]    = useState<SfSyncStatusData | null>(null);
+  const [available, setAvailable] = useState(true);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch('/api/knowledge/sf-sync-status', { credentials: 'include' });
+      if (!res.ok) { setAvailable(false); return; }
+      const data = await res.json() as SfSyncStatusData;
+      setStatus(data);
+      setAvailable(true);
+    } catch { setAvailable(false); }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+  return { status, available, reload: load, markUnavailable: () => setAvailable(false) };
+}
+
+function fmtRelative(iso: string | null): string {
+  if (!iso) return 'Never synced';
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return 'Just synced';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+function SfSyncStrip({ onSyncComplete }: { onSyncComplete: () => void }) {
+  const { status, available, reload: reloadStatus, markUnavailable } = useSfSyncStatus();
+  const [syncing,    setSyncing]    = useState(false);
+  const [syncResult, setSyncResult] = useState<{ created: number; updated: number } | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+
+  async function handleSync() {
+    if (syncing) return;
+    setSyncing(true);
+    setSyncResult(null);
+    try {
+      const res = await fetch('/api/knowledge/sf-articles/sync', { method: 'POST', credentials: 'include' });
+      if (!res.ok) {
+        // Salesforce may be disconnected — hide the strip rather than showing an error.
+        markUnavailable();
+        return;
+      }
+      const data = await res.json() as SfSyncResultData;
+      setSyncResult({ created: data.created, updated: data.updated });
+      onSyncComplete();
+      void reloadStatus();
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setSyncResult(null), 5_000);
+    } catch {
+      // Network-level failure — treat as unavailable.
+      markUnavailable();
+    } finally { setSyncing(false); }
+  }
+
+  if (!available || status === null) return null;
+
+  return (
+    <div className="shrink-0 border-t border-border/40 px-3 py-2 bg-muted/10">
+      <div className="flex items-center gap-1.5">
+        <Database className="w-3 h-3 text-muted-foreground/40 shrink-0" />
+        <span className="text-[10px] text-muted-foreground/60 flex-1 leading-tight truncate">
+          {syncResult
+            ? `${syncResult.created} new · ${syncResult.updated} updated`
+            : fmtRelative(status.lastSyncAt)
+          }
+        </span>
+        <button
+          onClick={() => void handleSync()}
+          disabled={syncing}
+          title="Sync articles from Salesforce"
+          className="p-1 rounded hover:bg-muted/40 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3 h-3 text-muted-foreground/60 ${syncing ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ArticleTree({
-  articles, loading, selectedId, onSelect, onNew,
+  articles, loading, selectedId, onSelect, onNew, onSyncComplete,
 }: {
   articles: KnowledgeArticle[];
   loading:  boolean;
   selectedId: string | null;
   onSelect: (id: string) => void;
   onNew: () => void;
+  onSyncComplete: () => void;
 }) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set(['draft', 'pending-review']));
 
@@ -256,6 +353,7 @@ function ArticleTree({
           <div className="px-4 py-8 text-center text-[13px] text-muted-foreground">No articles yet. Start by creating one.</div>
         )}
       </ScrollArea>
+      <SfSyncStrip onSyncComplete={onSyncComplete} />
     </div>
   );
 }
@@ -1432,7 +1530,7 @@ export default function KnowledgeHub() {
   const [govTab, setGovTab] = useState<GovTab>('health');
 
   const {
-    articles, loading,
+    articles, loading, reload,
     createArticle, updateArticle,
     submitForReview, approveArticle, requestChanges,
     publishToSf, deleteArticle,
@@ -1593,6 +1691,7 @@ export default function KnowledgeHub() {
             selectedId={isNewArticle ? null : selectedId}
             onSelect={handleSelect}
             onNew={handleNew}
+            onSyncComplete={reload}
           />
           <ArticleEditor
             isNew={isNewArticle}
