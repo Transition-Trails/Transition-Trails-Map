@@ -33,6 +33,15 @@ export interface KnowledgeArticle {
   reviewerEmail: string | null;
   // Screen recording
   recordingUrl: string | null;
+  // Knowledge Studio reference fields (left-column panel)
+  ownerDepartment:   string | null;
+  difficulty:        string | null;
+  audience:          string | null;
+  appliesTo:         string | null;
+  estimatedTime:     string | null;
+  lastTestedVersion: string | null;
+  retrievalAbstract: string | null;
+  prerequisites:     string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -47,6 +56,15 @@ export interface ArticleFormData {
   urlName?: string;
   dataCategoryGroup?: string;
   dataCategory?: string;
+  // Knowledge Studio reference fields
+  ownerDepartment?:   string;
+  difficulty?:        string;
+  audience?:          string;
+  appliesTo?:         string;
+  estimatedTime?:     string;
+  lastTestedVersion?: string;
+  retrievalAbstract?: string;
+  prerequisites?:     string;
 }
 
 const API = '/api/knowledge/articles';

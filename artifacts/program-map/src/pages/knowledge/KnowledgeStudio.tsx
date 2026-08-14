@@ -2,6 +2,7 @@ import { BookOpen, FileText, Brain, CheckCircle2, Thermometer, HelpCircle, Eye }
 import { HubShell } from '@/components/layout/HubShell';
 import { KnowledgeStudioOverview } from './KnowledgeStudioOverview';
 import { KnowledgeStudioPennyRead } from './KnowledgeStudioPennyRead';
+import KnowledgeStudioArticle from './KnowledgeStudioArticle';
 
 // ── Placeholder panel for tabs not yet built ─────────────────────────────────
 
@@ -38,12 +39,7 @@ const TABS = [
     label: 'Article',
     path: '/knowledge/studio/article',
     icon: FileText,
-    content: (
-      <ComingSoonPanel
-        title="Article Editor"
-        description="Author structured articles with step records, audience flags, and verify lines. Wires directly to Salesforce Knowledge on publish."
-      />
-    ),
+    content: <KnowledgeStudioArticle />,
   },
   {
     id: 'penny-review',

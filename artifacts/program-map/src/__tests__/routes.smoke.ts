@@ -134,7 +134,8 @@ export const ROUTE_MANIFEST: RouteEntry[] = [
   { path: '/knowledge/memory',                   kind: 'active' },
   // Knowledge Studio — seven-tab hub
   { path: '/knowledge/studio',                   kind: 'active', note: 'Knowledge Studio hub — Overview tab' },
-  { path: '/knowledge/studio/article',           kind: 'active', note: 'Knowledge Studio — Article tab' },
+  { path: '/knowledge/studio/article',           kind: 'active', note: 'Knowledge Studio — Article tab (list)' },
+  { path: '/knowledge/studio/article/:id',       kind: 'active', note: 'Knowledge Studio — Article editor (three-column)' },
   { path: '/knowledge/studio/penny-review',      kind: 'active', note: 'Knowledge Studio — Penny\'s Review tab' },
   { path: '/knowledge/studio/approval',          kind: 'active', note: 'Knowledge Studio — Approval tab' },
   { path: '/knowledge/studio/freshness',         kind: 'active', note: 'Knowledge Studio — Freshness tab' },

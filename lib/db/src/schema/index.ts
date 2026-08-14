@@ -44,3 +44,5 @@ export * from "./alertSettings";
 export * from "./sfSyncSettings";
 export * from "./contentItems";
 export * from "./buyerTokens";
+export * from "./articleProcedureSteps";
+export * from "./articleRelationships";

@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { knowledgeDocumentsTable, knowledgeSourcesTable, articleReviewsTable, knowledgeArticlesTable, sfSyncSettingsTable } from "@workspace/db/schema";
-import { eq, desc, asc, inArray, or } from "drizzle-orm";
+import { knowledgeDocumentsTable, knowledgeSourcesTable, articleReviewsTable, knowledgeArticlesTable, sfSyncSettingsTable, articleProcedureStepsTable, articleRelationshipsTable } from "@workspace/db/schema";
+import { eq, desc, asc, inArray, or, and } from "drizzle-orm";
+import { randomUUID } from "crypto";
 import { getSyncJobStatus, recordManualSync } from "../lib/sfArticleSyncJob.js";
 import {
   fetchSfLiveMetrics,
@@ -2253,19 +2254,27 @@ router.post("/knowledge/articles", async (req, res): Promise<void> => {
   }
 });
 
-// PATCH /api/knowledge/articles/:id  — update draft fields
-router.patch("/knowledge/articles/:id", async (req, res): Promise<void> => {
+// PATCH /api/knowledge/articles/:id  — update draft fields (staff only)
+router.patch("/knowledge/articles/:id", requireStaff, async (req, res): Promise<void> => {
   try {
-    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    const articleId = req.params["id"] as string;
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, articleId));
     if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
     const current = rows[0]!;
     if (current.status !== "draft") {
       res.status(409).json({ error: "Only draft articles can be edited. Recall it first." });
       return;
     }
-    const { title, summary, body, category, articleType, urlName, dataCategoryGroup, dataCategory } = req.body as Partial<{
+    const {
+      title, summary, body, category, articleType, urlName,
+      dataCategoryGroup, dataCategory, reviewCycle,
+      ownerDepartment, difficulty, audience, appliesTo, estimatedTime,
+      lastTestedVersion, retrievalAbstract, prerequisites,
+    } = req.body as Partial<{
       title: string; summary: string; body: string; category: string; articleType: string; urlName: string;
-      dataCategoryGroup: string; dataCategory: string;
+      dataCategoryGroup: string; dataCategory: string; reviewCycle: string;
+      ownerDepartment: string; difficulty: string; audience: string; appliesTo: string;
+      estimatedTime: string; lastTestedVersion: string; retrievalAbstract: string; prerequisites: string;
     }>;
     const [updated] = await db.update(knowledgeArticlesTable)
       .set({
@@ -2277,9 +2286,20 @@ router.patch("/knowledge/articles/:id", async (req, res): Promise<void> => {
         ...(urlName           !== undefined && { urlName: urlName.trim() || slugify(title ?? current.title) }),
         ...(dataCategoryGroup !== undefined && { dataCategoryGroup: dataCategoryGroup || null }),
         ...(dataCategory      !== undefined && { dataCategory: dataCategory || null }),
+        // Review cycle (sent explicitly from the left-panel save; empty string = clear to null)
+        ...(reviewCycle       !== undefined && { reviewCycle: reviewCycle || null }),
+        // Reference fields (Knowledge Studio left-column panel)
+        ...(ownerDepartment   !== undefined && { ownerDepartment:   ownerDepartment   || null }),
+        ...(difficulty        !== undefined && { difficulty:        difficulty        || null }),
+        ...(audience          !== undefined && { audience:          audience          || null }),
+        ...(appliesTo         !== undefined && { appliesTo:         appliesTo         || null }),
+        ...(estimatedTime     !== undefined && { estimatedTime:     estimatedTime     || null }),
+        ...(lastTestedVersion !== undefined && { lastTestedVersion: lastTestedVersion || null }),
+        ...(retrievalAbstract !== undefined && { retrievalAbstract: retrievalAbstract || null }),
+        ...(prerequisites     !== undefined && { prerequisites:     prerequisites     || null }),
         updatedAt: new Date(),
       })
-      .where(eq(knowledgeArticlesTable.id, req.params.id))
+      .where(eq(knowledgeArticlesTable.id, articleId))
       .returning();
     res.json({ article: updated });
   } catch (err) {
@@ -2545,16 +2565,318 @@ router.post("/knowledge/articles/:id/publish-to-sf", async (req, res): Promise<v
   }
 });
 
-// DELETE /api/knowledge/articles/:id  — only drafts can be deleted
-router.delete("/knowledge/articles/:id", async (req, res): Promise<void> => {
+// ─── Procedure Step endpoints ─────────────────────────────────────────────────
+// Steps are stored in article_procedure_steps (local authoritative).
+// SF write-through to Procedure_Step__c is best-effort — failures are logged and
+// do not prevent the local write from succeeding.
+
+// GET /api/knowledge/articles/:id/steps
+router.get("/knowledge/articles/:id/steps", requireStaff, async (req, res): Promise<void> => {
   try {
-    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+    const articleId = req.params["id"] as string;
+    const steps = await db.select()
+      .from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, articleId))
+      .orderBy(asc(articleProcedureStepsTable.sequence));
+    res.json({ steps });
+  } catch (err) {
+    req.log.error(err, "Failed to load procedure steps");
+    res.status(500).json({ error: "Failed to load steps" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/steps
+router.post("/knowledge/articles/:id/steps", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    // Determine next sequence number
+    const existing = await db.select({ sequence: articleProcedureStepsTable.sequence })
+      .from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, articleId))
+      .orderBy(desc(articleProcedureStepsTable.sequence))
+      .limit(1);
+    const nextSeq = existing.length > 0 ? (existing[0]!.sequence + 1) : 1;
+
+    const { instruction = "", verifyLine = null, directUrl = null, toolVersion = null } =
+      req.body as Partial<{ instruction: string; verifyLine: string | null; directUrl: string | null; toolVersion: string | null }>;
+
+    const id = randomUUID();
+    const [step] = await db.insert(articleProcedureStepsTable).values({
+      id, articleId, sequence: nextSeq, instruction, verifyLine, directUrl, toolVersion,
+      createdAt: new Date(), updatedAt: new Date(),
+    }).returning();
+
+    // Best-effort SF write
+    try {
+      const client = new ConnectorSalesforceClient();
+      const sfResult = await client.createRecord("Procedure_Step__c", {
+        Knowledge_Article__c: articleId,
+        Sequence__c:          nextSeq,
+        Instruction__c:       instruction,
+        Verify_Line__c:       verifyLine,
+      });
+      if (sfResult.success && step) {
+        await db.update(articleProcedureStepsTable)
+          .set({ sfStepId: sfResult.id, updatedAt: new Date() })
+          .where(eq(articleProcedureStepsTable.id, id));
+      }
+    } catch (sfErr) {
+      req.log.warn({ err: String(sfErr) }, "Procedure_Step__c SF write skipped (object may not exist yet)");
+    }
+
+    res.status(201).json({ step });
+  } catch (err) {
+    req.log.error(err, "Failed to create procedure step");
+    res.status(500).json({ error: "Failed to create step" });
+  }
+});
+
+// PATCH /api/knowledge/articles/:id/steps/reorder   — must appear before /:stepId
+router.patch("/knowledge/articles/:id/steps/reorder", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const { orderedIds } = req.body as { orderedIds: string[] };
+    if (!Array.isArray(orderedIds) || orderedIds.some(id => typeof id !== "string")) {
+      res.status(400).json({ error: "orderedIds must be a string array" }); return;
+    }
+
+    // Reject duplicate IDs before any DB work
+    const uniqueInputIds = new Set(orderedIds);
+    if (uniqueInputIds.size !== orderedIds.length) {
+      res.status(400).json({ error: "orderedIds contains duplicate IDs" }); return;
+    }
+
+    // Validate: all IDs must belong to this article, and the set must be complete
+    const existing = await db.select({ id: articleProcedureStepsTable.id })
+      .from(articleProcedureStepsTable)
+      .where(eq(articleProcedureStepsTable.articleId, articleId));
+    const validIds = new Set(existing.map(s => s.id));
+    const foreignIds = orderedIds.filter(id => !validIds.has(id));
+    if (foreignIds.length > 0) {
+      res.status(400).json({ error: "orderedIds contains IDs that do not belong to this article" }); return;
+    }
+    if (orderedIds.length !== validIds.size) {
+      res.status(400).json({ error: "orderedIds must contain exactly one entry per step in this article" }); return;
+    }
+
+    // Perform the reorder atomically so partial failures leave no gap/duplicate sequences
+    const now = new Date();
+    const steps = await db.transaction(async (tx) => {
+      for (let i = 0; i < orderedIds.length; i++) {
+        await tx.update(articleProcedureStepsTable)
+          .set({ sequence: i + 1, updatedAt: now })
+          .where(and(
+            eq(articleProcedureStepsTable.id, orderedIds[i]!),
+            eq(articleProcedureStepsTable.articleId, articleId),
+          ));
+      }
+      return tx.select()
+        .from(articleProcedureStepsTable)
+        .where(eq(articleProcedureStepsTable.articleId, articleId))
+        .orderBy(asc(articleProcedureStepsTable.sequence));
+    });
+    res.json({ steps });
+  } catch (err) {
+    req.log.error(err, "Failed to reorder steps");
+    res.status(500).json({ error: "Failed to reorder steps" });
+  }
+});
+
+// PATCH /api/knowledge/articles/:id/steps/:stepId
+router.patch("/knowledge/articles/:id/steps/:stepId", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const stepId    = req.params["stepId"] as string;
+    const { instruction, verifyLine, directUrl, toolVersion } = req.body as Partial<{
+      instruction: string; verifyLine: string | null; directUrl: string | null; toolVersion: string | null;
+    }>;
+    const typedPatch: {
+      updatedAt: Date;
+      instruction?: string;
+      verifyLine?:  string | null;
+      directUrl?:   string | null;
+      toolVersion?: string | null;
+    } = { updatedAt: new Date() };
+    if (instruction !== undefined) typedPatch.instruction = instruction;
+    if (verifyLine  !== undefined) typedPatch.verifyLine  = verifyLine  || null;
+    if (directUrl   !== undefined) typedPatch.directUrl   = directUrl   || null;
+    if (toolVersion !== undefined) typedPatch.toolVersion = toolVersion || null;
+
+    // Scope the update to both stepId AND articleId to prevent cross-article mutation
+    const [step] = await db.update(articleProcedureStepsTable)
+      .set(typedPatch)
+      .where(and(
+        eq(articleProcedureStepsTable.id, stepId),
+        eq(articleProcedureStepsTable.articleId, articleId),
+      ))
+      .returning();
+
+    if (!step) { res.status(404).json({ error: "Step not found or does not belong to this article" }); return; }
+    res.json({ step });
+  } catch (err) {
+    req.log.error(err, "Failed to update procedure step");
+    res.status(500).json({ error: "Failed to update step" });
+  }
+});
+
+// DELETE /api/knowledge/articles/:id/steps/:stepId
+router.delete("/knowledge/articles/:id/steps/:stepId", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const stepId    = req.params["stepId"] as string;
+    // Scope delete to both stepId AND articleId to prevent cross-article mutation
+    await db.delete(articleProcedureStepsTable)
+      .where(and(
+        eq(articleProcedureStepsTable.id, stepId),
+        eq(articleProcedureStepsTable.articleId, articleId),
+      ));
+    res.status(204).send();
+  } catch (err) {
+    req.log.error(err, "Failed to delete procedure step");
+    res.status(500).json({ error: "Failed to delete step" });
+  }
+});
+
+// ─── Article relationship endpoints ───────────────────────────────────────────
+// Every forward link writes its inverse in the same transaction.
+
+// GET /api/knowledge/articles/:id/relationships
+router.get("/knowledge/articles/:id/relationships", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const rels = await db.select()
+      .from(articleRelationshipsTable)
+      .where(eq(articleRelationshipsTable.articleId, articleId))
+      .orderBy(asc(articleRelationshipsTable.createdAt));
+    res.json({ relationships: rels });
+  } catch (err) {
+    req.log.error(err, "Failed to load relationships");
+    res.status(500).json({ error: "Failed to load relationships" });
+  }
+});
+
+// POST /api/knowledge/articles/:id/relationships
+router.post("/knowledge/articles/:id/relationships", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const { relatedArticleId, relationType = "other", reason = null } = req.body as {
+      relatedArticleId: string; relationType?: string; reason?: string | null;
+    };
+    if (!relatedArticleId) { res.status(400).json({ error: "relatedArticleId is required" }); return; }
+
+    // Verify both articles exist before creating any records
+    const [sourceArticle] = await db.select({ id: knowledgeArticlesTable.id })
+      .from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, articleId)).limit(1);
+    if (!sourceArticle) { res.status(404).json({ error: "Source article not found" }); return; }
+    const [targetArticle] = await db.select({ id: knowledgeArticlesTable.id })
+      .from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, relatedArticleId)).limit(1);
+    if (!targetArticle) { res.status(404).json({ error: "Target article not found" }); return; }
+
+    const now = new Date();
+    const forwardId = randomUUID();
+    const inverseId = randomUUID();
+
+    const inverseTypeMap: Record<string, string> = {
+      "prerequisite": "next-step",
+      "next-step":    "prerequisite",
+      "reverses":     "reverses",
+      "other":        "other",
+    };
+
+    // Both forward and inverse are written atomically; pairedRelId on each points to the other
+    // so deletion can remove exactly one pair without scanning by type/direction heuristics.
+    const forward = await db.transaction(async (tx) => {
+      const [fwd] = await tx.insert(articleRelationshipsTable).values({
+        id: forwardId, articleId, relatedArticleId,
+        relationType, reason, direction: "forward",
+        pairedRelId: inverseId,
+        createdAt: now, updatedAt: now,
+      }).returning();
+      await tx.insert(articleRelationshipsTable).values({
+        id: inverseId, articleId: relatedArticleId, relatedArticleId: articleId,
+        relationType: inverseTypeMap[relationType] ?? "other",
+        reason, direction: "inverse",
+        pairedRelId: forwardId,
+        createdAt: now, updatedAt: now,
+      });
+      return fwd!;
+    });
+
+    res.status(201).json({ relationship: forward });
+  } catch (err) {
+    req.log.error(err, "Failed to create relationship");
+    res.status(500).json({ error: "Failed to create relationship" });
+  }
+});
+
+// DELETE /api/knowledge/articles/:id/relationships/:relId
+router.delete("/knowledge/articles/:id/relationships/:relId", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const relId     = req.params["relId"] as string;
+    // Delete forward record and its exact paired inverse atomically.
+    await db.transaction(async (tx) => {
+      // Scope lookup to the URL article to prevent cross-article deletion
+      const rows = await tx.select().from(articleRelationshipsTable)
+        .where(and(
+          eq(articleRelationshipsTable.id, relId),
+          eq(articleRelationshipsTable.articleId, articleId),
+        ));
+      if (rows.length === 0) return; // already gone or not owned by this article
+      const fwd = rows[0]!;
+      // Delete the exact inverse using pairedRelId (set at creation time)
+      if (fwd.pairedRelId) {
+        await tx.delete(articleRelationshipsTable)
+          .where(eq(articleRelationshipsTable.id, fwd.pairedRelId));
+      }
+      await tx.delete(articleRelationshipsTable)
+        .where(eq(articleRelationshipsTable.id, relId));
+    });
+    res.status(204).send();
+  } catch (err) {
+    req.log.error(err, "Failed to delete relationship");
+    res.status(500).json({ error: "Failed to delete relationship" });
+  }
+});
+
+// DELETE /api/knowledge/articles/:id  — only drafts can be deleted
+// Cascade-deletes all procedure steps and both sides of any relationships.
+router.delete("/knowledge/articles/:id", requireStaff, async (req, res): Promise<void> => {
+  try {
+    const articleId = req.params["id"] as string;
+    const rows = await db.select().from(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, articleId));
     if (rows.length === 0) { res.status(404).json({ error: "Article not found" }); return; }
     if (rows[0]!.status !== "draft") {
       res.status(409).json({ error: "Only draft articles can be deleted." });
       return;
     }
-    await db.delete(knowledgeArticlesTable).where(eq(knowledgeArticlesTable.id, req.params.id));
+
+    await db.transaction(async (tx) => {
+      // 1. Delete all procedure steps for this article
+      await tx.delete(articleProcedureStepsTable)
+        .where(eq(articleProcedureStepsTable.articleId, articleId));
+
+      // 2. Delete all relationships where this article is the source OR target,
+      //    including both sides of every pair to avoid leaving stale inverse rows.
+      //    Get all relationship IDs involving this article first.
+      const ownedRels = await tx.select({ id: articleRelationshipsTable.id, pairedRelId: articleRelationshipsTable.pairedRelId })
+        .from(articleRelationshipsTable)
+        .where(eq(articleRelationshipsTable.articleId, articleId));
+      const pairedIds = ownedRels.map(r => r.pairedRelId).filter((id): id is string => id !== null);
+      // Delete the article's own rows
+      await tx.delete(articleRelationshipsTable)
+        .where(eq(articleRelationshipsTable.articleId, articleId));
+      // Delete the paired inverse rows on other articles
+      if (pairedIds.length > 0) {
+        await tx.delete(articleRelationshipsTable)
+          .where(inArray(articleRelationshipsTable.id, pairedIds));
+      }
+
+      // 3. Delete the article itself
+      await tx.delete(knowledgeArticlesTable)
+        .where(eq(knowledgeArticlesTable.id, articleId));
+    });
+
     res.status(204).send();
   } catch (err) {
     req.log.error(err, "Failed to delete knowledge article");

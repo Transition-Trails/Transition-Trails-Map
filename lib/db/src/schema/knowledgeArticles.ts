@@ -43,6 +43,19 @@ export const knowledgeArticlesTable = pgTable("knowledge_articles", {
   // Screen recording URL (stored in server filesystem, served via /api/knowledge/recordings/:filename)
   recordingUrl: text("recording_url"),
 
+  // Review cycle (Monthly | Quarterly | Yearly) — set in the Knowledge Studio left-column panel
+  reviewCycle: text("review_cycle"),
+
+  // ── Knowledge Studio reference fields (left-column panel) ──────────────────
+  ownerDepartment:    text("owner_department"),
+  difficulty:         text("difficulty"),          // Beginner | Intermediate | Advanced
+  audience:           text("audience"),            // e.g. "Coaches, Coordinators"
+  appliesTo:          text("applies_to"),          // program / context scope
+  estimatedTime:      text("estimated_time"),      // e.g. "5 min"
+  lastTestedVersion:  text("last_tested_version"), // Salesforce release tested against
+  retrievalAbstract:  text("retrieval_abstract"),  // Penny's read-only retrieval summary
+  prerequisites:      text("prerequisites"),       // free-text prereq note
+
   createdAt:       timestamp("created_at").defaultNow().notNull(),
   updatedAt:       timestamp("updated_at").defaultNow().notNull(),
 });

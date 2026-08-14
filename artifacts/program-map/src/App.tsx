@@ -392,6 +392,7 @@ function Router() {
       <Route path="/penny">                    <PennyPageShell><PennyCommandCenter /></PennyPageShell></Route>
 
       {/* Knowledge Studio — new seven-tab hub at /knowledge/studio */}
+      <Route path="/knowledge/studio/article/:id"  component={KnowledgeStudio} />
       <Route path="/knowledge/studio/article"      component={KnowledgeStudio} />
       <Route path="/knowledge/studio/penny-review" component={KnowledgeStudio} />
       <Route path="/knowledge/studio/approval"     component={KnowledgeStudio} />
