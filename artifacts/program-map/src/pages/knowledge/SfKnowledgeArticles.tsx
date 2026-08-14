@@ -8,6 +8,7 @@ import {
   Search, FileText, Loader2, AlertCircle,
   RefreshCw, Calendar, Globe, Eye, EyeOff, BookOpen, CheckCircle, Clock,
   Pencil, ExternalLink, X, Download, CloudDownload, ArrowRight, Timer,
+  Settings, ChevronDown,
 } from 'lucide-react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -370,6 +371,154 @@ function ArticlePopover({
   );
 }
 
+// ── Sync settings popover ─────────────────────────────────────────────────────
+
+const INTERVAL_OPTIONS: { label: string; value: number }[] = [
+  { label: '1 hour',   value: 1  },
+  { label: '3 hours',  value: 3  },
+  { label: '6 hours',  value: 6  },
+  { label: '12 hours', value: 12 },
+  { label: '24 hours', value: 24 },
+];
+
+function SyncSettingsPopover({
+  syncStatus,
+  onUpdated,
+}: {
+  syncStatus: { autoSyncEnabled: boolean; intervalHours: number; lastSyncAt: string | null } | undefined;
+  onUpdated: () => void;
+}) {
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: KeyboardEvent) { if (e.key === 'Escape') setOpen(false); }
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open]);
+
+  const mutation = useMutation({
+    mutationFn: async (body: { enabled?: boolean; intervalHours?: number }) => {
+      const r = await fetch('/api/knowledge/sf-sync-settings', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({})) as { error?: string };
+        throw new Error(err.error ?? `HTTP ${r.status}`);
+      }
+      return r.json() as Promise<{ settings: { enabled: boolean; intervalHours: number } }>;
+    },
+    onSuccess: () => {
+      onUpdated();
+      toast({ title: 'Auto-sync settings saved' });
+    },
+    onError: (err: Error) => {
+      toast({ variant: 'destructive', title: 'Could not save settings', description: err.message });
+    },
+  });
+
+  const enabled = syncStatus?.autoSyncEnabled ?? true;
+  const hours   = syncStatus?.intervalHours ?? 6;
+
+  return (
+    <div ref={ref} className="relative flex items-center gap-1.5">
+      {/* Status chip — also the trigger */}
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors rounded-md px-1.5 py-1 hover:bg-muted/60 border border-transparent hover:border-border"
+        title="Configure auto-sync schedule"
+      >
+        <Timer className="w-3 h-3 shrink-0" />
+        {enabled
+          ? <span>Auto-sync every {hours}h</span>
+          : <span>Auto-sync off</span>}
+        {syncStatus?.lastSyncAt && (
+          <span className="text-muted-foreground/60">
+            · last {relativeTime(syncStatus.lastSyncAt)}
+          </span>
+        )}
+        <Settings className="w-2.5 h-2.5 ml-0.5 shrink-0 opacity-60" />
+        <ChevronDown className={`w-2.5 h-2.5 shrink-0 opacity-60 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {/* Popover */}
+      {open && (
+        <div className="absolute top-full right-0 mt-1.5 z-50 w-64 rounded-lg border bg-white shadow-lg p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[12px] font-semibold text-foreground">Auto-sync schedule</span>
+            <button onClick={() => setOpen(false)} className="p-0.5 text-muted-foreground hover:text-foreground transition-colors">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Enabled toggle */}
+          <label className="flex items-center justify-between gap-3 cursor-pointer">
+            <span className="text-[12px] text-foreground">Enable auto-sync</span>
+            <button
+              role="switch"
+              aria-checked={enabled}
+              disabled={mutation.isPending}
+              onClick={() => mutation.mutate({ enabled: !enabled })}
+              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border-2 border-transparent transition-colors focus:outline-none disabled:opacity-50 ${
+                enabled ? 'bg-primary' : 'bg-muted'
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
+                  enabled ? 'translate-x-4' : 'translate-x-0.5'
+                }`}
+              />
+            </button>
+          </label>
+
+          {/* Interval picker */}
+          <div className={`space-y-1.5 ${!enabled ? 'opacity-50 pointer-events-none' : ''}`}>
+            <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Interval</span>
+            <div className="grid grid-cols-5 gap-1">
+              {INTERVAL_OPTIONS.map(opt => (
+                <button
+                  key={opt.value}
+                  disabled={mutation.isPending || !enabled}
+                  onClick={() => mutation.mutate({ intervalHours: opt.value })}
+                  className={`h-8 rounded-md border text-[11px] font-medium transition-colors ${
+                    hours === opt.value && enabled
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                  }`}
+                >
+                  {opt.value}h
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {mutation.isPending && (
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <Loader2 className="w-3 h-3 animate-spin" /> Saving…
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 interface SyncResult {
@@ -523,20 +672,11 @@ export default function SfKnowledgeArticles() {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Auto-sync status chip */}
-        {syncStatus && (
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            <Timer className="w-3 h-3 shrink-0" />
-            {syncStatus.autoSyncEnabled
-              ? <span>Auto-sync every {syncStatus.intervalHours}h</span>
-              : <span>Auto-sync off</span>}
-            {syncStatus.lastSyncAt && (
-              <span className="text-muted-foreground/60">
-                · last {relativeTime(syncStatus.lastSyncAt)}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Auto-sync settings (read-only when no data yet) */}
+        <SyncSettingsPopover
+          syncStatus={syncStatus}
+          onUpdated={() => void qc.invalidateQueries({ queryKey: ['sf-sync-status'] })}
+        />
 
         {/* Count + actions */}
         {totalCount > 0 && (
