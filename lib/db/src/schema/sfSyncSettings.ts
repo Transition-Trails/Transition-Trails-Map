@@ -16,6 +16,8 @@ export const sfSyncSettingsTable = pgTable("sf_sync_settings", {
   /** Email of the admin who last changed the settings. */
   updatedBy:     text("updated_by"),
   updatedAt:     timestamp("updated_at").defaultNow().notNull(),
+  /** Timestamp of the most recently completed sync (scheduled or manual). */
+  lastSyncedAt:  timestamp("last_synced_at"),
 });
 
 export type SfSyncSettingsRow    = typeof sfSyncSettingsTable.$inferSelect;

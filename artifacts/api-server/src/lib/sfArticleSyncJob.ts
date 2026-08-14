@@ -65,6 +65,45 @@ async function getSyncSettings(): Promise<SyncSettings> {
   return DEFAULT_SETTINGS;
 }
 
+/**
+ * Persist lastSyncedAt to the sf_sync_settings row so the timestamp survives
+ * a server restart.
+ */
+async function persistLastSyncedAt(syncedAt: string): Promise<void> {
+  try {
+    await db
+      .insert(sfSyncSettingsTable)
+      .values({ id: "default", lastSyncedAt: new Date(syncedAt) })
+      .onConflictDoUpdate({
+        target: sfSyncSettingsTable.id,
+        set: { lastSyncedAt: new Date(syncedAt) },
+      });
+  } catch (err) {
+    logger.warn({ err }, "sfArticleSyncJob: could not persist lastSyncedAt to DB");
+  }
+}
+
+/**
+ * Read lastSyncedAt from DB on startup and hydrate the in-memory state so the
+ * toolbar can show the correct "last synced Xh ago" time after a server restart.
+ */
+async function hydrateLastSyncedAt(): Promise<void> {
+  try {
+    const rows = await db
+      .select({ lastSyncedAt: sfSyncSettingsTable.lastSyncedAt })
+      .from(sfSyncSettingsTable)
+      .where(eq(sfSyncSettingsTable.id, "default"))
+      .limit(1);
+
+    if (rows.length > 0 && rows[0]?.lastSyncedAt) {
+      lastSyncAt = rows[0].lastSyncedAt.toISOString();
+      logger.info({ lastSyncAt }, "sfArticleSyncJob: hydrated lastSyncAt from DB");
+    }
+  } catch (err) {
+    logger.warn({ err }, "sfArticleSyncJob: could not hydrate lastSyncedAt from DB");
+  }
+}
+
 // ── Core tick ─────────────────────────────────────────────────────────────────
 
 let syncFnRef: SyncFn | null = null;
@@ -79,6 +118,7 @@ async function tick(): Promise<void> {
       const result = await syncFnRef(logger);
       lastSyncAt     = result.syncedAt;
       lastSyncResult = result;
+      void persistLastSyncedAt(result.syncedAt);
       logger.info(
         { total: result.total, created: result.created, updated: result.updated, skipped: result.skipped, errors: result.errors },
         "sfArticleSyncJob: sync complete",
@@ -106,6 +146,10 @@ export function startSfArticleSyncJob(syncFn: SyncFn): void {
   if (isJobRunning) return;
   syncFnRef    = syncFn;
   isJobRunning = true;
+
+  // Hydrate lastSyncAt from DB so the toolbar shows the correct time after a
+  // server restart, even before the next scheduled sync runs.
+  void hydrateLastSyncedAt();
 
   // Kick off after the first interval rather than immediately (avoids a race
   // at startup when DB connections aren't fully warm yet).
@@ -162,4 +206,5 @@ export function getSyncJobStatus(): SyncJobStatus {
 export function recordManualSync(result: SyncResult): void {
   lastSyncAt     = result.syncedAt;
   lastSyncResult = result;
+  void persistLastSyncedAt(result.syncedAt);
 }

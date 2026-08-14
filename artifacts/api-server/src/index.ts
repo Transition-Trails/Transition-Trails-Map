@@ -69,6 +69,11 @@ async function ensureSfSyncSettingsTable(): Promise<void> {
       "updated_at"     timestamp   NOT NULL DEFAULT NOW()
     );
   `);
+  // Belt-and-suspenders: add columns that may be missing from older deployments.
+  await pool.query(`
+    ALTER TABLE "sf_sync_settings"
+      ADD COLUMN IF NOT EXISTS "last_synced_at" timestamp;
+  `);
 }
 
 async function ensureSessionTable(): Promise<void> {
