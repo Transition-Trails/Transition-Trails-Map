@@ -41,4 +41,6 @@
 - [Status colour system](status-color-system.md) — 5-role system in src/config/statusColors.ts; all off-brand Tailwind colours swept from the codebase (except ProgramMap.tsx per-program map colours and toast.tsx destructive styles).
 - [Digital Twin migration](digital-twin-migration.md) — Digital Twin folded into Governance as 3 tabs; /digital-twin/* redirects to /governance/tracer|map|impact.
 - [Collaboration hub consolidation](collaboration-hub.md) — 6 sidebar items + 2 dead pages folded into CollaborationHub (4 tabs: Overview/Comms/Signals/Channels); old /collaboration/* routes redirect.
+- [OAuth state design](oauth-state-design.md) — sign-in state is HMAC-signed AND session-bound; signature-only acceptance is login-CSRF, never allow it.
+- [Trust proxy for prod sessions](trust-proxy-prod-sessions.md) — app.set('trust proxy',1) is required or secure session cookies never set behind Replit's proxy; prod-only sign-in breakage.
 - [Homebase shell and auth](homebase-shell.md) — separate shell + audience routing for learner/coach/volunteer; staff priority; 3 ENV vars activate it; drizzle push needs psql workaround (no TTY).

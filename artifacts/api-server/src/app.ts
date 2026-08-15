@@ -24,6 +24,15 @@ const PgStore = connectPgSimple(session);
 
 const app: Express = express();
 
+// Behind Replit's deployment proxy the connection reaching Express is plain
+// HTTP even though the client connects over HTTPS. Without trust proxy,
+// express-session sees req.secure === false and silently refuses to set the
+// `secure: true` session cookie in production — which breaks the Google
+// sign-in flow (the OAuth state saved at /login is never persisted, so the
+// callback always fails with state_mismatch). Trusting the first proxy hop
+// makes req.secure reflect X-Forwarded-Proto.
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,

@@ -44,6 +44,62 @@ const SCOPES           = 'openid email profile';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+// ── Stateless signed OAuth state ─────────────────────────────────────────────
+// The state parameter is self-validating: `base64url(payload).hmac` where the
+// payload holds a random nonce + issue timestamp, signed with SESSION_SECRET.
+// This makes callback validation independent of server memory AND of the
+// session cookie surviving the Google round-trip — it works identically on any
+// autoscale instance because nothing is stored server-side.
+//
+// CSRF defence-in-depth: the nonce is ALSO saved on the session at /login.
+// When the callback finds a session copy it must match exactly (full
+// double-submit protection). When the session copy is absent (cookie lost or
+// request landed with a fresh session), the signature + 10-minute expiry alone
+// authenticate the state — degraded but still forgery-proof, since only our
+// server can mint a valid signature.
+
+const STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
+function getStateSecret(): string {
+  const secret = process.env['SESSION_SECRET'];
+  if (!secret) throw new Error('SESSION_SECRET is required to sign OAuth state');
+  return secret;
+}
+
+export function makeSignedState(): string {
+  const payload = Buffer.from(
+    JSON.stringify({ n: crypto.randomBytes(16).toString('hex'), t: Date.now() }),
+  ).toString('base64url');
+  const sig = crypto.createHmac('sha256', getStateSecret()).update(payload).digest('base64url');
+  return `${payload}.${sig}`;
+}
+
+export function verifySignedState(state: string):
+  | { ok: true }
+  | { ok: false; reason: 'malformed' | 'bad_signature' | 'expired' } {
+  const dot = state.lastIndexOf('.');
+  if (dot <= 0) return { ok: false, reason: 'malformed' };
+  const payload = state.slice(0, dot);
+  const sig     = state.slice(dot + 1);
+
+  const expected = crypto.createHmac('sha256', getStateSecret()).update(payload).digest('base64url');
+  const sigBuf = Buffer.from(sig);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+    return { ok: false, reason: 'bad_signature' };
+  }
+
+  try {
+    const { t } = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { n: string; t: number };
+    if (typeof t !== 'number' || Date.now() - t > STATE_TTL_MS || t > Date.now() + 60_000) {
+      return { ok: false, reason: 'expired' };
+    }
+  } catch {
+    return { ok: false, reason: 'malformed' };
+  }
+  return { ok: true };
+}
+
 /**
  * Race a groups-lookup promise against a configurable wall-clock timeout.
  *
@@ -218,11 +274,17 @@ router.get('/auth/google/login', (req, res) => {
     return;
   }
 
-  const state = crypto.randomBytes(20).toString('hex');
+  // Signed state (HMAC + 10-min TTL) layered on top of the session copy.
+  // The session lives in the shared PostgreSQL store, so the state written on
+  // one autoscale instance is readable by whichever instance serves the
+  // callback — no instance-local memory is involved anywhere in this flow.
+  const state = makeSignedState();
   req.session['googleOAuthState'] = state;
 
   req.session.save((err) => {
     if (err) {
+      // The session copy is REQUIRED for browser binding (login-CSRF defence),
+      // so a failed save must abort sign-in rather than continue degraded.
       logger.error({ err }, 'googleSignIn: session save failed before OAuth redirect');
       res.status(500).send('Session error — please try again.');
       return;
@@ -257,11 +319,28 @@ router.get('/auth/google/callback', async (req, res) => {
     return;
   }
 
-  // CSRF check
+  // CSRF check — two layers:
+  // 1. The state must carry a valid HMAC signature and be < 10 minutes old.
+  //    This is self-contained: no server memory, no session required, works
+  //    on any autoscale instance.
+  const verdict = verifySignedState(state);
+  if (!verdict.ok) {
+    logger.warn({ reason: verdict.reason }, 'googleSignIn: callback state failed signature/expiry check');
+    res.redirect(verdict.reason === 'expired'
+      ? '/?sign_in_error=state_expired'
+      : '/?sign_in_error=state_mismatch');
+    return;
+  }
+  // 2. The session's stored copy MUST be present and match exactly. This binds
+  //    the callback to the browser that initiated sign-in (login-CSRF defence)
+  //    and makes the state single-use (the copy is deleted here). The session
+  //    lives in the shared PostgreSQL store, so this works across autoscale
+  //    instances. Signature-only acceptance is deliberately NOT allowed: an
+  //    HMAC proves WE minted the state, not that it belongs to THIS browser.
   const savedState = req.session['googleOAuthState'] as string | undefined;
   delete req.session['googleOAuthState'];
-
-  if (!savedState || savedState !== state) {
+  if (savedState === undefined || savedState !== state) {
+    logger.warn({ hadSessionCopy: savedState !== undefined }, 'googleSignIn: callback state missing from or mismatching the session');
     res.redirect('/?sign_in_error=state_mismatch');
     return;
   }

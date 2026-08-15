@@ -31,6 +31,10 @@ const ERROR_MESSAGES: Record<string, (email?: string, detail?: string) => { titl
     title: 'Sign-in session expired',
     body:  'The sign-in flow timed out or was opened in another tab. Please try again.',
   }),
+  state_expired: () => ({
+    title: 'Sign-in took too long',
+    body:  'The sign-in link expired (it is valid for 10 minutes). Please try again.',
+  }),
   token_exchange: () => ({
     title: 'Sign-in could not complete',
     body:  'There was a problem communicating with Google. Please try again — if this keeps happening, contact your program coordinator or administrator.',
