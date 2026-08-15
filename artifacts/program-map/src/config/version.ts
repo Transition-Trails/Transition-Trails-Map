@@ -10,4 +10,4 @@
 // automatically — no other file needs to be touched for the version string.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const APP_VERSION = "1.8";
+export const APP_VERSION = "1.9";

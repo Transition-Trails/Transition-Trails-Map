@@ -24,9 +24,27 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: "1.9",
+    date: "August 15, 2026",
+    label: "Current",
+    entries: [
+      { kind: "major", text: "Content Studio launched — a full content production hub with seven tabs: Topic (family card + 12-week coverage grid), Content Item (three-column workspace with production stations and publications table), Build With Me (production pipeline with a real scannable QR code), Trail Crew, Catalog, Penny Desk, and Pipeline (kanban board, stat cards, and a publication gaps matrix across YouTube / LinkedIn / Substack / Website / Instagram)." },
+      { kind: "major", text: "Buyer Kit Page shipped as a standalone artifact — kit sections, QR codes, and a bundle toggle, powered by real Salesforce Asset records instead of mock data." },
+      { kind: "major", text: "Knowledge Studio expansion — new studio pages with knowledge retrieval and an article recall → edit → review → publish cycle, plus Freshness and Help tabs with corrected audience access." },
+      { kind: "major", text: "Automatic Salesforce Knowledge article background sync — security-hardened sync job with interactive auto-sync settings in the SF Articles toolbar; last-synced time is stored in the database so the toolbar stays accurate after a server restart." },
+      { kind: "major", text: "Google sign-in on the published app fixed — the server now recognizes it is behind the deployment's HTTPS proxy, so the secure session cookie is set correctly and sign-in completes reliably across all autoscale instances." },
+      { kind: "minor", text: "Sign-in security hardened — the OAuth state is now HMAC-signed with a 10-minute expiry, single-use, and bound to the browser that started sign-in; expired links show a clear 'Sign-in took too long' message." },
+      { kind: "minor", text: "GSC case enforcement — Get Support Cases flow enforced end-to-end with local-save → retry → Salesforce sync, and the linked Service Contract name now shows in the submitted cases list." },
+      { kind: "minor", text: "Content Studio stage rail is interactive — Mark done advances the current stage, a Published banner appears on completion, and the publications table updates status live. Narrator voice choice is saved to the database so it roams across browsers and survives restarts." },
+      { kind: "minor", text: "Assessment question bank page added, with coach overview reporting aggregate-only stats." },
+      { kind: "fix",   text: "SF-synced article edit/publish round-trip repaired — normalization, reconciliation, version selection, body alignment, body-null guard, and pagination all corrected; in-review article bodies are preserved through a full sync cycle." },
+      { kind: "fix",   text: "Duplicate Salesforce article no longer created when the org rejects KnowledgeArticleId linking; SF-origin badge shown on synced articles in the Article Studio list." },
+      { kind: "fix",   text: "Case validation errors handled cleanly with a supporting test suite instead of failing silently." },
+    ],
+  },
+  {
     version: "1.8",
     date: "August 13, 2026",
-    label: "Current",
     entries: [
       { kind: "major", text: "Skill Assessment system launched — adaptive 8-domain Salesforce Administrator assessment for learners; scoring, confidence calibration, and a post-assessment debrief with domain bars and a 4-quadrant calibration grid. Assessment card on Learner Homebase links directly to the flow." },
       { kind: "major", text: "Coach view for skill assessments — Assessments tab on each learner's detail page shows domain scores, calibration mini-grid, and misconception risk per attempt. Staff Assessments page at /penny/assessments shows aggregate pass rate, avg score, and per-learner history from live data." },

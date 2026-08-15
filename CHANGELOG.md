@@ -5,6 +5,28 @@ Dates are in `MMMM D, YYYY` format. Versions follow semantic versioning conventi
 
 ---
 
+## [1.9] — August 15, 2026
+
+### Added
+- **Content Studio** — new content production hub with seven tabs: Topic (family card + 12-week coverage grid), Content Item (three-column workspace with production stations and publications table), Build With Me (full production pipeline UI with a real scannable QR code via `qrcode-generator`), Trail Crew, Catalog, Penny Desk, and Pipeline (advisory strip, stat cards, kanban board, and a publication gaps matrix across YouTube / LinkedIn / Substack / Website / Instagram). Stage rail is interactive — Mark done advances the current stage, a Published banner appears on completion, and the publications table updates live.
+- **Buyer Kit Page** — new standalone web artifact with kit sections, QR codes, and a `showBundle` toggle, backed by real Salesforce Asset records via a dedicated API route.
+- **Knowledge Studio expansion** — new studio pages with knowledge retrieval logic and an article recall → edit → review → publish cycle, plus Freshness and Help tabs with corrected audience access.
+- **Automatic SF Knowledge article background sync** — security-hardened sync job with interactive auto-sync settings in the SF Articles toolbar; `lastSyncedAt` persisted to the database and hydrated on startup so the toolbar stays accurate after a server restart.
+- **GSC case enforcement** — Get Support Cases flow enforced end-to-end with local-save → retry → Salesforce sync (verified by a dedicated test suite); linked Service Contract name shown in the submitted cases list.
+- **Assessment question bank page** — plus coach overview now returns aggregate-only stats.
+- Narrator voice choice moved from localStorage to the database — roams across browsers and survives restarts; the Narrate stage rail reflects the saved choice automatically.
+
+### Security
+- **Google sign-in fixed on the published app** — `trust proxy` enabled so Express recognizes Replit's TLS-terminating proxy; the secure session cookie is now set in production, ending the universal `state_mismatch` ("Sign-in session expired") failure.
+- **OAuth state hardened** — the sign-in state parameter is now HMAC-signed (SESSION_SECRET) with a 10-minute expiry and timing-safe verification, single-use, and strictly bound to the session that initiated sign-in (login-CSRF protection); sessions live in the shared PostgreSQL store, so validation works across all autoscale instances. Expired links show a distinct "Sign-in took too long" message.
+
+### Fixed
+- SF-synced article edit/publish round-trip repaired — normalization, reconciliation, version selection, body alignment, body-null guard, and pagination; in-review article bodies preserved through a full sync cycle (covered by tests).
+- Duplicate SF article no longer created when the org rejects `KnowledgeArticleId` linking; SF-origin badge shown on synced articles in the Article Studio list.
+- Case validation error handling added with a supporting test suite.
+
+---
+
 ## [1.8] — August 13, 2026
 
 ### Added
