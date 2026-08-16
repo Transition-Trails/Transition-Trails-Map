@@ -40,6 +40,7 @@ import {
   FileText,
   Plus,
 } from "lucide-react";
+import { STATUS_CLASSES } from "@/config/statusColors";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -330,7 +331,7 @@ function ConvItem({
   presence?: "active" | "away";
 }) {
   // unreadCount > 0  → known unread (amber badge)
-  // unreadCount === undefined → unknown read state (small grey dot — DM shown defensively)
+  // unreadCount === undefined → unknown read state (green status dot — DM shown defensively)
   // unreadCount === 0 → read (no indicator; DM is filtered out before reaching this component)
   const hasKnownUnread  = typeof conv.unreadCount === "number" && conv.unreadCount > 0;
   const hasUnknownState = conv.unreadCount === undefined && (conv.type === "im" || conv.type === "mpim");
@@ -350,7 +351,7 @@ function ConvItem({
         <span className="relative flex-shrink-0 w-3 h-3">
           <span className={`absolute inset-0 rounded-full border-2 ${selected ? "border-primary bg-primary/20" : "border-muted-foreground/40"}`} />
           {presence && (
-            <span className={`absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border border-white ${presence === "active" ? "bg-green-500" : "bg-muted-foreground/30"}`} />
+            <span className={`absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full border border-white ${presence === "active" ? STATUS_CLASSES.success.dot : "bg-muted-foreground/30"}`} />
           )}
         </span>
       )}
@@ -367,7 +368,7 @@ function ConvItem({
       )}
       {hasUnknownState && !hasKnownUnread && (
         <span
-          className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-muted-foreground/30"
+          className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${STATUS_CLASSES.success.dot}`}
           title="Read status unknown"
         />
       )}
