@@ -29,6 +29,8 @@ declare module "express-session" {
     sfContactId?:    string | null;
     codeVerifier?:   string;
     state?:          string;
+    /** Redirect URI bound to the in-flight Salesforce OAuth transaction. */
+    sfRedirectUri?:  string;
 
     // ── Homebase audience ─────────────────────────────────────────────────
     /**

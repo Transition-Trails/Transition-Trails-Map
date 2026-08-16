@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request } from "express";
 import { randomBytes } from "crypto";
 import {
   generatePKCE,
@@ -67,15 +67,40 @@ const CONNECTED_HTML = `<!DOCTYPE html>
 </html>`;
 
 
+// ── Callback URL resolution ───────────────────────────────────────────────────
+// The redirect URI must point back at the SAME environment that initiated the
+// login, or the callback lands on a server holding a different session and
+// fails with "Invalid or expired OAuth session" (a fixed URL once sent
+// production logins back to the dev server). Priority: derived from the
+// request's forwarded headers (each environment redirects to itself) →
+// SALESFORCE_CALLBACK_URL env var as a fallback when no host is available.
+// Both the production and development callback URLs must be registered in the
+// Salesforce Connected App's allowed callback URLs.
+function getSfCallbackUrl(req: Request): string {
+  const proto = (req.headers["x-forwarded-proto"] as string | undefined) ?? req.protocol;
+  const host  = (req.headers["x-forwarded-host"]  as string | undefined) ?? req.headers.host;
+  if (host) {
+    return `${(proto ?? "https").split(",")[0]!.trim()}://${host.split(",")[0]!.trim()}/api/auth/salesforce/callback`;
+  }
+  const fromEnv = process.env["SALESFORCE_CALLBACK_URL"];
+  if (fromEnv) return fromEnv;
+  throw new Error("Cannot resolve Salesforce callback URL: no Host header and SALESFORCE_CALLBACK_URL unset");
+}
+
 // ── GET /login ────────────────────────────────────────────────────────────────
 
 router.get("/login", (req, res): void => {
   try {
     const { codeVerifier, codeChallenge } = generatePKCE();
     const state = randomBytes(16).toString("hex");
+    const redirectUri = getSfCallbackUrl(req);
 
-    req.session.codeVerifier = codeVerifier;
-    req.session.state        = state;
+    req.session.codeVerifier  = codeVerifier;
+    req.session.state         = state;
+    // Bind the redirect URI to this OAuth transaction: the token exchange must
+    // use the byte-identical value that was sent to /authorize, so we store it
+    // rather than re-deriving it from the (separate) callback request.
+    req.session.sfRedirectUri = redirectUri;
 
     req.session.save((err) => {
       if (err) {
@@ -84,7 +109,7 @@ router.get("/login", (req, res): void => {
         return;
       }
       try {
-        res.redirect(buildAuthorizationUrl(codeChallenge, state));
+        res.redirect(buildAuthorizationUrl(codeChallenge, state, redirectUri));
       } catch (buildErr) {
         logger.error({ err: buildErr }, "Salesforce OAuth configuration error in /login");
         res.status(500).json({
@@ -136,11 +161,15 @@ router.get("/callback", async (req, res): Promise<void> => {
     // Capture verifier and immediately clear PKCE fields so any duplicate
     // callback request that arrives while this one is in-flight hits FIX 3.
     const codeVerifier = req.session.codeVerifier;
+    // Use the exact redirect URI sent to /authorize (bound at /login);
+    // Salesforce requires a byte-identical value at token exchange.
+    const boundRedirectUri = req.session.sfRedirectUri ?? getSfCallbackUrl(req);
     delete req.session.codeVerifier;
     delete req.session.state;
+    delete req.session.sfRedirectUri;
 
     try {
-      const tokens   = await exchangeCodeForTokens(code, codeVerifier);
+      const tokens   = await exchangeCodeForTokens(code, codeVerifier, boundRedirectUri);
       const identity = await getUserIdentity(tokens.accessToken, tokens.instanceUrl);
 
       // Resolve Contact ID (003xxx) — sfUserId is a User record (005xxx),

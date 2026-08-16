@@ -55,10 +55,9 @@ export function generatePKCE(): { codeVerifier: string; codeChallenge: string } 
 
 // ── Authorization URL ─────────────────────────────────────────────────────────
 
-export function buildAuthorizationUrl(codeChallenge: string, state: string): string {
+export function buildAuthorizationUrl(codeChallenge: string, state: string, redirectUri: string): string {
   const instanceUrl  = requireEnv("SALESFORCE_INSTANCE_URL");
   const clientId     = requireEnv("SALESFORCE_CLIENT_ID");
-  const redirectUri  = requireEnv("SALESFORCE_CALLBACK_URL");
 
   const params = new URLSearchParams({
     response_type:         "code",
@@ -77,12 +76,12 @@ export function buildAuthorizationUrl(codeChallenge: string, state: string): str
 
 export async function exchangeCodeForTokens(
   code: string,
-  codeVerifier: string
+  codeVerifier: string,
+  redirectUri: string
 ): Promise<SalesforceTokenResponse> {
   const instanceUrl  = requireEnv("SALESFORCE_INSTANCE_URL");
   const clientId     = requireEnv("SALESFORCE_CLIENT_ID");
   const clientSecret = requireEnv("SALESFORCE_CLIENT_SECRET");
-  const redirectUri  = requireEnv("SALESFORCE_CALLBACK_URL");
 
   const body = new URLSearchParams({
     grant_type:    "authorization_code",
