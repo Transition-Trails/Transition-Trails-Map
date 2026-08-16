@@ -146,36 +146,29 @@ const USER_SCOPES = [
   "canvases:write",
 ].join(",");
 
-// ── In-memory state store (CSRF protection across the OAuth redirect) ─────────
-// Keyed by random state token.  Entries expire after 10 minutes.
+// ── OAuth state (CSRF protection across the OAuth redirect) ──────────────────
+// Stored on the user's session (shared Postgres store) so validation survives
+// autoscale / multi-instance deployments. Entries expire after 10 minutes.
 
-interface OAuthState {
-  email:         string;
-  returnPath:    string;
-  /** Exact callback URI captured at /authorize time — must match at token-exchange time. */
-  callbackUri:   string;
-  /** Base URL of the request origin captured at /authorize time — used for post-OAuth redirects. */
-  returnBaseUrl: string;
-  createdAt:     number;
-}
-const stateStore = new Map<string, OAuthState>();
 const STATE_TTL_MS = 10 * 60 * 1000;
-
-function cleanStateStore() {
-  const now = Date.now();
-  for (const [key, s] of stateStore) {
-    if (now - s.createdAt > STATE_TTL_MS) stateStore.delete(key);
-  }
-}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function getPublicBaseUrl(req: { headers: Record<string, string | string[] | undefined> }): string {
+  // Derive from the request first so each environment (production domain,
+  // dev preview) redirects back to ITSELF. A fixed env value once sent
+  // production users to a stale dev domain, which Slack rejected with
+  // redirect_uri mismatch.
+  const proto = ((req.headers["x-forwarded-proto"] as string | undefined) ?? "https").split(",")[0]!.trim();
+  const host  = ((req.headers["x-forwarded-host"] as string | undefined)
+              ?? (req.headers["host"] as string | undefined))?.split(",")[0]?.trim();
+  if (host && !host.startsWith("localhost") && !host.startsWith("127.")) {
+    return `${proto}://${host}`;
+  }
+  // Fallbacks for direct localhost access (curl / smoke tests) only.
   const devDomain = process.env["REPLIT_DEV_DOMAIN"];
   if (devDomain) return `https://${devDomain}`;
-  const proto = (req.headers["x-forwarded-proto"] as string | undefined) ?? "http";
-  const host  = (req.headers["host"] as string | undefined) ?? "localhost:8080";
-  return `${proto}://${host}`;
+  return `http://${host ?? "localhost:8080"}`;
 }
 
 function getCallbackUri(req: Parameters<typeof getPublicBaseUrl>[0]): string {
@@ -293,30 +286,36 @@ router.get("/slack/oauth/authorize", requireSlackAuth, (req, res) => {
     return;
   }
 
-  cleanStateStore();
-
   const state = crypto.randomBytes(20).toString("hex");
   const returnPath    = sanitizeReturnPath(req.query["return"] as string | undefined);
   const callbackUri   = getCallbackUri(req);
   const returnBaseUrl = getPublicBaseUrl(req);
 
-  // Persist both URIs in the state store so the callback uses the EXACT same
-  // values regardless of which host/protocol serves that request.
-  stateStore.set(state, { email, returnPath, callbackUri, returnBaseUrl, createdAt: Date.now() });
+  // Persist the state + both URIs in the SESSION (shared Postgres store) so the
+  // callback uses the EXACT same values and validation survives autoscale /
+  // multi-instance deployments — an in-memory map would be instance-local.
+  req.session.slackOAuth = { state, email, returnPath, callbackUri, returnBaseUrl, createdAt: Date.now() };
 
-  const params = new URLSearchParams({
-    client_id:    clientId,
-    user_scope:   USER_SCOPES,
-    redirect_uri: callbackUri,
-    state,
+  req.session.save((err) => {
+    if (err) {
+      req.log?.error({ err }, "Failed to save session before Slack redirect");
+      res.status(500).json({ error: "Session error — could not initiate Slack connection." });
+      return;
+    }
+    const params = new URLSearchParams({
+      client_id:    clientId,
+      user_scope:   USER_SCOPES,
+      redirect_uri: callbackUri,
+      state,
+    });
+    res.redirect(`https://slack.com/oauth/v2/authorize?${params.toString()}`);
   });
-
-  res.redirect(`https://slack.com/oauth/v2/authorize?${params.toString()}`);
 });
 
 // ── GET /slack/oauth/callback ─────────────────────────────────────────────────
-// PUBLIC PATH — added to index.ts allowlist.  Session may or may not be present;
-// we identify the user via the state store instead.
+// PUBLIC PATH — added to index.ts allowlist (no staff gate). The session
+// cookie still rides along on Slack's top-level GET redirect (sameSite lax);
+// we identify the user via the session-bound OAuth state.
 
 router.get("/slack/oauth/callback", async (req, res) => {
   const { code, state, error: oauthError } = req.query as Record<string, string | undefined>;
@@ -334,13 +333,13 @@ router.get("/slack/oauth/callback", async (req, res) => {
     return;
   }
 
-  // Validate state / CSRF
-  const stored = stateStore.get(state);
-  if (!stored) {
+  // Validate state / CSRF against the session-bound copy (shared PG store).
+  const stored = req.session.slackOAuth;
+  if (!stored || stored.state !== state || Date.now() - stored.createdAt > STATE_TTL_MS) {
     res.status(400).send("Invalid or expired OAuth state. Please try connecting again.");
     return;
   }
-  stateStore.delete(state);
+  delete req.session.slackOAuth;
 
   // Use the exact origins captured at authorize time — not re-derived here.
   const { email, returnPath, callbackUri, returnBaseUrl: baseUrl } = stored;

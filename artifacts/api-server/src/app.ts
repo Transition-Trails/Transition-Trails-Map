@@ -66,6 +66,9 @@ app.use(
     cookie: {
       httpOnly: true,
       secure:   process.env["NODE_ENV"] === "production",
+      // Explicit lax (rather than browser default) — OAuth callbacks are
+      // top-level cross-site GET redirects and must carry the session cookie.
+      sameSite: "lax",
       maxAge:   7 * 24 * 60 * 60 * 1000,
     },
   })

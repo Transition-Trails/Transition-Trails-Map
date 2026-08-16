@@ -32,6 +32,18 @@ declare module "express-session" {
     /** Redirect URI bound to the in-flight Salesforce OAuth transaction. */
     sfRedirectUri?:  string;
 
+    /** In-flight Slack OAuth transaction (CSRF state + exact URIs). */
+    slackOAuth?: {
+      state:         string;
+      email:         string;
+      returnPath:    string;
+      /** Exact callback URI captured at /authorize time — must match at token-exchange time. */
+      callbackUri:   string;
+      /** Base URL of the request origin captured at /authorize time — used for post-OAuth redirects. */
+      returnBaseUrl: string;
+      createdAt:     number;
+    };
+
     // ── Homebase audience ─────────────────────────────────────────────────
     /**
      * Set when a signed-in user belongs to a homebase group (learner/coach/volunteer).
