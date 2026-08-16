@@ -1492,6 +1492,19 @@ export function SlimSlackPanel({ open, onToggle, returnPath }: SlimSlackPanelPro
     checkStatus();
   }, [checkStatus]);
 
+  // Listen for the OAuth popup's completion message — the callback page
+  // postMessages the opener and closes itself, so the panel refreshes in
+  // place without the main tab ever navigating.
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin) return;
+      const data = e.data as { type?: string; status?: string } | null;
+      if (data?.type === "slack-oauth") checkStatus();
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [checkStatus]);
+
   // Listen for OAuth callback return — the URL will have ?slackOAuth=connected
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

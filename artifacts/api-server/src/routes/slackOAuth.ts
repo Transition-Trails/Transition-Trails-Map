@@ -317,6 +317,55 @@ router.get("/slack/oauth/authorize", requireSlackAuth, (req, res) => {
 // cookie still rides along on Slack's top-level GET redirect (sameSite lax);
 // we identify the user via the session-bound OAuth state.
 
+/**
+ * Finish the OAuth popup flow: render a tiny page that notifies the opener
+ * window (so the panel in the main tab refreshes in place) and closes itself.
+ * If the flow was NOT opened as a popup (no opener), fall back to redirecting
+ * into the app with the legacy ?slackOAuth= query param.
+ */
+/** JSON-serialize a value safely for embedding inside an inline <script> block. */
+function scriptSafeJson(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
+function finishOAuthPopup(
+  res: Parameters<Parameters<typeof router.get>[1]>[1],
+  baseUrl: string,
+  returnPath: string,
+  status: "connected" | "cancelled" | "error",
+  errCode?: string,
+): void {
+  const fallbackUrl = `${baseUrl}${returnPath}?slackOAuth=${status}${errCode ? `&code=${encodeURIComponent(errCode)}` : ""}`;
+  const html = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Slack ${status === "connected" ? "connected" : "authorization"}</title></head>
+<body style="font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:#444">
+  <p>${status === "connected" ? "Slack connected — you can close this window." : "You can close this window."}</p>
+  <script>
+    (function () {
+      var payload = { type: "slack-oauth", status: ${scriptSafeJson(status)}, code: ${scriptSafeJson(errCode ?? null)} };
+      var target  = ${scriptSafeJson(baseUrl)};
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage(payload, target);
+          setTimeout(function () { try { window.close(); } catch (_) {} }, 400);
+          return;
+        }
+      } catch (_) {}
+      // Not a popup (or opener gone) — fall back to a normal redirect.
+      window.location.replace(${scriptSafeJson(fallbackUrl)});
+    })();
+  </script>
+</body>
+</html>`;
+  res.status(200).type("html").send(html);
+}
+
 router.get("/slack/oauth/callback", async (req, res) => {
   const { code, state, error: oauthError } = req.query as Record<string, string | undefined>;
 
@@ -324,7 +373,7 @@ router.get("/slack/oauth/callback", async (req, res) => {
   // to the request origin for the redirect target only if state is absent.
   if (oauthError && !state) {
     const fallbackBase = getPublicBaseUrl(req);
-    res.redirect(`${fallbackBase}/?slackOAuth=cancelled`);
+    finishOAuthPopup(res, fallbackBase, "/", "cancelled");
     return;
   }
 
@@ -346,14 +395,14 @@ router.get("/slack/oauth/callback", async (req, res) => {
 
   // Handle user-cancelled with a valid state (preferred path — origin is known)
   if (oauthError) {
-    res.redirect(`${baseUrl}${returnPath}?slackOAuth=cancelled`);
+    finishOAuthPopup(res, baseUrl, returnPath, "cancelled");
     return;
   }
 
   const clientId     = process.env["SLACK_CLIENT_ID"];
   const clientSecret = process.env["SLACK_CLIENT_SECRET"];
   if (!clientId || !clientSecret) {
-    res.status(503).send("Slack client credentials not configured.");
+    finishOAuthPopup(res, baseUrl, returnPath, "error", "not_configured");
     return;
   }
 
@@ -372,14 +421,14 @@ router.get("/slack/oauth/callback", async (req, res) => {
     });
     tokenData = (await tokenRes.json()) as Record<string, unknown>;
   } catch {
-    res.status(502).send("Failed to contact Slack token endpoint.");
+    finishOAuthPopup(res, baseUrl, returnPath, "error", "token_endpoint_unreachable");
     return;
   }
 
   if (tokenData["ok"] !== true) {
     const errCode = String(tokenData["error"] ?? "unknown");
     req.log?.warn({ errCode }, "slack oauth token exchange failed");
-    res.redirect(`${baseUrl}${returnPath}?slackOAuth=error&code=${errCode}`);
+    finishOAuthPopup(res, baseUrl, returnPath, "error", errCode);
     return;
   }
 
@@ -403,7 +452,7 @@ router.get("/slack/oauth/callback", async (req, res) => {
       { hasUserToken: !!finalToken, hasUserId: !!finalUserId, hasTeamId: !!teamId },
       "slack oauth: token exchange succeeded but required fields absent",
     );
-    res.redirect(`${baseUrl}${returnPath}?slackOAuth=error&code=missing_token_fields`);
+    finishOAuthPopup(res, baseUrl, returnPath, "error", "missing_token_fields");
     return;
   }
 
@@ -435,7 +484,7 @@ router.get("/slack/oauth/callback", async (req, res) => {
       });
   } catch (err) {
     req.log?.error({ err }, "slack oauth DB upsert failed");
-    res.redirect(`${baseUrl}${returnPath}?slackOAuth=error&code=db_error`);
+    finishOAuthPopup(res, baseUrl, returnPath, "error", "db_error");
     return;
   }
 
@@ -443,7 +492,7 @@ router.get("/slack/oauth/callback", async (req, res) => {
   // new workspace and the cached channel list would belong to the previous one.
   convCache.delete(email);
 
-  res.redirect(`${baseUrl}${returnPath}?slackOAuth=connected`);
+  finishOAuthPopup(res, baseUrl, returnPath, "connected");
 });
 
 // ── GET /slack/oauth/status ───────────────────────────────────────────────────
