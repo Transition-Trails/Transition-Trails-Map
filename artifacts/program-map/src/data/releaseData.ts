@@ -25,7 +25,7 @@ export interface Release {
 export const RELEASES: Release[] = [
   {
     version: "1.9",
-    date: "August 15, 2026",
+    date: "August 16, 2026",
     label: "Current",
     entries: [
       { kind: "major", text: "Content Studio launched — a full content production hub with seven tabs: Topic (family card + 12-week coverage grid), Content Item (three-column workspace with production stations and publications table), Build With Me (production pipeline with a real scannable QR code), Trail Crew, Catalog, Penny Desk, and Pipeline (kanban board, stat cards, and a publication gaps matrix across YouTube / LinkedIn / Substack / Website / Instagram)." },
@@ -34,6 +34,10 @@ export const RELEASES: Release[] = [
       { kind: "major", text: "Automatic Salesforce Knowledge article background sync — security-hardened sync job with interactive auto-sync settings in the SF Articles toolbar; last-synced time is stored in the database so the toolbar stays accurate after a server restart." },
       { kind: "major", text: "Google sign-in on the published app fixed — the server now recognizes it is behind the deployment's HTTPS proxy, so the secure session cookie is set correctly and sign-in completes reliably across all autoscale instances." },
       { kind: "minor", text: "Sign-in security hardened — the OAuth state is now HMAC-signed with a 10-minute expiry, single-use, and bound to the browser that started sign-in; expired links show a clear 'Sign-in took too long' message." },
+      { kind: "minor", text: "Connecting Slack now finishes in a small popup that closes itself — the main tab updates instantly without a full page reload, and cancelling or a Slack-side error is reported cleanly back to the page you were on." },
+      { kind: "fix",   text: "Salesforce reconnect fixed on the published app — the 'Invalid or expired OAuth session' error was caused by the callback pointing at the development server; the callback URL is now derived from the site you're actually on." },
+      { kind: "fix",   text: "Slack connect fixed on the published app — the 'redirect_uri did not match' error had the same root cause; the Slack flow now uses the live site's own address and keeps its sign-in state in the shared session store so it works across all server instances." },
+      { kind: "fix",   text: "Slack panel indicator dots now use the brand's success green from the design system instead of grey, so unread and presence indicators are easier to spot." },
       { kind: "minor", text: "GSC case enforcement — Get Support Cases flow enforced end-to-end with local-save → retry → Salesforce sync, and the linked Service Contract name now shows in the submitted cases list." },
       { kind: "minor", text: "Content Studio stage rail is interactive — Mark done advances the current stage, a Published banner appears on completion, and the publications table updates status live. Narrator voice choice is saved to the database so it roams across browsers and survives restarts." },
       { kind: "minor", text: "Assessment question bank page added, with coach overview reporting aggregate-only stats." },

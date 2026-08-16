@@ -5,7 +5,7 @@ Dates are in `MMMM D, YYYY` format. Versions follow semantic versioning conventi
 
 ---
 
-## [1.9] — August 15, 2026
+## [1.9] — August 16, 2026
 
 ### Added
 - **Content Studio** — new content production hub with seven tabs: Topic (family card + 12-week coverage grid), Content Item (three-column workspace with production stations and publications table), Build With Me (full production pipeline UI with a real scannable QR code via `qrcode-generator`), Trail Crew, Catalog, Penny Desk, and Pipeline (advisory strip, stat cards, kanban board, and a publication gaps matrix across YouTube / LinkedIn / Substack / Website / Instagram). Stage rail is interactive — Mark done advances the current stage, a Published banner appears on completion, and the publications table updates live.
@@ -15,12 +15,16 @@ Dates are in `MMMM D, YYYY` format. Versions follow semantic versioning conventi
 - **GSC case enforcement** — Get Support Cases flow enforced end-to-end with local-save → retry → Salesforce sync (verified by a dedicated test suite); linked Service Contract name shown in the submitted cases list.
 - **Assessment question bank page** — plus coach overview now returns aggregate-only stats.
 - Narrator voice choice moved from localStorage to the database — roams across browsers and survives restarts; the Narrate stage rail reflects the saved choice automatically.
+- **Slack popup connect flow** — connecting Slack now completes in a small popup that closes itself and notifies the opening tab via a secure, origin-checked message; the panel refreshes instantly without a full page reload. All terminal paths (connected, cancelled, and Slack-side errors) route through the same self-closing completion page, with a legacy redirect fallback when no opener window exists.
 
 ### Security
 - **Google sign-in fixed on the published app** — `trust proxy` enabled so Express recognizes Replit's TLS-terminating proxy; the secure session cookie is now set in production, ending the universal `state_mismatch` ("Sign-in session expired") failure.
 - **OAuth state hardened** — the sign-in state parameter is now HMAC-signed (SESSION_SECRET) with a 10-minute expiry and timing-safe verification, single-use, and strictly bound to the session that initiated sign-in (login-CSRF protection); sessions live in the shared PostgreSQL store, so validation works across all autoscale instances. Expired links show a distinct "Sign-in took too long" message.
 
 ### Fixed
+- **Salesforce reconnect on the published app** — "Invalid or expired OAuth session" was caused by a callback URL pinned to the development domain; the redirect URI is now derived from the request's forwarded headers and bound to the OAuth transaction in the session, so authorize and token exchange always use the byte-identical URI for whichever environment initiated the flow.
+- **Slack connect on the published app** — "redirect_uri did not match" had the same root cause (base URL preferred the dev domain); the Slack flow now derives its public base URL from request headers first and stores OAuth state in the shared PostgreSQL session store (replacing an in-memory map), making it safe across autoscale instances.
+- Slack panel unread and presence indicator dots now use the design system's success green (shared status color tokens) instead of grey/hardcoded colors.
 - SF-synced article edit/publish round-trip repaired — normalization, reconciliation, version selection, body alignment, body-null guard, and pagination; in-review article bodies preserved through a full sync cycle (covered by tests).
 - Duplicate SF article no longer created when the org rejects `KnowledgeArticleId` linking; SF-origin badge shown on synced articles in the Article Studio list.
 - Case validation error handling added with a supporting test suite.
